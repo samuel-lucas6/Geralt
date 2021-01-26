@@ -27,22 +27,23 @@ using System.Text;
 namespace Geralt
 {
     /// <summary>Hashing using SHA2.</summary>
+    /// <remarks>See here for more information: https://doc.libsodium.org/advanced/sha-2_hash_function </remarks>
     public class SHA2
     {
         private const int _sha512Bytes = 64;
         private const int _sha256Bytes = 32;
 
-        /// <summary>Hashes a string using the default algorithm.</summary>
+        /// <summary>Hashes a string using SHA512.</summary>
         /// <param name="message">The message.</param>
-        /// <returns>The hash of the message.</returns>
+        /// <returns>A 64 byte hash.</returns>
         public static byte[] Hash(string message)
         {
             return Hash(Encoding.UTF8.GetBytes(message));
         }
 
-        /// <summary>Hashes a byte array using the default algorithm.</summary>
+        /// <summary>Hashes a byte array using SHA512.</summary>
         /// <param name="message">The message.</param>
-        /// <returns>The hash of the message.</returns>
+        /// <returns>A 64 byte hash.</returns>
         public static byte[] Hash(byte[] message)
         {
             byte[] hash = new byte[_sha512Bytes];
@@ -50,17 +51,17 @@ namespace Geralt
             return hash;
         }
 
-        /// <summary>Hashes a string using the SHA512 algorithm.</summary>
+        /// <summary>Hashes a string using SHA512.</summary>
         /// <param name="message">The message.</param>
-        /// <returns>The hash of the message.</returns>
+        /// <returns>A 64 byte hash.</returns>
         public static byte[] Sha512(string message)
         {
             return Sha512(Encoding.UTF8.GetBytes(message));
         }
 
-        /// <summary>Hashes a byte array using the SHA512 algorithm.</summary>
+        /// <summary>Hashes a byte array using SHA512.</summary>
         /// <param name="message">The message.</param>
-        /// <returns>The hash of the message.</returns>
+        /// <returns>A 64 byte hash.</returns>
         public static byte[] Sha512(byte[] message)
         {
             byte[] hash = new byte[_sha512Bytes];
@@ -68,17 +69,17 @@ namespace Geralt
             return hash;
         }
 
-        /// <summary>Hashes a string using the SHA256 algorithm.</summary>
+        /// <summary>Hashes a string using SHA256.</summary>
         /// <param name="message">The message.</param>
-        /// <returns>The hash of the message.</returns>
+        /// <returns>A 32 byte hash.</returns>
         public static byte[] Sha256(string message)
         {
             return Sha256(Encoding.UTF8.GetBytes(message));
         }
 
-        /// <summary>Hashes a byte array using the SHA256 algorithm.</summary>
+        /// <summary>Hashes a byte array using SHA256.</summary>
         /// <param name="message">The message.</param>
-        /// <returns>The hash of the message.</returns>
+        /// <returns>A 32 byte hash.</returns>
         public static byte[] Sha256(byte[] message)
         {
             byte[] hash = new byte[_sha256Bytes];
