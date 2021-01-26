@@ -50,5 +50,50 @@ namespace Geralt
                 throw new KeyOutOfRangeException(nameof(key), (key == null) ? 0 : key.Length, $"Key must be {validKeyLength} bytes in length.");
             }
         }
+
+        public static void Key(byte[] key, int minimumKeyLength, int maxKeyLength)
+        {
+            if (key != null && (key.Length < minimumKeyLength || key.Length > maxKeyLength))
+            {
+                throw new KeyOutOfRangeException($"Key must be between {minimumKeyLength} and {maxKeyLength} bytes in length.");
+            }
+        }
+
+        public static byte[] Key(byte[] key)
+        {
+            return key ?? Array.Empty<byte>();
+        }
+
+        public static void Salt(byte[] salt, int validSaltLength)
+        {
+            if (salt == null || salt.Length != validSaltLength)
+            {
+                throw new SaltOutOfRangeException($"Salt must be {validSaltLength} bytes in length.");
+            }
+        }
+
+        public static void Personal(byte[] personal, int validPersonalLength)
+        {
+            if (personal == null || personal.Length != validPersonalLength)
+            {
+                throw new PersonalOutOfRangeException($"Personal must be {validPersonalLength} bytes in length.");
+            }
+        }
+
+        public static void Message(byte[] message)
+        {
+            if (message == null)
+            {
+                throw new ArgumentNullException(nameof(message), "Message cannot be null.");
+            }
+        }
+
+        public static void OutputLength(int bytes, int minimumOutputBytes, int maximumOutputBytes)
+        {
+            if (bytes < minimumOutputBytes || bytes > maximumOutputBytes)
+            {
+                throw new BytesOutOfRangeException(nameof(bytes), bytes, $"Bytes must be between {minimumOutputBytes} and {maximumOutputBytes} bytes in length.");
+            }
+        }
     }
 }

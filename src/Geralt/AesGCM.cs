@@ -29,7 +29,7 @@ using Geralt.Exceptions;
 
 namespace Geralt
 {
-    /// <summary>Authenticated Encryption with Additional Data using AES-GCM.
+    /// <summary>Authenticated encryption with additional data using AES-GCM.
     /// Only supported on modern x86/x64 processors.</summary>
     /// <remarks>See here for more information: https://doc.libsodium.org/secret-key_cryptography/aead/aes-256-gcm </remarks>
     public static class AesGCM
