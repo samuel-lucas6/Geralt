@@ -1,4 +1,4 @@
-/*
+﻿/*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
     Copyright (c) 2021 Samuel Lucas
     Copyright (c) 2017-2020 tabrath
@@ -24,28 +24,24 @@
 
 namespace Geralt
 {
-    /// <summary>A ciphertext / mac pair.</summary>
-    public class DetachedBox
+    public static class SecureRandom
     {
-        /// <summary>Initializes a new instance of the <see cref="DetachedBox"/> class.</summary>
-        public DetachedBox()
+        /// <summary>Gets random bytes.</summary>
+        /// <param name="count">The number of bytes to return.</param>
+        /// <returns>An array of random bytes.</returns>
+        public static byte[] GetBytes(int count)
         {
-            // Do nothing
+            byte[] randomBytes = new byte[count];
+            LibsodiumLibrary.randombytes_buf(randomBytes, count);
+            return randomBytes;
         }
 
-        /// <summary>Gets or sets the ciphertext.</summary>
-        public byte[] Ciphertext { get; set; }
-
-        /// <summary>Gets or sets the message authentication code.</summary>
-        public byte[] Tag { get; set; }
-
-        /// <summary>Initializes a new instance of the <see cref="DetachedBox"/> class.</summary>
-        /// <param name="ciphertext">The ciphertext.</param>
-        /// <param name="tag">The 16 byte message authentication code.</param>
-        public DetachedBox(byte[] ciphertext, byte[] tag)
+        /// <summary>Gets a random number.</summary>
+        /// <param name="upperBound">An integer between 0 and 2147483647.</param>
+        /// <returns>An unpredictable value between 0 and upperBound (excluded).</returns>
+        public static int GetNumber(int upperBound)
         {
-            Ciphertext = ciphertext;
-            Tag = tag;
+            return LibsodiumLibrary.randombytes_uniform(upperBound);
         }
     }
 }

@@ -42,28 +42,28 @@ namespace Geralt
         /// <returns>Returns a byte array with 32 random bytes</returns>
         public static byte[] GenerateKey()
         {
-            return GeraltCore.GetRandomBytes(XSALSA20_KEY_BYTES);
+            return SecureRandom.GetBytes(XSALSA20_KEY_BYTES);
         }
 
         /// <summary>Generates a random 24 byte nonce.</summary>
         /// <returns>Returns a byte array with 24 random bytes</returns>
         public static byte[] GenerateNonce()
         {
-            return GeraltCore.GetRandomBytes(XSALSA20_NONCE_BYTES);
+            return SecureRandom.GetBytes(XSALSA20_NONCE_BYTES);
         }
 
         /// <summary>Generates a random 24 byte nonce.</summary>
         /// <returns>Returns a byte array with 24 random bytes</returns>
         public static byte[] GenerateNonceChaCha20()
         {
-            return GeraltCore.GetRandomBytes(CHACHA20_NONCEBYTES);
+            return SecureRandom.GetBytes(CHACHA20_NONCEBYTES);
         }
 
         /// <summary>Generates a random 8 byte nonce.</summary>
         /// <returns>Returns a byte array with 8 random bytes</returns>
         public static byte[] GenerateNonceXChaCha20()
         {
-            return GeraltCore.GetRandomBytes(XCHACHA20_NONCEBYTES);
+            return SecureRandom.GetBytes(XCHACHA20_NONCEBYTES);
         }
 
 

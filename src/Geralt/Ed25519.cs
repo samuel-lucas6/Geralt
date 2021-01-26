@@ -29,7 +29,7 @@ using Geralt.Exceptions;
 
 namespace Geralt
 {
-    /// <summary>Public-key signatures</summary>
+    /// <summary>Public key signatures</summary>
     public static class Ed25519
     {
         private const int SECRET_KEY_BYTES = 64;

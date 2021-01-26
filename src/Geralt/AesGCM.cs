@@ -43,7 +43,7 @@ namespace Geralt
         /// <remarks><see cref="ChaCha20Poly1305"/> is recommended.</remarks>
         public static bool IsAvailable()
         {
-            GeraltCore.Init();
+            GeraltCore.InitialiseLibsodium();
             return LibsodiumLibrary.crypto_aead_aes256gcm_is_available() != 0;
         }
 
@@ -51,14 +51,14 @@ namespace Geralt
         /// <returns>A byte array with 32 random bytes.</returns>
         public static byte[] GenerateKey()
         {
-            return GeraltCore.GetRandomBytes(_keyBytes);
+            return SecureRandom.GetBytes(_keyBytes);
         }
 
         /// <summary>Generates a random 12 byte nonce.</summary>
         /// <returns>A byte array with 12 random bytes.</returns>
         public static byte[] GenerateNonce()
         {
-            return GeraltCore.GetRandomBytes(_nonceBytes);
+            return SecureRandom.GetBytes(_nonceBytes);
         }
 
         /// <summary>Encrypts a message using AES-GCM.</summary>

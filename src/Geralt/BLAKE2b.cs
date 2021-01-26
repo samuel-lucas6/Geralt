@@ -44,7 +44,7 @@ namespace Geralt
         /// <returns>A byte array with 64 random bytes.</returns>
         public static byte[] GenerateKey()
         {
-            return GeraltCore.GetRandomBytes(_maxKeyBytes);
+            return SecureRandom.GetBytes(_maxKeyBytes);
         }
 
         /// <summary>Hashes a message with an optional key using BLAKE2b.</summary>
@@ -80,8 +80,7 @@ namespace Geralt
         /// <exception cref="BytesOutOfRangeException"></exception>
         public static byte[] Hash(byte[] message, byte[] key, int bytes)
         {
-            key = ParameterValidation.Key(key);
-            ParameterValidation.Key(key, _minKeyBytes, _maxKeyBytes);
+            key = ParameterValidation.Key(key, _minKeyBytes, _maxKeyBytes);
             ParameterValidation.OutputLength(bytes, _minOutputBytes, _maxOutputBytes);
             byte[] hash = new byte[bytes];
             _ = LibsodiumLibrary.crypto_generichash(hash, hash.Length, message, message.Length, key, key.Length);
@@ -122,8 +121,7 @@ namespace Geralt
             ParameterValidation.Message(message);
             ParameterValidation.Salt(salt, _saltBytes);
             ParameterValidation.Personal(personal, _personalBytes);
-            key = ParameterValidation.Key(key);
-            ParameterValidation.Key(key, _minKeyBytes, _maxKeyBytes);
+            key = ParameterValidation.Key(key, _minKeyBytes, _maxKeyBytes);
             ParameterValidation.OutputLength(bytes, _minOutputBytes, _maxOutputBytes);
             byte[] hash = new byte[bytes];
             _ = LibsodiumLibrary.crypto_generichash_blake2b_salt_personal(hash, hash.Length, message, message.Length, key, key.Length, salt, personal);

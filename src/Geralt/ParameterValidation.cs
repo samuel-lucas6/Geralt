@@ -51,17 +51,29 @@ namespace Geralt
             }
         }
 
-        public static void Key(byte[] key, int minimumKeyLength, int maxKeyLength)
+        public static byte[] Key(byte[] key, int minimumKeyLength, int maxKeyLength)
         {
             if (key != null && (key.Length < minimumKeyLength || key.Length > maxKeyLength))
             {
                 throw new KeyOutOfRangeException($"Key must be between {minimumKeyLength} and {maxKeyLength} bytes in length.");
             }
+            return key ?? Array.Empty<byte>();
         }
 
-        public static byte[] Key(byte[] key)
+        public static void PrivateKey(byte[] privateKey, int validPrivateKeyLength)
         {
-            return key ?? Array.Empty<byte>();
+            if (privateKey == null || privateKey.Length != validPrivateKeyLength)
+            {
+                throw new KeyOutOfRangeException(nameof(privateKey), (privateKey == null) ? 0 : privateKey.Length, $"Private key must be {validPrivateKeyLength} bytes in length.");
+            }
+        }
+
+        public static void PublicKey(byte[] publicKey, int validPublicKeyLength)
+        {
+            if (publicKey == null || publicKey.Length != validPublicKeyLength)
+            {
+                throw new KeyOutOfRangeException(nameof(publicKey), (publicKey == null) ? 0 : publicKey.Length, $"Public key must be {validPublicKeyLength} bytes in length.");
+            }
         }
 
         public static void Salt(byte[] salt, int validSaltLength)
@@ -93,6 +105,14 @@ namespace Geralt
             if (bytes < minimumOutputBytes || bytes > maximumOutputBytes)
             {
                 throw new BytesOutOfRangeException(nameof(bytes), bytes, $"Bytes must be between {minimumOutputBytes} and {maximumOutputBytes} bytes in length.");
+            }
+        }
+
+        public static void Signature(byte[] signature, int validSignatureLength)
+        {
+            if (signature == null || signature.Length != validSignatureLength)
+            {
+                throw new SignatureOutOfRangeException(nameof(signature), (signature == null) ? 0 : signature.Length, $"Signature must be {validSignatureLength} bytes in length.");
             }
         }
     }

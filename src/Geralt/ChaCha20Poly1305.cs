@@ -42,7 +42,7 @@ namespace Geralt
         /// <returns>Returns a byte array with 8 random bytes.</returns>
         public static byte[] GenerateNonce()
         {
-            return GeraltCore.GetRandomBytes(NPUBBYTES);
+            return SecureRandom.GetBytes(NPUBBYTES);
         }
 
         /// <summary>

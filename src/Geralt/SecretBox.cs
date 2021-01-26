@@ -40,14 +40,14 @@ namespace Geralt
         /// <returns>Returns a byte array with 32 random bytes</returns>
         public static byte[] GenerateKey()
         {
-            return GeraltCore.GetRandomBytes(KEY_BYTES);
+            return SecureRandom.GetBytes(KEY_BYTES);
         }
 
         /// <summary>Generates a random 24 byte nonce.</summary>
         /// <returns>Returns a byte array with 24 random bytes</returns>
         public static byte[] GenerateNonce()
         {
-            return GeraltCore.GetRandomBytes(NONCE_BYTES);
+            return SecureRandom.GetBytes(NONCE_BYTES);
         }
 
         /// <summary>Creates a Secret Box</summary>
@@ -228,7 +228,7 @@ namespace Geralt
         /// <exception cref="CryptographicException"></exception>
         public static byte[] OpenDetached(DetachedBox detached, byte[] nonce, byte[] key)
         {
-            return OpenDetached(detached.CipherText, detached.Mac, nonce, key);
+            return OpenDetached(detached.Ciphertext, detached.Tag, nonce, key);
         }
 
         /// <summary>Opens a detached Secret Box</summary>

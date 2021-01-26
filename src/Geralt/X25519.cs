@@ -32,7 +32,7 @@ namespace Geralt
     {
         private const int _keyBytes = 32;
 
-        /// <summary>Compute a public key from a private key.</summary>
+        /// <summary>Computes a public key from a private key.</summary>
         /// <param name="privateKey">A private key.</param>
         /// <returns>The computed public key.</returns>
         /// <exception cref="KeyOutOfRangeException"></exception>
@@ -44,7 +44,7 @@ namespace Geralt
             return publicKey;
         }
 
-        /// <summary>Compute a shared secret from a private key and public key.</summary>
+        /// <summary>Computes a shared secret from a private key and public key.</summary>
         /// <param name="privateKey">A private key.</param>
         /// <param name="publicKey">A public key.</param>
         /// <returns>The computed shared secret.</returns>

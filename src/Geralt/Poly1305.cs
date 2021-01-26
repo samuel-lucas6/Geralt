@@ -38,7 +38,7 @@ namespace Geralt
         /// <returns>A byte array with 32 random bytes</returns>
         public static byte[] GenerateKey()
         {
-            return GeraltCore.GetRandomBytes(_keyBytes);
+            return SecureRandom.GetBytes(_keyBytes);
         }
 
         /// <summary>Computes the message authentication code of a message using Poly1305.</summary>

@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.InteropServices;
 
 /*
@@ -26,63 +27,33 @@ using System.Runtime.InteropServices;
 
 namespace Geralt
 {
-    /// <summary>
-    /// libsodium core information.
-    /// </summary>
+    /// <summary>Libsodium information.</summary>
     public static class GeraltCore
     {
-        private static bool _isInit;
+        private static bool _isInitialised;
 
         static GeraltCore()
         {
-            Init();
-        }
-
-        /// <summary>Gets random bytes</summary>
-        /// <param name="count">The count of bytes to return.</param>
-        /// <returns>An array of random bytes.</returns>
-        public static byte[] GetRandomBytes(int count)
-        {
-            var buffer = new byte[count];
-            LibsodiumLibrary.randombytes_buf(buffer, count);
-
-            return buffer;
-        }
-
-        /// <summary>
-        /// Gets a random number.
-        /// </summary>
-        /// <param name="upperBound">Integer between 0 and 2147483647.</param>
-        /// <returns>An unpredictable value between 0 and upperBound (excluded).</returns>
-        public static int GetRandomNumber(int upperBound)
-        {
-            var randomNumber = LibsodiumLibrary.randombytes_uniform(upperBound);
-
-            return randomNumber;
-        }
-
-        /// <summary>
-        /// Returns the version of libsodium in use.
-        /// </summary>
-        /// <returns>
-        /// The sodium version string.
-        /// </returns>
-        public static string SodiumVersionString()
-        {
-            var ptr = LibsodiumLibrary.sodium_version_string();
-
-            return Marshal.PtrToStringAnsi(ptr);
+            InitialiseLibsodium();
         }
 
         /// <summary>Initialize libsodium.</summary>
-        /// <remarks>This only needs to be done once, so this prevents repeated calls.</remarks>
-        public static void Init()
+        /// <remarks>This only needs to be done once. This method prevents repeated calls.</remarks>
+        public static void InitialiseLibsodium()
         {
-            if (!_isInit)
+            if (!_isInitialised)
             {
                 LibsodiumLibrary.sodium_init();
-                _isInit = true;
+                _isInitialised = true;
             }
+        }
+
+        /// <summary>Get the version of libsodium being used.</summary>
+        /// <returns>The libsodium version.</returns>
+        public static string GetLibsodiumVersion()
+        {
+            IntPtr versionPointer = LibsodiumLibrary.sodium_version_string();
+            return Marshal.PtrToStringAnsi(versionPointer);
         }
     }
 }

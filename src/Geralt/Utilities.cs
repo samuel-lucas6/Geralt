@@ -142,19 +142,19 @@ namespace Geralt
             const string ignoredCharacters = ":- ";
             byte[] decodedHex = new byte[hex.Length >> 1];
             IntPtr binaryPointer = Marshal.AllocHGlobal(decodedHex.Length);
-            int result = LibsodiumLibrary.sodium_hex2bin(binaryPointer, decodedHex.Length, hex, hex.Length, ignoredCharacters, out int binaryLength, hexEnd: null);
-            Marshal.Copy(binaryPointer, decodedHex, startIndex: 0, binaryLength);
+            int result = LibsodiumLibrary.sodium_hex2bin(binaryPointer, decodedHex.Length, hex, hex.Length, ignoredCharacters, out int decodedHexLength, hexEnd: null);
+            Marshal.Copy(binaryPointer, decodedHex, startIndex: 0, decodedHexLength);
             Marshal.FreeHGlobal(binaryPointer);
             if (result != 0)
             {
                 throw new FormatException(_decodingFailedError);
             }
             // Remove the trailing nulls from the array if there were some format characters in the hex string before
-            if (decodedHex.Length != binaryLength)
+            if (decodedHex.Length != decodedHexLength)
             {
-                byte[] binaryWithoutPadding = new byte[binaryLength];
-                Array.Copy(decodedHex, binaryWithoutPadding, binaryLength);
-                return binaryWithoutPadding;
+                byte[] decodedHexWithoutPadding = new byte[decodedHexLength];
+                Array.Copy(decodedHex, decodedHexWithoutPadding, decodedHexLength);
+                return decodedHexWithoutPadding;
             }
             return decodedHex;
         }

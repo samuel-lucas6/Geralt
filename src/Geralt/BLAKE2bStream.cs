@@ -32,85 +32,57 @@ namespace Geralt
 {
     public partial class BLAKE2b
     {
-        /// <summary>BLAKE2b for hashing streams.</summary>
+        /// <summary>Hashing streams using BLAKE2b.</summary>
+        /// <remarks>See here for more information: https://doc.libsodium.org/hashing/generic_hashing </remarks>
         public class GenericHashAlgorithm : HashAlgorithm
         {
-            private IntPtr hashStatePtr;
-            private byte[] key;
-            private int bytes;
+            private IntPtr HashStatePointer { get; set; }
+            private byte[] Key { get; set; }
+            private int Bytes { get; set; }
 
-            /// <summary>
-            /// Initializes the hashing algorithm.
-            /// </summary>
-            /// <param name="key">The key; may be null, otherwise between 16 and 64 bytes.</param>
-            /// <param name="bytes">The size (in bytes) of the desired result.</param>
+            /// <summary>Initializes the hashing algorithm.</summary>
+            /// <param name="key">The key - may be null; otherwise, between 16 and 64 bytes.</param>
+            /// <param name="bytes">The size (in bytes) of the desired output.</param>
             /// <exception cref="KeyOutOfRangeException"></exception>
             /// <exception cref="BytesOutOfRangeException"></exception>
             public GenericHashAlgorithm(string key, int bytes) : this(Encoding.UTF8.GetBytes(key), bytes) { }
 
-            /// <summary>
-            /// Initializes the hashing algorithm.
-            /// </summary>
-            /// <param name="key">The key; may be null, otherwise between 16 and 64 bytes.</param>
-            /// <param name="bytes">The size (in bytes) of the desired result.</param>
+            /// <summary>Initializes the hashing algorithm.</summary>
+            /// <param name="key">The key - may be null; otherwise, between 16 and 64 bytes.</param>
+            /// <param name="bytes">The size (in bytes) of the desired output.</param>
             /// <exception cref="KeyOutOfRangeException"></exception>
             /// <exception cref="BytesOutOfRangeException"></exception>
             public GenericHashAlgorithm(byte[] key, int bytes)
             {
-                this.hashStatePtr = Marshal.AllocHGlobal(Marshal.SizeOf<LibsodiumLibrary.HashState>());
-
-                //validate the length of the key
-                int keyLength;
-                if (key != null)
-                {
-                    if (key.Length > KEY_BYTES_MAX || key.Length < KEY_BYTES_MIN)
-                    {
-                        throw new KeyOutOfRangeException(string.Format("key must be between {0} and {1} bytes in length.",
-                          KEY_BYTES_MIN, KEY_BYTES_MAX));
-                    }
-
-                    keyLength = key.Length;
-                }
-                else
-                {
-                    key = new byte[0];
-                    keyLength = 0;
-                }
-
-                this.key = key;
-
-                //validate output length
-                if (bytes > BYTES_MAX || bytes < BYTES_MIN)
-                    throw new BytesOutOfRangeException("bytes", bytes,
-                      string.Format("bytes must be between {0} and {1} bytes in length.", BYTES_MIN, BYTES_MAX));
-
-                this.bytes = bytes;
-
+                HashStatePointer = Marshal.AllocHGlobal(Marshal.SizeOf<LibsodiumLibrary.HashState>());
+                Key = ParameterValidation.Key(key, _minKeyBytes, _maxKeyBytes);
+                ParameterValidation.OutputLength(bytes, _minOutputBytes, _maxOutputBytes);
+                Bytes = bytes;
                 Initialize();
             }
 
             ~GenericHashAlgorithm()
             {
-                Marshal.FreeHGlobal(hashStatePtr);
+                Marshal.FreeHGlobal(HashStatePointer);
             }
 
             override public void Initialize()
             {
-                LibsodiumLibrary.crypto_generichash_init(hashStatePtr, key, key.Length, bytes);
+                _ = LibsodiumLibrary.crypto_generichash_init(HashStatePointer, Key, Key.Length, Bytes);
             }
 
-            override protected void HashCore(byte[] array, int ibStart, int cbSize)
+            override protected void HashCore(byte[] array, int arrayOffset, int bytes)
             {
-                byte[] subArray = new byte[cbSize];
-                Array.Copy(array, ibStart, subArray, 0, cbSize);
-                LibsodiumLibrary.crypto_generichash_update(hashStatePtr, subArray, cbSize);
+                byte[] message = new byte[bytes];
+                Array.Copy(array, arrayOffset, message, destinationIndex: 0, bytes);
+                _ = LibsodiumLibrary.crypto_generichash_update(HashStatePointer, message, bytes);
             }
 
             override protected byte[] HashFinal()
             {
-                byte[] buffer = new byte[bytes];
-                LibsodiumLibrary.crypto_generichash_final(hashStatePtr, buffer, bytes);
-                return buffer;
+                byte[] hash = new byte[Bytes];
+                _ = LibsodiumLibrary.crypto_generichash_final(HashStatePointer, hash, Bytes);
+                return hash;
             }
         }
     }

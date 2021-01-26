@@ -27,7 +27,8 @@ using Geralt.Exceptions;
 
 namespace Geralt
 {
-    /// <summary>One Time Message Authentication</summary>
+    /// <summary>Compute a message authentication code using HMAC.</summary>
+    /// <remarks>See here for more information: https://doc.libsodium.org/advanced/hmac-sha2 </remarks>
     public static class SecretKeyAuth
     {
         private const int KEY_BYTES = 32;
@@ -43,7 +44,7 @@ namespace Geralt
         /// <returns>Returns a byte array with 32 random bytes</returns>
         public static byte[] GenerateKey()
         {
-            return GeraltCore.GetRandomBytes(KEY_BYTES);
+            return SecureRandom.GetBytes(KEY_BYTES);
         }
 
         /// <summary>Signs a message with HMAC-SHA512-256.</summary>

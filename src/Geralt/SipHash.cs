@@ -27,7 +27,8 @@ using Geralt.Exceptions;
 
 namespace Geralt
 {
-    /// <summary>Hashing using SipHash-2-4.</summary>
+    /// <summary>Short hashing using SipHash-2-4.</summary>
+    /// <remarks>See here for more information: https://doc.libsodium.org/hashing/short-input_hashing </remarks>
     public static class SipHash
     {
         private const int _hashBytes = 8;
@@ -37,7 +38,7 @@ namespace Geralt
         /// <returns>A byte array with 16 random bytes.</returns>
         public static byte[] GenerateKey()
         {
-            return GeraltCore.GetRandomBytes(_keyBytes);
+            return SecureRandom.GetBytes(_keyBytes);
         }
 
         /// <summary>Hashes a message with a key using SipHash-2-4.</summary>
@@ -67,10 +68,7 @@ namespace Geralt
         /// <exception cref="KeyOutOfRangeException"></exception>
         public static byte[] Hash(byte[] message, byte[] key)
         {
-            if (key == null || key.Length != _keyBytes)
-            {
-                throw new KeyOutOfRangeException(nameof(key), (key == null) ? 0 : key.Length, $"Key must be {_keyBytes} bytes in length.");
-            }
+            ParameterValidation.Key(key, _keyBytes);
             byte[] hash = new byte[_hashBytes];
             _ = LibsodiumLibrary.crypto_shorthash(hash, message, message.Length, key);
             return hash;

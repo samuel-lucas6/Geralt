@@ -41,11 +41,10 @@ namespace Geralt
         {
             if (privateKey.Length % 16 != 0)
             {
-                throw new KeyOutOfRangeException("Private Key length must be a multiple of 16 bytes.");
+                throw new KeyOutOfRangeException("Private key length must be a multiple of 16 bytes.");
             }
             PublicKey = publicKey;
             _privateKey = privateKey;
-            EncryptPrivateKey();
         }
 
         ~KeyPair()
@@ -58,10 +57,8 @@ namespace Geralt
         {
             get
             {
-                DecryptPrivateKey();
                 var privateKey = new byte[_privateKey.Length];
                 Array.Copy(_privateKey, privateKey, privateKey.Length);
-                EncryptPrivateKey();
                 return privateKey;
             }
         }
@@ -73,20 +70,6 @@ namespace Geralt
             {
                 Array.Clear(_privateKey, index: 0, _privateKey.Length);
             }
-        }
-
-        private static void EncryptPrivateKey()
-        {
-#if NET461
-      ProtectedMemory.Protect(_privateKey, MemoryProtectionScope.SameProcess);
-#endif
-        }
-
-        private static void DecryptPrivateKey()
-        {
-#if NET461
-      ProtectedMemory.Unprotect(_privateKey, MemoryProtectionScope.SameProcess);
-#endif
         }
     }
 }

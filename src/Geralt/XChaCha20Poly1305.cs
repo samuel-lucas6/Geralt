@@ -29,7 +29,7 @@ using Geralt.Exceptions;
 
 namespace Geralt
 {
-    /// <summary>Authenticated Encryption with Additional Data using XChaCha20-Poly1305.</summary>
+    /// <summary>Authenticated encryption with additional data using XChaCha20-Poly1305.</summary>
     /// <remarks>See here for more information: https://doc.libsodium.org/secret-key_cryptography/aead/chacha20-poly1305/xchacha20-poly1305_construction </remarks>
     public static class XChaCha20Poly1305
     {
@@ -38,22 +38,20 @@ namespace Geralt
         private const int _tagBytes = 16;
 
         /// <summary>Generates a random 32 byte key.</summary>
-        /// <returns>Returns a byte array with 32 random bytes.</returns>
+        /// <returns>A byte array with 32 random bytes.</returns>
         public static byte[] GenerateKey()
         {
-            return GeraltCore.GetRandomBytes(_keyBytes);
+            return SecureRandom.GetBytes(_keyBytes);
         }
 
         /// <summary>Generates a random 24 byte nonce.</summary>
-        /// <returns>Returns a byte array with 24 random bytes.</returns>
+        /// <returns>A byte array with 24 random bytes.</returns>
         public static byte[] GenerateNonce()
         {
-            return GeraltCore.GetRandomBytes(_nonceBytes);
+            return SecureRandom.GetBytes(_nonceBytes);
         }
 
-        /// <summary>
-        /// Encrypts a message using XChaCha20-Poly1305.
-        /// </summary>
+        /// <summary>Encrypts a message using XChaCha20-Poly1305.</summary>
         /// <param name="message">The message to be encrypted.</param>
         /// <param name="nonce">The 24 byte nonce.</param>
         /// <param name="key">The 32 byte key.</param>
@@ -85,9 +83,7 @@ namespace Geralt
             return RemoveTrailingNulls(ciphertext, ciphertextLength);
         }
 
-        /// <summary>
-        /// Decrypts a ciphertext message using XChaCha20-Poly1305.
-        /// </summary>
+        /// <summary>Decrypts a ciphertext message using XChaCha20-Poly1305.</summary>
         /// <param name="ciphertext">The ciphertext to be decrypted.</param>
         /// <param name="nonce">The 24 byte nonce.</param>
         /// <param name="key">The 32 byte key.</param>

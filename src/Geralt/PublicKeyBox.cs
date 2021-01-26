@@ -61,7 +61,7 @@ namespace Geralt
                 throw new SeedOutOfRangeException("privateKey", (privateKey == null) ? 0 : privateKey.Length,
                   string.Format("privateKey must be {0} bytes in length.", SecretKeyBytes));
 
-            var publicKey = ScalarMult.Base(privateKey);
+            var publicKey = X25519.GetPublicKey(privateKey);
 
             return new KeyPair(publicKey, privateKey);
         }
@@ -90,7 +90,7 @@ namespace Geralt
         /// <returns>Returns a byte array with 24 random bytes</returns>
         public static byte[] GenerateNonce()
         {
-            return GeraltCore.GetRandomBytes(NONCE_BYTES);
+            return SecureRandom.GetBytes(NONCE_BYTES);
         }
 
         /// <summary>Creates a Box</summary>
@@ -281,7 +281,7 @@ namespace Geralt
         /// <exception cref="CryptographicException"></exception>
         public static byte[] OpenDetached(DetachedBox detached, byte[] nonce, byte[] secretKey, byte[] publicKey)
         {
-            return OpenDetached(detached.CipherText, detached.Mac, nonce, secretKey, publicKey);
+            return OpenDetached(detached.Ciphertext, detached.Tag, nonce, secretKey, publicKey);
         }
 
         /// <summary>Opens a detached Box</summary>

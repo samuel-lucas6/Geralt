@@ -117,14 +117,14 @@ namespace Geralt
         /// <returns>Returns a byte array with 32 random bytes</returns>
         public static byte[] ScryptGenerateSalt()
         {
-            return GeraltCore.GetRandomBytes((int)SCRYPT_SALSA208_SHA256_SALTBYTES);
+            return SecureRandom.GetBytes((int)SCRYPT_SALSA208_SHA256_SALTBYTES);
         }
 
         /// <summary>Generates a random 16 byte salt for the Argon2i algorithm.</summary>
         /// <returns>Returns a byte array with 16 random bytes</returns>
         public static byte[] ArgonGenerateSalt()
         {
-            return GeraltCore.GetRandomBytes((int)ARGON_SALTBYTES);
+            return SecureRandom.GetBytes((int)ARGON_SALTBYTES);
         }
 
         /// <summary>
@@ -164,7 +164,7 @@ namespace Geralt
 
             var buffer = new byte[outputLength];
 
-            GeraltCore.Init();
+            GeraltCore.InitialiseLibsodium();
 
             var ret = LibsodiumLibrary.crypto_pwhash(buffer, buffer.Length, password, password.Length, salt, opsLimit, memLimit, (int)alg);
 
@@ -267,7 +267,7 @@ namespace Geralt
             var buffer = new byte[ARGON_STRBYTES];
             var pass = Encoding.UTF8.GetBytes(password);
 
-            GeraltCore.Init();
+            GeraltCore.InitialiseLibsodium();
 
             var ret = LibsodiumLibrary.crypto_pwhash_str(buffer, pass, pass.Length, opsLimit, memLimit);
 
@@ -301,7 +301,7 @@ namespace Geralt
             if (hash == null)
                 throw new ArgumentNullException(nameof(hash), "Hash cannot be null");
 
-            GeraltCore.Init();
+            GeraltCore.InitialiseLibsodium();
 
             var ret = LibsodiumLibrary.crypto_pwhash_str_verify(hash, password, password.Length);
 
@@ -344,7 +344,7 @@ namespace Geralt
             var buffer = new byte[SCRYPT_SALSA208_SHA256_STRBYTES];
             var pass = Encoding.UTF8.GetBytes(password);
 
-            GeraltCore.Init();
+            GeraltCore.InitialiseLibsodium();
 
             var ret = LibsodiumLibrary.crypto_pwhash_scryptsalsa208sha256_str(buffer, pass, pass.Length, opsLimit, memLimit);
 
@@ -444,7 +444,7 @@ namespace Geralt
 
             var buffer = new byte[outputLength];
 
-            GeraltCore.Init();
+            GeraltCore.InitialiseLibsodium();
 
             var ret = LibsodiumLibrary.crypto_pwhash_scryptsalsa208sha256(buffer, buffer.Length, password, password.Length, salt, opsLimit, memLimit);
 
@@ -476,7 +476,7 @@ namespace Geralt
             if (hash == null)
                 throw new ArgumentNullException(nameof(hash), "Hash cannot be null");
 
-            GeraltCore.Init();
+            GeraltCore.InitialiseLibsodium();
 
             var ret = LibsodiumLibrary.crypto_pwhash_scryptsalsa208sha256_str_verify(hash, password, password.Length);
 
@@ -497,7 +497,7 @@ namespace Geralt
                 throw new ArgumentNullException("password", "Password cannot be null");
             }
 
-            GeraltCore.Init();
+            GeraltCore.InitialiseLibsodium();
 
             int status = LibsodiumLibrary.crypto_pwhash_str_needs_rehash(password, opsLimit, memLimit);
 
