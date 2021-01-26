@@ -27,75 +27,67 @@ using Geralt.Exceptions;
 
 namespace Geralt
 {
-    /// <summary>One Time Message Authentication</summary>
+    /// <summary>Compute a message authentication code using Poly1305.</summary>
+    /// <remarks>See here for more information: https://doc.libsodium.org/advanced/poly1305 </remarks>
     public static class Poly1305
     {
         private const int _keyBytes = 32;
         private const int _tagBytes = 16;
 
         /// <summary>Generates a random 32 byte key.</summary>
-        /// <returns>Returns a byte array with 32 random bytes</returns>
+        /// <returns>A byte array with 32 random bytes</returns>
         public static byte[] GenerateKey()
         {
             return GeraltCore.GetRandomBytes(_keyBytes);
         }
 
-        /// <summary>Signs a message using Poly1305.</summary>
+        /// <summary>Computes the message authentication code of a message using Poly1305.</summary>
         /// <param name="message">The message.</param>
         /// <param name="key">The 32 byte key.</param>
         /// <returns>A 16 byte authentication tag.</returns>
         /// <exception cref="KeyOutOfRangeException"></exception>
-        public static byte[] Sign(string message, byte[] key)
+        public static byte[] ComputeMAC(string message, byte[] key)
         {
-            return Sign(Encoding.UTF8.GetBytes(message), key);
+            return ComputeMAC(Encoding.UTF8.GetBytes(message), key);
         }
 
-        /// <summary>Signs a message using Poly1305.</summary>
+        /// <summary>Computes the message authentication code of a message using Poly1305.</summary>
         /// <param name="message">The message.</param>
         /// <param name="key">The 32 byte key.</param>
         /// <returns>A 16 byte authentication tag.</returns>
         /// <exception cref="KeyOutOfRangeException"></exception>
-        public static byte[] Sign(byte[] message, byte[] key)
+        public static byte[] ComputeMAC(byte[] message, byte[] key)
         {
-            if (key == null || key.Length != _keyBytes)
-            {
-                throw new KeyOutOfRangeException(nameof(key), (key == null) ? 0 : key.Length, $"Key must be {_keyBytes} bytes in length.");
-            }
-            byte[] authenticationTag = new byte[_tagBytes];
-            _ = LibsodiumLibrary.crypto_onetimeauth(authenticationTag, message, message.Length, key);
-            return authenticationTag;
+            ParameterValidation.Key(key, _keyBytes);
+            byte[] tag = new byte[_tagBytes];
+            _ = LibsodiumLibrary.crypto_onetimeauth(tag, message, message.Length, key);
+            return tag;
         }
 
-        /// <summary>Verifies a message signed with the Sign method.</summary>
+        /// <summary>Verifies a Poly1305 message authentication code.</summary>
         /// <param name="message">The message.</param>
-        /// <param name="signature">The 16 byte signature.</param>
+        /// <param name="tag">The 16 byte authentication tag.</param>
         /// <param name="key">The 32 byte key.</param>
         /// <returns>True if verified.</returns>
         /// <exception cref="KeyOutOfRangeException"></exception>
         /// <exception cref="SignatureOutOfRangeException"></exception>
-        public static bool Verify(string message, byte[] signature, byte[] key)
+        public static bool VerifyMAC(string message, byte[] tag, byte[] key)
         {
-            return Verify(Encoding.UTF8.GetBytes(message), signature, key);
+            return VerifyMAC(Encoding.UTF8.GetBytes(message), tag, key);
         }
 
-        /// <summary>Verifies a message signed with the Sign method.</summary>
+        /// <summary>Verifies a Poly1305 message authentication code.</summary>
         /// <param name="message">The message.</param>
-        /// <param name="signature">The 16 byte signature.</param>
+        /// <param name="tag">The 16 byte authentication tag.</param>
         /// <param name="key">The 32 byte key.</param>
         /// <returns>True if verified.</returns>
         /// <exception cref="KeyOutOfRangeException"></exception>
         /// <exception cref="SignatureOutOfRangeException"></exception>
-        public static bool Verify(byte[] message, byte[] signature, byte[] key)
+        public static bool VerifyMAC(byte[] message, byte[] tag, byte[] key)
         {
-            if (key == null || key.Length != _keyBytes)
-            {
-                throw new KeyOutOfRangeException(nameof(key), (key == null) ? 0 : key.Length, $"Key must be {_keyBytes} bytes in length.");
-            }
-            if (signature == null || signature.Length != _tagBytes)
-            {
-                throw new SignatureOutOfRangeException(nameof(signature), (signature == null) ? 0 : signature.Length, $"Signature must be {_tagBytes} bytes in length.");
-            }
-            int result = LibsodiumLibrary.crypto_onetimeauth_verify(signature, message, message.Length, key);
+            ParameterValidation.Key(key, _keyBytes);
+            ParameterValidation.Signature(tag, _tagBytes);
+            int result = LibsodiumLibrary.crypto_onetimeauth_verify(tag, message, message.Length, key);
             return result == 0;
         }
     }
