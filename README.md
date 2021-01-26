@@ -1,0 +1,2 @@
+# Geralt
+libsodium for .NET.
