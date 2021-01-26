@@ -1,0 +1,4 @@
+C:\Users\Samuel\source\repos\Geralt\test\Sodium.Tests\obj\Release\netcoreapp2.0\Sodium.Tests.csprojAssemblyReference.cache
+C:\Users\Samuel\source\repos\Geralt\test\Sodium.Tests\obj\Release\netcoreapp2.0\Sodium.Tests.AssemblyInfoInputs.cache
+C:\Users\Samuel\source\repos\Geralt\test\Sodium.Tests\obj\Release\netcoreapp2.0\Sodium.Tests.AssemblyInfo.cs
+C:\Users\Samuel\source\repos\Geralt\test\Sodium.Tests\obj\Release\netcoreapp2.0\Sodium.Tests.csproj.CoreCompileInputs.cache

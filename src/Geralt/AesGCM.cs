@@ -1,0 +1,134 @@
+using System;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using Geralt.Exceptions;
+
+/*
+    Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
+    Copyright (c) 2021 Samuel Lucas
+    Copyright (c) 2017-2020 tabrath
+    Copyright (c) 2013-2017 Adam Caudill & Contributors
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy of
+    this software and associated documentation files (the "Software"), to deal in
+    the Software without restriction, including without limitation the rights to
+    use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+    the Software, and to permit persons to whom the Software is furnished to do so,
+    subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+    FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+    COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+    IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+namespace Geralt
+{
+    /// <summary>Authenticated Encryption with Additional Data using AES-GCM.
+    /// Only supported on modern x86/x64 processors.</summary>
+    /// <remarks>See here for more information: https://doc.libsodium.org/secret-key_cryptography/aead/aes-256-gcm </remarks>
+    public static class AesGCM
+    {
+        private const int _keyBytes = 32;
+        private const int _nonceBytes = 12;
+        private const int _tagBytes = 16;
+
+        /// <summary>Detect if the current CPU supports the required instructions (SSSE3, aesni, pcmul).</summary>
+        /// <returns><c>true</c> if the CPU supports the necessary instructions, otherwise <c>false</c>.</returns>
+        /// <remarks><see cref="ChaCha20Poly1305"/> is recommended.</remarks>
+        public static bool IsAvailable()
+        {
+            GeraltCore.Init();
+            return LibsodiumLibrary.crypto_aead_aes256gcm_is_available() != 0;
+        }
+
+        /// <summary>Generates a random 32 byte key.</summary>
+        /// <returns>A byte array with 32 random bytes.</returns>
+        public static byte[] GenerateKey()
+        {
+            return GeraltCore.GetRandomBytes(_keyBytes);
+        }
+
+        /// <summary>Generates a random 12 byte nonce.</summary>
+        /// <returns>A byte array with 12 random bytes.</returns>
+        public static byte[] GenerateNonce()
+        {
+            return GeraltCore.GetRandomBytes(_nonceBytes);
+        }
+
+        /// <summary>Encrypts a message using AES-GCM.</summary>
+        /// <param name="message">The message to be encrypted.</param>
+        /// <param name="nonce">The 12 byte nonce.</param>
+        /// <param name="key">The 32 byte key.</param>
+        /// <param name="additionalData">The additional data - may be null.</param>
+        /// <returns>The encrypted message with an authentication tag.</returns>
+        /// <remarks>The nonce should never be reused with the same key.</remarks>
+        /// <remarks>The recommended way to generate a nonce is to use GenerateNonce() for the first message and increment it for each subsequent message using the same key.</remarks>
+        /// <exception cref="KeyOutOfRangeException"></exception>
+        /// <exception cref="NonceOutOfRangeException"></exception>
+        /// <exception cref="CryptographicException"></exception>
+        public static byte[] Encrypt(byte[] message, byte[] nonce, byte[] key, byte[] additionalData = null)
+        {
+            additionalData = ParameterValidation.AdditionalData(additionalData);
+            ParameterValidation.Nonce(nonce, _nonceBytes);
+            ParameterValidation.Key(key, _keyBytes);
+            byte[] ciphertext = new byte[message.Length + _tagBytes];
+            IntPtr ciphertextPointer = Marshal.AllocHGlobal(ciphertext.Length);
+            int result = LibsodiumLibrary.crypto_aead_aes256gcm_encrypt(ciphertextPointer, out long ciphertextLength, message, message.Length, additionalData, additionalData.Length, nsec: null, nonce, key);
+            Marshal.Copy(ciphertextPointer, ciphertext, startIndex: 0, (int)ciphertextLength);
+            Marshal.FreeHGlobal(ciphertextPointer);
+            if (result != 0)
+            {
+                throw new CryptographicException("Error encrypting message.");
+            }
+            if (ciphertext.Length == ciphertextLength)
+            {
+                return ciphertext;
+            }
+            return RemoveTrailingNulls(ciphertext, ciphertextLength);
+        }
+
+        /// <summary>Decrypts a ciphertext using AES-GCM.</summary>
+        /// <param name="ciphertext">The ciphertext to be decrypted.</param>
+        /// <param name="nonce">The 12 byte nonce.</param>
+        /// <param name="key">The 32 byte key.</param>
+        /// <param name="additionalData">The additional data - may be null.</param>
+        /// <returns>The decrypted ciphertext.</returns>
+        /// <exception cref="KeyOutOfRangeException"></exception>
+        /// <exception cref="NonceOutOfRangeException"></exception>
+        /// <exception cref="AdditionalDataOutOfRangeException"></exception>
+        /// <exception cref="CryptographicException"></exception>
+        public static byte[] Decrypt(byte[] cipher, byte[] nonce, byte[] key, byte[] additionalData = null)
+        {
+            additionalData = ParameterValidation.AdditionalData(additionalData);
+            ParameterValidation.Nonce(nonce, _nonceBytes);
+            ParameterValidation.Key(key, _keyBytes);
+            byte[] plaintext = new byte[cipher.Length - _tagBytes];
+            IntPtr plaintextPointer = Marshal.AllocHGlobal(plaintext.Length);
+            int result = LibsodiumLibrary.crypto_aead_aes256gcm_decrypt(plaintextPointer, out long plaintextLength, nsec: null, cipher, cipher.Length, additionalData, additionalData.Length, nonce, key);
+            Marshal.Copy(plaintextPointer, plaintext, startIndex: 0, (int)plaintextLength);
+            Marshal.FreeHGlobal(plaintextPointer);
+            if (result != 0)
+            {
+                throw new CryptographicException("Error decrypting message.");
+            }
+            if (plaintext.Length == plaintextLength)
+            {
+                return plaintext;
+            }
+            return RemoveTrailingNulls(plaintext, plaintextLength);
+        }
+
+        private static byte[] RemoveTrailingNulls(byte[] message, long messageLength)
+        {
+            byte[] messageWithoutPadding = new byte[message.Length];
+            Array.Copy(message, messageWithoutPadding, (int)messageLength);
+            return messageWithoutPadding;
+        }
+    }
+}
