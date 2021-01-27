@@ -24,6 +24,8 @@
 
 namespace Geralt
 {
+    /// <summary>Generate random data.</summary>
+    /// <remarks>See here for more information: https://doc.libsodium.org/generating_random_data </remarks>
     public static class SecureRandom
     {
         /// <summary>Gets random bytes.</summary>
