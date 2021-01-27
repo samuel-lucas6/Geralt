@@ -10,7 +10,7 @@ using Geralt.Exceptions;
 
     Permission is hereby granted, free of charge, to any person obtaining a copy of
     this software and associated documentation files (the "Software"), to deal in
-    the Software without restriction, including without limitation the rights to
+    the Software without restriction, including without strengthation the rights to
     use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
     the Software, and to permit persons to whom the Software is furnished to do so,
     subject to the following conditions:
@@ -19,7 +19,7 @@ using Geralt.Exceptions;
     copies or substantial portions of the Software.
 
     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+    IMPLIED, INCLUDING BUT NOT strengthED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
     FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
     COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
     IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
@@ -53,7 +53,7 @@ namespace Geralt
             Argon2id = 2
         }
 
-        /// <summary>Represents predefined and useful parameter limits.</summary>
+        /// <summary>Represents predefined and useful parameter strengths.</summary>
         public enum Strength
         {
             /// <summary>For interactive sessions (uses 64 MiB of RAM)</summary>
@@ -100,7 +100,7 @@ namespace Geralt
         /// <summary>Derives a key of any size from a password and a salt.</summary>
         /// <param name="password">The password.</param>
         /// <param name="salt">A 16 character salt.</param>
-        /// <param name="limit">The limit for computation.</param>
+        /// <param name="strength">The strength for computation.</param>
         /// <param name="outputLength">The length of the computed hash.</param>
         /// <param name="algorithm">The Argon2 algorithm. Argon2id is recommended.</param>
         /// <returns>A byte array of the specified output length.</returns>
@@ -108,15 +108,15 @@ namespace Geralt
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="SaltOutOfRangeException"></exception>
         /// <exception cref="OutOfMemoryException"></exception>
-        public static byte[] Hash(string password, string salt, Strength limit = Strength.Interactive, int outputLength = _defaultOutputLength, Algorithm algorithm = Algorithm.Argon2id)
+        public static byte[] Hash(string password, string salt, Strength strength = Strength.Interactive, int outputLength = _defaultOutputLength, Algorithm algorithm = Algorithm.Argon2id)
         {
-            return Hash(Encoding.UTF8.GetBytes(password), Encoding.UTF8.GetBytes(salt), limit, outputLength, algorithm);
+            return Hash(Encoding.UTF8.GetBytes(password), Encoding.UTF8.GetBytes(salt), strength, outputLength, algorithm);
         }
 
         /// <summary>Derives a key of any size from a password and a salt.</summary>
         /// <param name="password">The password.</param>
         /// <param name="salt">A 16 byte salt.</param>
-        /// <param name="limit">The limit for computation.</param>
+        /// <param name="strength">The strength for computation.</param>
         /// <param name="outputLength">The length of the computed hash.</param>
         /// <param name="algorithm">The Argon2 algorithm. Argon2id is recommended.</param>
         /// <returns>A byte array of the specified output length.</returns>
@@ -124,9 +124,9 @@ namespace Geralt
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="SaltOutOfRangeException"></exception>
         /// <exception cref="OutOfMemoryException"></exception>
-        public static byte[] Hash(byte[] password, byte[] salt, Strength limit = Strength.Interactive, int outputLength = _defaultOutputLength, Algorithm algorithm = Algorithm.Argon2id)
+        public static byte[] Hash(byte[] password, byte[] salt, Strength strength = Strength.Interactive, int outputLength = _defaultOutputLength, Algorithm algorithm = Algorithm.Argon2id)
         {
-            (int iterations, int memorySize) = GetParameters(limit);
+            (int iterations, int memorySize) = GetParameters(strength);
             return Hash(password, salt, iterations, memorySize, outputLength, algorithm);
         }
 
@@ -148,14 +148,14 @@ namespace Geralt
 
         /// <summary>Returns the hash in a string format, which includes the generated salt.</summary>
         /// <param name="password">The password.</param>
-        /// <param name="limit">The limit for computation.</param>
+        /// <param name="strength">The strength for computation.</param>
         /// <returns>A zero-terminated ASCII encoded string of the computed hash.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="OutOfMemoryException"></exception>
-        public static string Hash(string password, Strength limit = Strength.Interactive)
+        public static string Hash(string password, Strength strength = Strength.Interactive)
         {
-            (int iterations, int memorySize) = GetParameters(limit);
+            (int iterations, int memorySize) = GetParameters(strength);
             return Hash(password, iterations, memorySize);
         }
 
@@ -204,9 +204,9 @@ namespace Geralt
             return result == 0;
         }
 
-        private static (int iterations, int memorySize) GetParameters(Strength limit = Strength.Interactive)
+        private static (int iterations, int memorySize) GetParameters(Strength strength = Strength.Interactive)
         {
-            return limit switch
+            return strength switch
             {
                 Strength.Interactive => (_iterationsInteractive, _memorySizeInteractive),
                 Strength.Moderate => (_iterationsModerate, _memorySizeModerate),
