@@ -10,7 +10,7 @@ using Geralt.Exceptions;
 
     Permission is hereby granted, free of charge, to any person obtaining a copy of
     this software and associated documentation files (the "Software"), to deal in
-    the Software without restriction, including without limitation the rights to
+    the Software without restriction, including without strengthation the rights to
     use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
     the Software, and to permit persons to whom the Software is furnished to do so,
     subject to the following conditions:
@@ -19,7 +19,7 @@ using Geralt.Exceptions;
     copies or substantial portions of the Software.
 
     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+    IMPLIED, INCLUDING BUT NOT strengthED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
     FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
     COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
     IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
@@ -32,287 +32,190 @@ namespace Geralt
     /// <remarks>See here for more information: https://doc.libsodium.org/advanced/scrypt </remarks>
     public class Scrypt
     {
+        private const int _hashStringBytes = 102;
+        private const int _defaultOutputLength = 32;
+        private const int _minimumOutputLength = 16;
+        private const int _saltBytes = 32;
+        private const int _blockSizeInteractive = 8388608;
+        private const int _blockSizeMedium = 12582910;
+        private const int _blockSizeSensitive = 33554432;
+        private const int _memorySizeInteractive = 33554430;
+        private const int _memorySizeMedium = 134217728;
+        private const int _memorySizeSensitive = 536870900;
 
-        private const uint SCRYPT_SALSA208_SHA256_STRBYTES = 102U;
-        private const uint SCRYPT_SALSA208_SHA256_SALTBYTES = 32U;
-
-        private const long SCRYPT_OPSLIMIT_INTERACTIVE = 524288;
-        private const long SCRYPT_OPSLIMIT_MODERATE = 8388608;
-        private const long SCRYPT_OPSLIMIT_MEDIUM = 8388608;
-        private const long SCRYPT_OPSLIMIT_SENSITIVE = 33554432;
-
-        private const int SCRYPT_MEMLIMIT_INTERACTIVE = 16777216;
-        private const int SCRYPT_MEMLIMIT_MODERATE = 100000000;
-        private const int SCRYPT_MEMLIMIT_MEDIUM = 134217728;
-        private const int SCRYPT_MEMLIMIT_SENSITIVE = 1073741824;
-
-        /// <summary>Represents predefined and useful limits for ScryptHashBinary() and ScryptHashString().</summary>
+        /// <summary>Represents predefined and useful parameter strengths.</summary>
         public enum Strength
         {
-            /// <summary>For interactive sessions (fast: uses 16MB of RAM).</summary>
+            /// <summary>For interactive sessions (uses 32 MiB of RAM).</summary>
             Interactive,
-            /// <summary>For normal use (moderate: uses 100MB of RAM).</summary>
-            [Obsolete("Use Strength.Medium instead.")]
-            Moderate,
-            /// <summary>For normal use (moderate: uses 128MB of RAM).</summary>
+            /// <summary>For normal use (uses 128 MiB of RAM).</summary>
             Medium,
-            /// <summary>For more sensitive use (moderate: uses 128MB of RAM).</summary>
-            MediumSlow,
-            /// <summary>For highly sensitive data (slow: uses more than 1GB of RAM).</summary>
+            /// <summary>For highly sensitive data (uses 512 MiB of RAM).</summary>
             Sensitive
         }
 
-        public enum HashType
+        /// <summary>Generates a random 32 byte salt.</summary>
+        /// <returns>A byte array with 32 random bytes.</returns>
+        public static byte[] GenerateSalt()
         {
-            /// <summary>Argon2 hash.</summary>
-            Argon,
-            /// <summary>Scrypt hash.</summary>
-            Scrypt
-        }
-
-        /// <summary>Generates a random 32 byte salt for the Scrypt algorithm.</summary>
-        /// <returns>Returns a byte array with 32 random bytes</returns>
-        public static byte[] ScryptGenerateSalt()
-        {
-            return SecureRandom.GetBytes((int)SCRYPT_SALSA208_SHA256_SALTBYTES);
+            return SecureRandom.GetBytes(_saltBytes);
         }
 
         /// <summary>Returns the hash in a string format, which includes the generated salt.</summary>
         /// <param name="password">The password.</param>
-        /// <param name="limit">The limit for computation.</param>
-        /// <returns>Returns an zero-terminated ASCII encoded string of the computed password and hash.</returns>
+        /// <param name="strength">The strength for computation.</param>
+        /// <returns>A zero-terminated ASCII encoded string of the computed hash.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="OutOfMemoryException"></exception>
-        public static string ScryptHashString(string password, Strength limit = Strength.Interactive)
+        public static string Hash(string password, Strength strength = Strength.Interactive)
         {
-            var (opsLimit, memLimit) = GetScryptOpsAndMemoryLimit(limit);
-
-            return ScryptHashString(password, opsLimit, memLimit);
+            (int blockSize, int memorySize) = GetParameters(strength);
+            return Hash(password, blockSize, memorySize);
         }
 
         /// <summary>Returns the hash in a string format, which includes the generated salt.</summary>
         /// <param name="password">The password.</param>
-        /// <param name="opsLimit">Represents a maximum amount of computations to perform.</param>
-        /// <param name="memLimit">Is the maximum amount of RAM that the function will use, in bytes.</param>
-        /// <returns>Returns an zero-terminated ASCII encoded string of the computed password and hash.</returns>
+        /// <param name="blockSize">The number of computations to perform.</param>
+        /// <param name="memorySize">The amount of RAM that the function will use (in bytes).</param>
+        /// <returns>Returns an zero-terminated ASCII encoded string of the computed hash.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="OutOfMemoryException"></exception>
-        public static string ScryptHashString(string password, long opsLimit, int memLimit)
+        public static string Hash(string password, int blockSize, int memorySize)
         {
-            if (password == null)
-                throw new ArgumentNullException(nameof(password), "Password cannot be null");
-
-            if (opsLimit <= 0)
-                throw new ArgumentOutOfRangeException(nameof(opsLimit), "opsLimit cannot be zero or negative");
-
-            if (memLimit <= 0)
-                throw new ArgumentOutOfRangeException(nameof(memLimit), "memLimit cannot be zero or negative");
-
-            var buffer = new byte[SCRYPT_SALSA208_SHA256_STRBYTES];
-            var pass = Encoding.UTF8.GetBytes(password);
-
+            ParameterValidation.Password(password);
+            ValidateBlockSize(blockSize);
+            ValidateMemorySize(memorySize);
+            byte[] hash = new byte[_hashStringBytes];
+            byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
             GeraltCore.InitialiseLibsodium();
-
-            var ret = LibsodiumLibrary.crypto_pwhash_scryptsalsa208sha256_str(buffer, pass, pass.Length, opsLimit, memLimit);
-
-            if (ret != 0)
-            {
-                throw new OutOfMemoryException("Internal error, hash failed (usually because the operating system refused to allocate the amount of requested memory).");
-            }
-
-            return Utilities.UnsafeAsciiBytesToString(buffer);
+            int result = LibsodiumLibrary.crypto_pwhash_scryptsalsa208sha256_str(hash, passwordBytes, passwordBytes.Length, blockSize, memorySize);
+            ParameterValidation.PasswordHashingResult(result);
+            return Utilities.UnsafeAsciiBytesToString(hash);
         }
 
-        /// <summary>Derives a secret key of any size from a password and a salt.</summary>
+        /// <summary>Derives a key of any size from a password and a salt.</summary>
         /// <param name="password">The password.</param>
         /// <param name="salt">The salt.</param>
-        /// <param name="limit">The limit for computation.</param>
-        /// <param name="outputLength">The length of the computed output array.</param>
-        /// <returns>Returns a byte array of the given size.</returns>
+        /// <param name="strength">The strength for computation.</param>
+        /// <param name="outputLength">The length of the computed hash.</param>
+        /// <returns>A byte array of the specified output length.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="SaltOutOfRangeException"></exception>
         /// <exception cref="OutOfMemoryException"></exception>
-        public static byte[] ScryptHashBinary(string password, string salt, Strength limit = Strength.Interactive, long outputLength = SCRYPT_SALSA208_SHA256_SALTBYTES)
+        public static byte[] Hash(string password, string salt, Strength strength = Strength.Interactive, int outputLength = _defaultOutputLength)
         {
-            return ScryptHashBinary(Encoding.UTF8.GetBytes(password), Encoding.UTF8.GetBytes(salt), limit, outputLength);
+            return Hash(Encoding.UTF8.GetBytes(password), Encoding.UTF8.GetBytes(salt), strength, outputLength);
         }
 
-        /// <summary>Derives a secret key of any size from a password and a salt.</summary>
+        /// <summary>Derives a key of any size from a password and a salt.</summary>
         /// <param name="password">The password.</param>
         /// <param name="salt">The salt.</param>
-        /// <param name="limit">The limit for computation.</param>
-        /// <param name="outputLength">The length of the computed output array.</param>
-        /// <returns>Returns a byte array of the given size.</returns>
+        /// <param name="strength">The strength for computation.</param>
+        /// <param name="outputLength">The length of the computed hash.</param>
+        /// <returns>A byte array of the specified output length.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="SaltOutOfRangeException"></exception>
         /// <exception cref="OutOfMemoryException"></exception>
-        public static byte[] ScryptHashBinary(byte[] password, byte[] salt, Strength limit = Strength.Interactive, long outputLength = SCRYPT_SALSA208_SHA256_SALTBYTES)
+        public static byte[] Hash(byte[] password, byte[] salt, Strength strength = Strength.Interactive, int outputLength = _defaultOutputLength)
         {
-            var (opsLimit, memLimit) = GetScryptOpsAndMemoryLimit(limit);
-
-            return ScryptHashBinary(password, salt, opsLimit, memLimit, outputLength);
+            (int blockSize, int memorySize) = GetParameters(strength);
+            return Hash(password, salt, blockSize, memorySize, outputLength);
         }
 
-        /// <summary>
-        /// Derives a secret key of any size from a password and a salt.
-        /// </summary>
+        /// <summary>Derives a key of any size from a password and a salt.</summary>
         /// <param name="password">The password.</param>
         /// <param name="salt">The salt.</param>
-        /// <param name="opsLimit">Represents a maximum amount of computations to perform.</param>
-        /// <param name="memLimit">Is the maximum amount of RAM that the function will use, in bytes.</param>
-        /// <param name="outputLength">The length of the computed output array.</param>
-        /// <returns>Returns a byte array of the given size.</returns>
+        /// <param name="blockSize">The number of computations to perform.</param>
+        /// <param name="memorySize">The amount of RAM that the function will use (in bytes).</param>
+        /// <param name="outputLength">The length of the computed output hash.</param>
+        /// <returns>A byte array of the specified output length.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="SaltOutOfRangeException"></exception>
         /// <exception cref="OutOfMemoryException"></exception>
-        public static byte[] ScryptHashBinary(string password, string salt, long opsLimit, int memLimit, long outputLength = SCRYPT_SALSA208_SHA256_SALTBYTES)
+        public static byte[] Hash(string password, string salt, int blockSize, int memorySize, int outputLength = _defaultOutputLength)
         {
-            var pass = Encoding.UTF8.GetBytes(password);
-            var saltAsBytes = Encoding.UTF8.GetBytes(salt);
-
-            return ScryptHashBinary(pass, saltAsBytes, opsLimit, memLimit, outputLength);
+            return Hash(Encoding.UTF8.GetBytes(password), Encoding.UTF8.GetBytes(salt), blockSize, memorySize, outputLength);
         }
 
-        /// <summary>
-        /// Derives a secret key of any size from a password and a salt.
-        /// </summary>
+        /// <summary>Derives a key of any size from a password and a salt.</summary>
         /// <param name="password">The password.</param>
         /// <param name="salt">The salt.</param>
-        /// <param name="opsLimit">Represents a maximum amount of computations to perform.</param>
-        /// <param name="memLimit">Is the maximum amount of RAM that the function will use, in bytes.</param>
-        /// <param name="outputLength">The length of the computed output array.</param>
-        /// <returns>Returns a byte array of the given size.</returns>
+        /// <param name="blockSize">The number of computations to perform.</param>
+        /// <param name="memorySize">The amount of RAM that the function will use (in bytes).</param>
+        /// <param name="outputLength">The length of the computed output hash.</param>
+        /// <returns>A byte array of the specified output length.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="SaltOutOfRangeException"></exception>
         /// <exception cref="OutOfMemoryException"></exception>
-        public static byte[] ScryptHashBinary(byte[] password, byte[] salt, long opsLimit, int memLimit, long outputLength = SCRYPT_SALSA208_SHA256_SALTBYTES)
+        public static byte[] Hash(byte[] password, byte[] salt, int blockSize, int memorySize, int outputLength = _defaultOutputLength)
         {
-            if (password == null)
-                throw new ArgumentNullException(nameof(password), "Password cannot be null");
-
-            if (salt == null)
-                throw new ArgumentNullException(nameof(salt), "Salt cannot be null");
-
-            if (salt.Length != SCRYPT_SALSA208_SHA256_SALTBYTES)
-                throw new SaltOutOfRangeException($"Salt must be {SCRYPT_SALSA208_SHA256_SALTBYTES} bytes in length.");
-
-            if (opsLimit <= 0)
-                throw new ArgumentOutOfRangeException(nameof(opsLimit), "opsLimit cannot be zero or negative");
-
-            if (memLimit <= 0)
-                throw new ArgumentOutOfRangeException(nameof(memLimit), "memLimit cannot be zero or negative");
-
-            if (outputLength < 16)
-                throw new ArgumentOutOfRangeException(nameof(outputLength), "OutputLength cannot be less than 16 bytes");
-
-            var buffer = new byte[outputLength];
-
+            ParameterValidation.Password(password);
+            ParameterValidation.Salt(salt, _saltBytes);
+            ValidateBlockSize(blockSize);
+            ValidateMemorySize(memorySize);
+            ParameterValidation.OutputLength(outputLength, _minimumOutputLength);
+            byte[] hash = new byte[outputLength];
             GeraltCore.InitialiseLibsodium();
-
-            var ret = LibsodiumLibrary.crypto_pwhash_scryptsalsa208sha256(buffer, buffer.Length, password, password.Length, salt, opsLimit, memLimit);
-
-            if (ret != 0)
-                throw new OutOfMemoryException("Internal error, hash failed (usually because the operating system refused to allocate the amount of requested memory).");
-
-            return buffer;
+            int result = LibsodiumLibrary.crypto_pwhash_scryptsalsa208sha256(hash, hash.Length, password, password.Length, salt, blockSize, memorySize);
+            ParameterValidation.PasswordHashingResult(result);
+            return hash;
         }
 
-        /// <summary>Verifies that a hash generated with ScryptHashString matches the supplied password.</summary>
+        /// <summary>Verifies that a string hash matches the supplied password.</summary>
         /// <param name="hash">The hash.</param>
         /// <param name="password">The password.</param>
         /// <returns><c>true</c> on success; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public static bool ScryptHashStringVerify(string hash, string password)
+        public static bool Verify(string hash, string password)
         {
-            return ScryptHashStringVerify(Encoding.UTF8.GetBytes(hash), Encoding.UTF8.GetBytes(password));
+            return Verify(Encoding.UTF8.GetBytes(hash), Encoding.UTF8.GetBytes(password));
         }
 
-        /// <summary>Verifies that a hash generated with ScryptHashString matches the supplied password.</summary>
+        /// <summary>Verifies that a string hash matches the supplied password.</summary>
         /// <param name="hash">The hash.</param>
         /// <param name="password">The password.</param>
         /// <returns><c>true</c> on success; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public static bool ScryptHashStringVerify(byte[] hash, byte[] password)
+        public static bool Verify(byte[] hash, byte[] password)
         {
-            if (password == null)
-                throw new ArgumentNullException(nameof(password), "Password cannot be null");
-            if (hash == null)
-                throw new ArgumentNullException(nameof(hash), "Hash cannot be null");
-
+            ParameterValidation.Password(password);
+            ParameterValidation.Hash(hash);
             GeraltCore.InitialiseLibsodium();
-
-            var ret = LibsodiumLibrary.crypto_pwhash_scryptsalsa208sha256_str_verify(hash, password, password.Length);
-
-            return ret == 0;
+            int result = LibsodiumLibrary.crypto_pwhash_scryptsalsa208sha256_str_verify(hash, password, password.Length);
+            return result == 0;
         }
 
-        /// <summary>
-        /// Checks if the current password hash needs rehashing
-        /// </summary>
-        /// <param name="password">Password that needs rehashing</param>
-        /// <param name="opsLimit"></param>
-        /// <param name="memLimit"></param>
-        /// <returns></returns>
-        public static bool ArgonPasswordNeedsRehash(byte[] password, long opsLimit, int memLimit)
+        private static (int blockSize, int memorySize) GetParameters(Strength strength = Strength.Interactive)
         {
-            if (password == null)
+            return strength switch
             {
-                throw new ArgumentNullException("password", "Password cannot be null");
-            }
-
-            GeraltCore.InitialiseLibsodium();
-
-            int status = LibsodiumLibrary.crypto_pwhash_str_needs_rehash(password, opsLimit, memLimit);
-
-            if (status == -1)
-            {
-                throw new InvalidArgonPasswordString();
-            }
-
-            return status == 1;
+                Strength.Interactive => (_blockSizeInteractive, _memorySizeInteractive),
+                Strength.Medium => (_blockSizeMedium, _memorySizeMedium),
+                Strength.Sensitive => (_blockSizeSensitive, _memorySizeSensitive),
+                _ => (_blockSizeInteractive, _memorySizeInteractive),
+            };
         }
 
-        private static (long opsLimit, int memLimit) GetScryptOpsAndMemoryLimit(Strength limit = Strength.Interactive)
+        private static void ValidateBlockSize(int blockSize)
         {
-            int memLimit;
-            long opsLimit;
-
-            switch (limit)
+            if (blockSize <= 0)
             {
-                case Strength.Interactive:
-                    opsLimit = SCRYPT_OPSLIMIT_INTERACTIVE;
-                    memLimit = SCRYPT_MEMLIMIT_INTERACTIVE;
-                    break;
-                case Strength.Moderate:
-                    opsLimit = SCRYPT_OPSLIMIT_MODERATE;
-                    memLimit = SCRYPT_MEMLIMIT_MODERATE;
-                    break;
-                case Strength.Medium:
-                    opsLimit = SCRYPT_OPSLIMIT_MEDIUM;
-                    memLimit = SCRYPT_MEMLIMIT_MEDIUM;
-                    break;
-                case Strength.MediumSlow:
-                    //to slow the process down, use the sensitive ops limit
-                    opsLimit = SCRYPT_OPSLIMIT_SENSITIVE;
-                    memLimit = SCRYPT_MEMLIMIT_MEDIUM;
-                    break;
-                case Strength.Sensitive:
-                    opsLimit = SCRYPT_OPSLIMIT_SENSITIVE;
-                    memLimit = SCRYPT_MEMLIMIT_SENSITIVE;
-                    break;
-                default:
-                    opsLimit = SCRYPT_OPSLIMIT_INTERACTIVE;
-                    memLimit = SCRYPT_MEMLIMIT_INTERACTIVE;
-                    break;
+                throw new ArgumentOutOfRangeException(nameof(blockSize), "Block size cannot be zero or negative.");
             }
+        }
 
-            return (opsLimit, memLimit);
+        private static void ValidateMemorySize(int memorySize)
+        {
+            if (memorySize <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(memorySize), "Memory size cannot be zero or negative.");
+            }
         }
     }
 }
