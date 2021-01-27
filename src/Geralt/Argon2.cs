@@ -34,14 +34,15 @@ namespace Geralt
     public static class Argon2
     {
         private const int _hashStringBytes = 128;
+        private const int _defaultOutputLength = 32;
         private const int _saltBytes = 16;
         private const int _minimumIterations = 3;
-        private const int _interactiveIterations = 4;
-        private const int _moderateIterations = 6;
-        private const int _sensitiveIterations = 8;
-        private const int _interactiveMemorySize = 67108860;
-        private const int _moderateMemorySize = 134217728;
-        private const int _sensitiveMemorySize = 536870912;
+        private const int _iterationsInteractive = 4;
+        private const int _iterationsModerate = 6;
+        private const int _iterationsSensitive = 8;
+        private const int _memorySizeInteractive = 67108860;
+        private const int _memorySizeModerate = 134217728;
+        private const int _memorySizeSensitive = 536870912;
 
         /// <summary>Represents the available Argon2 algorithms.</summary>
         public enum Algorithm
@@ -82,7 +83,7 @@ namespace Geralt
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="SaltOutOfRangeException"></exception>
         /// <exception cref="OutOfMemoryException"></exception>
-        public static byte[] Hash(byte[] password, byte[] salt, int iterations, int memorySize, int outputLength = _saltBytes, Algorithm algorithm = Algorithm.Argon2id)
+        public static byte[] Hash(byte[] password, byte[] salt, int iterations, int memorySize, int outputLength = _defaultOutputLength, Algorithm algorithm = Algorithm.Argon2id)
         {
             ParameterValidation.Password(password);
             ParameterValidation.Salt(salt, _saltBytes);
@@ -107,7 +108,7 @@ namespace Geralt
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="SaltOutOfRangeException"></exception>
         /// <exception cref="OutOfMemoryException"></exception>
-        public static byte[] Hash(string password, string salt, Strength limit = Strength.Interactive, int outputLength = _saltBytes, Algorithm algorithm = Algorithm.Argon2id)
+        public static byte[] Hash(string password, string salt, Strength limit = Strength.Interactive, int outputLength = _defaultOutputLength, Algorithm algorithm = Algorithm.Argon2id)
         {
             return Hash(Encoding.UTF8.GetBytes(password), Encoding.UTF8.GetBytes(salt), limit, outputLength, algorithm);
         }
@@ -123,7 +124,7 @@ namespace Geralt
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="SaltOutOfRangeException"></exception>
         /// <exception cref="OutOfMemoryException"></exception>
-        public static byte[] Hash(byte[] password, byte[] salt, Strength limit = Strength.Interactive, int outputLength = _saltBytes, Algorithm algorithm = Algorithm.Argon2id)
+        public static byte[] Hash(byte[] password, byte[] salt, Strength limit = Strength.Interactive, int outputLength = _defaultOutputLength, Algorithm algorithm = Algorithm.Argon2id)
         {
             (int iterations, int memorySize) = GetParameters(limit);
             return Hash(password, salt, iterations, memorySize, outputLength, algorithm);
@@ -140,7 +141,7 @@ namespace Geralt
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="SaltOutOfRangeException"></exception>
         /// <exception cref="OutOfMemoryException"></exception>
-        public static byte[] ArgonHashBinary(string password, string salt, int iterations, int memorySize, int outputLength = _saltBytes)
+        public static byte[] Hash(string password, string salt, int iterations, int memorySize, int outputLength = _defaultOutputLength)
         {
             return Hash(Encoding.UTF8.GetBytes(password), Encoding.UTF8.GetBytes(salt), iterations, memorySize, outputLength);
         }
@@ -207,10 +208,10 @@ namespace Geralt
         {
             return limit switch
             {
-                Strength.Interactive => (_interactiveIterations, _interactiveMemorySize),
-                Strength.Moderate => (_moderateIterations, _moderateMemorySize),
-                Strength.Sensitive => (_sensitiveIterations, _sensitiveMemorySize),
-                _ => (_interactiveIterations, _interactiveMemorySize),
+                Strength.Interactive => (_iterationsInteractive, _memorySizeInteractive),
+                Strength.Moderate => (_iterationsModerate, _memorySizeModerate),
+                Strength.Sensitive => (_iterationsSensitive, _memorySizeSensitive),
+                _ => (_iterationsInteractive, _memorySizeInteractive),
             };
         }
 
