@@ -40,7 +40,7 @@ namespace Geralt
         private const int _iterationsInteractive = 4;
         private const int _iterationsModerate = 6;
         private const int _iterationsSensitive = 8;
-        private const int _memorySizeInteractive = 67108860;
+        private const int _memorySizeInteractive = 67108864;
         private const int _memorySizeModerate = 134217728;
         private const int _memorySizeSensitive = 536870912;
 
@@ -93,7 +93,7 @@ namespace Geralt
             byte[] hash = new byte[outputLength];
             GeraltCore.InitialiseLibsodium();
             int result = LibsodiumLibrary.crypto_pwhash(hash, hash.Length, password, password.Length, salt, iterations, memorySize, (int)algorithm);
-            ValidateResult(result);
+            ParameterValidation.PasswordHashingResult(result);
             return hash;
         }
 
@@ -176,7 +176,7 @@ namespace Geralt
             byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
             GeraltCore.InitialiseLibsodium();
             int result = LibsodiumLibrary.crypto_pwhash_str(hash, passwordBytes, passwordBytes.Length, iterations, memorySize);
-            ValidateResult(result);
+            ParameterValidation.PasswordHashingResult(result);
             return Utilities.UnsafeAsciiBytesToString(hash);
         }
 
@@ -202,6 +202,52 @@ namespace Geralt
             GeraltCore.InitialiseLibsodium();
             int result = LibsodiumLibrary.crypto_pwhash_str_verify(hash, password, password.Length);
             return result == 0;
+        }
+
+        /// <summary>Checks if a password hash matches the iterations and memory size parameters.</summary>
+        /// <param name="hash">The password hash to check.</param>
+        /// <param name="strength">The strength preset used for the hash.</param>
+        /// <returns><c>true</c> if the hash is correct; otherwise, <c>false</c>.</returns>
+        public static bool DoesPasswordNeedRehash(byte[] password, Strength strength = Strength.Interactive)
+        {
+            (int opsLimit, int memLimit) = GetParameters(strength);
+            return DoesPasswordNeedRehash(password, opsLimit, memLimit);
+        }
+
+        /// <summary>Checks if a password hash matches the iterations and memory size parameters.</summary>
+        /// <param name="hash">The password hash to check.</param>
+        /// <param name="strength">The strength preset used for the hash.</param>
+        /// <returns><c>true</c> if the hash is correct; otherwise, <c>false</c>.</returns>
+        public static bool DoesPasswordNeedRehash(string password, Strength strength = Strength.Interactive)
+        {
+            return DoesPasswordNeedRehash(Encoding.UTF8.GetBytes(password), strength);
+        }
+
+        /// <summary>Checks if a password hash matches the iterations and memory size parameters.</summary>
+        /// <param name="hash">The password hash to check.</param>
+        /// <param name="iterations">The number of iterations used for the hash.</param>
+        /// <param name="memorySize">The amount of memory (in bytes) used for the hash.</param>
+        /// <returns><c>true</c> if the hash is correct; otherwise, <c>false</c>.</returns>
+        public static bool DoesPasswordNeedRehash(string password, int iterations, int memorySize)
+        {
+            return DoesPasswordNeedRehash(Encoding.UTF8.GetBytes(password), iterations, memorySize);
+        }
+
+        /// <summary>Checks if a password hash matches the iterations and memory size parameters.</summary>
+        /// <param name="hash">The password hash to check.</param>
+        /// <param name="iterations">The number of iterations used for the hash.</param>
+        /// <param name="memorySize">The amount of memory (in bytes) used for the hash.</param>
+        /// <returns><c>true</c> if the hash is correct; otherwise, <c>false</c>.</returns>
+        public static bool DoesPasswordNeedRehash(byte[] hash, int iterations, int memorySize)
+        {
+            ParameterValidation.Password(hash);
+            GeraltCore.InitialiseLibsodium();
+            int result = LibsodiumLibrary.crypto_pwhash_str_needs_rehash(hash, iterations, memorySize);
+            if (result == -1)
+            {
+                throw new InvalidArgonPasswordString();
+            }
+            return result == 1;
         }
 
         private static (int iterations, int memorySize) GetParameters(Strength strength = Strength.Interactive)
@@ -236,14 +282,6 @@ namespace Geralt
             if (outputLength <= 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(outputLength), "Output length cannot be zero or negative.");
-            }
-        }
-
-        private static void ValidateResult(int result)
-        {
-            if (result != 0)
-            {
-                throw new OutOfMemoryException("Internal error - hashing failed. Possibly not enough memory.");
             }
         }
     }
