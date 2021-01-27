@@ -208,26 +208,6 @@ namespace Geralt
             return decodedBase64;
         }
 
-        /// <summary>Takes a byte array and increments it.</summary>
-        /// <param name="value">The value to increment.</param>
-        /// <returns>The incremented byte array.</returns>
-        public static byte[] Increment(byte[] value)
-        {
-            byte[] buffer = value;
-            LibsodiumLibrary.sodium_increment(buffer, buffer.Length);
-            return buffer;
-        }
-
-        /// <summary>Compares two byte arrays in constant time.</summary>
-        /// <param name="a">The first byte array.</param>
-        /// <param name="b">The second byte array.</param>
-        /// <returns><c>true</c> if the values are equal, otherwise <c>false</c>.</returns>
-        public static bool Compare(byte[] a, byte[] b)
-        {
-            int result = LibsodiumLibrary.sodium_compare(a, b, a.Length);
-            return result == 0;
-        }
-
         internal static string UnsafeAsciiBytesToString(byte[] buffer)
         {
             unsafe
