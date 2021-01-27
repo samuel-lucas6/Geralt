@@ -46,10 +46,10 @@ namespace Geralt
         /// <summary>Represents the available Argon2 algorithms.</summary>
         public enum Algorithm
         {
-            /// <summary>The default and recommended algorithm.</summary>
-            Argon2id = 1,
             /// <summary>The Argon2i algorithm. Requires 10+ iterations to be secure.</summary>
-            Argon2i = 2
+            Argon2i = 1,
+            /// <summary>The default and recommended algorithm.</summary>
+            Argon2id = 2
         }
 
         /// <summary>Represents predefined and useful parameter limits.</summary>
