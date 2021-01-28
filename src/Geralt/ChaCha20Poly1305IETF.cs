@@ -29,20 +29,19 @@ using Geralt.Exceptions;
 
 namespace Geralt
 {
-    /// <summary>Authenticated Encryption with Additional Data.</summary>
+    /// <summary>Authenticated encryption with additional data using IETF ChaCha20-Poly1305.</summary>
+    /// <remarks>See here for more information: https://doc.libsodium.org/secret-key_cryptography/aead/chacha20-poly1305/ietf_chacha20-poly1305_construction </remarks>
     public static class ChaCha20Poly1305IETF
     {
-        private const int KEYBYTES = 32;
-        private const int NPUBBYTES = 8;
-        private const int ABYTES = 16;
+        private const int _keyBytes = 32;
+        private const int _nonceBytes = 12;
+        private const int _tagBytes = 16;
 
-        //TODO: we could implement a method which increments the nonce.
-
-        /// <summary>Generates a random 8 byte nonce.</summary>
-        /// <returns>Returns a byte array with 8 random bytes.</returns>
+        /// <summary>Generates a random 12 byte nonce.</summary>
+        /// <returns>A byte array with 12 random bytes.</returns>
         public static byte[] GenerateNonce()
         {
-            return SecureRandom.GetBytes(NPUBBYTES);
+            return SecureRandom.GetBytes(_nonceBytes);
         }
 
         /// <summary>Increments a nonce in constant time.</summary>
@@ -53,118 +52,72 @@ namespace Geralt
             return ConstantTime.Increment(nonce);
         }
 
-        /// <summary>
-        /// Encrypts a message with an authentication tag and additional data.
-        /// </summary>
+        /// <summary>Encrypts a message using IETF ChaCha20-Poly1305.</summary>
         /// <param name="message">The message to be encrypted.</param>
-        /// <param name="nonce">The 8 byte nonce.</param>
+        /// <param name="nonce">The 12 byte nonce.</param>
         /// <param name="key">The 32 byte key.</param>
-        /// <param name="additionalData">The additional data; may be null, otherwise between 0 and 16 bytes.</param>
-        /// <returns>The encrypted message with additional data.</returns>
-        /// <remarks>The nonce should never ever be reused with the same key.</remarks>
-        /// <remarks>The recommended way to generate it is to use GenerateNonce() for the first message, and increment it for each subsequent message using the same key.</remarks>
+        /// <param name="additionalData">The additional data - can be null.</param>
+        /// <returns>The encrypted message with an authentication tag.</returns>
+        /// <remarks>Never reuse a nonce with the same key. A counter nonce is recommended.</remarks>
         /// <exception cref="KeyOutOfRangeException"></exception>
         /// <exception cref="NonceOutOfRangeException"></exception>
-        /// <exception cref="AdditionalDataOutOfRangeException"></exception>
         /// <exception cref="CryptographicException"></exception>
         public static byte[] Encrypt(byte[] message, byte[] nonce, byte[] key, byte[] additionalData = null)
         {
-            //additionalData can be null
-            if (additionalData == null)
-                additionalData = new byte[0x00];
-
-            //validate the length of the key
-            if (key == null || key.Length != KEYBYTES)
-                throw new KeyOutOfRangeException("key", (key == null) ? 0 : key.Length,
-                  string.Format("key must be {0} bytes in length.", KEYBYTES));
-
-            //validate the length of the nonce
-            if (nonce == null || nonce.Length != NPUBBYTES)
-                throw new NonceOutOfRangeException("nonce", (nonce == null) ? 0 : nonce.Length,
-                  string.Format("nonce must be {0} bytes in length.", NPUBBYTES));
-
-            //validate the length of the additionalData
-            if (additionalData.Length > ABYTES || additionalData.Length < 0)
-                throw new AdditionalDataOutOfRangeException(
-                  string.Format("additionalData must be between {0} and {1} bytes in length.", 0, ABYTES));
-
-            var cipher = new byte[message.Length + ABYTES];
-            var bin = Marshal.AllocHGlobal(cipher.Length);
-            long cipherLength;
-
-            var ret = LibsodiumLibrary.crypto_aead_chacha20poly1305_ietf_encrypt(bin, out cipherLength, message, message.Length, additionalData, additionalData.Length, null,
-              nonce, key);
-
-            Marshal.Copy(bin, cipher, 0, (int)cipherLength);
-            Marshal.FreeHGlobal(bin);
-
-            if (ret != 0)
+            additionalData = ParameterValidation.AdditionalData(additionalData);
+            ParameterValidation.Key(key, _keyBytes);
+            ParameterValidation.Nonce(nonce, _nonceBytes);
+            byte[] ciphertext = new byte[message.Length + _tagBytes];
+            IntPtr ciphertextPointer = Marshal.AllocHGlobal(ciphertext.Length);
+            int result = LibsodiumLibrary.crypto_aead_chacha20poly1305_ietf_encrypt(ciphertextPointer, out long ciphertextLength, message, message.Length, additionalData, additionalData.Length, nsec: null, nonce, key);
+            Marshal.Copy(ciphertextPointer, ciphertext, startIndex: 0, (int)ciphertextLength);
+            Marshal.FreeHGlobal(ciphertextPointer);
+            if (result != 0)
+            {
                 throw new CryptographicException("Error encrypting message.");
-
-            if (cipher.Length == cipherLength)
-                return cipher;
-
-            //remove the trailing nulls from the array
-            var tmp = new byte[cipherLength];
-            Array.Copy(cipher, 0, tmp, 0, (int)cipherLength);
-
-            return tmp;
+            }
+            if (ciphertext.Length == ciphertextLength)
+            {
+                return ciphertext;
+            }
+            return RemoveTrailingNulls(ciphertext, ciphertextLength);
         }
 
-        /// <summary>
-        /// Decrypts a cipher with an authentication tag and additional data.
-        /// </summary>
-        /// <param name="cipher">The cipher to be decrypted.</param>
-        /// <param name="nonce">The 8 byte nonce.</param>
+        /// <summary>Decrypts a ciphertext message using ChaCha20-Poly1305.</summary>
+        /// <param name="ciphertext">The ciphertext to be decrypted.</param>
+        /// <param name="nonce">The 12 byte nonce.</param>
         /// <param name="key">The 32 byte key.</param>
-        /// <param name="additionalData">The additional data; may be null, otherwise between 0 and 16 bytes.</param>
-        /// <returns>The decrypted cipher.</returns>
+        /// <param name="additionalData">The additional data - can be null.</param>
+        /// <returns>The decrypted ciphertext.</returns>
         /// <exception cref="KeyOutOfRangeException"></exception>
         /// <exception cref="NonceOutOfRangeException"></exception>
-        /// <exception cref="AdditionalDataOutOfRangeException"></exception>
         /// <exception cref="CryptographicException"></exception>
-        public static byte[] Decrypt(byte[] cipher, byte[] nonce, byte[] key, byte[] additionalData = null)
+        public static byte[] Decrypt(byte[] ciphertext, byte[] nonce, byte[] key, byte[] additionalData = null)
         {
-            //additionalData can be null
-            if (additionalData == null)
-                additionalData = new byte[0x00];
-
-            //validate the length of the key
-            if (key == null || key.Length != KEYBYTES)
-                throw new KeyOutOfRangeException("key", (key == null) ? 0 : key.Length,
-                  string.Format("key must be {0} bytes in length.", KEYBYTES));
-
-            //validate the length of the nonce
-            if (nonce == null || nonce.Length != NPUBBYTES)
-                throw new NonceOutOfRangeException("nonce", (nonce == null) ? 0 : nonce.Length,
-                  string.Format("nonce must be {0} bytes in length.", NPUBBYTES));
-
-            //validate the length of the additionalData
-            if (additionalData.Length > ABYTES || additionalData.Length < 0)
-                throw new AdditionalDataOutOfRangeException(
-                  string.Format("additionalData must be between {0} and {1} bytes in length.", 0, ABYTES));
-
-            var message = new byte[cipher.Length - ABYTES];
-            var bin = Marshal.AllocHGlobal(message.Length);
-            long messageLength;
-
-            var ret = LibsodiumLibrary.crypto_aead_chacha20poly1305_ietf_decrypt(bin, out messageLength, null, cipher, cipher.Length,
-              additionalData, additionalData.Length, nonce, key);
-
-            Marshal.Copy(bin, message, 0, (int)messageLength);
-            Marshal.FreeHGlobal(bin);
-
-            if (ret != 0)
+            additionalData = ParameterValidation.AdditionalData(additionalData);
+            ParameterValidation.Key(key, _keyBytes);
+            ParameterValidation.Nonce(nonce, _nonceBytes);
+            byte[] message = new byte[ciphertext.Length - _tagBytes];
+            IntPtr messagePointer = Marshal.AllocHGlobal(message.Length);
+            int result = LibsodiumLibrary.crypto_aead_chacha20poly1305_ietf_decrypt(messagePointer, out long messageLength, nsec: null, ciphertext, ciphertext.Length, additionalData, additionalData.Length, nonce, key);
+            Marshal.Copy(messagePointer, message, startIndex: 0, (int)messageLength);
+            Marshal.FreeHGlobal(messagePointer);
+            if (result != 0)
+            {
                 throw new CryptographicException("Error decrypting message.");
-
+            }
             if (message.Length == messageLength)
+            {
                 return message;
+            }
+            return RemoveTrailingNulls(message, messageLength);
+        }
 
-            //remove the trailing nulls from the array
-            var tmp = new byte[messageLength];
-            Array.Copy(message, 0, tmp, 0, (int)messageLength);
-
-            return tmp;
+        private static byte[] RemoveTrailingNulls(byte[] message, long messageLength)
+        {
+            byte[] messageWithoutPadding = new byte[message.Length];
+            Array.Copy(message, messageWithoutPadding, (int)messageLength);
+            return messageWithoutPadding;
         }
     }
 }

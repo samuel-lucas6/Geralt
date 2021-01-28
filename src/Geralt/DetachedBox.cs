@@ -24,7 +24,7 @@
 
 namespace Geralt
 {
-    /// <summary>A ciphertext / mac pair.</summary>
+    /// <summary>A ciphertext/message authentication code pair.</summary>
     public class DetachedBox
     {
         /// <summary>Initializes a new instance of the <see cref="DetachedBox"/> class.</summary>
