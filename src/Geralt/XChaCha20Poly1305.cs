@@ -51,6 +51,14 @@ namespace Geralt
             return SecureRandom.GetBytes(_nonceBytes);
         }
 
+        /// <summary>Increments a nonce in constant time.</summary>
+        /// <param name="nonce">The nonce to increment.</param>
+        /// <returns>The incremented byte array.</returns>
+        public static byte[] IncrementNonce(byte[] nonce)
+        {
+            return ConstantTime.Increment(nonce);
+        }
+
         /// <summary>Encrypts a message using XChaCha20-Poly1305.</summary>
         /// <param name="message">The message to be encrypted.</param>
         /// <param name="nonce">The 24 byte nonce.</param>
