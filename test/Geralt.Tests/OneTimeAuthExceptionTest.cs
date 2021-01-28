@@ -1,7 +1,7 @@
-using System.Text;
-using NUnit.Framework;
-using Geralt.Exceptions;
 using Geralt;
+using Geralt.Exceptions;
+using NUnit.Framework;
+using System.Text;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.

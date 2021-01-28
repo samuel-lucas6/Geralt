@@ -1,7 +1,7 @@
-using System.Text;
-using NUnit.Framework;
-using Geralt.Exceptions;
 using Geralt;
+using Geralt.Exceptions;
+using NUnit.Framework;
+using System.Text;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
@@ -44,7 +44,7 @@ namespace Tests
         0x6f,0x3b,0xb1,0x29,0x26,0x18,0xb6,0xfd,
         0x1c,0x2f,0x8b,0x27,0xff,0x88
       };
-            Assert.Throws<SeedOutOfRangeException>(
+            _ = Assert.Throws<SeedOutOfRangeException>(
               () => PublicKeyBox.GenerateKeyPair(bobSk));
         }
 
@@ -58,7 +58,7 @@ namespace Tests
         0x6f,0x3b,0xb1,0x29,0x26,0x18,0xb6,0xfd,
         0x1c,0x2f,0x8b,0x27,0xff,0x88
       };
-            Assert.Throws<SeedOutOfRangeException>(
+            _ = Assert.Throws<SeedOutOfRangeException>(
               () => PublicKeyBox.GenerateSeededKeyPair(invalidSeed));
         }
 
@@ -75,7 +75,7 @@ namespace Tests
             var nonce = Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX");
             var alicePk = Utilities.HexToBinary("83638e30326e2f55509286ac86afeb5bfd0732a3d11747bd50eb96bb9ec85645");
 
-            Assert.Throws<KeyOutOfRangeException>(
+            _ = Assert.Throws<KeyOutOfRangeException>(
               () => PublicKeyBox.Create(message, nonce, bobSk, alicePk));
         }
 
@@ -92,7 +92,7 @@ namespace Tests
             var nonce = Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX");
             var aliceSk = Utilities.HexToBinary("2a5c92fac62514f793c0bfd374f629a138c5702793a32c61dadc593728a15975");
 
-            Assert.Throws<KeyOutOfRangeException>(
+            _ = Assert.Throws<KeyOutOfRangeException>(
               () => PublicKeyBox.Create(message, nonce, aliceSk, bobPk));
         }
 
@@ -104,7 +104,7 @@ namespace Tests
             var bobSk = Utilities.HexToBinary("2a5c92fac62514f793c0bfd374f629a138c5702793a32c61dadc593728a15975");
             var alicePk = Utilities.HexToBinary("83638e30326e2f55509286ac86afeb5bfd0732a3d11747bd50eb96bb9ec85645");
 
-            Assert.Throws<NonceOutOfRangeException>(
+            _ = Assert.Throws<NonceOutOfRangeException>(
               () => PublicKeyBox.Create(message, nonce, bobSk, alicePk));
         }
 
@@ -121,7 +121,7 @@ namespace Tests
             var nonce = Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX");
             var alicePk = Utilities.HexToBinary("83638e30326e2f55509286ac86afeb5bfd0732a3d11747bd50eb96bb9ec85645");
 
-            Assert.Throws<KeyOutOfRangeException>(
+            _ = Assert.Throws<KeyOutOfRangeException>(
               () => PublicKeyBox.CreateDetached(message, nonce, bobSk, alicePk));
         }
 
@@ -138,21 +138,21 @@ namespace Tests
             var nonce = Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX");
             var aliceSk = Utilities.HexToBinary("2a5c92fac62514f793c0bfd374f629a138c5702793a32c61dadc593728a15975");
 
-            Assert.Throws<KeyOutOfRangeException>(
+            _ = Assert.Throws<KeyOutOfRangeException>(
               () => PublicKeyBox.CreateDetached(message, nonce, aliceSk, bobPk));
         }
 
         [Test]
         public void PublicKeyBoxCreateDetachedWithBadNonce()
         {
-            Assert.Throws<NonceOutOfRangeException>(() =>
-            {
-                PublicKeyBox.CreateDetached(
-            Encoding.UTF8.GetBytes("Adam Caudill"),
-            Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVX"),
-            Utilities.HexToBinary("2a5c92fac62514f793c0bfd374f629a138c5702793a32c61dadc593728a15975"),
-            Utilities.HexToBinary("83638e30326e2f55509286ac86afeb5bfd0732a3d11747bd50eb96bb9ec85645"));
-            });
+            _ = Assert.Throws<NonceOutOfRangeException>(() =>
+              {
+                  _ = PublicKeyBox.CreateDetached(
+              Encoding.UTF8.GetBytes("Adam Caudill"),
+              Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVX"),
+              Utilities.HexToBinary("2a5c92fac62514f793c0bfd374f629a138c5702793a32c61dadc593728a15975"),
+              Utilities.HexToBinary("83638e30326e2f55509286ac86afeb5bfd0732a3d11747bd50eb96bb9ec85645"));
+              });
         }
 
         [Test]
@@ -164,14 +164,14 @@ namespace Tests
         0x6f,0x3b,0xb1,0x29,0x26,0x18,0xb6,0xfd,
         0x1c,0x2f,0x8b,0x27,0xff,0x88
       };
-            Assert.Throws<KeyOutOfRangeException>(() =>
-            {
-                PublicKeyBox.Open(
-            Utilities.HexToBinary("aed04284c55860ad0f6379f235cc2cb8c32aba7a811b35cfac94f64d"),
-            Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
-            bobPk,
-            Utilities.HexToBinary("753cb95919b15b76654b1969c554a4aaf8334402ef1468cb40a602b9c9fd2c13"));
-            });
+            _ = Assert.Throws<KeyOutOfRangeException>(() =>
+              {
+                  _ = PublicKeyBox.Open(
+              Utilities.HexToBinary("aed04284c55860ad0f6379f235cc2cb8c32aba7a811b35cfac94f64d"),
+              Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
+              bobPk,
+              Utilities.HexToBinary("753cb95919b15b76654b1969c554a4aaf8334402ef1468cb40a602b9c9fd2c13"));
+              });
         }
 
         [Test]
@@ -184,27 +184,27 @@ namespace Tests
         0x1c,0x2f,0x8b,0x27,0xff,0x88
       };
 
-            Assert.Throws<KeyOutOfRangeException>(() =>
-            {
-                PublicKeyBox.Open(
-            Utilities.HexToBinary("aed04284c55860ad0f6379f235cc2cb8c32aba7a811b35cfac94f64d"),
-            Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
-            Utilities.HexToBinary("d4c8438482d5d103a2315251a5eed7c46017864a02ddc4c8b03f0ede8cb3ef9b"), bobPk);
-            });
+            _ = Assert.Throws<KeyOutOfRangeException>(() =>
+              {
+                  _ = PublicKeyBox.Open(
+              Utilities.HexToBinary("aed04284c55860ad0f6379f235cc2cb8c32aba7a811b35cfac94f64d"),
+              Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
+              Utilities.HexToBinary("d4c8438482d5d103a2315251a5eed7c46017864a02ddc4c8b03f0ede8cb3ef9b"), bobPk);
+              });
 
         }
 
         [Test]
         public void PublicKeyBoxOpenBadNonce()
         {
-            Assert.Throws<NonceOutOfRangeException>(() =>
-            {
-                PublicKeyBox.Open(
-            Utilities.HexToBinary("aed04284c55860ad0f6379f235cc2cb8c32aba7a811b35cfac94f64d"),
-            Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVW"),
-            Utilities.HexToBinary("d4c8438482d5d103a2315251a5eed7c46017864a02ddc4c8b03f0ede8cb3ef9b"),
-            Utilities.HexToBinary("753cb95919b15b76654b1969c554a4aaf8334402ef1468cb40a602b9c9fd2c13"));
-            });
+            _ = Assert.Throws<NonceOutOfRangeException>(() =>
+              {
+                  _ = PublicKeyBox.Open(
+              Utilities.HexToBinary("aed04284c55860ad0f6379f235cc2cb8c32aba7a811b35cfac94f64d"),
+              Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVW"),
+              Utilities.HexToBinary("d4c8438482d5d103a2315251a5eed7c46017864a02ddc4c8b03f0ede8cb3ef9b"),
+              Utilities.HexToBinary("753cb95919b15b76654b1969c554a4aaf8334402ef1468cb40a602b9c9fd2c13"));
+              });
         }
 
         [Test]
@@ -218,7 +218,7 @@ namespace Tests
 
             Assert.Throws<KeyOutOfRangeException>(() =>
             {
-                PublicKeyBox.OpenDetached(actual.CipherText, actual.Mac,
+                PublicKeyBox.OpenDetached(actual.Ciphertext, actual.Mac,
             Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
             Utilities.HexToBinary("2a5c92fac62514f793c0bfd374f629a138c5702793a32c61dadc593728a159"),
             Utilities.HexToBinary("83638e30326e2f55509286ac86afeb5bfd0732a3d11747bd50eb96bb9ec85645"));
@@ -236,7 +236,7 @@ namespace Tests
 
             Assert.Throws<KeyOutOfRangeException>(() =>
             {
-                PublicKeyBox.OpenDetached(actual.CipherText, actual.Mac,
+                PublicKeyBox.OpenDetached(actual.Ciphertext, actual.Mac,
             Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
             Utilities.HexToBinary("2a5c92fac62514f793c0bfd374f629a138c5702793a32c61dadc593728a15975"),
             Utilities.HexToBinary("83638e30326e2f55509286ac86afeb5bfd0732a3d11747bd50eb96bb9ec856"));
@@ -254,7 +254,7 @@ namespace Tests
 
             Assert.Throws<NonceOutOfRangeException>(() =>
             {
-                PublicKeyBox.OpenDetached(actual.CipherText, actual.Mac,
+                PublicKeyBox.OpenDetached(actual.Ciphertext, actual.Mac,
             Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVW"),
             Utilities.HexToBinary("2a5c92fac62514f793c0bfd374f629a138c5702793a32c61dadc593728a15975"),
             Utilities.HexToBinary("83638e30326e2f55509286ac86afeb5bfd0732a3d11747bd50eb96bb9ec85645"));
@@ -271,13 +271,13 @@ namespace Tests
             Utilities.HexToBinary("2a5c92fac62514f793c0bfd374f629a138c5702793a32c61dadc593728a15975"),
             Utilities.HexToBinary("83638e30326e2f55509286ac86afeb5bfd0732a3d11747bd50eb96bb9ec85645"));
 
-            Assert.Throws<MacOutOfRangeException>(() =>
-            {
-                PublicKeyBox.OpenDetached(actual.CipherText, null,
-            Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
-            Utilities.HexToBinary("2a5c92fac62514f793c0bfd374f629a138c5702793a32c61dadc593728a15975"),
-            Utilities.HexToBinary("83638e30326e2f55509286ac86afeb5bfd0732a3d11747bd50eb96bb9ec85645"));
-            });
+            _ = Assert.Throws<MacOutOfRangeException>(() =>
+              {
+                  _ = PublicKeyBox.OpenDetached(actual.Ciphertext, null,
+              Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
+              Utilities.HexToBinary("2a5c92fac62514f793c0bfd374f629a138c5702793a32c61dadc593728a15975"),
+              Utilities.HexToBinary("83638e30326e2f55509286ac86afeb5bfd0732a3d11747bd50eb96bb9ec85645"));
+              });
         }
     }
 }

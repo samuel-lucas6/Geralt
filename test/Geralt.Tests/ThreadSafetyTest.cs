@@ -1,8 +1,8 @@
+using Geralt;
+using NUnit.Framework;
 using System;
 using System.Linq;
 using System.Threading;
-using NUnit.Framework;
-using Geralt;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
@@ -38,7 +38,7 @@ namespace Tests
         {
             try
             {
-                var bytes = GeraltCore.GetRandomBytes(32);
+                var bytes = SecureRandom.GetBytes(32);
 
                 //this is mostly to make the compiler happier, as otherwise, bytes is never used
                 if (bytes.Count() != 32)

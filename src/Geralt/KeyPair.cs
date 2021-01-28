@@ -1,5 +1,5 @@
-using System;
 using Geralt.Exceptions;
+using System;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
@@ -70,6 +70,7 @@ namespace Geralt
             {
                 Array.Clear(_privateKey, index: 0, _privateKey.Length);
             }
+            GC.SuppressFinalize(this);
         }
     }
 }

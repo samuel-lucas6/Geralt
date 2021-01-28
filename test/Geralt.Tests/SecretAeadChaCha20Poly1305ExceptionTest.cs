@@ -1,6 +1,6 @@
-using NUnit.Framework;
-using Geralt.Exceptions;
 using Geralt;
+using Geralt.Exceptions;
+using NUnit.Framework;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
@@ -53,7 +53,7 @@ namespace Tests
         0x86, 0xd0, 0x99, 0x74, 0x84, 0x0b, 0xde, 0xd2, 0xa5, 0xca
       };
 
-            Assert.Throws<KeyOutOfRangeException>(
+            _ = Assert.Throws<KeyOutOfRangeException>(
               () => ChaCha20Poly1305.Encrypt(m, nonce, key, ad));
         }
 
@@ -78,7 +78,7 @@ namespace Tests
         0x86, 0xd0, 0x99, 0x74, 0x84, 0x0b, 0xde, 0xd2, 0xa5, 0xca
       };
 
-            Assert.Throws<NonceOutOfRangeException>(
+            _ = Assert.Throws<NonceOutOfRangeException>(
               () => ChaCha20Poly1305.Encrypt(m, nonce, key, ad));
         }
 
@@ -105,7 +105,7 @@ namespace Tests
         0x86, 0xd0, 0x99, 0x74, 0x84, 0x0b, 0xde, 0xd2, 0xa5, 0xca
       };
 
-            Assert.Throws<AdditionalDataOutOfRangeException>(
+            _ = Assert.Throws<AdditionalDataOutOfRangeException>(
               () => ChaCha20Poly1305.Encrypt(m, nonce, key, ad));
         }
 
@@ -130,7 +130,7 @@ namespace Tests
         0x86, 0xd0, 0x99, 0x74, 0x84, 0x0b, 0xde, 0xd2, 0xa5, 0xca
       };
 
-            Assert.Throws<KeyOutOfRangeException>(
+            _ = Assert.Throws<KeyOutOfRangeException>(
               () => ChaCha20Poly1305.Decrypt(m, nonce, key, ad));
         }
 
@@ -155,7 +155,7 @@ namespace Tests
         0x86, 0xd0, 0x99, 0x74, 0x84, 0x0b, 0xde, 0xd2, 0xa5, 0xca
       };
 
-            Assert.Throws<NonceOutOfRangeException>(
+            _ = Assert.Throws<NonceOutOfRangeException>(
               () => ChaCha20Poly1305.Decrypt(m, nonce, key, ad));
         }
 
@@ -182,7 +182,7 @@ namespace Tests
         0x86, 0xd0, 0x99, 0x74, 0x84, 0x0b, 0xde, 0xd2, 0xa5, 0xca
       };
 
-            Assert.Throws<AdditionalDataOutOfRangeException>(
+            _ = Assert.Throws<AdditionalDataOutOfRangeException>(
               () => ChaCha20Poly1305.Decrypt(m, nonce, key, ad));
         }
     }

@@ -1,7 +1,7 @@
+using Geralt;
+using NUnit.Framework;
 using System.IO;
 using System.Text;
-using NUnit.Framework;
-using Geralt;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.

@@ -27,9 +27,7 @@ using System.Runtime.InteropServices;
 
 namespace Geralt
 {
-    /// <summary>
-    /// libsodium library binding.
-    /// </summary>
+    /// <summary>libsodium library binding.</summary>
     public static partial class LibsodiumLibrary
     {
 #if IOS
@@ -275,7 +273,7 @@ namespace Geralt
         internal static extern IntPtr sodium_bin2hex(byte[] hex, int hexMaxlen, byte[] bin, int binLen);
 
         //sodium_hex2bin
-        [DllImport(_dllName, CallingConvention = _callingConvention)]
+        [DllImport(_dllName, CallingConvention = _callingConvention, CharSet = CharSet.Unicode)]
         internal static extern int sodium_hex2bin(IntPtr bin, int binMaxlen, string hex, int hexLen, string ignore, out int binLen, string hexEnd);
 
         //sodium_bin2base64
@@ -283,7 +281,7 @@ namespace Geralt
         internal static extern IntPtr sodium_bin2base64(byte[] b64, int b64Maxlen, byte[] bin, int binLen, int variant);
 
         //sodium_base642bin
-        [DllImport(_dllName, CallingConvention = _callingConvention)]
+        [DllImport(_dllName, CallingConvention = _callingConvention, CharSet = CharSet.Unicode)]
         internal static extern int sodium_base642bin(IntPtr bin, int binMaxlen, string b64, int b64Len, string ignore, out int binLen, out char b64End, int variant);
 
         //sodium_base64_encoded_len

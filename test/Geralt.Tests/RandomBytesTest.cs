@@ -1,5 +1,5 @@
-using NUnit.Framework;
 using Geralt;
+using NUnit.Framework;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
@@ -35,9 +35,9 @@ namespace Tests
         [Test]
         public void GetRandomBytesTest()
         {
-            var v16 = GeraltCore.GetRandomBytes(16);
-            var v32 = GeraltCore.GetRandomBytes(32);
-            var v64 = GeraltCore.GetRandomBytes(64);
+            var v16 = SecureRandom.GetBytes(16);
+            var v32 = SecureRandom.GetBytes(32);
+            var v64 = SecureRandom.GetBytes(64);
 
             Assert.IsNotNull(v16);
             Assert.IsNotNull(v32);

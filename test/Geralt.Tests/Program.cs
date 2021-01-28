@@ -1,5 +1,5 @@
-using System.Reflection;
 using NUnitLite;
+using System.Reflection;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
@@ -31,7 +31,7 @@ namespace Geralt.Tests
     {
         public static void Main(string[] args)
         {
-            new AutoRun(typeof(Program).GetTypeInfo().Assembly).Execute(args);
+            _ = new AutoRun(typeof(Program).GetTypeInfo().Assembly).Execute(args);
         }
     }
 }

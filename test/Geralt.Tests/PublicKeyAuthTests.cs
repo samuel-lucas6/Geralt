@@ -1,6 +1,6 @@
-using System.Text;
-using NUnit.Framework;
 using Geralt;
+using NUnit.Framework;
+using System.Text;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
@@ -47,7 +47,7 @@ namespace Tests
         public void GenerateKeyVerifySignedDataTest()
         {
             var actual = Ed25519.GenerateKeyPair();
-            byte[] randomArray = GeraltCore.GetRandomBytes(255);
+            byte[] randomArray = SecureRandom.GetBytes(255);
             var sign = Ed25519.SignDetached(randomArray, actual.PrivateKey);
             Assert.IsTrue(Ed25519.VerifyDetached(sign, randomArray, actual.PublicKey));
         }
@@ -159,7 +159,7 @@ namespace Tests
                 ed25519SkPk = keys.PrivateKey;
                 curve25519Pk = Ed25519.ConvertEd25519PublicKeyToCurve25519PublicKey(ed25519Pk);
                 curve25519Sk = Ed25519.ConvertEd25519SecretKeyToCurve25519SecretKey(ed25519SkPk);
-                var curve25519Pk2 = ScalarMult.Base(curve25519Sk);
+                var curve25519Pk2 = X25519.Base(curve25519Sk);
 
                 CollectionAssert.AreEqual(curve25519Pk, curve25519Pk2);
             }

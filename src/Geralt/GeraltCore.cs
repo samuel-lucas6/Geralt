@@ -39,7 +39,7 @@ namespace Geralt
 
         /// <summary>Initialize libsodium.</summary>
         /// <remarks>This only needs to be done once. This method prevents repeated calls.</remarks>
-        public static void InitialiseLibsodium()
+        internal static void InitialiseLibsodium()
         {
             if (!_isInitialised)
             {

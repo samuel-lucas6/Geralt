@@ -1,7 +1,7 @@
-using System.Text;
-using NUnit.Framework;
-using Geralt.Exceptions;
 using Geralt;
+using Geralt.Exceptions;
+using NUnit.Framework;
+using System.Text;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
@@ -36,73 +36,73 @@ namespace Tests
         [Test]
         public void CreateSecretBoxBadKey()
         {
-            Assert.Throws<KeyOutOfRangeException>(() =>
-            {
-                SecretBox.Create(
-            Encoding.UTF8.GetBytes("Adam Caudill"),
-            Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
-            Encoding.UTF8.GetBytes("123456789012345678901234567890"));
-            });
+            _ = Assert.Throws<KeyOutOfRangeException>(() =>
+              {
+                  _ = SecretBox.Create(
+              Encoding.UTF8.GetBytes("Adam Caudill"),
+              Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
+              Encoding.UTF8.GetBytes("123456789012345678901234567890"));
+              });
         }
 
         [Test]
         public void CreateSecretBoxBadNonce()
         {
-            Assert.Throws<NonceOutOfRangeException>(() =>
-            {
-                SecretBox.Create(
-            Encoding.UTF8.GetBytes("Adam Caudill"),
-            Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVW"),
-            Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
-            });
+            _ = Assert.Throws<NonceOutOfRangeException>(() =>
+              {
+                  _ = SecretBox.Create(
+              Encoding.UTF8.GetBytes("Adam Caudill"),
+              Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVW"),
+              Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
+              });
         }
 
         [Test]
         public void CreateDetachedSecretBoxBadKey()
         {
-            Assert.Throws<KeyOutOfRangeException>(() =>
-            {
-                SecretBox.CreateDetached(
-            Encoding.UTF8.GetBytes("Adam Caudill"),
-            Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
-            Encoding.UTF8.GetBytes("123456789012345678901234567890"));
-            });
+            _ = Assert.Throws<KeyOutOfRangeException>(() =>
+              {
+                  _ = SecretBox.CreateDetached(
+              Encoding.UTF8.GetBytes("Adam Caudill"),
+              Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
+              Encoding.UTF8.GetBytes("123456789012345678901234567890"));
+              });
         }
 
         [Test]
         public void CreateDetachedSecretBoxBadNonce()
         {
-            Assert.Throws<NonceOutOfRangeException>(() =>
-            {
-                SecretBox.CreateDetached(
-            Encoding.UTF8.GetBytes("Adam Caudill"),
-            Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVW"),
-            Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
-            });
+            _ = Assert.Throws<NonceOutOfRangeException>(() =>
+              {
+                  _ = SecretBox.CreateDetached(
+              Encoding.UTF8.GetBytes("Adam Caudill"),
+              Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVW"),
+              Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
+              });
         }
 
         [Test]
         public void OpenSecretBoxBadKey()
         {
-            Assert.Throws<KeyOutOfRangeException>(() =>
-            {
-                SecretBox.Open(
-            Utilities.HexToBinary("00000000000000000000000000000000b58d3c3e5ae78770b7db54e29e3885138a2f1ddb738f2309d9b38164"),
-            Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
-            Encoding.UTF8.GetBytes("123456789012345678901234567890"));
-            });
+            _ = Assert.Throws<KeyOutOfRangeException>(() =>
+              {
+                  _ = SecretBox.Open(
+              Utilities.HexToBinary("00000000000000000000000000000000b58d3c3e5ae78770b7db54e29e3885138a2f1ddb738f2309d9b38164"),
+              Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
+              Encoding.UTF8.GetBytes("123456789012345678901234567890"));
+              });
         }
 
         [Test]
         public void OpenSecretBoxBadNonce()
         {
-            Assert.Throws<NonceOutOfRangeException>(() =>
-            {
-                SecretBox.Open(
-            Utilities.HexToBinary("00000000000000000000000000000000b58d3c3e5ae78770b7db54e29e3885138a2f1ddb738f2309d9b38164"),
-            Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVW"),
-            Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
-            });
+            _ = Assert.Throws<NonceOutOfRangeException>(() =>
+              {
+                  _ = SecretBox.Open(
+              Utilities.HexToBinary("00000000000000000000000000000000b58d3c3e5ae78770b7db54e29e3885138a2f1ddb738f2309d9b38164"),
+              Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVW"),
+              Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
+              });
         }
 
         [Test]
@@ -115,7 +115,7 @@ namespace Tests
 
             Assert.Throws<KeyOutOfRangeException>(() =>
             {
-                SecretBox.OpenDetached(actual.CipherText, actual.Mac,
+                SecretBox.OpenDetached(actual.Ciphertext, actual.Mac,
             Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
             Encoding.UTF8.GetBytes("123456789012345678901234567890"));
             });
@@ -131,7 +131,7 @@ namespace Tests
 
             Assert.Throws<NonceOutOfRangeException>(() =>
             {
-                SecretBox.OpenDetached(actual.CipherText, actual.Mac,
+                SecretBox.OpenDetached(actual.Ciphertext, actual.Mac,
             Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVW"),
             Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
             });
@@ -145,12 +145,12 @@ namespace Tests
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
 
-            Assert.Throws<MacOutOfRangeException>(() =>
-            {
-                SecretBox.OpenDetached(actual.CipherText, null,
-            Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
-            Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
-            });
+            _ = Assert.Throws<MacOutOfRangeException>(() =>
+              {
+                  _ = SecretBox.OpenDetached(actual.Ciphertext, null,
+              Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
+              Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
+              });
         }
     }
 }

@@ -1,7 +1,7 @@
+using Geralt.Exceptions;
 using System;
 using System.Security.Cryptography;
 using System.Text;
-using Geralt.Exceptions;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
@@ -45,7 +45,7 @@ namespace Geralt
             var publicKey = new byte[PublicKeyBytes];
             var privateKey = new byte[SecretKeyBytes];
 
-            LibsodiumLibrary.crypto_box_keypair(publicKey, privateKey);
+            _ = LibsodiumLibrary.crypto_box_keypair(publicKey, privateKey);
 
             return new KeyPair(publicKey, privateKey);
         }
@@ -58,7 +58,7 @@ namespace Geralt
         {
             //validate the length of the seed
             if (privateKey == null || privateKey.Length != SecretKeyBytes)
-                throw new SeedOutOfRangeException("privateKey", (privateKey == null) ? 0 : privateKey.Length,
+                throw new SeedOutOfRangeException(nameof(privateKey), (privateKey == null) ? 0 : privateKey.Length,
                   string.Format("privateKey must be {0} bytes in length.", SecretKeyBytes));
 
             var publicKey = X25519.GetPublicKey(privateKey);
@@ -78,10 +78,10 @@ namespace Geralt
             int seedBytes = LibsodiumLibrary.crypto_box_seedbytes();
             //validate the length of the seed
             if (seed == null || seed.Length != seedBytes)
-                throw new SeedOutOfRangeException("seed", (seed == null) ? 0 : seed.Length,
+                throw new SeedOutOfRangeException(nameof(seed), (seed == null) ? 0 : seed.Length,
                   string.Format("Key seed must be {0} bytes in length.", SecretKeyBytes));
 
-            LibsodiumLibrary.crypto_box_seed_keypair(publicKey, privateKey, seed);
+            _ = LibsodiumLibrary.crypto_box_seed_keypair(publicKey, privateKey, seed);
 
             return new KeyPair(publicKey, privateKey);
         }
@@ -120,17 +120,17 @@ namespace Geralt
         {
             //validate the length of the secret key
             if (secretKey == null || secretKey.Length != SecretKeyBytes)
-                throw new KeyOutOfRangeException("secretKey", (secretKey == null) ? 0 : secretKey.Length,
+                throw new KeyOutOfRangeException(nameof(secretKey), (secretKey == null) ? 0 : secretKey.Length,
                   string.Format("key must be {0} bytes in length.", SecretKeyBytes));
 
             //validate the length of the public key
             if (publicKey == null || publicKey.Length != PublicKeyBytes)
-                throw new KeyOutOfRangeException("publicKey", (publicKey == null) ? 0 : publicKey.Length,
+                throw new KeyOutOfRangeException(nameof(publicKey), (publicKey == null) ? 0 : publicKey.Length,
                   string.Format("key must be {0} bytes in length.", PublicKeyBytes));
 
             //validate the length of the nonce
             if (nonce == null || nonce.Length != NONCE_BYTES)
-                throw new NonceOutOfRangeException("nonce", (nonce == null) ? 0 : nonce.Length,
+                throw new NonceOutOfRangeException(nameof(nonce), (nonce == null) ? 0 : nonce.Length,
                   string.Format("nonce must be {0} bytes in length.", NONCE_BYTES));
 
             var buffer = new byte[message.Length + MAC_BYTES];
@@ -169,17 +169,17 @@ namespace Geralt
         {
             //validate the length of the secret key
             if (secretKey == null || secretKey.Length != SecretKeyBytes)
-                throw new KeyOutOfRangeException("secretKey", (secretKey == null) ? 0 : secretKey.Length,
+                throw new KeyOutOfRangeException(nameof(secretKey), (secretKey == null) ? 0 : secretKey.Length,
                   string.Format("key must be {0} bytes in length.", SecretKeyBytes));
 
             //validate the length of the public key
             if (publicKey == null || publicKey.Length != PublicKeyBytes)
-                throw new KeyOutOfRangeException("publicKey", (publicKey == null) ? 0 : secretKey.Length,
+                throw new KeyOutOfRangeException(nameof(publicKey), (publicKey == null) ? 0 : secretKey.Length,
                   string.Format("key must be {0} bytes in length.", PublicKeyBytes));
 
             //validate the length of the nonce
             if (nonce == null || nonce.Length != NONCE_BYTES)
-                throw new NonceOutOfRangeException("nonce", (nonce == null) ? 0 : nonce.Length,
+                throw new NonceOutOfRangeException(nameof(nonce), (nonce == null) ? 0 : nonce.Length,
                   string.Format("nonce must be {0} bytes in length.", NONCE_BYTES));
 
             var cipher = new byte[message.Length];
@@ -206,17 +206,17 @@ namespace Geralt
         {
             //validate the length of the secret key
             if (secretKey == null || secretKey.Length != SecretKeyBytes)
-                throw new KeyOutOfRangeException("secretKey", (secretKey == null) ? 0 : secretKey.Length,
+                throw new KeyOutOfRangeException(nameof(secretKey), (secretKey == null) ? 0 : secretKey.Length,
                   string.Format("key must be {0} bytes in length.", SecretKeyBytes));
 
             //validate the length of the public key
             if (publicKey == null || publicKey.Length != PublicKeyBytes)
-                throw new KeyOutOfRangeException("publicKey", (publicKey == null) ? 0 : secretKey.Length,
+                throw new KeyOutOfRangeException(nameof(publicKey), (publicKey == null) ? 0 : secretKey.Length,
                   string.Format("key must be {0} bytes in length.", PublicKeyBytes));
 
             //validate the length of the nonce
             if (nonce == null || nonce.Length != NONCE_BYTES)
-                throw new NonceOutOfRangeException("nonce", (nonce == null) ? 0 : nonce.Length,
+                throw new NonceOutOfRangeException(nameof(nonce), (nonce == null) ? 0 : nonce.Length,
                   string.Format("nonce must be {0} bytes in length.", NONCE_BYTES));
 
             //check to see if there are MAC_BYTES of leading nulls, if so, trim.
@@ -299,22 +299,22 @@ namespace Geralt
         {
             //validate the length of the secret key
             if (secretKey == null || secretKey.Length != SecretKeyBytes)
-                throw new KeyOutOfRangeException("secretKey", (secretKey == null) ? 0 : secretKey.Length,
+                throw new KeyOutOfRangeException(nameof(secretKey), (secretKey == null) ? 0 : secretKey.Length,
                   string.Format("key must be {0} bytes in length.", SecretKeyBytes));
 
             //validate the length of the public key
             if (publicKey == null || publicKey.Length != PublicKeyBytes)
-                throw new KeyOutOfRangeException("publicKey", (publicKey == null) ? 0 : secretKey.Length,
+                throw new KeyOutOfRangeException(nameof(publicKey), (publicKey == null) ? 0 : secretKey.Length,
                   string.Format("key must be {0} bytes in length.", PublicKeyBytes));
 
             //validate the length of the mac
             if (mac == null || mac.Length != MAC_BYTES)
-                throw new MacOutOfRangeException("mac", (mac == null) ? 0 : mac.Length,
+                throw new MacOutOfRangeException(nameof(mac), (mac == null) ? 0 : mac.Length,
                   string.Format("mac must be {0} bytes in length.", MAC_BYTES));
 
             //validate the length of the nonce
             if (nonce == null || nonce.Length != NONCE_BYTES)
-                throw new NonceOutOfRangeException("nonce", (nonce == null) ? 0 : nonce.Length,
+                throw new NonceOutOfRangeException(nameof(nonce), (nonce == null) ? 0 : nonce.Length,
                   string.Format("nonce must be {0} bytes in length.", NONCE_BYTES));
 
             var buffer = new byte[cipherText.Length];

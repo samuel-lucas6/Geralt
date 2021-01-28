@@ -1,6 +1,6 @@
-using NUnit.Framework;
-using Geralt.Exceptions;
 using Geralt;
+using Geralt.Exceptions;
+using NUnit.Framework;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
@@ -52,7 +52,7 @@ namespace Tests
                 0xad,0xfc,0x7e,0x14,0x6f,0x88,0x2b,0x4f
             };
 
-            Assert.Throws<KeyOutOfRangeException>(() => new KeyPair(bobPk, bobSk));
+            _ = Assert.Throws<KeyOutOfRangeException>(() => new KeyPair(bobPk, bobSk));
         }
     }
 }

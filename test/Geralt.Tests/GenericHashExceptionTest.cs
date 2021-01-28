@@ -1,6 +1,6 @@
-using NUnit.Framework;
-using Geralt.Exceptions;
 using Geralt;
+using Geralt.Exceptions;
+using NUnit.Framework;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
@@ -37,7 +37,7 @@ namespace Tests
         {
             const string KEY = "1234567891123456123456789112345612345678911234561234567891123456123456789112345612345678911234561234567891123456123456789112345612345678911234561234567891123456";
             const int BYTES = 32;
-            Assert.Throws<KeyOutOfRangeException>(() => BLAKE2b.Hash("Adam Caudill", KEY, BYTES));
+            _ = Assert.Throws<KeyOutOfRangeException>(() => BLAKE2b.Hash("Adam Caudill", KEY, BYTES));
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace Tests
         {
             const string KEY = "12345";
             const int BYTES = 32;
-            Assert.Throws<KeyOutOfRangeException>(() => BLAKE2b.Hash("Adam Caudill", KEY, BYTES));
+            _ = Assert.Throws<KeyOutOfRangeException>(() => BLAKE2b.Hash("Adam Caudill", KEY, BYTES));
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace Tests
         {
             const string KEY = "1234567891123456";
             const int BYTES = 128;
-            Assert.Throws<BytesOutOfRangeException>(() => BLAKE2b.Hash("Adam Caudill", KEY, BYTES));
+            _ = Assert.Throws<BytesOutOfRangeException>(() => BLAKE2b.Hash("Adam Caudill", KEY, BYTES));
         }
 
         [Test]
@@ -61,7 +61,7 @@ namespace Tests
         {
             const string KEY = "1234567891123456";
             const int BYTES = 12;
-            Assert.Throws<BytesOutOfRangeException>(() => BLAKE2b.Hash("Adam Caudill", KEY, BYTES));
+            _ = Assert.Throws<BytesOutOfRangeException>(() => BLAKE2b.Hash("Adam Caudill", KEY, BYTES));
         }
 
         [Test]
@@ -70,10 +70,10 @@ namespace Tests
             const string SALT = "5b6b41ed9b343fe0";
             const string PERSONAL = "5126fb2a37400d2a";
             const string KEY = "1234567891123456";
-            Assert.Throws<System.ArgumentNullException>(() =>
-            {
-                Utilities.BinaryToHex(BLAKE2b.HashSaltPersonal(null, KEY, SALT, PERSONAL));
-            });
+            _ = Assert.Throws<System.ArgumentNullException>(() =>
+              {
+                  _ = Utilities.BinaryToHex(BLAKE2b.HashSaltPersonal(null, KEY, SALT, PERSONAL));
+              });
         }
 
         [Test]
@@ -81,10 +81,10 @@ namespace Tests
         {
             const string PERSONAL = "5126fb2a37400d2a";
             const string KEY = "1234567891123456";
-            Assert.Throws<System.ArgumentNullException>(() =>
-            {
-                Utilities.BinaryToHex(BLAKE2b.HashSaltPersonal("message", KEY, null, PERSONAL));
-            });
+            _ = Assert.Throws<System.ArgumentNullException>(() =>
+              {
+                  _ = Utilities.BinaryToHex(BLAKE2b.HashSaltPersonal("message", KEY, null, PERSONAL));
+              });
         }
 
         [Test]
@@ -92,10 +92,10 @@ namespace Tests
         {
             const string SALT = "5b6b41ed9b343fe0";
             const string KEY = "1234567891123456";
-            Assert.Throws<System.ArgumentNullException>(() =>
-            {
-                Utilities.BinaryToHex(BLAKE2b.HashSaltPersonal("message", KEY, SALT, null));
-            });
+            _ = Assert.Throws<System.ArgumentNullException>(() =>
+              {
+                  _ = Utilities.BinaryToHex(BLAKE2b.HashSaltPersonal("message", KEY, SALT, null));
+              });
         }
 
         [Test]
@@ -104,10 +104,10 @@ namespace Tests
             const string SALT = "5b6b41ed9b343fe0";
             const string PERSONAL = "5126fb2a37400d2a";
             const string KEY = "1234567891123456123456789112345612345678911234561234567891123456123456789112345612345678911234561234567891123456123456789112345612345678911234561234567891123456";
-            Assert.Throws<KeyOutOfRangeException>(() =>
-            {
-                Utilities.BinaryToHex(BLAKE2b.HashSaltPersonal("message", KEY, SALT, PERSONAL));
-            });
+            _ = Assert.Throws<KeyOutOfRangeException>(() =>
+              {
+                  _ = Utilities.BinaryToHex(BLAKE2b.HashSaltPersonal("message", KEY, SALT, PERSONAL));
+              });
         }
 
         [Test]
@@ -116,10 +116,10 @@ namespace Tests
             const string SALT = "5b6b41ed9b343fe0";
             const string PERSONAL = "5126fb2a37400d2a";
             const string KEY = "12345";
-            Assert.Throws<KeyOutOfRangeException>(() =>
-            {
-                Utilities.BinaryToHex(BLAKE2b.HashSaltPersonal("message", KEY, SALT, PERSONAL));
-            });
+            _ = Assert.Throws<KeyOutOfRangeException>(() =>
+              {
+                  _ = Utilities.BinaryToHex(BLAKE2b.HashSaltPersonal("message", KEY, SALT, PERSONAL));
+              });
         }
 
         [Test]
@@ -128,10 +128,10 @@ namespace Tests
             const string SALT = "5b6b41ed9b343fe05b6b41ed9b343fe05b6b41ed9b343fe05b6b41ed9b343fe0";
             const string PERSONAL = "5126fb2a37400d2a";
             const string KEY = "1234567891123456";
-            Assert.Throws<SaltOutOfRangeException>(() =>
-            {
-                Utilities.BinaryToHex(BLAKE2b.HashSaltPersonal("message", KEY, SALT, PERSONAL));
-            });
+            _ = Assert.Throws<SaltOutOfRangeException>(() =>
+              {
+                  _ = Utilities.BinaryToHex(BLAKE2b.HashSaltPersonal("message", KEY, SALT, PERSONAL));
+              });
         }
 
         [Test]
@@ -140,10 +140,10 @@ namespace Tests
             const string SALT = "5b6b";
             const string PERSONAL = "5126fb2a37400d2a";
             const string KEY = "1234567891123456";
-            Assert.Throws<SaltOutOfRangeException>(() =>
-            {
-                Utilities.BinaryToHex(BLAKE2b.HashSaltPersonal("message", KEY, SALT, PERSONAL));
-            });
+            _ = Assert.Throws<SaltOutOfRangeException>(() =>
+              {
+                  _ = Utilities.BinaryToHex(BLAKE2b.HashSaltPersonal("message", KEY, SALT, PERSONAL));
+              });
         }
 
         [Test]
@@ -152,10 +152,10 @@ namespace Tests
             const string SALT = "5b6b41ed9b343fe0";
             const string PERSONAL = "5126fb2a37400d2a5126fb2a37400d2a5126fb2a37400d2a5126fb2a37400d2a";
             const string KEY = "1234567891123456";
-            Assert.Throws<PersonalOutOfRangeException>(() =>
-            {
-                Utilities.BinaryToHex(BLAKE2b.HashSaltPersonal("message", KEY, SALT, PERSONAL));
-            });
+            _ = Assert.Throws<PersonalOutOfRangeException>(() =>
+              {
+                  _ = Utilities.BinaryToHex(BLAKE2b.HashSaltPersonal("message", KEY, SALT, PERSONAL));
+              });
         }
 
         [Test]
@@ -164,10 +164,10 @@ namespace Tests
             const string SALT = "5b6b41ed9b343fe0";
             const string PERSONAL = "5126f";
             const string KEY = "1234567891123456";
-            Assert.Throws<PersonalOutOfRangeException>(() =>
-            {
-                Utilities.BinaryToHex(BLAKE2b.HashSaltPersonal("message", KEY, SALT, PERSONAL));
-            });
+            _ = Assert.Throws<PersonalOutOfRangeException>(() =>
+              {
+                  _ = Utilities.BinaryToHex(BLAKE2b.HashSaltPersonal("message", KEY, SALT, PERSONAL));
+              });
         }
 
         [Test]
@@ -176,10 +176,10 @@ namespace Tests
             const string SALT = "5b6b41ed9b343fe0";
             const string PERSONAL = "5126fb2a37400d2a";
             const string KEY = "1234567891123456";
-            Assert.Throws<BytesOutOfRangeException>(() =>
-            {
-                Utilities.BinaryToHex(BLAKE2b.HashSaltPersonal("message", KEY, SALT, PERSONAL, 5));
-            });
+            _ = Assert.Throws<BytesOutOfRangeException>(() =>
+              {
+                  _ = Utilities.BinaryToHex(BLAKE2b.HashSaltPersonal("message", KEY, SALT, PERSONAL, 5));
+              });
         }
 
         [Test]
@@ -188,10 +188,10 @@ namespace Tests
             const string SALT = "5b6b41ed9b343fe0";
             const string PERSONAL = "5126fb2a37400d2a";
             const string KEY = "1234567891123456";
-            Assert.Throws<BytesOutOfRangeException>(() =>
-            {
-                Utilities.BinaryToHex(BLAKE2b.HashSaltPersonal("message", KEY, SALT, PERSONAL, 128));
-            });
+            _ = Assert.Throws<BytesOutOfRangeException>(() =>
+              {
+                  _ = Utilities.BinaryToHex(BLAKE2b.HashSaltPersonal("message", KEY, SALT, PERSONAL, 128));
+              });
         }
     }
 }

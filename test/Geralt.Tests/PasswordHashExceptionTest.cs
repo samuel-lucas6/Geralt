@@ -1,6 +1,6 @@
-using NUnit.Framework;
-using Geralt.Exceptions;
 using Geralt;
+using Geralt.Exceptions;
+using NUnit.Framework;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
@@ -39,7 +39,7 @@ namespace Tests
             const int MEM_LIMIT = 7256678;
             Assert.Throws<System.ArgumentNullException>(() =>
             {
-                PasswordHash.ScryptHashString(null, OPS_LIMIT, MEM_LIMIT);
+                Scrypt.ScryptHashString(null, OPS_LIMIT, MEM_LIMIT);
             });
         }
 
@@ -50,7 +50,7 @@ namespace Tests
             const int MEM_LIMIT = 7256678;
             Assert.Throws<System.ArgumentOutOfRangeException>(() =>
             {
-                PasswordHash.ScryptHashString(PASSWORD, 0, MEM_LIMIT);
+                Scrypt.ScryptHashString(PASSWORD, 0, MEM_LIMIT);
             });
         }
 
@@ -61,7 +61,7 @@ namespace Tests
             const long OPS_LIMIT = 481326;
             Assert.Throws<System.ArgumentOutOfRangeException>(() =>
             {
-                PasswordHash.ScryptHashString(PASSWORD, OPS_LIMIT, 0);
+                Scrypt.ScryptHashString(PASSWORD, OPS_LIMIT, 0);
             });
         }
 
@@ -70,10 +70,10 @@ namespace Tests
         {
             //TODO: implement (should work on any testsystem)
             //Note: Int32.MaxValue
-            Assert.Throws<System.OutOfMemoryException>(() =>
-            {
+            _ = Assert.Throws<System.OutOfMemoryException>(() =>
+              {
 
-            });
+              });
         }
 
         [Test]
@@ -83,7 +83,7 @@ namespace Tests
             const long OUTPUT_LENGTH = 32;
             Assert.Throws<System.ArgumentNullException>(() =>
             {
-                PasswordHash.ScryptHashBinary(null, SALT, PasswordHash.Strength.Interactive, OUTPUT_LENGTH);
+                Scrypt.ScryptHashBinary(null, SALT, Scrypt.Strength.Interactive, OUTPUT_LENGTH);
             });
         }
 
@@ -94,7 +94,7 @@ namespace Tests
             const long OUTPUT_LENGTH = 32;
             Assert.Throws<System.ArgumentNullException>(() =>
             {
-                PasswordHash.ScryptHashBinary(PASSWORD, null, PasswordHash.Strength.Interactive, OUTPUT_LENGTH);
+                Scrypt.ScryptHashBinary(PASSWORD, null, Scrypt.Strength.Interactive, OUTPUT_LENGTH);
             });
         }
 
@@ -106,7 +106,7 @@ namespace Tests
             const long OUTPUT_LENGTH = 32;
             Assert.Throws<SaltOutOfRangeException>(() =>
             {
-                PasswordHash.ScryptHashBinary(PASSWORD, SALT, PasswordHash.Strength.Interactive, OUTPUT_LENGTH);
+                Scrypt.ScryptHashBinary(PASSWORD, SALT, Scrypt.Strength.Interactive, OUTPUT_LENGTH);
             });
         }
 
@@ -120,7 +120,7 @@ namespace Tests
             const int MEM_LIMIT = 7256678;
             Assert.Throws<System.ArgumentOutOfRangeException>(() =>
             {
-                PasswordHash.ScryptHashBinary(PASSWORD, SALT, OPS_LIMIT, MEM_LIMIT, OUTPUT_LENGTH);
+                Scrypt.ScryptHashBinary(PASSWORD, SALT, OPS_LIMIT, MEM_LIMIT, OUTPUT_LENGTH);
             });
         }
 
@@ -134,7 +134,7 @@ namespace Tests
             const int MEM_LIMIT = 0;
             Assert.Throws<System.ArgumentOutOfRangeException>(() =>
             {
-                PasswordHash.ScryptHashBinary(PASSWORD, SALT, OPS_LIMIT, MEM_LIMIT, OUTPUT_LENGTH);
+                Scrypt.ScryptHashBinary(PASSWORD, SALT, OPS_LIMIT, MEM_LIMIT, OUTPUT_LENGTH);
             });
         }
 
@@ -148,7 +148,7 @@ namespace Tests
             const int MEM_LIMIT = 7256678;
             Assert.Throws<System.ArgumentOutOfRangeException>(() =>
             {
-                PasswordHash.ScryptHashBinary(PASSWORD, SALT, OPS_LIMIT, MEM_LIMIT, OUTPUT_LENGTH);
+                Scrypt.ScryptHashBinary(PASSWORD, SALT, OPS_LIMIT, MEM_LIMIT, OUTPUT_LENGTH);
             });
         }
 
@@ -157,10 +157,10 @@ namespace Tests
         {
             //TODO: implement (should work on any testsystem)
             //Note: Int32.MaxValue
-            Assert.Throws<System.OutOfMemoryException>(() =>
-            {
+            _ = Assert.Throws<System.OutOfMemoryException>(() =>
+              {
 
-            });
+              });
         }
 
         [Test]
@@ -169,7 +169,7 @@ namespace Tests
             const string PASSWORD = "gkahjfkjewrykjKJHKJHKJbhuiqyr  8923fhsjfkajwehkjg";
             Assert.Throws<System.ArgumentNullException>(() =>
             {
-                PasswordHash.ScryptHashStringVerify(null, PASSWORD);
+                Scrypt.ScryptHashStringVerify(null, PASSWORD);
             });
         }
 
@@ -179,8 +179,8 @@ namespace Tests
             const string PASSWORD = "gkahjfkjewrykjKJHKJHKJbhuiqyr  8923fhsjfkajwehkjg";
             Assert.Throws<System.ArgumentNullException>(() =>
             {
-                var hash = PasswordHash.ScryptHashString(PASSWORD);
-                PasswordHash.ScryptHashStringVerify(hash, null);
+                var hash = Scrypt.ScryptHashString(PASSWORD);
+                Scrypt.ScryptHashStringVerify(hash, null);
             });
         }
 

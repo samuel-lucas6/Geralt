@@ -1,7 +1,7 @@
+using Geralt.Exceptions;
 using System;
 using System.Security.Cryptography;
 using System.Text;
-using Geralt.Exceptions;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
@@ -75,12 +75,12 @@ namespace Geralt
         {
             //validate the length of the key
             if (key == null || key.Length != KEY_BYTES)
-                throw new KeyOutOfRangeException("key", (key == null) ? 0 : key.Length,
+                throw new KeyOutOfRangeException(nameof(key), (key == null) ? 0 : key.Length,
                   string.Format("key must be {0} bytes in length.", KEY_BYTES));
 
             //validate the length of the nonce
             if (nonce == null || nonce.Length != NONCE_BYTES)
-                throw new NonceOutOfRangeException("nonce", (nonce == null) ? 0 : nonce.Length,
+                throw new NonceOutOfRangeException(nameof(nonce), (nonce == null) ? 0 : nonce.Length,
                   string.Format("nonce must be {0} bytes in length.", NONCE_BYTES));
 
             var buffer = new byte[MAC_BYTES + message.Length];
@@ -117,12 +117,12 @@ namespace Geralt
         {
             //validate the length of the key
             if (key == null || key.Length != KEY_BYTES)
-                throw new KeyOutOfRangeException("key", (key == null) ? 0 : key.Length,
+                throw new KeyOutOfRangeException(nameof(key), (key == null) ? 0 : key.Length,
                   string.Format("key must be {0} bytes in length.", KEY_BYTES));
 
             //validate the length of the nonce
             if (nonce == null || nonce.Length != NONCE_BYTES)
-                throw new NonceOutOfRangeException("nonce", (nonce == null) ? 0 : nonce.Length,
+                throw new NonceOutOfRangeException(nameof(nonce), (nonce == null) ? 0 : nonce.Length,
                   string.Format("nonce must be {0} bytes in length.", NONCE_BYTES));
 
             var cipher = new byte[message.Length];
@@ -160,12 +160,12 @@ namespace Geralt
         {
             //validate the length of the key
             if (key == null || key.Length != KEY_BYTES)
-                throw new KeyOutOfRangeException("key", (key == null) ? 0 : key.Length,
+                throw new KeyOutOfRangeException(nameof(key), (key == null) ? 0 : key.Length,
                   string.Format("key must be {0} bytes in length.", KEY_BYTES));
 
             //validate the length of the nonce
             if (nonce == null || nonce.Length != NONCE_BYTES)
-                throw new NonceOutOfRangeException("nonce", (nonce == null) ? 0 : nonce.Length,
+                throw new NonceOutOfRangeException(nameof(nonce), (nonce == null) ? 0 : nonce.Length,
                   string.Format("nonce must be {0} bytes in length.", NONCE_BYTES));
 
             //check to see if there are MAC_BYTES of leading nulls, if so, trim.
@@ -245,17 +245,17 @@ namespace Geralt
         {
             //validate the length of the key
             if (key == null || key.Length != KEY_BYTES)
-                throw new KeyOutOfRangeException("key", (key == null) ? 0 : key.Length,
+                throw new KeyOutOfRangeException(nameof(key), (key == null) ? 0 : key.Length,
                   string.Format("key must be {0} bytes in length.", KEY_BYTES));
 
             //validate the length of the nonce
             if (nonce == null || nonce.Length != NONCE_BYTES)
-                throw new NonceOutOfRangeException("nonce", (nonce == null) ? 0 : nonce.Length,
+                throw new NonceOutOfRangeException(nameof(nonce), (nonce == null) ? 0 : nonce.Length,
                   string.Format("nonce must be {0} bytes in length.", NONCE_BYTES));
 
             //validate the length of the mac
             if (mac == null || mac.Length != MAC_BYTES)
-                throw new MacOutOfRangeException("mac", (mac == null) ? 0 : mac.Length,
+                throw new MacOutOfRangeException(nameof(mac), (mac == null) ? 0 : mac.Length,
                   string.Format("mac must be {0} bytes in length.", MAC_BYTES));
 
             var buffer = new byte[cipherText.Length];

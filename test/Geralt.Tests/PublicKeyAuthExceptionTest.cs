@@ -1,8 +1,8 @@
+using Geralt;
+using Geralt.Exceptions;
+using NUnit.Framework;
 using System.Security.Cryptography;
 using System.Text;
-using NUnit.Framework;
-using Geralt.Exceptions;
-using Geralt;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
@@ -46,7 +46,7 @@ namespace Tests
         0x1c,0x2f,0x8b,0x27,0xff,0x88
       };
 
-            Assert.Throws<SeedOutOfRangeException>(
+            _ = Assert.Throws<SeedOutOfRangeException>(
               () => Ed25519.GenerateKeyPair(bobSk));
         }
 
@@ -63,7 +63,7 @@ namespace Tests
       };
             var message = Encoding.UTF8.GetBytes("Adam Caudill");
 
-            Assert.Throws<KeyOutOfRangeException>(
+            _ = Assert.Throws<KeyOutOfRangeException>(
               () => Ed25519.Sign(message, bobSk));
         }
 
@@ -80,7 +80,7 @@ namespace Tests
       };
             var message = Encoding.UTF8.GetBytes("Adam Caudill");
 
-            Assert.Throws<KeyOutOfRangeException>(
+            _ = Assert.Throws<KeyOutOfRangeException>(
               () => Ed25519.Verify(message, bobSk));
         }
 
@@ -98,7 +98,7 @@ namespace Tests
             var message = Encoding.UTF8.GetBytes("Adam Caudill");
 
             //It`s not really signed ...
-            Assert.Throws<CryptographicException>(
+            _ = Assert.Throws<CryptographicException>(
               () => Ed25519.Verify(message, bobSk));
         }
 
@@ -115,7 +115,7 @@ namespace Tests
       };
             var message = Encoding.UTF8.GetBytes("Adam Caudill");
 
-            Assert.Throws<KeyOutOfRangeException>(
+            _ = Assert.Throws<KeyOutOfRangeException>(
               () => Ed25519.SignDetached(message, bobSk));
         }
 
@@ -133,7 +133,7 @@ namespace Tests
             var signature = Utilities.HexToBinary("8d5436accbe258a6b252c1140f38d7b8dc6196619945818b72512b6a8019d86dfeeb56f40c4d4b983d97dfeed37948527256c3567d6b253757fcfb32bef56f0b");
             var message = Encoding.UTF8.GetBytes("Adam Caudill");
 
-            Assert.Throws<KeyOutOfRangeException>(
+            _ = Assert.Throws<KeyOutOfRangeException>(
               () => Ed25519.VerifyDetached(signature, message, bobSk));
         }
 
@@ -143,7 +143,7 @@ namespace Tests
             var signature = Utilities.HexToBinary("5436accbe258a6b252c1140f38d7b8dc6196619945818b72512b6a8019d86dfeeb56f40c4d4b983d97dfeed37948527256c3567d6b253757fcfb32bef56f0b");
             var message = Encoding.UTF8.GetBytes("Adam Caudill");
             var key = Utilities.HexToBinary("4ffda13c11d61d2b9568e54bec06ea59368e84874883087645e64e5e9653422e");
-            Assert.Throws<SignatureOutOfRangeException>(
+            _ = Assert.Throws<SignatureOutOfRangeException>(
               () => Ed25519.VerifyDetached(signature, message, key));
         }
 
@@ -167,10 +167,10 @@ namespace Tests
         public void ConvertEd25519PublicKeyToCurve25519PublicKeyWrongKey()
         {
             //TODO: implement
-            Assert.Throws<CryptographicException>(() =>
-            {
+            _ = Assert.Throws<CryptographicException>(() =>
+              {
 
-            });
+              });
         }
 
         [Test]
@@ -197,10 +197,10 @@ namespace Tests
         public void ConvertEd25519SecretKeyToCurve25519SecretKeyWrongKey()
         {
             //TODO: implement
-            Assert.Throws<CryptographicException>(() =>
-            {
+            _ = Assert.Throws<CryptographicException>(() =>
+              {
 
-            });
+              });
         }
     }
 }

@@ -1,6 +1,6 @@
-using System.Text;
-using NUnit.Framework;
 using Geralt;
+using NUnit.Framework;
+using System.Text;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
@@ -95,7 +95,7 @@ namespace Tests
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
 
-            var clear = SecretBox.OpenDetached(actual.CipherText, actual.Mac,
+            var clear = SecretBox.OpenDetached(actual.Ciphertext, actual.Mac,
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
 

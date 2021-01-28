@@ -1,6 +1,6 @@
+using Geralt.Exceptions;
 using System.Security.Cryptography;
 using System.Text;
-using Geralt.Exceptions;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
@@ -92,12 +92,12 @@ namespace Geralt
         {
             //validate the length of the key
             if (key == null || key.Length != XSALSA20_KEY_BYTES)
-                throw new KeyOutOfRangeException("key", (key == null) ? 0 : key.Length,
+                throw new KeyOutOfRangeException(nameof(key), (key == null) ? 0 : key.Length,
                   string.Format("key must be {0} bytes in length.", XSALSA20_KEY_BYTES));
 
             //validate the length of the nonce
             if (nonce == null || nonce.Length != XSALSA20_NONCE_BYTES)
-                throw new NonceOutOfRangeException("nonce", (nonce == null) ? 0 : nonce.Length,
+                throw new NonceOutOfRangeException(nameof(nonce), (nonce == null) ? 0 : nonce.Length,
                   string.Format("nonce must be {0} bytes in length.", XSALSA20_NONCE_BYTES));
 
             var buffer = new byte[message.Length];
@@ -134,12 +134,12 @@ namespace Geralt
         {
             //validate the length of the key
             if (key == null || key.Length != CHACHA20_KEY_BYTES)
-                throw new KeyOutOfRangeException("key", (key == null) ? 0 : key.Length,
+                throw new KeyOutOfRangeException(nameof(key), (key == null) ? 0 : key.Length,
                   string.Format("key must be {0} bytes in length.", CHACHA20_KEY_BYTES));
 
             //validate the length of the nonce
             if (nonce == null || nonce.Length != CHACHA20_NONCEBYTES)
-                throw new NonceOutOfRangeException("nonce", (nonce == null) ? 0 : nonce.Length,
+                throw new NonceOutOfRangeException(nameof(nonce), (nonce == null) ? 0 : nonce.Length,
                   string.Format("nonce must be {0} bytes in length.", CHACHA20_NONCEBYTES));
 
             var buffer = new byte[message.Length];
@@ -176,12 +176,12 @@ namespace Geralt
         {
             //validate the length of the key
             if (key == null || key.Length != XCHACHA20_KEY_BYTES)
-                throw new KeyOutOfRangeException("key", (key == null) ? 0 : key.Length,
+                throw new KeyOutOfRangeException(nameof(key), (key == null) ? 0 : key.Length,
                   string.Format("key must be {0} bytes in length.", XCHACHA20_KEY_BYTES));
 
             //validate the length of the nonce
             if (nonce == null || nonce.Length != XCHACHA20_NONCEBYTES)
-                throw new NonceOutOfRangeException("nonce", (nonce == null) ? 0 : nonce.Length,
+                throw new NonceOutOfRangeException(nameof(nonce), (nonce == null) ? 0 : nonce.Length,
                   string.Format("nonce must be {0} bytes in length.", XCHACHA20_NONCEBYTES));
 
             var buffer = new byte[message.Length];
@@ -218,12 +218,12 @@ namespace Geralt
         {
             //validate the length of the key
             if (key == null || key.Length != XSALSA20_KEY_BYTES)
-                throw new KeyOutOfRangeException("key", (key == null) ? 0 : key.Length,
+                throw new KeyOutOfRangeException(nameof(key), (key == null) ? 0 : key.Length,
                   string.Format("key must be {0} bytes in length.", XSALSA20_KEY_BYTES));
 
             //validate the length of the nonce
             if (nonce == null || nonce.Length != XSALSA20_NONCE_BYTES)
-                throw new NonceOutOfRangeException("nonce", (nonce == null) ? 0 : nonce.Length,
+                throw new NonceOutOfRangeException(nameof(nonce), (nonce == null) ? 0 : nonce.Length,
                   string.Format("nonce must be {0} bytes in length.", XSALSA20_NONCE_BYTES));
 
             var buffer = new byte[cipherText.Length];
@@ -260,12 +260,12 @@ namespace Geralt
         {
             //validate the length of the key
             if (key == null || key.Length != CHACHA20_KEY_BYTES)
-                throw new KeyOutOfRangeException("key", (key == null) ? 0 : key.Length,
+                throw new KeyOutOfRangeException(nameof(key), (key == null) ? 0 : key.Length,
                   string.Format("key must be {0} bytes in length.", CHACHA20_KEY_BYTES));
 
             //validate the length of the nonce
             if (nonce == null || nonce.Length != CHACHA20_NONCEBYTES)
-                throw new NonceOutOfRangeException("nonce", (nonce == null) ? 0 : nonce.Length,
+                throw new NonceOutOfRangeException(nameof(nonce), (nonce == null) ? 0 : nonce.Length,
                   string.Format("nonce must be {0} bytes in length.", CHACHA20_NONCEBYTES));
 
             var buffer = new byte[cipherText.Length];
@@ -303,12 +303,12 @@ namespace Geralt
         {
             //validate the length of the key
             if (key == null || key.Length != XCHACHA20_KEY_BYTES)
-                throw new KeyOutOfRangeException("key", (key == null) ? 0 : key.Length,
+                throw new KeyOutOfRangeException(nameof(key), (key == null) ? 0 : key.Length,
                   string.Format("key must be {0} bytes in length.", XCHACHA20_KEY_BYTES));
 
             //validate the length of the nonce
             if (nonce == null || nonce.Length != XCHACHA20_NONCEBYTES)
-                throw new NonceOutOfRangeException("nonce", (nonce == null) ? 0 : nonce.Length,
+                throw new NonceOutOfRangeException(nameof(nonce), (nonce == null) ? 0 : nonce.Length,
                   string.Format("nonce must be {0} bytes in length.", XCHACHA20_NONCEBYTES));
 
             var buffer = new byte[cipherText.Length];

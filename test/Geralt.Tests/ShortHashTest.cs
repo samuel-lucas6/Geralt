@@ -1,5 +1,5 @@
-using NUnit.Framework;
 using Geralt;
+using NUnit.Framework;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.

@@ -98,13 +98,13 @@ namespace Geralt
                     switch (hexFormat)
                     {
                         case HexFormat.Colon:
-                            stringBuilder.Append((char)58);
+                            _ = stringBuilder.Append((char)58);
                             break;
                         case HexFormat.Hyphen:
-                            stringBuilder.Append((char)45);
+                            _ = stringBuilder.Append((char)45);
                             break;
                         case HexFormat.Space:
-                            stringBuilder.Append((char)32);
+                            _ = stringBuilder.Append((char)32);
                             break;
                         default:
                             // No formatting
@@ -114,20 +114,20 @@ namespace Geralt
                 int byteValue = data[i] >> 4;
                 if (hexCase == HexCase.Lower)
                 {
-                    stringBuilder.Append((char)(87 + byteValue + (((byteValue - 10) >> 31) & -39)));
+                    _ = stringBuilder.Append((char)(87 + byteValue + (((byteValue - 10) >> 31) & -39)));
                 }
                 else
                 {
-                    stringBuilder.Append((char)(55 + byteValue + (((byteValue - 10) >> 31) & -7)));
+                    _ = stringBuilder.Append((char)(55 + byteValue + (((byteValue - 10) >> 31) & -7)));
                 }
                 byteValue = data[i] & 0xF;
                 if (hexCase == HexCase.Lower)
                 {
-                    stringBuilder.Append((char)(87 + byteValue + (((byteValue - 10) >> 31) & -39)));
+                    _ = stringBuilder.Append((char)(87 + byteValue + (((byteValue - 10) >> 31) & -39)));
                 }
                 else
                 {
-                    stringBuilder.Append((char)(55 + byteValue + (((byteValue - 10) >> 31) & -7)));
+                    _ = stringBuilder.Append((char)(55 + byteValue + (((byteValue - 10) >> 31) & -7)));
                 }
             }
             return stringBuilder.ToString();

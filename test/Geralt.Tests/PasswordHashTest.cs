@@ -1,7 +1,7 @@
+using Geralt;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
-using Geralt;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
@@ -48,7 +48,7 @@ namespace Tests
         [Test]
         public void ArgonGenerateSaltTest()
         {
-            Assert.AreEqual(16, PasswordHash.ArgonGenerateSalt().Length);
+            Assert.AreEqual(16, Scrypt.ArgonGenerateSalt().Length);
         }
 
         /// <summary>
@@ -61,14 +61,14 @@ namespace Tests
               "e125cee61c8cb7778d9e5ad0a6f5d978ce9f84de213a8556d9ffe202020ab4a6ed9074a4eb3416f9b168f137510f3a30b70b96cbfa219ff99f6c6eaffb15c06b60e00cc2890277f0fd3c622115772f7048adaebed86e";
             const string SALT = "44071f6d181561670bda728d43fb79b4";
             const long OUTPUT_LENGTH = 16;
-            var hash1 = PasswordHash.ArgonHashBinary(Utilities.HexToBinary(PASSWORD), Utilities.HexToBinary(SALT),
-              PasswordHash.StrengthArgon.Interactive, OUTPUT_LENGTH);
-            var hash2 = PasswordHash.ArgonHashBinary(Utilities.HexToBinary(PASSWORD), Utilities.HexToBinary(SALT),
-              PasswordHash.StrengthArgon.Interactive, OUTPUT_LENGTH);
-            var hash3 = PasswordHash.ArgonHashBinary(Utilities.HexToBinary(PASSWORD), Utilities.HexToBinary(SALT),
-              PasswordHash.StrengthArgon.Interactive, OUTPUT_LENGTH, PasswordHash.ArgonAlgorithm.Argon_2ID13);
-            var hash4 = PasswordHash.ArgonHashBinary(Utilities.HexToBinary(PASSWORD), Utilities.HexToBinary(SALT),
-              PasswordHash.StrengthArgon.Interactive, OUTPUT_LENGTH, PasswordHash.ArgonAlgorithm.Argon_2ID13);
+            var hash1 = Scrypt.ArgonHashBinary(Utilities.HexToBinary(PASSWORD), Utilities.HexToBinary(SALT),
+              Scrypt.StrengthArgon.Interactive, OUTPUT_LENGTH);
+            var hash2 = Scrypt.ArgonHashBinary(Utilities.HexToBinary(PASSWORD), Utilities.HexToBinary(SALT),
+              Scrypt.StrengthArgon.Interactive, OUTPUT_LENGTH);
+            var hash3 = Scrypt.ArgonHashBinary(Utilities.HexToBinary(PASSWORD), Utilities.HexToBinary(SALT),
+              Scrypt.StrengthArgon.Interactive, OUTPUT_LENGTH, Scrypt.ArgonAlgorithm.Argon_2ID13);
+            var hash4 = Scrypt.ArgonHashBinary(Utilities.HexToBinary(PASSWORD), Utilities.HexToBinary(SALT),
+              Scrypt.StrengthArgon.Interactive, OUTPUT_LENGTH, Scrypt.ArgonAlgorithm.Argon_2ID13);
 
             Assert.AreEqual(OUTPUT_LENGTH, hash1.Length);
             Assert.AreEqual(OUTPUT_LENGTH, hash2.Length);
@@ -88,12 +88,12 @@ namespace Tests
             const string PASSWORD = "gkahjfkjewrykjKJHKJHKJbhuiqyr  8923fhsjfkajwehkjg";
             const string SALT = "qa~t](84z<1t<1oz";
             const long OUTPUT_LENGTH = 16;
-            var hash1 = PasswordHash.ArgonHashBinary(PASSWORD, SALT, PasswordHash.StrengthArgon.Interactive, OUTPUT_LENGTH);
-            var hash2 = PasswordHash.ArgonHashBinary(PASSWORD, SALT, PasswordHash.StrengthArgon.Interactive, OUTPUT_LENGTH);
-            var hash3 = PasswordHash.ArgonHashBinary(PASSWORD, SALT, PasswordHash.StrengthArgon.Interactive, OUTPUT_LENGTH,
-              PasswordHash.ArgonAlgorithm.Argon_2ID13);
-            var hash4 = PasswordHash.ArgonHashBinary(PASSWORD, SALT, PasswordHash.StrengthArgon.Interactive, OUTPUT_LENGTH,
-              PasswordHash.ArgonAlgorithm.Argon_2ID13);
+            var hash1 = Scrypt.ArgonHashBinary(PASSWORD, SALT, Scrypt.StrengthArgon.Interactive, OUTPUT_LENGTH);
+            var hash2 = Scrypt.ArgonHashBinary(PASSWORD, SALT, Scrypt.StrengthArgon.Interactive, OUTPUT_LENGTH);
+            var hash3 = Scrypt.ArgonHashBinary(PASSWORD, SALT, Scrypt.StrengthArgon.Interactive, OUTPUT_LENGTH,
+              Scrypt.ArgonAlgorithm.Argon_2ID13);
+            var hash4 = Scrypt.ArgonHashBinary(PASSWORD, SALT, Scrypt.StrengthArgon.Interactive, OUTPUT_LENGTH,
+              Scrypt.ArgonAlgorithm.Argon_2ID13);
 
             Assert.AreEqual(OUTPUT_LENGTH, hash1.Length);
             Assert.AreEqual(OUTPUT_LENGTH, hash2.Length);
@@ -113,12 +113,12 @@ namespace Tests
             const string PASSWORD = "gkahjfkjewrykjKJHKJHKJbhuiqyr  8923fhsjfkajwehkjg";
             const string SALT = "qa~t](84z<1t<1oz";
             const long OUTPUT_LENGTH = 32;
-            var hash1 = PasswordHash.ArgonHashBinary(PASSWORD, SALT, PasswordHash.StrengthArgon.Interactive, OUTPUT_LENGTH);
-            var hash2 = PasswordHash.ArgonHashBinary(PASSWORD, SALT, PasswordHash.StrengthArgon.Interactive, OUTPUT_LENGTH);
-            var hash3 = PasswordHash.ArgonHashBinary(PASSWORD, SALT, PasswordHash.StrengthArgon.Interactive, OUTPUT_LENGTH,
-              PasswordHash.ArgonAlgorithm.Argon_2ID13);
-            var hash4 = PasswordHash.ArgonHashBinary(PASSWORD, SALT, PasswordHash.StrengthArgon.Interactive, OUTPUT_LENGTH,
-              PasswordHash.ArgonAlgorithm.Argon_2ID13);
+            var hash1 = Scrypt.ArgonHashBinary(PASSWORD, SALT, Scrypt.StrengthArgon.Interactive, OUTPUT_LENGTH);
+            var hash2 = Scrypt.ArgonHashBinary(PASSWORD, SALT, Scrypt.StrengthArgon.Interactive, OUTPUT_LENGTH);
+            var hash3 = Scrypt.ArgonHashBinary(PASSWORD, SALT, Scrypt.StrengthArgon.Interactive, OUTPUT_LENGTH,
+              Scrypt.ArgonAlgorithm.Argon_2ID13);
+            var hash4 = Scrypt.ArgonHashBinary(PASSWORD, SALT, Scrypt.StrengthArgon.Interactive, OUTPUT_LENGTH,
+              Scrypt.ArgonAlgorithm.Argon_2ID13);
 
             Assert.AreEqual(OUTPUT_LENGTH, hash1.Length);
             Assert.AreEqual(OUTPUT_LENGTH, hash2.Length);
@@ -138,12 +138,12 @@ namespace Tests
             const string PASSWORD = "gkahjfkjewrykjKJHKJHKJbhuiqyr  8923fhsjfkajwehkjg";
             const string SALT = "qa~t](84z<1t<1oz";
             const long OUTPUT_LENGTH = 128;
-            var hash1 = PasswordHash.ArgonHashBinary(PASSWORD, SALT, PasswordHash.StrengthArgon.Interactive, OUTPUT_LENGTH);
-            var hash2 = PasswordHash.ArgonHashBinary(PASSWORD, SALT, PasswordHash.StrengthArgon.Interactive, OUTPUT_LENGTH);
-            var hash3 = PasswordHash.ArgonHashBinary(PASSWORD, SALT, PasswordHash.StrengthArgon.Interactive, OUTPUT_LENGTH,
-              PasswordHash.ArgonAlgorithm.Argon_2ID13);
-            var hash4 = PasswordHash.ArgonHashBinary(PASSWORD, SALT, PasswordHash.StrengthArgon.Interactive, OUTPUT_LENGTH,
-              PasswordHash.ArgonAlgorithm.Argon_2ID13);
+            var hash1 = Scrypt.ArgonHashBinary(PASSWORD, SALT, Scrypt.StrengthArgon.Interactive, OUTPUT_LENGTH);
+            var hash2 = Scrypt.ArgonHashBinary(PASSWORD, SALT, Scrypt.StrengthArgon.Interactive, OUTPUT_LENGTH);
+            var hash3 = Scrypt.ArgonHashBinary(PASSWORD, SALT, Scrypt.StrengthArgon.Interactive, OUTPUT_LENGTH,
+              Scrypt.ArgonAlgorithm.Argon_2ID13);
+            var hash4 = Scrypt.ArgonHashBinary(PASSWORD, SALT, Scrypt.StrengthArgon.Interactive, OUTPUT_LENGTH,
+              Scrypt.ArgonAlgorithm.Argon_2ID13);
 
             Assert.AreEqual(OUTPUT_LENGTH, hash1.Length);
             Assert.AreEqual(OUTPUT_LENGTH, hash2.Length);
@@ -163,12 +163,12 @@ namespace Tests
             const string PASSWORD = "gkahjfkjewrykjKJHKJHKJbhuiqyr  8923fhsjfkajwehkjg";
             const string SALT = "qa~t](84z<1t<1oz";
             const long OUTPUT_LENGTH = 512;
-            var hash1 = PasswordHash.ArgonHashBinary(PASSWORD, SALT, PasswordHash.StrengthArgon.Interactive, OUTPUT_LENGTH);
-            var hash2 = PasswordHash.ArgonHashBinary(PASSWORD, SALT, PasswordHash.StrengthArgon.Interactive, OUTPUT_LENGTH);
-            var hash3 = PasswordHash.ArgonHashBinary(PASSWORD, SALT, PasswordHash.StrengthArgon.Interactive, OUTPUT_LENGTH,
-              PasswordHash.ArgonAlgorithm.Argon_2ID13);
-            var hash4 = PasswordHash.ArgonHashBinary(PASSWORD, SALT, PasswordHash.StrengthArgon.Interactive, OUTPUT_LENGTH,
-              PasswordHash.ArgonAlgorithm.Argon_2ID13);
+            var hash1 = Scrypt.ArgonHashBinary(PASSWORD, SALT, Scrypt.StrengthArgon.Interactive, OUTPUT_LENGTH);
+            var hash2 = Scrypt.ArgonHashBinary(PASSWORD, SALT, Scrypt.StrengthArgon.Interactive, OUTPUT_LENGTH);
+            var hash3 = Scrypt.ArgonHashBinary(PASSWORD, SALT, Scrypt.StrengthArgon.Interactive, OUTPUT_LENGTH,
+              Scrypt.ArgonAlgorithm.Argon_2ID13);
+            var hash4 = Scrypt.ArgonHashBinary(PASSWORD, SALT, Scrypt.StrengthArgon.Interactive, OUTPUT_LENGTH,
+              Scrypt.ArgonAlgorithm.Argon_2ID13);
 
             Assert.AreEqual(OUTPUT_LENGTH, hash1.Length);
             Assert.AreEqual(OUTPUT_LENGTH, hash2.Length);
@@ -188,27 +188,27 @@ namespace Tests
             const long OPS_LIMIT = 4;
             const int MEM_LIMIT = 33554432;
 
-            var hash = PasswordHash.ArgonHashString(PASSWORD, OPS_LIMIT, MEM_LIMIT);
+            var hash = Scrypt.ArgonHashString(PASSWORD, OPS_LIMIT, MEM_LIMIT);
 
-            Assert.IsTrue(PasswordHash.ArgonHashStringVerify(hash, PASSWORD));
+            Assert.IsTrue(Scrypt.ArgonHashStringVerify(hash, PASSWORD));
         }
 
         [Test]
         public void ArgonHashStringInteractiveTest()
         {
             const string PASSWORD = "gkahjfkjewrykjKJHKJHKJbhuiqyr  8923fhsjfkajwehkjg";
-            var hash = PasswordHash.ArgonHashString(PASSWORD);
+            var hash = Scrypt.ArgonHashString(PASSWORD);
 
-            Assert.IsTrue(PasswordHash.ArgonHashStringVerify(hash, PASSWORD));
+            Assert.IsTrue(Scrypt.ArgonHashStringVerify(hash, PASSWORD));
         }
 
         [Test]
         public void ArgonHashStringModerateTest()
         {
             const string PASSWORD = "gkahjfkjewrykjKJHKJHKJbhuiqyr  8923fhsjfkajwehkjg";
-            var hash = PasswordHash.ArgonHashString(PASSWORD, PasswordHash.StrengthArgon.Moderate);
+            var hash = Scrypt.ArgonHashString(PASSWORD, Scrypt.StrengthArgon.Moderate);
 
-            Assert.IsTrue(PasswordHash.ArgonHashStringVerify(hash, PASSWORD));
+            Assert.IsTrue(Scrypt.ArgonHashStringVerify(hash, PASSWORD));
         }
 
         [Test]
@@ -219,9 +219,9 @@ namespace Tests
             try
             {
                 //Could cause OutOfMemoryException
-                var hash = PasswordHash.ArgonHashString(PASSWORD, PasswordHash.StrengthArgon.Sensitive);
+                var hash = Scrypt.ArgonHashString(PASSWORD, Scrypt.StrengthArgon.Sensitive);
 
-                Assert.IsTrue(PasswordHash.ArgonHashStringVerify(hash, PASSWORD));
+                Assert.IsTrue(Scrypt.ArgonHashStringVerify(hash, PASSWORD));
             }
             catch (OutOfMemoryException e)
             {
@@ -309,14 +309,14 @@ namespace Tests
                 foreach (var testObject in testObjects)
                 {
                     Assert.AreEqual(testObject.OutputLength,
-                      PasswordHash.ArgonHashBinary(Utilities.HexToBinary(testObject.Password),
+                      Scrypt.ArgonHashBinary(Utilities.HexToBinary(testObject.Password),
                         Utilities.HexToBinary(testObject.Salt), testObject.OpsLimit, testObject.MemLimit, testObject.OutputLength)
                         .Length);
 
                     Assert.AreEqual(testObject.OutputLength,
-                      PasswordHash.ArgonHashBinary(Utilities.HexToBinary(testObject.Password),
+                      Scrypt.ArgonHashBinary(Utilities.HexToBinary(testObject.Password),
                           Utilities.HexToBinary(testObject.Salt), testObject.OpsLimit, testObject.MemLimit, testObject.OutputLength,
-                          PasswordHash.ArgonAlgorithm.Argon_2ID13).Length);
+                          Scrypt.ArgonAlgorithm.Argon_2ID13).Length);
                 }
             }
             catch (OutOfMemoryException e)
@@ -347,7 +347,7 @@ namespace Tests
 
             foreach (var test in tests)
             {
-                Assert.IsTrue(PasswordHash.ArgonHashStringVerify(test[OUTPUT], test[PASS]));
+                Assert.IsTrue(Scrypt.ArgonHashStringVerify(test[OUTPUT], test[PASS]));
             }
         }
 
@@ -355,14 +355,14 @@ namespace Tests
         [Test]
         public void ScryptGenerateSaltTest()
         {
-            Assert.AreEqual(32, PasswordHash.ScryptGenerateSalt().Length);
+            Assert.AreEqual(32, Scrypt.ScryptGenerateSalt().Length);
         }
 
         /// <summary>Verify that the length of the returned salt is correct.</summary>
         [Test]
         public void TestGenerateSalt()
         {
-            Assert.AreEqual(32, PasswordHash.GenerateSalt().Length);
+            Assert.AreEqual(32, Scrypt.GenerateSalt().Length);
         }
 
         [Test]
@@ -374,45 +374,45 @@ namespace Tests
             const long OPS_LIMIT = 481326;
             const int MEM_LIMIT = 7256678; //~7.26 MB
 
-            var hash = PasswordHash.ScryptHashString(PASSWORD, OPS_LIMIT, MEM_LIMIT);
+            var hash = Scrypt.ScryptHashString(PASSWORD, OPS_LIMIT, MEM_LIMIT);
 
-            Assert.IsTrue(PasswordHash.ScryptHashStringVerify(hash, PASSWORD));
+            Assert.IsTrue(Scrypt.ScryptHashStringVerify(hash, PASSWORD));
         }
 
         [Test]
         public void ScryptHashStringInteractiveTest()
         {
             const string PASSWORD = "gkahjfkjewrykjKJHKJHKJbhuiqyr  8923fhsjfkajwehkjg";
-            var hash = PasswordHash.ScryptHashString(PASSWORD);
+            var hash = Scrypt.ScryptHashString(PASSWORD);
 
-            Assert.IsTrue(PasswordHash.ScryptHashStringVerify(hash, PASSWORD));
+            Assert.IsTrue(Scrypt.ScryptHashStringVerify(hash, PASSWORD));
         }
 
         [Test]
         public void ScryptHashStringModerateTest()
         {
             const string PASSWORD = "gkahjfkjewrykjKJHKJHKJbhuiqyr  8923fhsjfkajwehkjg";
-            var hash = PasswordHash.ScryptHashString(PASSWORD, PasswordHash.Strength.Moderate);
+            var hash = Scrypt.ScryptHashString(PASSWORD, Scrypt.Strength.Moderate);
 
-            Assert.IsTrue(PasswordHash.ScryptHashStringVerify(hash, PASSWORD));
+            Assert.IsTrue(Scrypt.ScryptHashStringVerify(hash, PASSWORD));
         }
 
         [Test]
         public void ScryptHashStringMediumTest()
         {
             const string PASSWORD = "gkahjfkjewrykjKJHKJHKJbhuiqyr  8923fhsjfkajwehkjg";
-            var hash = PasswordHash.ScryptHashString(PASSWORD, PasswordHash.Strength.Medium);
+            var hash = Scrypt.ScryptHashString(PASSWORD, Scrypt.Strength.Medium);
 
-            Assert.IsTrue(PasswordHash.ScryptHashStringVerify(hash, PASSWORD));
+            Assert.IsTrue(Scrypt.ScryptHashStringVerify(hash, PASSWORD));
         }
 
         [Test]
         public void ScryptHashStringMediumSlowTest()
         {
             const string PASSWORD = "gkahjfkjewrykjKJHKJHKJbhuiqyr  8923fhsjfkajwehkjg";
-            var hash = PasswordHash.ScryptHashString(PASSWORD, PasswordHash.Strength.MediumSlow);
+            var hash = Scrypt.ScryptHashString(PASSWORD, Scrypt.Strength.MediumSlow);
 
-            Assert.IsTrue(PasswordHash.ScryptHashStringVerify(hash, PASSWORD));
+            Assert.IsTrue(Scrypt.ScryptHashStringVerify(hash, PASSWORD));
         }
 
         [Test]
@@ -423,9 +423,9 @@ namespace Tests
             try
             {
                 //Could cause OutOfMemoryException
-                var hash = PasswordHash.ScryptHashString(PASSWORD, PasswordHash.Strength.Sensitive);
+                var hash = Scrypt.ScryptHashString(PASSWORD, Scrypt.Strength.Sensitive);
 
-                Assert.IsTrue(PasswordHash.ScryptHashStringVerify(hash, PASSWORD));
+                Assert.IsTrue(Scrypt.ScryptHashStringVerify(hash, PASSWORD));
             }
             catch (OutOfMemoryException e)
             {
@@ -527,7 +527,7 @@ namespace Tests
             foreach (var testObject in testObjects)
             {
                 Assert.AreEqual(testObject.OutputLength,
-                  PasswordHash.ScryptHashBinary(Utilities.HexToBinary(testObject.Password),
+                  Scrypt.ScryptHashBinary(Utilities.HexToBinary(testObject.Password),
                     Utilities.HexToBinary(testObject.Salt), testObject.OpsLimit, testObject.MemLimit, testObject.OutputLength)
                     .Length);
             }
@@ -545,7 +545,7 @@ namespace Tests
             var password = Utilities.HexToBinary(PASSWORD);
             var salt = Utilities.HexToBinary(SALT);
             Assert.Throws<ArgumentOutOfRangeException>(
-              () => PasswordHash.ScryptHashBinary(password, salt, 643464, 1397645, 5));
+              () => Scrypt.ScryptHashBinary(password, salt, 643464, 1397645, 5));
         }
 
         /// <summary>
@@ -558,10 +558,10 @@ namespace Tests
               "e125cee61c8cb7778d9e5ad0a6f5d978ce9f84de213a8556d9ffe202020ab4a6ed9074a4eb3416f9b168f137510f3a30b70b96cbfa219ff99f6c6eaffb15c06b60e00cc2890277f0fd3c622115772f7048adaebed86e";
             const string SALT = "44071f6d181561670bda728d43fb79b443bb805afdebaf98622b5165e01b15fb";
             const long OUTPUT_LENGTH = 32;
-            var hash1 = PasswordHash.ScryptHashBinary(Utilities.HexToBinary(PASSWORD), Utilities.HexToBinary(SALT),
-              PasswordHash.Strength.Interactive, OUTPUT_LENGTH);
-            var hash2 = PasswordHash.ScryptHashBinary(Utilities.HexToBinary(PASSWORD), Utilities.HexToBinary(SALT),
-              PasswordHash.Strength.Interactive, OUTPUT_LENGTH);
+            var hash1 = Scrypt.ScryptHashBinary(Utilities.HexToBinary(PASSWORD), Utilities.HexToBinary(SALT),
+              Scrypt.Strength.Interactive, OUTPUT_LENGTH);
+            var hash2 = Scrypt.ScryptHashBinary(Utilities.HexToBinary(PASSWORD), Utilities.HexToBinary(SALT),
+              Scrypt.Strength.Interactive, OUTPUT_LENGTH);
 
             Assert.AreEqual(OUTPUT_LENGTH, hash1.Length);
             Assert.AreEqual(OUTPUT_LENGTH, hash2.Length);
@@ -577,8 +577,8 @@ namespace Tests
             const string PASSWORD = "gkahjfkjewrykjKJHKJHKJbhuiqyr  8923fhsjfkajwehkjg";
             const string SALT = "qa~t](84z<1t<1oz:ik.@IRNyhG=8q(o";
             const long OUTPUT_LENGTH = 32;
-            var hash1 = PasswordHash.ScryptHashBinary(PASSWORD, SALT, PasswordHash.Strength.Interactive, OUTPUT_LENGTH);
-            var hash2 = PasswordHash.ScryptHashBinary(PASSWORD, SALT, PasswordHash.Strength.Interactive, OUTPUT_LENGTH);
+            var hash1 = Scrypt.ScryptHashBinary(PASSWORD, SALT, Scrypt.Strength.Interactive, OUTPUT_LENGTH);
+            var hash2 = Scrypt.ScryptHashBinary(PASSWORD, SALT, Scrypt.Strength.Interactive, OUTPUT_LENGTH);
 
             Assert.AreEqual(OUTPUT_LENGTH, hash1.Length);
             Assert.AreEqual(OUTPUT_LENGTH, hash2.Length);
@@ -594,8 +594,8 @@ namespace Tests
             const string PASSWORD = "gkahjfkjewrykjKJHKJHKJbhuiqyr  8923fhsjfkajwehkjg";
             const string SALT = "qa~t](84z<1t<1oz:ik.@IRNyhG=8q(o";
             const long OUTPUT_LENGTH = 128;
-            var hash1 = PasswordHash.ScryptHashBinary(PASSWORD, SALT, PasswordHash.Strength.Interactive, OUTPUT_LENGTH);
-            var hash2 = PasswordHash.ScryptHashBinary(PASSWORD, SALT, PasswordHash.Strength.Interactive, OUTPUT_LENGTH);
+            var hash1 = Scrypt.ScryptHashBinary(PASSWORD, SALT, Scrypt.Strength.Interactive, OUTPUT_LENGTH);
+            var hash2 = Scrypt.ScryptHashBinary(PASSWORD, SALT, Scrypt.Strength.Interactive, OUTPUT_LENGTH);
 
             Assert.AreEqual(OUTPUT_LENGTH, hash1.Length);
             Assert.AreEqual(OUTPUT_LENGTH, hash2.Length);
@@ -611,8 +611,8 @@ namespace Tests
             const string PASSWORD = "gkahjfkjewrykjKJHKJHKJbhuiqyr  8923fhsjfkajwehkjg";
             const string SALT = "qa~t](84z<1t<1oz:ik.@IRNyhG=8q(o";
             const long OUTPUT_LENGTH = 512;
-            var hash1 = PasswordHash.ScryptHashBinary(PASSWORD, SALT, PasswordHash.Strength.Interactive, OUTPUT_LENGTH);
-            var hash2 = PasswordHash.ScryptHashBinary(PASSWORD, SALT, PasswordHash.Strength.Interactive, OUTPUT_LENGTH);
+            var hash1 = Scrypt.ScryptHashBinary(PASSWORD, SALT, Scrypt.Strength.Interactive, OUTPUT_LENGTH);
+            var hash2 = Scrypt.ScryptHashBinary(PASSWORD, SALT, Scrypt.Strength.Interactive, OUTPUT_LENGTH);
 
             Assert.AreEqual(OUTPUT_LENGTH, hash1.Length);
             Assert.AreEqual(OUTPUT_LENGTH, hash2.Length);
@@ -680,7 +680,7 @@ namespace Tests
 
             foreach (var test in tests)
             {
-                Assert.IsTrue(PasswordHash.ScryptHashStringVerify(test[OUTPUT], test[PASS]));
+                Assert.IsTrue(Scrypt.ScryptHashStringVerify(test[OUTPUT], test[PASS]));
             }
         }
 
@@ -689,13 +689,13 @@ namespace Tests
         {
             string password = "password";
 
-            string argonHash = PasswordHash.ArgonHashString(password, 4, 134_217_728);
+            string argonHash = Scrypt.ArgonHashString(password, 4, 134_217_728);
 
-            Assert.IsTrue(PasswordHash.ArgonPasswordNeedsRehash(argonHash, 4, 107_374_182_4));
+            Assert.IsTrue(Scrypt.ArgonPasswordNeedsRehash(argonHash, 4, 107_374_182_4));
 
-            Assert.IsFalse(PasswordHash.ArgonPasswordNeedsRehash(argonHash, 4, 134_217_728));
+            Assert.IsFalse(Scrypt.ArgonPasswordNeedsRehash(argonHash, 4, 134_217_728));
 
-            Assert.IsTrue(PasswordHash.ArgonPasswordNeedsRehash(argonHash, PasswordHash.StrengthArgon.Sensitive));
+            Assert.IsTrue(Scrypt.ArgonPasswordNeedsRehash(argonHash, Scrypt.StrengthArgon.Sensitive));
 
         }
     }

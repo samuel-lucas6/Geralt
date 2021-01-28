@@ -1,6 +1,6 @@
-using System.Linq;
-using NUnit.Framework;
 using Geralt;
+using NUnit.Framework;
+using System.Linq;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
@@ -41,7 +41,7 @@ namespace Tests
                 0xb1,0x77,0xfb,0xa5,0x1d,0xb9,0x2c,0x2a
             };
 
-            var alicePk = ScalarMult.Base(aliceSk);
+            var alicePk = X25519.Base(aliceSk);
 
             var result = new byte[] {
                 0x85,0x20,0xf0,0x09,0x89,0x30,0xa7,0x54,
@@ -63,7 +63,7 @@ namespace Tests
                 0x1c,0x2f,0x8b,0x27,0xff,0x88,0xe0,0xeb
             };
 
-            var bobPk = ScalarMult.Base(bobSk);
+            var bobPk = X25519.Base(bobSk);
 
             var result = new byte[] {
                 0xde,0x9e,0xdb,0x7d,0x7b,0x7d,0xc1,0xb4,
@@ -92,7 +92,7 @@ namespace Tests
                 0xad,0xfc,0x7e,0x14,0x6f,0x88,0x2b,0x4f
             };
 
-            var k = ScalarMult.Mult(aliceSk, bobPk);
+            var k = X25519.Mult(aliceSk, bobPk);
 
             var result = new byte[] {
                 0x4a,0x5d,0x9d,0x5b,0xa4,0xce,0x2d,0xe1,
@@ -121,7 +121,7 @@ namespace Tests
                 0xeb,0xa4,0xa9,0x8e,0xaa,0x9b,0x4e,0x6a
             };
 
-            var k = ScalarMult.Mult(bobSk, alicePk);
+            var k = X25519.Mult(bobSk, alicePk);
 
             var result = new byte[] {
                 0x4a,0x5d,0x9d,0x5b,0xa4,0xce,0x2d,0xe1,

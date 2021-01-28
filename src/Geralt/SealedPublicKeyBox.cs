@@ -1,6 +1,6 @@
+using Geralt.Exceptions;
 using System.Security.Cryptography;
 using System.Text;
-using Geralt.Exceptions;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
@@ -78,7 +78,7 @@ namespace Geralt
         {
             //validate the length of the recipient public key
             if (recipientPublicKey == null || recipientPublicKey.Length != RecipientPublicKeyBytes)
-                throw new KeyOutOfRangeException("recipientPublicKey",
+                throw new KeyOutOfRangeException(nameof(recipientPublicKey),
                     (recipientPublicKey == null) ? 0 : recipientPublicKey.Length,
                     string.Format("recipientPublicKey must be {0} bytes in length.", RecipientPublicKeyBytes));
 
@@ -136,13 +136,13 @@ namespace Geralt
         {
             //validate the length of the recipient secret key
             if (recipientSecretKey == null || recipientSecretKey.Length != RecipientSecretKeyBytes)
-                throw new KeyOutOfRangeException("recipientPublicKey",
+                throw new KeyOutOfRangeException(nameof(recipientPublicKey),
                     (recipientSecretKey == null) ? 0 : recipientSecretKey.Length,
                     string.Format("recipientSecretKey must be {0} bytes in length.", RecipientSecretKeyBytes));
 
             //validate the length of the recipient public key
             if (recipientPublicKey == null || recipientPublicKey.Length != RecipientPublicKeyBytes)
-                throw new KeyOutOfRangeException("recipientPublicKey",
+                throw new KeyOutOfRangeException(nameof(recipientPublicKey),
                     (recipientPublicKey == null) ? 0 : recipientPublicKey.Length,
                     string.Format("recipientPublicKey must be {0} bytes in length.", RecipientPublicKeyBytes));
 

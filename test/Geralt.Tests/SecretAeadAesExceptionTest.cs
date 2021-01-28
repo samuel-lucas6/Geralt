@@ -1,6 +1,6 @@
-using NUnit.Framework;
-using Geralt.Exceptions;
 using Geralt;
+using Geralt.Exceptions;
+using NUnit.Framework;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
@@ -55,7 +55,7 @@ namespace Tests
 
             if (AesGCM.IsAvailable())
             {
-                Assert.Throws<KeyOutOfRangeException>(
+                _ = Assert.Throws<KeyOutOfRangeException>(
                   () => AesGCM.Encrypt(m, nonce, key, ad));
             }
             else
@@ -87,7 +87,7 @@ namespace Tests
 
             if (AesGCM.IsAvailable())
             {
-                Assert.Throws<NonceOutOfRangeException>(
+                _ = Assert.Throws<NonceOutOfRangeException>(
                   () => AesGCM.Encrypt(m, nonce, key, ad));
             }
             else
@@ -120,7 +120,7 @@ namespace Tests
       };
             if (AesGCM.IsAvailable())
             {
-                Assert.Throws<AdditionalDataOutOfRangeException>(
+                _ = Assert.Throws<AdditionalDataOutOfRangeException>(
                   () => AesGCM.Encrypt(m, nonce, key, ad));
             }
             else
@@ -151,7 +151,7 @@ namespace Tests
       };
             if (AesGCM.IsAvailable())
             {
-                Assert.Throws<KeyOutOfRangeException>(
+                _ = Assert.Throws<KeyOutOfRangeException>(
                   () => AesGCM.Decrypt(m, nonce, key, ad));
             }
             else
@@ -183,7 +183,7 @@ namespace Tests
 
             if (AesGCM.IsAvailable())
             {
-                Assert.Throws<NonceOutOfRangeException>(
+                _ = Assert.Throws<NonceOutOfRangeException>(
                   () => AesGCM.Decrypt(m, nonce, key, ad));
             }
             else
@@ -216,7 +216,7 @@ namespace Tests
       };
             if (AesGCM.IsAvailable())
             {
-                Assert.Throws<AdditionalDataOutOfRangeException>(
+                _ = Assert.Throws<AdditionalDataOutOfRangeException>(
                   () => AesGCM.Decrypt(m, nonce, key, ad));
             }
             else
