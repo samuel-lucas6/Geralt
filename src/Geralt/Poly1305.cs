@@ -46,9 +46,9 @@ namespace Geralt
         /// <param name="key">The 32 byte key.</param>
         /// <returns>A 16 byte authentication tag.</returns>
         /// <exception cref="KeyOutOfRangeException"></exception>
-        public static byte[] ComputeMAC(string message, byte[] key)
+        public static byte[] Compute(string message, byte[] key)
         {
-            return ComputeMAC(Encoding.UTF8.GetBytes(message), key);
+            return Compute(Encoding.UTF8.GetBytes(message), key);
         }
 
         /// <summary>Computes the message authentication code of a message using Poly1305.</summary>
@@ -56,7 +56,7 @@ namespace Geralt
         /// <param name="key">The 32 byte key.</param>
         /// <returns>A 16 byte authentication tag.</returns>
         /// <exception cref="KeyOutOfRangeException"></exception>
-        public static byte[] ComputeMAC(byte[] message, byte[] key)
+        public static byte[] Compute(byte[] message, byte[] key)
         {
             ParameterValidation.Key(key, _keyBytes);
             byte[] tag = new byte[_tagBytes];
@@ -71,9 +71,9 @@ namespace Geralt
         /// <returns>True if verified.</returns>
         /// <exception cref="KeyOutOfRangeException"></exception>
         /// <exception cref="SignatureOutOfRangeException"></exception>
-        public static bool VerifyMAC(string message, byte[] tag, byte[] key)
+        public static bool Verify(string message, byte[] tag, byte[] key)
         {
-            return VerifyMAC(Encoding.UTF8.GetBytes(message), tag, key);
+            return Verify(Encoding.UTF8.GetBytes(message), tag, key);
         }
 
         /// <summary>Verifies a Poly1305 message authentication code.</summary>
@@ -83,7 +83,7 @@ namespace Geralt
         /// <returns>True if verified.</returns>
         /// <exception cref="KeyOutOfRangeException"></exception>
         /// <exception cref="SignatureOutOfRangeException"></exception>
-        public static bool VerifyMAC(byte[] message, byte[] tag, byte[] key)
+        public static bool Verify(byte[] message, byte[] tag, byte[] key)
         {
             ParameterValidation.Key(key, _keyBytes);
             ParameterValidation.Signature(tag, _tagBytes);
