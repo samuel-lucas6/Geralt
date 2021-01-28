@@ -27,15 +27,15 @@ using Geralt.Exceptions;
 
 namespace Geralt
 {
-    public static class ParameterValidation
+    internal static class ParameterValidation
     {
-        public static byte[] AdditionalData(byte[] additionalData)
+        internal static byte[] AdditionalData(byte[] additionalData)
         {
             // Additional data can be null
             return additionalData ?? (Array.Empty<byte>());
         }
 
-        public static void Nonce(byte[] nonce, int validNonceLength)
+        internal static void Nonce(byte[] nonce, int validNonceLength)
         {
             if (nonce == null || nonce.Length != validNonceLength)
             {
@@ -43,7 +43,7 @@ namespace Geralt
             }
         }
 
-        public static void Key(byte[] key, int validKeyLength)
+        internal static void Key(byte[] key, int validKeyLength)
         {
             if (key == null || key.Length != validKeyLength)
             {
@@ -51,7 +51,7 @@ namespace Geralt
             }
         }
 
-        public static byte[] Key(byte[] key, int minimumKeyLength, int maxKeyLength)
+        internal static byte[] Key(byte[] key, int minimumKeyLength, int maxKeyLength)
         {
             if (key != null && (key.Length < minimumKeyLength || key.Length > maxKeyLength))
             {
@@ -60,7 +60,7 @@ namespace Geralt
             return key ?? Array.Empty<byte>();
         }
 
-        public static void PrivateKey(byte[] privateKey, int validPrivateKeyLength)
+        internal static void PrivateKey(byte[] privateKey, int validPrivateKeyLength)
         {
             if (privateKey == null || privateKey.Length != validPrivateKeyLength)
             {
@@ -68,7 +68,7 @@ namespace Geralt
             }
         }
 
-        public static void PublicKey(byte[] publicKey, int validPublicKeyLength)
+        internal static void PublicKey(byte[] publicKey, int validPublicKeyLength)
         {
             if (publicKey == null || publicKey.Length != validPublicKeyLength)
             {
@@ -76,7 +76,7 @@ namespace Geralt
             }
         }
 
-        public static void Salt(byte[] salt, int validSaltLength)
+        internal static void Salt(byte[] salt, int validSaltLength)
         {
             if (salt == null || salt.Length != validSaltLength)
             {
@@ -84,7 +84,7 @@ namespace Geralt
             }
         }
 
-        public static void Personal(byte[] personal, int validPersonalLength)
+        internal static void Personal(byte[] personal, int validPersonalLength)
         {
             if (personal == null || personal.Length != validPersonalLength)
             {
@@ -92,7 +92,7 @@ namespace Geralt
             }
         }
 
-        public static void Message(byte[] message)
+        internal static void Message(byte[] message)
         {
             if (message == null)
             {
@@ -100,7 +100,7 @@ namespace Geralt
             }
         }
 
-        public static void OutputLength(int bytes, int minimumOutputBytes, int maximumOutputBytes)
+        internal static void OutputLength(int bytes, int minimumOutputBytes, int maximumOutputBytes)
         {
             if (bytes < minimumOutputBytes || bytes > maximumOutputBytes)
             {
@@ -108,7 +108,7 @@ namespace Geralt
             }
         }
 
-        public static void OutputLength(int outputLength, int minimumOutputLength)
+        internal static void OutputLength(int outputLength, int minimumOutputLength)
         {
             if (outputLength < minimumOutputLength)
             {
@@ -116,7 +116,7 @@ namespace Geralt
             }
         }
 
-        public static void Signature(byte[] signature, int validSignatureLength)
+        internal static void Signature(byte[] signature, int validSignatureLength)
         {
             if (signature == null || signature.Length != validSignatureLength)
             {
@@ -124,7 +124,7 @@ namespace Geralt
             }
         }
 
-        public static void Password(byte[] password)
+        internal static void Password(byte[] password)
         {
             if (password == null)
             {
@@ -132,7 +132,7 @@ namespace Geralt
             }
         }
 
-        public static void Password(string password)
+        internal static void Password(string password)
         {
             if (password == null)
             {
@@ -140,7 +140,7 @@ namespace Geralt
             }
         }
 
-        public static void Hash(byte[] hash)
+        internal static void Hash(byte[] hash)
         {
             if (hash == null)
             {
@@ -148,7 +148,7 @@ namespace Geralt
             }
         }
 
-        public static void PasswordHashingResult(int result)
+        internal static void PasswordHashingResult(int result)
         {
             if (result != 0)
             {
@@ -156,7 +156,7 @@ namespace Geralt
             }
         }
 
-        public static void Seed(byte[] seed, int validSeedLength)
+        internal static void Seed(byte[] seed, int validSeedLength)
         {
             if (seed == null || seed.Length != validSeedLength)
             {
