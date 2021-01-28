@@ -119,9 +119,9 @@ namespace Geralt
         public static byte[] HashSaltPersonal(byte[] message, byte[] key, byte[] salt, byte[] personal, int bytes = _defaultOutputBytes)
         {
             ParameterValidation.Message(message);
+            key = ParameterValidation.Key(key, _minKeyBytes, _maxKeyBytes);
             ParameterValidation.Salt(salt, _saltBytes);
             ParameterValidation.Personal(personal, _personalBytes);
-            key = ParameterValidation.Key(key, _minKeyBytes, _maxKeyBytes);
             ParameterValidation.OutputLength(bytes, _minOutputBytes, _maxOutputBytes);
             byte[] hash = new byte[bytes];
             _ = LibsodiumLibrary.crypto_generichash_blake2b_salt_personal(hash, hash.Length, message, message.Length, key, key.Length, salt, personal);

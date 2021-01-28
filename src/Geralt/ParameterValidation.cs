@@ -108,11 +108,59 @@ namespace Geralt
             }
         }
 
+        public static void OutputLength(int outputLength, int minimumOutputLength)
+        {
+            if (outputLength < minimumOutputLength)
+            {
+                throw new ArgumentOutOfRangeException(nameof(outputLength), $"Output length cannot be less than {minimumOutputLength} bytes.");
+            }
+        }
+
         public static void Signature(byte[] signature, int validSignatureLength)
         {
             if (signature == null || signature.Length != validSignatureLength)
             {
                 throw new SignatureOutOfRangeException(nameof(signature), (signature == null) ? 0 : signature.Length, $"Signature must be {validSignatureLength} bytes in length.");
+            }
+        }
+
+        public static void Password(byte[] password)
+        {
+            if (password == null)
+            {
+                throw new ArgumentNullException(nameof(password), "Password cannot be null.");
+            }
+        }
+
+        public static void Password(string password)
+        {
+            if (password == null)
+            {
+                throw new ArgumentNullException(nameof(password), "Password cannot be null");
+            }
+        }
+
+        public static void Hash(byte[] hash)
+        {
+            if (hash == null)
+            {
+                throw new ArgumentNullException(nameof(hash), "Hash cannot be null");
+            }
+        }
+
+        public static void PasswordHashingResult(int result)
+        {
+            if (result != 0)
+            {
+                throw new OutOfMemoryException("Internal error - hashing failed. Possibly not enough memory.");
+            }
+        }
+
+        public static void Seed(byte[] seed, int validSeedLength)
+        {
+            if (seed == null || seed.Length != validSeedLength)
+            {
+                throw new SeedOutOfRangeException(nameof(seed), (seed == null) ? 0 : seed.Length, $"Seed must be {validSeedLength} bytes in length.");
             }
         }
     }

@@ -42,7 +42,7 @@ namespace Geralt
         }
 
         /// <summary>Clears a char array containing sensitive data.</summary>
-        /// <param name="array">The byte array to clear.</param>
+        /// <param name="array">The char array to clear.</param>
         public static void ZeroArray(char[] array)
         {
             if (array != null)
