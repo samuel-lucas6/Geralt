@@ -45,7 +45,7 @@ namespace Geralt
         /// <param name="array">The char array to clear.</param>
         public static void ZeroArray(char[] array)
         {
-            if (array != null)
+            if (array.Length > 0)
             {
                 Array.Clear(array, _index, array.Length);
             }
