@@ -39,7 +39,7 @@ namespace Geralt
         private const int _tagBytes = 16;
 
         /// <summary>Detect if the current CPU supports the required instructions (SSSE3, aesni, pcmul).</summary>
-        /// <returns><c>true</c> if the CPU supports the necessary instructions, otherwise <c>false</c>.</returns>
+        /// <returns><c>true</c> if the CPU supports the necessary instructions; otherwise, <c>false</c>.</returns>
         /// <remarks><see cref="ChaCha20Poly1305"/> is recommended.</remarks>
         public static bool IsAvailable()
         {
