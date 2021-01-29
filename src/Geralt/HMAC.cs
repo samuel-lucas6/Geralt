@@ -86,7 +86,7 @@ namespace Geralt
         public static bool Verify(byte[] message, byte[] tag, byte[] key)
         {
             ParameterValidation.Key(key, _keyBytes);
-            ParameterValidation.Signature(tag, _hmacSHA256Bytes);
+            ParameterValidation.Tag(tag, _hmacSHA256Bytes);
             int result = LibsodiumLibrary.crypto_auth_verify(tag, message, message.Length, key);
             return result == 0;
         }
@@ -159,7 +159,7 @@ namespace Geralt
         public static bool VerifySHA256(byte[] message, byte[] tag, byte[] key)
         {
             ParameterValidation.Key(key, _keyBytes);
-            ParameterValidation.Signature(tag, _hmacSHA256Bytes);
+            ParameterValidation.Tag(tag, _hmacSHA256Bytes);
             int result = LibsodiumLibrary.crypto_auth_hmacsha256_verify(tag, message, message.Length, key);
             return result == 0;
         }
@@ -186,7 +186,7 @@ namespace Geralt
         public static bool VerifySHA512(byte[] message, byte[] tag, byte[] key)
         {
             ParameterValidation.Key(key, _keyBytes);
-            ParameterValidation.Signature(tag, _hmacSHA512Bytes);
+            ParameterValidation.Tag(tag, _hmacSHA512Bytes);
             int result = LibsodiumLibrary.crypto_auth_hmacsha512_verify(tag, message, message.Length, key);
             return result == 0;
         }

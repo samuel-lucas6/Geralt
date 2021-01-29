@@ -86,7 +86,7 @@ namespace Geralt
         public static bool Verify(byte[] message, byte[] tag, byte[] key)
         {
             ParameterValidation.Key(key, _keyBytes);
-            ParameterValidation.Signature(tag, _tagBytes);
+            ParameterValidation.Tag(tag, _tagBytes);
             int result = LibsodiumLibrary.crypto_onetimeauth_verify(tag, message, message.Length, key);
             return result == 0;
         }

@@ -114,6 +114,14 @@ namespace Geralt
             }
         }
 
+        internal static void Tag(byte[] tag, int validTagLength)
+        {
+            if (tag == null || tag.Length != validTagLength)
+            {
+                throw new SignatureOutOfRangeException(nameof(tag), (tag == null) ? 0 : tag.Length, $"Tag must be {validTagLength} bytes in length.");
+            }
+        }
+
         internal static void Signature(byte[] signature, int validSignatureLength)
         {
             if (signature == null || signature.Length != validSignatureLength)

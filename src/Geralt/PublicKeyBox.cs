@@ -252,7 +252,7 @@ namespace Geralt
         /// <param name="publicKey">The sender's public key.</param>
         /// <returns>The decrypted message.</returns>
         /// <exception cref="KeyOutOfRangeException"></exception>
-        /// <exception cref="MacOutOfRangeException"></exception>
+        /// <exception cref="TagOutOfRangeException"></exception>
         /// <exception cref="NonceOutOfRangeException"></exception>
         /// <exception cref="CryptographicException"></exception>
         public static byte[] OpenDetached(string cipherText, byte[] mac, byte[] nonce, byte[] secretKey, byte[] publicKey)
@@ -267,7 +267,7 @@ namespace Geralt
         /// <param name="publicKey">The sender's public key.</param>
         /// <returns>The decrypted message.</returns>
         /// <exception cref="KeyOutOfRangeException"></exception>
-        /// <exception cref="MacOutOfRangeException"></exception>
+        /// <exception cref="TagOutOfRangeException"></exception>
         /// <exception cref="NonceOutOfRangeException"></exception>
         /// <exception cref="CryptographicException"></exception>
         public static byte[] OpenDetached(DetachedBox detached, byte[] nonce, byte[] secretKey, byte[] publicKey)
@@ -283,7 +283,7 @@ namespace Geralt
         /// <param name="publicKey">The sender's public key.</param>
         /// <returns>The decrypted message.</returns>
         /// <exception cref="KeyOutOfRangeException"></exception>
-        /// <exception cref="MacOutOfRangeException"></exception>
+        /// <exception cref="TagOutOfRangeException"></exception>
         /// <exception cref="NonceOutOfRangeException"></exception>
         /// <exception cref="CryptographicException"></exception>
         public static byte[] OpenDetached(byte[] cipherText, byte[] mac, byte[] nonce, byte[] secretKey, byte[] publicKey)
@@ -300,7 +300,7 @@ namespace Geralt
 
             //validate the length of the mac
             if (mac == null || mac.Length != MAC_BYTES)
-                throw new MacOutOfRangeException(nameof(mac), (mac == null) ? 0 : mac.Length,
+                throw new TagOutOfRangeException(nameof(mac), (mac == null) ? 0 : mac.Length,
                   string.Format("mac must be {0} bytes in length.", MAC_BYTES));
 
             //validate the length of the nonce
