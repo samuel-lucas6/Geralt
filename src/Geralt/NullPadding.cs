@@ -28,7 +28,7 @@ namespace Geralt
 {
     internal static class NullPadding
     {
-        internal static byte[] TrimLeadingNulls(byte[] ciphertext, int tagBytes)
+        internal static byte[] RemoveLeadingNulls(byte[] ciphertext, int tagBytes)
         {
             // Check to see if there are _tagBytes of leading nulls. If so, trim.
             // This is required due to an error in older versions.
@@ -51,6 +51,13 @@ namespace Geralt
                 }
             }
             return ciphertext;
+        }
+
+        internal static byte[] RemoveTrailingNulls(byte[] message, long messageLength)
+        {
+            byte[] trimmedMessage = new byte[message.Length];
+            Array.Copy(message, trimmedMessage, (int)messageLength);
+            return trimmedMessage;
         }
     }
 }

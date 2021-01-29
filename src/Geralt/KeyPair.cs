@@ -53,23 +53,12 @@ namespace Geralt
         }
 
         /// <summary>Gets the private key.</summary>
-        public byte[] PrivateKey
-        {
-            get
-            {
-                var privateKey = new byte[_privateKey.Length];
-                Array.Copy(_privateKey, privateKey, privateKey.Length);
-                return privateKey;
-            }
-        }
+        public byte[] PrivateKey => _privateKey;
 
         /// <summary>Dispose of the private key in memory.</summary>
         public void Dispose()
         {
-            if (_privateKey != null && _privateKey.Length > 0)
-            {
-                Array.Clear(_privateKey, index: 0, _privateKey.Length);
-            }
+            SecureMemory.ZeroArray(_privateKey);
             GC.SuppressFinalize(this);
         }
     }

@@ -128,7 +128,7 @@ namespace Geralt
             ParameterValidation.Nonce(nonce, _nonceBytes);
             ParameterValidation.PrivateKey(recipientPrivateKey, _privateKeyBytes);
             ParameterValidation.PublicKey(senderPublicKey, _publicKeyBytes);
-            ciphertext = NullPadding.TrimLeadingNulls(ciphertext, _tagBytes);
+            ciphertext = NullPadding.RemoveLeadingNulls(ciphertext, _tagBytes);
             byte[] message = new byte[ciphertext.Length - _tagBytes];
             int result = LibsodiumLibrary.crypto_box_open_easy(message, ciphertext, ciphertext.Length, nonce, senderPublicKey, recipientPrivateKey);
             return result != 0 ? throw new CryptographicException("Error decrypting message.") : message;

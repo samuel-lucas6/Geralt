@@ -76,7 +76,7 @@ namespace Geralt
             {
                 throw new CryptographicException("Error encrypting message.");
             }
-            return ciphertext.Length == ciphertextLength ? ciphertext : RemoveTrailingNulls(ciphertext, ciphertextLength);
+            return ciphertext.Length == ciphertextLength ? ciphertext : NullPadding.RemoveTrailingNulls(ciphertext, ciphertextLength);
         }
 
         /// <summary>Decrypts a ciphertext message using ChaCha20-Poly1305.</summary>
@@ -102,14 +102,7 @@ namespace Geralt
             {
                 throw new CryptographicException("Error decrypting message.");
             }
-            return message.Length == messageLength ? message : RemoveTrailingNulls(message, messageLength);
-        }
-
-        private static byte[] RemoveTrailingNulls(byte[] message, long messageLength)
-        {
-            byte[] messageWithoutPadding = new byte[message.Length];
-            Array.Copy(message, messageWithoutPadding, (int)messageLength);
-            return messageWithoutPadding;
+            return message.Length == messageLength ? message : NullPadding.RemoveTrailingNulls(message, messageLength);
         }
     }
 }
