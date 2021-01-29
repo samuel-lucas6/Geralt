@@ -136,10 +136,7 @@ namespace Geralt
             var buffer = new byte[message.Length + MAC_BYTES];
             var ret = LibsodiumLibrary.crypto_box_easy(buffer, message, message.Length, nonce, publicKey, secretKey);
 
-            if (ret != 0)
-                throw new CryptographicException("Failed to create PublicKeyBox");
-
-            return buffer;
+            return ret != 0 ? throw new CryptographicException("Failed to create PublicKeyBox") : buffer;
         }
 
         /// <summary>Creates detached a Box</summary>
@@ -187,10 +184,7 @@ namespace Geralt
 
             var ret = LibsodiumLibrary.crypto_box_detached(cipher, mac, message, message.Length, nonce, secretKey, publicKey);
 
-            if (ret != 0)
-                throw new CryptographicException("Failed to create public detached Box");
-
-            return new DetachedBox(cipher, mac);
+            return ret != 0 ? throw new CryptographicException("Failed to create public detached Box") : new DetachedBox(cipher, mac);
         }
 
         /// <summary>Opens a Box</summary>
@@ -247,10 +241,7 @@ namespace Geralt
             var buffer = new byte[cipherText.Length - MAC_BYTES];
             var ret = LibsodiumLibrary.crypto_box_open_easy(buffer, cipherText, cipherText.Length, nonce, publicKey, secretKey);
 
-            if (ret != 0)
-                throw new CryptographicException("Failed to open PublicKeyBox");
-
-            return buffer;
+            return ret != 0 ? throw new CryptographicException("Failed to open PublicKeyBox") : buffer;
         }
 
         /// <summary>Opens a detached Box</summary>
@@ -320,10 +311,7 @@ namespace Geralt
             var buffer = new byte[cipherText.Length];
             var ret = LibsodiumLibrary.crypto_box_open_detached(buffer, cipherText, mac, cipherText.Length, nonce, secretKey, publicKey);
 
-            if (ret != 0)
-                throw new CryptographicException("Failed to open public detached Box");
-
-            return buffer;
+            return ret != 0 ? throw new CryptographicException("Failed to open public detached Box") : buffer;
         }
     }
 }

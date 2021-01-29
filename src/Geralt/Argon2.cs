@@ -243,11 +243,7 @@ namespace Geralt
             ParameterValidation.Password(hash);
             GeraltCore.InitialiseLibsodium();
             int result = LibsodiumLibrary.crypto_pwhash_str_needs_rehash(hash, iterations, memorySize);
-            if (result == -1)
-            {
-                throw new InvalidArgonPasswordString();
-            }
-            return result == 1;
+            return result == -1 ? throw new InvalidArgonPasswordString() : result == 1;
         }
 
         private static (int iterations, int memorySize) GetParameters(Strength strength = Strength.Interactive)

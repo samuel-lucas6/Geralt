@@ -94,11 +94,7 @@ namespace Geralt
             {
                 throw new CryptographicException("Error encrypting message.");
             }
-            if (ciphertext.Length == ciphertextLength)
-            {
-                return ciphertext;
-            }
-            return RemoveTrailingNulls(ciphertext, ciphertextLength);
+            return ciphertext.Length == ciphertextLength ? ciphertext : RemoveTrailingNulls(ciphertext, ciphertextLength);
         }
 
         /// <summary>Decrypts a ciphertext using AES-GCM.</summary>
@@ -125,11 +121,7 @@ namespace Geralt
             {
                 throw new CryptographicException("Error decrypting message.");
             }
-            if (plaintext.Length == plaintextLength)
-            {
-                return plaintext;
-            }
-            return RemoveTrailingNulls(plaintext, plaintextLength);
+            return plaintext.Length == plaintextLength ? plaintext : RemoveTrailingNulls(plaintext, plaintextLength);
         }
 
         private static byte[] RemoveTrailingNulls(byte[] message, long messageLength)

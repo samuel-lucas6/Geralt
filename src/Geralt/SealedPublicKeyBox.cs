@@ -85,10 +85,7 @@ namespace Geralt
             var buffer = new byte[message.Length + CryptoBoxSealbytes];
             var ret = LibsodiumLibrary.crypto_box_seal(buffer, message, message.Length, recipientPublicKey);
 
-            if (ret != 0)
-                throw new CryptographicException("Failed to create SealedBox");
-
-            return buffer;
+            return ret != 0 ? throw new CryptographicException("Failed to create SealedBox") : buffer;
         }
 
         /// <summary>Opens a SealedPublicKeyBox</summary>
@@ -151,10 +148,7 @@ namespace Geralt
             var ret = LibsodiumLibrary.crypto_box_seal_open(buffer, cipherText, cipherText.Length, recipientPublicKey,
                 recipientSecretKey);
 
-            if (ret != 0)
-                throw new CryptographicException("Failed to open SealedBox");
-
-            return buffer;
+            return ret != 0 ? throw new CryptographicException("Failed to open SealedBox") : buffer;
         }
     }
 }

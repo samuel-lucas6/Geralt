@@ -157,11 +157,7 @@ namespace Geralt
             ParameterValidation.PublicKey(ed25519PublicKey, _publicKeyBytes);
             byte[] x25519PublicKey = new byte[PublicKeyBox.PublicKeyBytes];
             int result = LibsodiumLibrary.crypto_sign_ed25519_pk_to_curve25519(x25519PublicKey, ed25519PublicKey);
-            if (result != 0)
-            {
-                throw new CryptographicException("Failed to convert public key.");
-            }
-            return x25519PublicKey;
+            return result != 0 ? throw new CryptographicException("Failed to convert public key.") : x25519PublicKey;
         }
 
         /// <summary>Converts an Ed25519 private key to an X25519 private key.</summary>
@@ -174,11 +170,7 @@ namespace Geralt
             ParameterValidation.PrivateKey(ed25519PrivateKey, _privateKeyBytes);
             byte[] x25519PrivateKey = new byte[PublicKeyBox.SecretKeyBytes];
             int result = LibsodiumLibrary.crypto_sign_ed25519_sk_to_curve25519(x25519PrivateKey, ed25519PrivateKey);
-            if (result != 0)
-            {
-                throw new CryptographicException("Failed to convert private key.");
-            }
-            return x25519PrivateKey;
+            return result != 0 ? throw new CryptographicException("Failed to convert private key.") : x25519PrivateKey;
         }
 
         /// <summary>Extracts the seed from an Ed25519 private key.</summary>
@@ -189,11 +181,7 @@ namespace Geralt
             ParameterValidation.PrivateKey(privateKey, _privateKeyBytes);
             byte[] seed = new byte[_seedBytes];
             int result = LibsodiumLibrary.crypto_sign_ed25519_sk_to_seed(seed, privateKey);
-            if (result != 0)
-            {
-                throw new CryptographicException("Failed to extract the seed from the private key.");
-            }
-            return seed;
+            return result != 0 ? throw new CryptographicException("Failed to extract the seed from the private key.") : seed;
         }
 
         /// <summary>Extracts the public key from an Ed25519 private key.</summary>
@@ -204,11 +192,7 @@ namespace Geralt
             ParameterValidation.PrivateKey(privateKey, _privateKeyBytes);
             byte[] publicKey = new byte[_publicKeyBytes];
             int result = LibsodiumLibrary.crypto_sign_ed25519_sk_to_pk(publicKey, privateKey);
-            if (result != 0)
-            {
-                throw new CryptographicException("Failed to extract the public key from the private key.");
-            }
-            return publicKey;
+            return result != 0 ? throw new CryptographicException("Failed to extract the public key from the private key.") : publicKey;
         }
     }
 }

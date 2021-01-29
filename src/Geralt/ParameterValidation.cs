@@ -53,11 +53,9 @@ namespace Geralt
 
         internal static byte[] Key(byte[] key, int minimumKeyLength, int maxKeyLength)
         {
-            if (key != null && (key.Length < minimumKeyLength || key.Length > maxKeyLength))
-            {
-                throw new KeyOutOfRangeException($"Key must be between {minimumKeyLength} and {maxKeyLength} bytes in length.");
-            }
-            return key ?? Array.Empty<byte>();
+            return key != null && (key.Length < minimumKeyLength || key.Length > maxKeyLength)
+                ? throw new KeyOutOfRangeException($"Key must be between {minimumKeyLength} and {maxKeyLength} bytes in length.")
+                : key ?? Array.Empty<byte>();
         }
 
         internal static void PrivateKey(byte[] privateKey, int validPrivateKeyLength)

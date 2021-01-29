@@ -1,7 +1,7 @@
 using Geralt.Exceptions;
 using System;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using System.Text;
 
 /*
     Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
@@ -29,9 +29,9 @@ using System.Security.Cryptography;
 
 namespace Geralt
 {
-    /// <summary>Authenticated encryption with additional data using XChaCha20-Poly1305.</summary>
-    /// <remarks>See here for more information: https://doc.libsodium.org/secret-key_cryptography/aead/chacha20-poly1305/xchacha20-poly1305_construction </remarks>
-    public static class XChaCha20Poly1305
+    /// <summary>Authenticated encryption using XSalsa20-Poly1305.</summary>
+    /// <remarks>See here for more information: https://doc.libsodium.org/secret-key_cryptography/secretbox </remarks>
+    public static class XSalsa20Poly1305
     {
         private const int _keyBytes = 32;
         private const int _nonceBytes = 24;
@@ -59,65 +59,66 @@ namespace Geralt
             return ConstantTime.Increment(nonce);
         }
 
-        /// <summary>Encrypts a message using XChaCha20-Poly1305.</summary>
+        /// <summary>Encrypts a message using XSalsa20-Poly1305.</summary>
         /// <param name="message">The message to be encrypted.</param>
         /// <param name="nonce">The 24 byte nonce.</param>
         /// <param name="key">The 32 byte key.</param>
-        /// <param name="additionalData">The additional data - can be null.</param>
         /// <returns>The encrypted message with an authentication tag.</returns>
         /// <remarks>The nonce should never be reused with the same key.</remarks>
         /// <remarks>The recommended way to generate a nonce is to use GenerateNonce() for the first message and increment it for each subsequent message using the same key.</remarks>
         /// <exception cref="KeyOutOfRangeException"></exception>
         /// <exception cref="NonceOutOfRangeException"></exception>
         /// <exception cref="CryptographicException"></exception>
-        public static byte[] Encrypt(byte[] message, byte[] nonce, byte[] key, byte[] additionalData = null)
+        public static byte[] Encrypt(byte[] message, byte[] nonce, byte[] key)
         {
-            additionalData = ParameterValidation.AdditionalData(additionalData);
-            ParameterValidation.Nonce(nonce, _nonceBytes);
             ParameterValidation.Key(key, _keyBytes);
-            byte[] ciphertext = new byte[message.Length + _tagBytes];
-            IntPtr ciphertextPointer = Marshal.AllocHGlobal(ciphertext.Length);
-            int result = LibsodiumLibrary.crypto_aead_xchacha20poly1305_ietf_encrypt(ciphertextPointer, out long ciphertextLength, message, message.Length, additionalData, additionalData.Length, nsec: null, nonce, key);
-            Marshal.Copy(ciphertextPointer, ciphertext, startIndex: 0, (int)ciphertextLength);
-            Marshal.FreeHGlobal(ciphertextPointer);
-            if (result != 0)
-            {
-                throw new CryptographicException("Error encrypting message.");
-            }
-            return ciphertext.Length == ciphertextLength ? ciphertext : RemoveTrailingNulls(ciphertext, ciphertextLength);
+            ParameterValidation.Nonce(nonce, _nonceBytes);
+            byte[] ciphertext = new byte[_tagBytes + message.Length];
+            int result = LibsodiumLibrary.crypto_secretbox_easy(ciphertext, message, message.Length, nonce, key);
+            return result != 0 ? throw new CryptographicException("Error encrypting message.") : ciphertext;
         }
 
-        /// <summary>Decrypts a ciphertext message using XChaCha20-Poly1305.</summary>
+        /// <summary>Decrypts a ciphertext message using XSalsa20-Poly1305.</summary>
         /// <param name="ciphertext">The ciphertext to be decrypted.</param>
         /// <param name="nonce">The 24 byte nonce.</param>
         /// <param name="key">The 32 byte key.</param>
-        /// <param name="additionalData">The additional data - can be null.</param>
         /// <returns>The decrypted ciphertext.</returns>
         /// <exception cref="KeyOutOfRangeException"></exception>
         /// <exception cref="NonceOutOfRangeException"></exception>
         /// <exception cref="CryptographicException"></exception>
-        public static byte[] Decrypt(byte[] ciphertext, byte[] nonce, byte[] key, byte[] additionalData = null)
+        public static byte[] Decrypt(byte[] ciphertext, byte[] nonce, byte[] key)
         {
-            additionalData = ParameterValidation.AdditionalData(additionalData);
-            ParameterValidation.Nonce(nonce, _nonceBytes);
             ParameterValidation.Key(key, _keyBytes);
-            byte[] plaintext = new byte[ciphertext.Length - _tagBytes];
-            IntPtr plaintextPointer = Marshal.AllocHGlobal(plaintext.Length);
-            int result = LibsodiumLibrary.crypto_aead_xchacha20poly1305_ietf_decrypt(plaintextPointer, out long plaintextLength, nsec: null, ciphertext, ciphertext.Length, additionalData, additionalData.Length, nonce, key);
-            Marshal.Copy(plaintextPointer, plaintext, startIndex: 0, (int)plaintextLength);
-            Marshal.FreeHGlobal(plaintextPointer);
-            if (result != 0)
-            {
-                throw new CryptographicException("Error decrypting message.");
-            }
-            return plaintext.Length == plaintextLength ? plaintext : RemoveTrailingNulls(plaintext, plaintextLength);
+            ParameterValidation.Nonce(nonce, _nonceBytes);
+            ciphertext = TrimLeadingNulls(ciphertext);
+            var message = new byte[ciphertext.Length - _tagBytes];
+            int result = LibsodiumLibrary.crypto_secretbox_open_easy(message, ciphertext, ciphertext.Length, nonce, key);
+            return result != 0 ? throw new CryptographicException("Error decrypting message.") : message;
         }
 
-        private static byte[] RemoveTrailingNulls(byte[] message, long messageLength)
+        private static byte[] TrimLeadingNulls(byte[] ciphertext)
         {
-            byte[] messageWithoutPadding = new byte[message.Length];
-            Array.Copy(message, messageWithoutPadding, (int)messageLength);
-            return messageWithoutPadding;
+            // Check to see if there are _tagBytes of leading nulls. If so, trim.
+            // This is required due to an error in older versions.
+            if (ciphertext[0] == 0)
+            {
+                bool trim = true;
+                for (int i = 0; i < _tagBytes - 1; i++)
+                {
+                    if (ciphertext[i] != 0)
+                    {
+                        trim = false;
+                        break;
+                    }
+                }
+                if (trim)
+                {
+                    byte[] trimmedCiphertext = new byte[ciphertext.Length - _tagBytes];
+                    Array.Copy(ciphertext, _tagBytes, trimmedCiphertext, destinationIndex: 0, trimmedCiphertext.Length);
+                    return trimmedCiphertext;
+                }
+            }
+            return ciphertext;
         }
     }
 }

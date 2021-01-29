@@ -103,10 +103,7 @@ namespace Geralt
             var buffer = new byte[message.Length];
             var ret = LibsodiumLibrary.crypto_stream_xor(buffer, message, message.Length, nonce, key);
 
-            if (ret != 0)
-                throw new CryptographicException("Error encrypting message.");
-
-            return buffer;
+            return ret != 0 ? throw new CryptographicException("Error encrypting message.") : buffer;
         }
 
         /// <summary>Encryptes messages via ChaCha20</summary>
@@ -145,10 +142,7 @@ namespace Geralt
             var buffer = new byte[message.Length];
             var ret = LibsodiumLibrary.crypto_stream_chacha20_xor(buffer, message, message.Length, nonce, key);
 
-            if (ret != 0)
-                throw new CryptographicException("Error encrypting message.");
-
-            return buffer;
+            return ret != 0 ? throw new CryptographicException("Error encrypting message.") : buffer;
         }
 
         /// <summary>Encryptes messages via XChaCha20</summary>
@@ -187,10 +181,7 @@ namespace Geralt
             var buffer = new byte[message.Length];
             var ret = LibsodiumLibrary.crypto_stream_xchacha20_xor(buffer, message, message.Length, nonce, key);
 
-            if (ret != 0)
-                throw new CryptographicException("Error encrypting message.");
-
-            return buffer;
+            return ret != 0 ? throw new CryptographicException("Error encrypting message.") : buffer;
         }
 
         /// <summary>Decryptes messages via XSalsa20</summary>
@@ -229,10 +220,7 @@ namespace Geralt
             var buffer = new byte[cipherText.Length];
             var ret = LibsodiumLibrary.crypto_stream_xor(buffer, cipherText, cipherText.Length, nonce, key);
 
-            if (ret != 0)
-                throw new CryptographicException("Error derypting message.");
-
-            return buffer;
+            return ret != 0 ? throw new CryptographicException("Error derypting message.") : buffer;
         }
 
         /// <summary>Decryptes messages via ChaCha20</summary>
@@ -271,10 +259,7 @@ namespace Geralt
             var buffer = new byte[cipherText.Length];
             var ret = LibsodiumLibrary.crypto_stream_chacha20_xor(buffer, cipherText, cipherText.Length, nonce, key);
 
-            if (ret != 0)
-                throw new CryptographicException("Error derypting message.");
-
-            return buffer;
+            return ret != 0 ? throw new CryptographicException("Error derypting message.") : buffer;
         }
 
         /// <summary>Decryptes messages via XChaCha20</summary>
@@ -314,10 +299,7 @@ namespace Geralt
             var buffer = new byte[cipherText.Length];
             var ret = LibsodiumLibrary.crypto_stream_xchacha20_xor(buffer, cipherText, cipherText.Length, nonce, key);
 
-            if (ret != 0)
-                throw new CryptographicException("Error derypting message.");
-
-            return buffer;
+            return ret != 0 ? throw new CryptographicException("Error derypting message.") : buffer;
         }
     }
 }

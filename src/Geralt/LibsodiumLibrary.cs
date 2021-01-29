@@ -28,7 +28,8 @@ using System.Runtime.InteropServices;
 namespace Geralt
 {
     /// <summary>libsodium library binding.</summary>
-    public static partial class LibsodiumLibrary
+    /// <remarks>See here for more information: https://doc.libsodium.org/internals </remarks>
+    internal static partial class LibsodiumLibrary
     {
 #if IOS
         const string DllName = "__Internal";
@@ -113,6 +114,7 @@ namespace Geralt
         [DllImport(_dllName, CallingConvention = _callingConvention)]
         internal static extern int crypto_pwhash_scryptsalsa208sha256_str_verify(byte[] buffer, byte[] password, long passLength);
 
+        //crypto_pwhash_str_needs_rehash
         [DllImport(_dllName, CallingConvention = _callingConvention)]
         internal static extern int crypto_pwhash_str_needs_rehash(byte[] buffer, long opsLimit, int memLimit);
 
@@ -357,9 +359,11 @@ namespace Geralt
             public byte last_node;
         }
 
+        //crypto_stream_xchacha20
         [DllImport(_dllName, CallingConvention = _callingConvention)]
         internal static extern int crypto_stream_xchacha20(byte[] buffer, int bufferLength, byte[] nonce, byte[] key);
 
+        //crypto_stream_xchacha20_xor
         [DllImport(_dllName, CallingConvention = _callingConvention)]
         internal static extern int crypto_stream_xchacha20_xor(byte[] buffer, byte[] message, long messageLength, byte[] nonce, byte[] key);
     }
