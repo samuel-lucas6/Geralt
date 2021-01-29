@@ -155,7 +155,7 @@ namespace Geralt
         public static byte[] ConvertPublicKeyToX25519(byte[] ed25519PublicKey)
         {
             ParameterValidation.PublicKey(ed25519PublicKey, _publicKeyBytes);
-            byte[] x25519PublicKey = new byte[PublicKeyBox.PublicKeyBytes];
+            byte[] x25519PublicKey = new byte[AuthenticatedHybridEncryption._publicKeyBytes];
             int result = LibsodiumLibrary.crypto_sign_ed25519_pk_to_curve25519(x25519PublicKey, ed25519PublicKey);
             return result != 0 ? throw new CryptographicException("Failed to convert public key.") : x25519PublicKey;
         }
@@ -168,7 +168,7 @@ namespace Geralt
         public static byte[] ConvertPrivateKeyToX25519(byte[] ed25519PrivateKey)
         {
             ParameterValidation.PrivateKey(ed25519PrivateKey, _privateKeyBytes);
-            byte[] x25519PrivateKey = new byte[PublicKeyBox.SecretKeyBytes];
+            byte[] x25519PrivateKey = new byte[AuthenticatedHybridEncryption._privateKeyBytes];
             int result = LibsodiumLibrary.crypto_sign_ed25519_sk_to_curve25519(x25519PrivateKey, ed25519PrivateKey);
             return result != 0 ? throw new CryptographicException("Failed to convert private key.") : x25519PrivateKey;
         }

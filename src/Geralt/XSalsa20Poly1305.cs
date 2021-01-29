@@ -90,35 +90,10 @@ namespace Geralt
         {
             ParameterValidation.Key(key, _keyBytes);
             ParameterValidation.Nonce(nonce, _nonceBytes);
-            ciphertext = TrimLeadingNulls(ciphertext);
+            ciphertext = NullPadding.TrimLeadingNulls(ciphertext, _tagBytes);
             var message = new byte[ciphertext.Length - _tagBytes];
             int result = LibsodiumLibrary.crypto_secretbox_open_easy(message, ciphertext, ciphertext.Length, nonce, key);
             return result != 0 ? throw new CryptographicException("Error decrypting message.") : message;
-        }
-
-        private static byte[] TrimLeadingNulls(byte[] ciphertext)
-        {
-            // Check to see if there are _tagBytes of leading nulls. If so, trim.
-            // This is required due to an error in older versions.
-            if (ciphertext[0] == 0)
-            {
-                bool trim = true;
-                for (int i = 0; i < _tagBytes - 1; i++)
-                {
-                    if (ciphertext[i] != 0)
-                    {
-                        trim = false;
-                        break;
-                    }
-                }
-                if (trim)
-                {
-                    byte[] trimmedCiphertext = new byte[ciphertext.Length - _tagBytes];
-                    Array.Copy(ciphertext, _tagBytes, trimmedCiphertext, destinationIndex: 0, trimmedCiphertext.Length);
-                    return trimmedCiphertext;
-                }
-            }
-            return ciphertext;
         }
     }
 }
