@@ -111,7 +111,8 @@ namespace Geralt
             ParameterValidation.PublicKey(recipientPublicKey, _publicKeyBytes);
             byte[] ciphertext = new byte[message.Length + _tagBytes];
             int result = LibsodiumLibrary.crypto_box_easy(ciphertext, message, message.Length, nonce, recipientPublicKey, senderPrivateKey);
-            return result != 0 ? throw new CryptographicException("Error encrypting message.") : ciphertext;
+            ResultValidation.EncryptResult(result);
+            return ciphertext;
         }
 
         /// <summary>Decrypts a message from the sender.</summary>
@@ -131,7 +132,8 @@ namespace Geralt
             ciphertext = NullPadding.RemoveLeadingNulls(ciphertext, _tagBytes);
             byte[] message = new byte[ciphertext.Length - _tagBytes];
             int result = LibsodiumLibrary.crypto_box_open_easy(message, ciphertext, ciphertext.Length, nonce, senderPublicKey, recipientPrivateKey);
-            return result != 0 ? throw new CryptographicException("Error decrypting message.") : message;
+            ResultValidation.DecryptResult(result);
+            return message;
         }
     }
 }

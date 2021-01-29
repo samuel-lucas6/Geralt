@@ -90,10 +90,7 @@ namespace Geralt
             int result = LibsodiumLibrary.crypto_aead_aes256gcm_encrypt(ciphertextPointer, out long ciphertextLength, message, message.Length, additionalData, additionalData.Length, nsec: null, nonce, key);
             Marshal.Copy(ciphertextPointer, ciphertext, startIndex: 0, (int)ciphertextLength);
             Marshal.FreeHGlobal(ciphertextPointer);
-            if (result != 0)
-            {
-                throw new CryptographicException("Error encrypting message.");
-            }
+            ResultValidation.EncryptResult(result);
             return ciphertext.Length == ciphertextLength ? ciphertext : NullPadding.RemoveTrailingNulls(ciphertext, ciphertextLength);
         }
 
@@ -117,10 +114,7 @@ namespace Geralt
             int result = LibsodiumLibrary.crypto_aead_aes256gcm_decrypt(plaintextPointer, out long plaintextLength, nsec: null, cipher, cipher.Length, additionalData, additionalData.Length, nonce, key);
             Marshal.Copy(plaintextPointer, plaintext, startIndex: 0, (int)plaintextLength);
             Marshal.FreeHGlobal(plaintextPointer);
-            if (result != 0)
-            {
-                throw new CryptographicException("Error decrypting message.");
-            }
+            ResultValidation.DecryptResult(result);
             return plaintext.Length == plaintextLength ? plaintext : NullPadding.RemoveTrailingNulls(plaintext, plaintextLength);
         }
     }

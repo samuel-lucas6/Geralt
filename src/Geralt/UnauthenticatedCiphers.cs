@@ -102,8 +102,8 @@ namespace Geralt
 
             var buffer = new byte[message.Length];
             var ret = LibsodiumLibrary.crypto_stream_xor(buffer, message, message.Length, nonce, key);
-
-            return ret != 0 ? throw new CryptographicException("Error encrypting message.") : buffer;
+            ResultValidation.EncryptResult(ret);
+            return buffer;
         }
 
         /// <summary>Encryptes messages via ChaCha20</summary>
@@ -141,8 +141,8 @@ namespace Geralt
 
             var buffer = new byte[message.Length];
             var ret = LibsodiumLibrary.crypto_stream_chacha20_xor(buffer, message, message.Length, nonce, key);
-
-            return ret != 0 ? throw new CryptographicException("Error encrypting message.") : buffer;
+            ResultValidation.EncryptResult(ret);
+            return buffer;
         }
 
         /// <summary>Encryptes messages via XChaCha20</summary>
@@ -180,8 +180,8 @@ namespace Geralt
 
             var buffer = new byte[message.Length];
             var ret = LibsodiumLibrary.crypto_stream_xchacha20_xor(buffer, message, message.Length, nonce, key);
-
-            return ret != 0 ? throw new CryptographicException("Error encrypting message.") : buffer;
+            ResultValidation.EncryptResult(ret);
+            return buffer;
         }
 
         /// <summary>Decryptes messages via XSalsa20</summary>

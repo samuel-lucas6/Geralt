@@ -84,7 +84,8 @@ namespace Geralt
             ParameterValidation.PublicKey(recipientPublicKey, _recipientPublicKeyBytes);
             byte[] ciphertext = new byte[message.Length + _ephemeralKeyAndTagBytes];
             int result = LibsodiumLibrary.crypto_box_seal(ciphertext, message, message.Length, recipientPublicKey);
-            return result != 0 ? throw new CryptographicException("Error encrypting message.") : ciphertext;
+            ResultValidation.EncryptResult(result);
+            return ciphertext;
         }
 
         /// <summary>Decrypt an anonymously encrypted message.</summary>
@@ -134,7 +135,8 @@ namespace Geralt
             ParameterValidation.PublicKey(recipientPublicKey, _recipientPublicKeyBytes);
             byte[] message = new byte[ciphertext.Length - _ephemeralKeyAndTagBytes];
             int result = LibsodiumLibrary.crypto_box_seal_open(message, ciphertext, ciphertext.Length, recipientPublicKey, recipientPrivateKey);
-            return result != 0 ? throw new CryptographicException("Error decrypting message.") : message;
+            ResultValidation.DecryptResult(result);
+            return  message;
         }
     }
 }
