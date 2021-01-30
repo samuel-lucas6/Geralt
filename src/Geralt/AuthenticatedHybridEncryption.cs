@@ -35,6 +35,7 @@ namespace Geralt
     {
         public const int _publicKeyBytes = 32;
         public const int _privateKeyBytes = 32;
+        private const int _seedBytes = 32;
         private const int _nonceBytes = 24;
         private const int _tagBytes = 16;
 
@@ -67,9 +68,7 @@ namespace Geralt
         {
             byte[] publicKey = new byte[_publicKeyBytes];
             byte[] privateKey = new byte[_privateKeyBytes];
-            // Expected length of the seed
-            int seedBytes = LibsodiumLibrary.crypto_box_seedbytes();
-            ParameterValidation.Seed(seed, seedBytes);
+            ParameterValidation.Seed(seed, _seedBytes);
             _ = LibsodiumLibrary.crypto_box_seed_keypair(publicKey, privateKey, seed);
             return new KeyPair(publicKey, privateKey);
         }
