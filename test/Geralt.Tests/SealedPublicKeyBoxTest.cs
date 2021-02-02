@@ -35,11 +35,11 @@ namespace Tests
         public void CreateAndOpenSealedBoxTest()
         {
             const string message = "Adam Caudill";
-            var recipientKeypair = PublicKeyBox.GenerateKeyPair();
+            var recipientKeypair = AuthenticatedHybridEncryption.GenerateKeyPair();
 
-            var encrypted = SealedPublicKeyBox.Create(
+            var encrypted = EphemeralHybridEncryption.Create(
               Encoding.UTF8.GetBytes(message), recipientKeypair.PublicKey);
-            var decrypted = SealedPublicKeyBox.Open(encrypted, recipientKeypair.PrivateKey, recipientKeypair.PublicKey);
+            var decrypted = EphemeralHybridEncryption.Open(encrypted, recipientKeypair.PrivateKey, recipientKeypair.PublicKey);
 
             Assert.AreEqual(message, Encoding.UTF8.GetString(decrypted));
         }
@@ -48,10 +48,10 @@ namespace Tests
         public void CreateAndOpenSealedBoxWithKeyPairTest()
         {
             const string message = "Adam Caudill";
-            var recipientKeypair = PublicKeyBox.GenerateKeyPair();
+            var recipientKeypair = AuthenticatedHybridEncryption.GenerateKeyPair();
 
-            var encrypted = SealedPublicKeyBox.Create(message, recipientKeypair);
-            var decrypted = SealedPublicKeyBox.Open(encrypted, recipientKeypair);
+            var encrypted = EphemeralHybridEncryption.Create(message, recipientKeypair);
+            var decrypted = EphemeralHybridEncryption.Open(encrypted, recipientKeypair);
 
             Assert.AreEqual(message, Encoding.UTF8.GetString(decrypted));
         }

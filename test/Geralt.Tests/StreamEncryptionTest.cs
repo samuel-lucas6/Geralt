@@ -36,28 +36,28 @@ namespace Tests
         [Test]
         public void TestGenerateKey()
         {
-            Assert.AreEqual(32, UnauthenticatedCiphers.GenerateKey().Length);
+            Assert.AreEqual(32, XChaCha20.GenerateKey().Length);
         }
 
         /// <summary>Verify that the length of the returned key is correct.</summary>
         [Test]
         public void TestGenerateNonce()
         {
-            Assert.AreEqual(24, UnauthenticatedCiphers.GenerateNonce().Length);
+            Assert.AreEqual(24, XChaCha20.GenerateNonce().Length);
         }
 
         /// <summary>Verify that the length of the returned key is correct.</summary>
         [Test]
         public void TestGenerateNonceChaCha20()
         {
-            Assert.AreEqual(8, UnauthenticatedCiphers.GenerateNonceChaCha20().Length);
+            Assert.AreEqual(8, XChaCha20.GenerateNonceChaCha20().Length);
         }
 
         /// <summary>Verify that the length of the returned key is correct.</summary>
         [Test]
         public void TestGenerateNonceXChaCha20()
         {
-            Assert.AreEqual(24, UnauthenticatedCiphers.GenerateNonceXChaCha20().Length);
+            Assert.AreEqual(24, XChaCha20.GenerateNonceXChaCha20().Length);
         }
 
         /// <summary>Does StreamEncryption.Encrypt() return the expected value?</summary>
@@ -65,7 +65,7 @@ namespace Tests
         public void CreateSecretBox()
         {
             var expected = Utilities.HexToBinary("c7b7f04c00e14b02dd56c78c");
-            var actual = UnauthenticatedCiphers.Encrypt(
+            var actual = XChaCha20.Encrypt(
               Encoding.UTF8.GetBytes("Adam Caudill"),
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
@@ -77,7 +77,7 @@ namespace Tests
         public void OpenSecretBox()
         {
             const string EXPECTED = "Adam Caudill";
-            var actual = Encoding.UTF8.GetString(UnauthenticatedCiphers.Decrypt(
+            var actual = Encoding.UTF8.GetString(XChaCha20.Decrypt(
               Utilities.HexToBinary("c7b7f04c00e14b02dd56c78c"),
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012")));
@@ -89,7 +89,7 @@ namespace Tests
         public void CreateSecretBoxChaCha20()
         {
             var expected = Utilities.HexToBinary("a6ce598d8b865fb328581bcd");
-            var actual = UnauthenticatedCiphers.EncryptChaCha20(
+            var actual = XChaCha20.EncryptChaCha20(
               Encoding.UTF8.GetBytes("Adam Caudill"),
               Encoding.UTF8.GetBytes("ABCDEFGH"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
@@ -101,7 +101,7 @@ namespace Tests
         public void OpenSecretBoxChaCha20()
         {
             const string EXPECTED = "Adam Caudill";
-            var actual = Encoding.UTF8.GetString(UnauthenticatedCiphers.DecryptChaCha20(
+            var actual = Encoding.UTF8.GetString(XChaCha20.DecryptChaCha20(
               Utilities.HexToBinary("a6ce598d8b865fb328581bcd"),
               Encoding.UTF8.GetBytes("ABCDEFGH"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012")));
@@ -113,7 +113,7 @@ namespace Tests
         public void CreateSecretBoxXChaCha20()
         {
             var expected = Utilities.HexToBinary("b99341769d6d1342541de1ad");
-            var actual = UnauthenticatedCiphers.EncryptXChaCha20(
+            var actual = XChaCha20.EncryptXChaCha20(
               Encoding.UTF8.GetBytes("Adam Caudill"),
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
@@ -125,7 +125,7 @@ namespace Tests
         public void OpenSecretBoxXChaCha20()
         {
             const string EXPECTED = "Adam Caudill";
-            var actual = Encoding.UTF8.GetString(UnauthenticatedCiphers.DecryptXChaCha20(
+            var actual = Encoding.UTF8.GetString(XChaCha20.DecryptXChaCha20(
               Utilities.HexToBinary("b99341769d6d1342541de1ad"),
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012")));

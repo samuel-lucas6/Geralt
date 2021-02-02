@@ -36,14 +36,14 @@ namespace Tests
         [Test]
         public void TestGenerateKey()
         {
-            Assert.AreEqual(32, SecretBox.GenerateKey().Length);
+            Assert.AreEqual(32, XSalsa20Poly1305.GenerateKey().Length);
         }
 
         /// <summary>Verify that the length of the returned key is correct.</summary>
         [Test]
         public void TestGenerateNonce()
         {
-            Assert.AreEqual(24, SecretBox.GenerateNonce().Length);
+            Assert.AreEqual(24, XSalsa20Poly1305.GenerateNonce().Length);
         }
 
         /// <summary>Does SecretBox.Create() return the expected value?</summary>
@@ -51,7 +51,7 @@ namespace Tests
         public void CreateSecretBox()
         {
             var expected = Utilities.HexToBinary("b58d3c3e5ae78770b7db54e29e3885138a2f1ddb738f2309d9b38164");
-            var actual = SecretBox.Create(
+            var actual = XSalsa20Poly1305.Create(
               Encoding.UTF8.GetBytes("Adam Caudill"),
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
@@ -64,7 +64,7 @@ namespace Tests
         public void OpenSecretBox()
         {
             const string EXPECTED = "Adam Caudill";
-            var actual = Encoding.UTF8.GetString(SecretBox.Open(
+            var actual = Encoding.UTF8.GetString(XSalsa20Poly1305.Open(
               Utilities.HexToBinary("b58d3c3e5ae78770b7db54e29e3885138a2f1ddb738f2309d9b38164"),
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012")));
@@ -77,7 +77,7 @@ namespace Tests
         public void OpenSecretBoxWithPadding()
         {
             const string EXPECTED = "Adam Caudill";
-            var actual = Encoding.UTF8.GetString(SecretBox.Open(
+            var actual = Encoding.UTF8.GetString(XSalsa20Poly1305.Open(
               Utilities.HexToBinary("00000000000000000000000000000000b58d3c3e5ae78770b7db54e29e3885138a2f1ddb738f2309d9b38164"),
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012")));
@@ -90,12 +90,12 @@ namespace Tests
         public void DetachedSecretBox()
         {
             var expected = Utilities.HexToBinary("4164616d2043617564696c6c");
-            var actual = SecretBox.CreateDetached(
+            var actual = XSalsa20Poly1305.CreateDetached(
               Encoding.UTF8.GetBytes("Adam Caudill"),
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
 
-            var clear = SecretBox.OpenDetached(actual.Ciphertext, actual.Mac,
+            var clear = XSalsa20Poly1305.OpenDetached(actual.Ciphertext, actual.Mac,
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
 

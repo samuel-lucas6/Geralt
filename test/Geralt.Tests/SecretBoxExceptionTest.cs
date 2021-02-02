@@ -38,7 +38,7 @@ namespace Tests
         {
             _ = Assert.Throws<KeyOutOfRangeException>(() =>
               {
-                  _ = SecretBox.Create(
+                  _ = XSalsa20Poly1305.Create(
               Encoding.UTF8.GetBytes("Adam Caudill"),
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
               Encoding.UTF8.GetBytes("123456789012345678901234567890"));
@@ -50,7 +50,7 @@ namespace Tests
         {
             _ = Assert.Throws<NonceOutOfRangeException>(() =>
               {
-                  _ = SecretBox.Create(
+                  _ = XSalsa20Poly1305.Create(
               Encoding.UTF8.GetBytes("Adam Caudill"),
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVW"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
@@ -62,7 +62,7 @@ namespace Tests
         {
             _ = Assert.Throws<KeyOutOfRangeException>(() =>
               {
-                  _ = SecretBox.CreateDetached(
+                  _ = XSalsa20Poly1305.CreateDetached(
               Encoding.UTF8.GetBytes("Adam Caudill"),
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
               Encoding.UTF8.GetBytes("123456789012345678901234567890"));
@@ -74,7 +74,7 @@ namespace Tests
         {
             _ = Assert.Throws<NonceOutOfRangeException>(() =>
               {
-                  _ = SecretBox.CreateDetached(
+                  _ = XSalsa20Poly1305.CreateDetached(
               Encoding.UTF8.GetBytes("Adam Caudill"),
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVW"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
@@ -86,7 +86,7 @@ namespace Tests
         {
             _ = Assert.Throws<KeyOutOfRangeException>(() =>
               {
-                  _ = SecretBox.Open(
+                  _ = XSalsa20Poly1305.Open(
               Utilities.HexToBinary("00000000000000000000000000000000b58d3c3e5ae78770b7db54e29e3885138a2f1ddb738f2309d9b38164"),
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
               Encoding.UTF8.GetBytes("123456789012345678901234567890"));
@@ -98,7 +98,7 @@ namespace Tests
         {
             _ = Assert.Throws<NonceOutOfRangeException>(() =>
               {
-                  _ = SecretBox.Open(
+                  _ = XSalsa20Poly1305.Open(
               Utilities.HexToBinary("00000000000000000000000000000000b58d3c3e5ae78770b7db54e29e3885138a2f1ddb738f2309d9b38164"),
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVW"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
@@ -108,14 +108,14 @@ namespace Tests
         [Test]
         public void OpenDetachedSecretBoxBadKey()
         {
-            var actual = SecretBox.CreateDetached(
+            var actual = XSalsa20Poly1305.CreateDetached(
               Encoding.UTF8.GetBytes("Adam Caudill"),
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
 
             Assert.Throws<KeyOutOfRangeException>(() =>
             {
-                SecretBox.OpenDetached(actual.Ciphertext, actual.Mac,
+                XSalsa20Poly1305.OpenDetached(actual.Ciphertext, actual.Mac,
             Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
             Encoding.UTF8.GetBytes("123456789012345678901234567890"));
             });
@@ -124,14 +124,14 @@ namespace Tests
         [Test]
         public void OpenDetachedSecretBoxBadNonce()
         {
-            var actual = SecretBox.CreateDetached(
+            var actual = XSalsa20Poly1305.CreateDetached(
               Encoding.UTF8.GetBytes("Adam Caudill"),
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
 
             Assert.Throws<NonceOutOfRangeException>(() =>
             {
-                SecretBox.OpenDetached(actual.Ciphertext, actual.Mac,
+                XSalsa20Poly1305.OpenDetached(actual.Ciphertext, actual.Mac,
             Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVW"),
             Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
             });
@@ -140,14 +140,14 @@ namespace Tests
         [Test]
         public void OpenDetachedSecretBoxBadMac()
         {
-            var actual = SecretBox.CreateDetached(
+            var actual = XSalsa20Poly1305.CreateDetached(
               Encoding.UTF8.GetBytes("Adam Caudill"),
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
 
-            _ = Assert.Throws<MacOutOfRangeException>(() =>
+            _ = Assert.Throws<TagOutOfRangeException>(() =>
               {
-                  _ = SecretBox.OpenDetached(actual.Ciphertext, null,
+                  _ = XSalsa20Poly1305.OpenDetached(actual.Ciphertext, null,
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
               });

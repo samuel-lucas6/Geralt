@@ -39,7 +39,7 @@ namespace Tests
         {
             _ = Assert.Throws<KeyOutOfRangeException>(() =>
               {
-                  _ = UnauthenticatedCiphers.Encrypt(
+                  _ = XChaCha20.Encrypt(
               Encoding.UTF8.GetBytes("Adam Caudill"),
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
               Encoding.UTF8.GetBytes("123456789012345678901234567890"));
@@ -52,7 +52,7 @@ namespace Tests
         {
             _ = Assert.Throws<NonceOutOfRangeException>(() =>
               {
-                  _ = UnauthenticatedCiphers.Encrypt(
+                  _ = XChaCha20.Encrypt(
               Encoding.UTF8.GetBytes("Adam Caudill"),
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVW"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
@@ -65,7 +65,7 @@ namespace Tests
         {
             _ = Assert.Throws<KeyOutOfRangeException>(() =>
               {
-                  _ = UnauthenticatedCiphers.Decrypt(
+                  _ = XChaCha20.Decrypt(
               Utilities.HexToBinary("c7b7f04c00e14b02dd56c78c"),
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWX"),
               Encoding.UTF8.GetBytes("123456789012345678901234567890"));
@@ -78,7 +78,7 @@ namespace Tests
         {
             _ = Assert.Throws<NonceOutOfRangeException>(() =>
               {
-                  _ = UnauthenticatedCiphers.Decrypt(
+                  _ = XChaCha20.Decrypt(
               Utilities.HexToBinary("c7b7f04c00e14b02dd56c78c"),
               Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVW"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
@@ -111,7 +111,7 @@ namespace Tests
         {
             _ = Assert.Throws<KeyOutOfRangeException>(() =>
               {
-                  _ = UnauthenticatedCiphers.EncryptChaCha20(
+                  _ = XChaCha20.EncryptChaCha20(
               Encoding.UTF8.GetBytes("Adam Caudill"),
               Encoding.UTF8.GetBytes("ABCDEFGH"),
               Encoding.UTF8.GetBytes("123456789012345678901234567890"));
@@ -124,7 +124,7 @@ namespace Tests
         {
             _ = Assert.Throws<NonceOutOfRangeException>(() =>
               {
-                  _ = UnauthenticatedCiphers.EncryptChaCha20(
+                  _ = XChaCha20.EncryptChaCha20(
               Encoding.UTF8.GetBytes("Adam Caudill"),
               Encoding.UTF8.GetBytes("ABC"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
@@ -137,7 +137,7 @@ namespace Tests
         {
             _ = Assert.Throws<KeyOutOfRangeException>(() =>
               {
-                  _ = UnauthenticatedCiphers.DecryptChaCha20(
+                  _ = XChaCha20.DecryptChaCha20(
               Utilities.HexToBinary("a6ce598d8b865fb328581bcd"),
               Encoding.UTF8.GetBytes("ABCDEFGH"),
               Encoding.UTF8.GetBytes("123456789012345678901234567890"));
@@ -150,7 +150,7 @@ namespace Tests
         {
             _ = Assert.Throws<NonceOutOfRangeException>(() =>
               {
-                  _ = UnauthenticatedCiphers.DecryptChaCha20(
+                  _ = XChaCha20.DecryptChaCha20(
               Utilities.HexToBinary("a6ce598d8b865fb328581bcd"),
               Encoding.UTF8.GetBytes("ABC"),
               Encoding.UTF8.GetBytes("12345678901234567890123456789012"));

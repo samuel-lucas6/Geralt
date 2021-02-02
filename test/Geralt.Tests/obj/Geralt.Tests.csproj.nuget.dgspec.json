@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Samuel\\source\\repos\\Geralt\\test\\Sodium.Tests\\Geralt.Tests.csproj": {}
+    "C:\\Users\\Samuel\\source\\repos\\Geralt\\test\\Geralt.Tests\\Geralt.Tests.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Samuel\\source\\repos\\Geralt\\src\\Sodium.Core\\Geralt.csproj": {
-      "version": "1.2.3",
+    "C:\\Users\\Samuel\\source\\repos\\Geralt\\src\\Geralt\\Geralt.csproj": {
+      "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Samuel\\source\\repos\\Geralt\\src\\Sodium.Core\\Geralt.csproj",
+        "projectUniqueName": "C:\\Users\\Samuel\\source\\repos\\Geralt\\src\\Geralt\\Geralt.csproj",
         "projectName": "Geralt",
-        "projectPath": "C:\\Users\\Samuel\\source\\repos\\Geralt\\src\\Sodium.Core\\Geralt.csproj",
+        "projectPath": "C:\\Users\\Samuel\\source\\repos\\Geralt\\src\\Geralt\\Geralt.csproj",
         "packagesPath": "C:\\Users\\Samuel\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Samuel\\source\\repos\\Geralt\\src\\Sodium.Core\\obj\\",
+        "outputPath": "C:\\Users\\Samuel\\source\\repos\\Geralt\\src\\Geralt\\obj\\",
         "projectStyle": "PackageReference",
         "crossTargeting": true,
         "configFilePaths": [
@@ -138,32 +138,32 @@
         }
       }
     },
-    "C:\\Users\\Samuel\\source\\repos\\Geralt\\test\\Sodium.Tests\\Geralt.Tests.csproj": {
+    "C:\\Users\\Samuel\\source\\repos\\Geralt\\test\\Geralt.Tests\\Geralt.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Samuel\\source\\repos\\Geralt\\test\\Sodium.Tests\\Geralt.Tests.csproj",
+        "projectUniqueName": "C:\\Users\\Samuel\\source\\repos\\Geralt\\test\\Geralt.Tests\\Geralt.Tests.csproj",
         "projectName": "Geralt.Tests",
-        "projectPath": "C:\\Users\\Samuel\\source\\repos\\Geralt\\test\\Sodium.Tests\\Geralt.Tests.csproj",
+        "projectPath": "C:\\Users\\Samuel\\source\\repos\\Geralt\\test\\Geralt.Tests\\Geralt.Tests.csproj",
         "packagesPath": "C:\\Users\\Samuel\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Samuel\\source\\repos\\Geralt\\test\\Sodium.Tests\\obj\\",
+        "outputPath": "C:\\Users\\Samuel\\source\\repos\\Geralt\\test\\Geralt.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Samuel\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "netcoreapp2.0"
+          "net5.0"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "netcoreapp2.0": {
-            "targetAlias": "netcoreapp2.0",
+          "net5.0": {
+            "targetAlias": "net5.0",
             "projectReferences": {
-              "C:\\Users\\Samuel\\source\\repos\\Geralt\\src\\Sodium.Core\\Geralt.csproj": {
-                "projectPath": "C:\\Users\\Samuel\\source\\repos\\Geralt\\src\\Sodium.Core\\Geralt.csproj"
+              "C:\\Users\\Samuel\\source\\repos\\Geralt\\src\\Geralt\\Geralt.csproj": {
+                "projectPath": "C:\\Users\\Samuel\\source\\repos\\Geralt\\src\\Geralt\\Geralt.csproj"
               }
             }
           }
@@ -175,38 +175,24 @@
         }
       },
       "frameworks": {
-        "netcoreapp2.0": {
-          "targetAlias": "netcoreapp2.0",
+        "net5.0": {
+          "targetAlias": "net5.0",
           "dependencies": {
             "Microsoft.NET.Test.Sdk": {
               "target": "Package",
-              "version": "[15.7.2, )"
-            },
-            "Microsoft.NETCore.App": {
-              "suppressParent": "All",
-              "target": "Package",
-              "version": "[2.0.0, )",
-              "autoReferenced": true
-            },
-            "Mono.Cecil": {
-              "target": "Package",
-              "version": "[0.10.0, )"
+              "version": "[16.8.3, )"
             },
             "NUnitLite": {
               "target": "Package",
-              "version": "[3.10.1, )"
-            },
-            "coverlet.msbuild": {
-              "target": "Package",
-              "version": "[2.0.0, )"
+              "version": "[3.13.1, )"
             },
             "nunit": {
               "target": "Package",
-              "version": "[3.10.1, )"
+              "version": "[3.13.1, )"
             },
             "nunit3testadapter": {
               "target": "Package",
-              "version": "[3.10.0, )"
+              "version": "[3.17.0, )"
             }
           },
           "imports": [
@@ -219,6 +205,11 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.102\\RuntimeIdentifierGraph.json"
         }
       }
