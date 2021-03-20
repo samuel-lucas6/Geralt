@@ -34,71 +34,100 @@ namespace Geralt
     {
         public const int KeySize = 32;
         public const int SaltSize = 16;
-        public const int PersonalSize = 16;
-        public const int Length = 64;
-        private const int _minOutputlength = 16;
-        private const int _maxOutputlength = 64;
-        private const int _minKeylength = 16;
-        private const int _maxKeylength = 64;
+        public const int ContextSize = 16;
+        public const int MACLength = 32;
+        public const int HashLength = 64;
+        private const int _minLength = 16;
+        private const int _maxLength = 64;
+        private const int _minKeySize = 16;
+        private const int _maxKeySize = 64;
 
-        public static byte[] Hash(string message, int length = Length)
+        /// <summary>Hashes a message using BLAKE2b.</summary>
+        /// <param name="message">The message to be hashed.</param>
+        /// <param name="length">The length of the hash in bytes.</param>
+        /// <returns>The hash of the message.</returns>
+        /// <exception cref="KeyOutOfRangeException"></exception>
+        /// <exception cref="LengthOutOfRangeException"></exception>
+        public static byte[] Hash(string message, int length = HashLength)
         {
             return MAC(Encoding.UTF8.GetBytes(message), key: null, length);
         }
 
-        public static byte[] Hash(byte[] message, int length = Length)
+        /// <summary>Hashes a message using BLAKE2b.</summary>
+        /// <param name="message">The message to be hashed.</param>
+        /// <param name="length">The length of the hash in bytes.</param>
+        /// <returns>The hash of the message.</returns>
+        /// <exception cref="KeyOutOfRangeException"></exception>
+        /// <exception cref="LengthOutOfRangeException"></exception>
+        public static byte[] Hash(byte[] message, int length = HashLength)
         {
             return MAC(message, key: null, length);
         }
 
-        /// <summary>Hashes a message with an optional key using BLAKE2b.</summary>
-        /// <param name="message">The message to be hashed.</param>
-        /// <param name="key">The key - may be null; otherwise, between 16 and 64 length.</param>
-        /// <param name="length">The size (in length) of the desired output.</param>
-        /// <returns>A byte array of the specified length.</returns>
+        /// <summary>Computes a MAC using BLAKE2b.</summary>
+        /// <param name="message">The message to be authenticated.</param>
+        /// <param name="key">The 32 or 64 byte key.</param>
+        /// <param name="length">The length of the authentication tag in bytes.</param>
+        /// <returns>The computed tag.</returns>
         /// <exception cref="KeyOutOfRangeException"></exception>
-        /// <exception cref="BytesOutOfRangeException"></exception>
-        public static byte[] MAC(string message, byte[] key, int length = Length)
+        /// <exception cref="LengthOutOfRangeException"></exception>
+        public static byte[] MAC(string message, byte[] key, int length = MACLength)
         {
             return MAC(Encoding.UTF8.GetBytes(message), key, length);
         }
 
-        /// <summary>Hashes a message with an optional key using BLAKE2b.</summary>
-        /// <param name="message">The message to be hashed.</param>
-        /// <param name="key">The key - may be null; otherwise, between 16 and 64 length.</param>
-        /// <param name="length">The size (in length) of the desired output.</param>
-        /// <returns>A byte array of the specified length.</returns>
+        /// <summary>Computes a MAC using BLAKE2b.</summary>
+        /// <param name="message">The message to be authenticated.</param>
+        /// <param name="key">The 32 or 64 byte key.</param>
+        /// <param name="length">The length of the authentication tag in bytes.</param>
+        /// <returns>The computed tag.</returns>
         /// <exception cref="KeyOutOfRangeException"></exception>
-        /// <exception cref="BytesOutOfRangeException"></exception>
-        public static byte[] MAC(byte[] message, byte[] key, int length = Length)
+        /// <exception cref="LengthOutOfRangeException"></exception>
+        public static byte[] MAC(byte[] message, byte[] key, int length = MACLength)
         {
-            key = ParameterValidation.Key(key, _minKeylength, _maxKeylength);
-            ParameterValidation.OutputLength(length, _minOutputlength, _maxOutputlength);
+            key = ParameterValidation.Key(key, _minKeySize, _maxKeySize);
+            ParameterValidation.OutputLength(length, _minLength, _maxLength);
             byte[] hash = new byte[length];
             _ = LibsodiumLibrary.crypto_generichash(hash, hash.Length, message, message.Length, key, key.Length);
             return hash;
         }
 
-        /// <summary>Derives a subkey based on a master key, salt, and personalisation parameter.</summary>
-        /// <param name="message">The message to be hashed.</param>
-        /// <param name="key">The key for keyed hashing.</param>
-        /// <param name="salt">The salt for key derivation.</param>
-        /// <param name="personal">The personalisation parameter for key derivation.</param>
-        /// <param name="length">The size (in length) of the desired output.</param>
-        /// <returns>The derived subkey message.</returns>
+        /// <summary>Derives a subkey.</summary>
+        /// <param name="inputKeyingMaterial">The master key.</param>
+        /// <param name="salt">The 16 byte random or counter salt.</param>
+        /// <param name="context">The 16 character context string.</param>
+        /// <param name="length">The subkey size in bytes.</param>
+        /// <param name="message">An optional message to be included in the hash.</param>
+        /// <returns>The derived subkey.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="KeyOutOfRangeException"></exception>
         /// <exception cref="SaltOutOfRangeException"></exception>
         /// <exception cref="PersonalOutOfRangeException"></exception>
-        public static byte[] DeriveKey(byte[] message, byte[] key, byte[] salt, byte[] personal, int length = KeySize)
+        public static byte[] DeriveKey(byte[] inputKeyingMaterial, byte[] salt, string context, int length = KeySize, byte[] message = null)
         {
-            ParameterValidation.Message(message);
-            key = ParameterValidation.Key(key, _minKeylength, _maxKeylength);
+            return DeriveKey(inputKeyingMaterial, salt, Encoding.UTF8.GetBytes(context), length, message);
+        }
+
+        /// <summary>Derives a subkey.</summary>
+        /// <param name="inputKeyingMaterial">The master key.</param>
+        /// <param name="salt">The 16 byte random or counter salt.</param>
+        /// <param name="context">The 16 byte context information.</param>
+        /// <param name="length">The subkey size in bytes.</param>
+        /// <param name="message">An optional message to be included in the hash.</param>
+        /// <returns>The derived subkey.</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="KeyOutOfRangeException"></exception>
+        /// <exception cref="SaltOutOfRangeException"></exception>
+        /// <exception cref="PersonalOutOfRangeException"></exception>
+        public static byte[] DeriveKey(byte[] inputKeyingMaterial, byte[] salt, byte[] context, int length = KeySize, byte[] message = null)
+        {
+            inputKeyingMaterial = ParameterValidation.Key(inputKeyingMaterial, _minKeySize, _maxKeySize);
             ParameterValidation.Salt(salt, SaltSize);
-            ParameterValidation.Personal(personal, PersonalSize);
-            ParameterValidation.OutputLength(length, _minOutputlength, _maxOutputlength);
+            ParameterValidation.Personal(context, ContextSize);
+            ParameterValidation.OutputLength(length, _minLength, _maxLength);
+            if (message == null) { message = Array.Empty<byte>(); }
             byte[] hash = new byte[length];
-            _ = LibsodiumLibrary.crypto_generichash_blake2b_salt_personal(hash, hash.Length, message, message.Length, key, key.Length, salt, personal);
+            _ = LibsodiumLibrary.crypto_generichash_blake2b_salt_personal(hash, hash.Length, message, message.Length, inputKeyingMaterial, inputKeyingMaterial.Length, salt, context);
             return hash;
         }
     }

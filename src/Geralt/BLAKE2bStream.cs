@@ -2,7 +2,6 @@ using Geralt.Exceptions;
 using System;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
-using System.Text;
 
 /*
     Geralt: A cryptographic library for .NET based on libsodium.
@@ -34,41 +33,47 @@ namespace Geralt
     {
         /// <summary>Hashing streams using BLAKE2b.</summary>
         /// <remarks>See here for more information: https://doc.libsodium.org/hashing/generic_hashing </remarks>
-        public class GenericHashAlgorithm : HashAlgorithm
+        public class Stream : HashAlgorithm
         {
             private IntPtr HashStatePointer { get; set; }
             private byte[] Key { get; set; }
-            private int Bytes { get; set; }
+            private int OutputLength { get; set; }
 
-            /// <summary>Initializes the hashing algorithm.</summary>
-            /// <param name="key">The key - may be null; otherwise, between 16 and 64 bytes.</param>
-            /// <param name="bytes">The size (in bytes) of the desired output.</param>
+            /// <summary>Initializes the hash algorithm.</summary>
+            /// <param name="length">The length of the hash in bytes.</param>
             /// <exception cref="KeyOutOfRangeException"></exception>
-            /// <exception cref="BytesOutOfRangeException"></exception>
-            public GenericHashAlgorithm(string key, int bytes) : this(Encoding.UTF8.GetBytes(key), bytes) { }
-
-            /// <summary>Initializes the hashing algorithm.</summary>
-            /// <param name="key">The key - may be null; otherwise, between 16 and 64 bytes.</param>
-            /// <param name="bytes">The size (in bytes) of the desired output.</param>
-            /// <exception cref="KeyOutOfRangeException"></exception>
-            /// <exception cref="BytesOutOfRangeException"></exception>
-            public GenericHashAlgorithm(byte[] key, int bytes)
+            /// <exception cref="LengthOutOfRangeException"></exception>
+            public Stream(int length = HashLength)
             {
                 HashStatePointer = Marshal.AllocHGlobal(Marshal.SizeOf<LibsodiumLibrary.HashState>());
-                Key = ParameterValidation.Key(key, _minKeyBytes, _maxKeyBytes);
-                ParameterValidation.OutputLength(bytes, _minOutputBytes, _maxOutputBytes);
-                Bytes = bytes;
+                Key = Array.Empty<byte>();
+                ParameterValidation.OutputLength(length, _minLength, _maxLength);
+                OutputLength = length;
                 Initialize();
             }
 
-            ~GenericHashAlgorithm()
+            /// <summary>Initializes the hash algorithm.</summary>
+            /// <param name="key">The 32 or 64 byte key.</param>
+            /// <param name="length">The length of the authentication tag in bytes.</param>
+            /// <exception cref="KeyOutOfRangeException"></exception>
+            /// <exception cref="LengthOutOfRangeException"></exception>
+            public Stream(byte[] key, int length = MACLength)
+            {
+                HashStatePointer = Marshal.AllocHGlobal(Marshal.SizeOf<LibsodiumLibrary.HashState>());
+                Key = ParameterValidation.Key(key, _minKeySize, _maxKeySize);
+                ParameterValidation.OutputLength(length, _minLength, _maxLength);
+                OutputLength = length;
+                Initialize();
+            }
+
+            ~Stream()
             {
                 Marshal.FreeHGlobal(HashStatePointer);
             }
 
             override public void Initialize()
             {
-                _ = LibsodiumLibrary.crypto_generichash_init(HashStatePointer, Key, Key.Length, Bytes);
+                _ = LibsodiumLibrary.crypto_generichash_init(HashStatePointer, Key, Key.Length, OutputLength);
             }
 
             override protected void HashCore(byte[] array, int arrayOffset, int bytes)
@@ -80,8 +85,8 @@ namespace Geralt
 
             override protected byte[] HashFinal()
             {
-                byte[] hash = new byte[Bytes];
-                _ = LibsodiumLibrary.crypto_generichash_final(HashStatePointer, hash, Bytes);
+                byte[] hash = new byte[OutputLength];
+                _ = LibsodiumLibrary.crypto_generichash_final(HashStatePointer, hash, OutputLength);
                 return hash;
             }
         }
