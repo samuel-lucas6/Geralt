@@ -3,7 +3,7 @@ using System;
 using System.Text;
 
 /*
-    Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
+    Geralt: A cryptographic library for .NET based on libsodium.
     Copyright (c) 2021 Samuel Lucas
     Copyright (c) 2017-2020 tabrath
     Copyright (c) 2013-2017 Adam Caudill & Contributors
@@ -32,98 +32,72 @@ namespace Geralt
     /// <remarks>See here for more information: https://doc.libsodium.org/hashing/generic_hashing </remarks>
     public partial class BLAKE2b
     {
-        private const int _minOutputBytes = 16;
-        private const int _maxOutputBytes = 64;
-        private const int _defaultOutputBytes = 64;
-        private const int _minKeyBytes = 16;
-        private const int _maxKeyBytes = 64;
-        private const int _saltBytes = 16;
-        private const int _personalBytes = 16;
+        public const int KeySize = 32;
+        public const int SaltSize = 16;
+        public const int PersonalSize = 16;
+        public const int Length = 64;
+        private const int _minOutputlength = 16;
+        private const int _maxOutputlength = 64;
+        private const int _minKeylength = 16;
+        private const int _maxKeylength = 64;
 
-        /// <summary>Generates a random 64 byte key.</summary>
-        /// <returns>A byte array with 64 random bytes.</returns>
-        public static byte[] GenerateKey()
+        public static byte[] Hash(string message, int length = Length)
         {
-            return SecureRandom.GetBytes(_maxKeyBytes);
+            return MAC(Encoding.UTF8.GetBytes(message), key: null, length);
+        }
+
+        public static byte[] Hash(byte[] message, int length = Length)
+        {
+            return MAC(message, key: null, length);
         }
 
         /// <summary>Hashes a message with an optional key using BLAKE2b.</summary>
         /// <param name="message">The message to be hashed.</param>
-        /// <param name="key">The key - may be null; otherwise, between 16 and 64 bytes.</param>
-        /// <param name="bytes">The size (in bytes) of the desired output.</param>
+        /// <param name="key">The key - may be null; otherwise, between 16 and 64 length.</param>
+        /// <param name="length">The size (in length) of the desired output.</param>
         /// <returns>A byte array of the specified length.</returns>
         /// <exception cref="KeyOutOfRangeException"></exception>
         /// <exception cref="BytesOutOfRangeException"></exception>
-        public static byte[] Hash(string message, string key, int bytes)
+        public static byte[] MAC(string message, byte[] key, int length = Length)
         {
-            return Hash(message, Encoding.UTF8.GetBytes(key), bytes);
+            return MAC(Encoding.UTF8.GetBytes(message), key, length);
         }
 
         /// <summary>Hashes a message with an optional key using BLAKE2b.</summary>
         /// <param name="message">The message to be hashed.</param>
-        /// <param name="key">The key - may be null; otherwise, between 16 and 64 bytes.</param>
-        /// <param name="bytes">The size (in bytes) of the desired output.</param>
+        /// <param name="key">The key - may be null; otherwise, between 16 and 64 length.</param>
+        /// <param name="length">The size (in length) of the desired output.</param>
         /// <returns>A byte array of the specified length.</returns>
         /// <exception cref="KeyOutOfRangeException"></exception>
         /// <exception cref="BytesOutOfRangeException"></exception>
-        public static byte[] Hash(string message, byte[] key, int bytes)
+        public static byte[] MAC(byte[] message, byte[] key, int length = Length)
         {
-            return Hash(Encoding.UTF8.GetBytes(message), key, bytes);
-        }
-
-        /// <summary>Hashes a message with an optional key using BLAKE2b.</summary>
-        /// <param name="message">The message to be hashed.</param>
-        /// <param name="key">The key - may be null; otherwise, between 16 and 64 bytes.</param>
-        /// <param name="bytes">The size (in bytes) of the desired output.</param>
-        /// <returns>A byte array of the specified length.</returns>
-        /// <exception cref="KeyOutOfRangeException"></exception>
-        /// <exception cref="BytesOutOfRangeException"></exception>
-        public static byte[] Hash(byte[] message, byte[] key, int bytes)
-        {
-            key = ParameterValidation.Key(key, _minKeyBytes, _maxKeyBytes);
-            ParameterValidation.OutputLength(bytes, _minOutputBytes, _maxOutputBytes);
-            byte[] hash = new byte[bytes];
+            key = ParameterValidation.Key(key, _minKeylength, _maxKeylength);
+            ParameterValidation.OutputLength(length, _minOutputlength, _maxOutputlength);
+            byte[] hash = new byte[length];
             _ = LibsodiumLibrary.crypto_generichash(hash, hash.Length, message, message.Length, key, key.Length);
             return hash;
         }
 
-        /// <summary>Generates a hash based on a key, salt, and personalisation parameter.</summary>
-        /// <remarks>Can be used for key derivation as an alternative to HKDF.</remarks>
-        /// <returns>The hashed message.</returns>
+        /// <summary>Derives a subkey based on a master key, salt, and personalisation parameter.</summary>
         /// <param name="message">The message to be hashed.</param>
         /// <param name="key">The key for keyed hashing.</param>
         /// <param name="salt">The salt for key derivation.</param>
         /// <param name="personal">The personalisation parameter for key derivation.</param>
-        /// <param name="bytes">The size (in bytes) of the desired output.</param>
+        /// <param name="length">The size (in length) of the desired output.</param>
+        /// <returns>The derived subkey message.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="KeyOutOfRangeException"></exception>
         /// <exception cref="SaltOutOfRangeException"></exception>
         /// <exception cref="PersonalOutOfRangeException"></exception>
-        public static byte[] HashSaltPersonal(string message, string key, string salt, string personal, int bytes = _defaultOutputBytes)
-        {
-            return HashSaltPersonal(Encoding.UTF8.GetBytes(message), Encoding.UTF8.GetBytes(key), Encoding.UTF8.GetBytes(salt), Encoding.UTF8.GetBytes(personal), bytes);
-        }
-
-        /// <summary>Generates a hash based on a key, salt, and personalisation parameter.</summary>
-        /// <remarks>Can be used for key derivation as an alternative to HKDF.</remarks>
-        /// <returns>The hashed message.</returns>
-        /// <param name="message">The message to be hashed.</param>
-        /// <param name="key">The key for keyed hashing.</param>
-        /// <param name="salt">The salt for key derivation.</param>
-        /// <param name="personal">The personalisation parameter for key derivation.</param>
-        /// <param name="bytes">The size (in bytes) of the desired output.</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="KeyOutOfRangeException"></exception>
-        /// <exception cref="SaltOutOfRangeException"></exception>
-        /// <exception cref="PersonalOutOfRangeException"></exception>
-        public static byte[] HashSaltPersonal(byte[] message, byte[] key, byte[] salt, byte[] personal, int bytes = _defaultOutputBytes)
+        public static byte[] DeriveKey(byte[] message, byte[] key, byte[] salt, byte[] personal, int length = KeySize)
         {
             ParameterValidation.Message(message);
-            key = ParameterValidation.Key(key, _minKeyBytes, _maxKeyBytes);
-            ParameterValidation.Salt(salt, _saltBytes);
-            ParameterValidation.Personal(personal, _personalBytes);
-            ParameterValidation.OutputLength(bytes, _minOutputBytes, _maxOutputBytes);
-            byte[] hash = new byte[bytes];
+            key = ParameterValidation.Key(key, _minKeylength, _maxKeylength);
+            ParameterValidation.Salt(salt, SaltSize);
+            ParameterValidation.Personal(personal, PersonalSize);
+            ParameterValidation.OutputLength(length, _minOutputlength, _maxOutputlength);
+            byte[] hash = new byte[length];
             _ = LibsodiumLibrary.crypto_generichash_blake2b_salt_personal(hash, hash.Length, message, message.Length, key, key.Length, salt, personal);
             return hash;
         }

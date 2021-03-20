@@ -1,7 +1,5 @@
-﻿using System.Text;
-
-/*
-    Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
+﻿/*
+    Geralt: A cryptographic library for .NET based on libsodium.
     Copyright (c) 2021 Samuel Lucas
     Copyright (c) 2017-2020 tabrath
     Copyright (c) 2013-2017 Adam Caudill & Contributors
@@ -31,7 +29,7 @@ namespace Geralt
     public static class ConstantTime
     {
         /// <summary>Increments a byte array in constant time.</summary>
-        /// <remarks>Should be used to increment a counter nonce.</remarks>
+        /// <remarks>This should be used to increment a counter nonce.</remarks>
         /// <param name="array">The byte array to increment.</param>
         /// <returns>The incremented byte array.</returns>
         public static byte[] Increment(byte[] array)
@@ -40,8 +38,8 @@ namespace Geralt
             return array;
         }
 
-        /// <summary>Compares two byte arrays in constant time.</summary>
-        /// <remarks>Should be used to compare authentication tags.</remarks>
+        /// <summary>Compares two byte arrays of the same length in constant time.</summary>
+        /// <remarks>This should be used to compare authentication tags.</remarks>
         /// <param name="a">The first byte array.</param>
         /// <param name="b">The second byte array.</param>
         /// <returns><c>true</c> if the values are equal; otherwise, <c>false</c>.</returns>
@@ -49,16 +47,6 @@ namespace Geralt
         {
             int result = LibsodiumLibrary.sodium_compare(a, b, a.Length);
             return result == 0;
-        }
-
-        /// <summary>Compares two char arrays in constant time.</summary>
-        /// <remarks>Should be used to compare two passwords (e.g. retyped passwords).</remarks>
-        /// <param name="a">The first char array.</param>
-        /// <param name="b">The second char array.</param>
-        /// <returns><c>true</c> if the values are equal; otherwise, <c>false</c>.</returns>
-        public static bool Compare(char[] a, char[] b)
-        {
-            return Compare(Encoding.UTF8.GetBytes(a), Encoding.UTF8.GetBytes(b));
         }
     }
 }

@@ -2,7 +2,7 @@ using Geralt.Exceptions;
 using System;
 
 /*
-    Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
+    Geralt: A cryptographic library for .NET based on libsodium.
     Copyright (c) 2021 Samuel Lucas
     Copyright (c) 2017-2020 tabrath
     Copyright (c) 2013-2017 Adam Caudill & Contributors
@@ -51,11 +51,9 @@ namespace Geralt
             }
         }
 
-        internal static byte[] Key(byte[] key, int minimumKeyLength, int maxKeyLength)
+        internal static byte[] Key(byte[] key, int minKeyLength, int maxKeyLength)
         {
-            return key != null && (key.Length < minimumKeyLength || key.Length > maxKeyLength)
-                ? throw new KeyOutOfRangeException($"Key must be between {minimumKeyLength} and {maxKeyLength} bytes in length.")
-                : key ?? Array.Empty<byte>();
+            return key != null && (key.Length < minKeyLength || key.Length > maxKeyLength) ? throw new KeyOutOfRangeException($"Key must be between {minKeyLength} and {maxKeyLength} bytes in length.") : key ?? Array.Empty<byte>();
         }
 
         internal static void PrivateKey(byte[] privateKey, int validPrivateKeyLength)

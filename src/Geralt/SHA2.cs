@@ -1,7 +1,7 @@
 using System.Text;
 
 /*
-    Geralt: libsodium for .NET - A fast, secure, and modern cryptographic library.
+    Geralt: A cryptographic library for .NET based on libsodium.
     Copyright (c) 2021 Samuel Lucas
     Copyright (c) 2017-2020 tabrath
     Copyright (c) 2013-2017 Adam Caudill & Contributors
