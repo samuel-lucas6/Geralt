@@ -29,34 +29,24 @@ using System.Text;
 namespace Geralt
 {
     /// <summary>Hashing, keyed hashing, and key derivation using BLAKE2b.</summary>
-    /// <remarks>See here for more information: https://doc.libsodium.org/hashing/generic_hashing </remarks>
     public partial class BLAKE2b
     {
         public const int KeySize = 32;
         public const int SaltSize = 16;
         public const int ContextSize = 16;
-        public const int MACLength = 32;
         public const int HashLength = 64;
+        public const int MACLength = 32;
         private const int _minLength = 16;
         private const int _maxLength = 64;
         private const int _minKeySize = 16;
         private const int _maxKeySize = 64;
 
         /// <summary>Hashes a message using BLAKE2b.</summary>
+        /// <remarks>The output length should be 32 or 64 bytes.</remarks>
         /// <param name="message">The message to be hashed.</param>
         /// <param name="length">The length of the hash in bytes.</param>
         /// <returns>The hash of the message.</returns>
-        /// <exception cref="KeyOutOfRangeException"></exception>
-        /// <exception cref="LengthOutOfRangeException"></exception>
-        public static byte[] Hash(string message, int length = HashLength)
-        {
-            return MAC(Encoding.UTF8.GetBytes(message), key: null, length);
-        }
-
-        /// <summary>Hashes a message using BLAKE2b.</summary>
-        /// <param name="message">The message to be hashed.</param>
-        /// <param name="length">The length of the hash in bytes.</param>
-        /// <returns>The hash of the message.</returns>
+        /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="KeyOutOfRangeException"></exception>
         /// <exception cref="LengthOutOfRangeException"></exception>
         public static byte[] Hash(byte[] message, int length = HashLength)
@@ -65,26 +55,17 @@ namespace Geralt
         }
 
         /// <summary>Computes a MAC using BLAKE2b.</summary>
+        /// <remarks>The authentication tag length should be 32 or 64 bytes.</remarks>
         /// <param name="message">The message to be authenticated.</param>
         /// <param name="key">The 32 or 64 byte key.</param>
         /// <param name="length">The length of the authentication tag in bytes.</param>
-        /// <returns>The computed tag.</returns>
-        /// <exception cref="KeyOutOfRangeException"></exception>
-        /// <exception cref="LengthOutOfRangeException"></exception>
-        public static byte[] MAC(string message, byte[] key, int length = MACLength)
-        {
-            return MAC(Encoding.UTF8.GetBytes(message), key, length);
-        }
-
-        /// <summary>Computes a MAC using BLAKE2b.</summary>
-        /// <param name="message">The message to be authenticated.</param>
-        /// <param name="key">The 32 or 64 byte key.</param>
-        /// <param name="length">The length of the authentication tag in bytes.</param>
-        /// <returns>The computed tag.</returns>
+        /// <returns>The computed authentication tag.</returns>
+        /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="KeyOutOfRangeException"></exception>
         /// <exception cref="LengthOutOfRangeException"></exception>
         public static byte[] MAC(byte[] message, byte[] key, int length = MACLength)
         {
+            ParameterValidation.Message(message);
             key = ParameterValidation.Key(key, _minKeySize, _maxKeySize);
             ParameterValidation.OutputLength(length, _minLength, _maxLength);
             byte[] hash = new byte[length];
@@ -92,7 +73,8 @@ namespace Geralt
             return hash;
         }
 
-        /// <summary>Derives a subkey.</summary>
+        /// <summary>Derives a subkey from a master key.</summary>
+        /// <remarks>The subkey length should be 32 or 64 bytes.</remarks>
         /// <param name="inputKeyingMaterial">The master key.</param>
         /// <param name="salt">The 16 byte random or counter salt.</param>
         /// <param name="context">The 16 character context string.</param>
@@ -102,28 +84,30 @@ namespace Geralt
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="KeyOutOfRangeException"></exception>
         /// <exception cref="SaltOutOfRangeException"></exception>
-        /// <exception cref="PersonalOutOfRangeException"></exception>
+        /// <exception cref="ContextOutOfRangeException"></exception>
+        /// <exception cref="LengthOutOfRangeException"></exception>
         public static byte[] DeriveKey(byte[] inputKeyingMaterial, byte[] salt, string context, int length = KeySize, byte[] message = null)
         {
             return DeriveKey(inputKeyingMaterial, salt, Encoding.UTF8.GetBytes(context), length, message);
         }
 
-        /// <summary>Derives a subkey.</summary>
+        /// <summary>Derives a subkey from a master key.</summary>
+        /// <remarks>The subkey length should be 32 or 64 bytes.</remarks>
         /// <param name="inputKeyingMaterial">The master key.</param>
         /// <param name="salt">The 16 byte random or counter salt.</param>
         /// <param name="context">The 16 byte context information.</param>
         /// <param name="length">The subkey size in bytes.</param>
         /// <param name="message">An optional message to be included in the hash.</param>
         /// <returns>The derived subkey.</returns>
-        /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="KeyOutOfRangeException"></exception>
         /// <exception cref="SaltOutOfRangeException"></exception>
-        /// <exception cref="PersonalOutOfRangeException"></exception>
+        /// <exception cref="ContextOutOfRangeException"></exception>
+        /// <exception cref="LengthOutOfRangeException"></exception>
         public static byte[] DeriveKey(byte[] inputKeyingMaterial, byte[] salt, byte[] context, int length = KeySize, byte[] message = null)
         {
             inputKeyingMaterial = ParameterValidation.Key(inputKeyingMaterial, _minKeySize, _maxKeySize);
             ParameterValidation.Salt(salt, SaltSize);
-            ParameterValidation.Personal(context, ContextSize);
+            ParameterValidation.Context(context, ContextSize);
             ParameterValidation.OutputLength(length, _minLength, _maxLength);
             if (message == null) { message = Array.Empty<byte>(); }
             byte[] hash = new byte[length];

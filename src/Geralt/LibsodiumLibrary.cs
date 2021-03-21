@@ -320,7 +320,7 @@ namespace Geralt
 
         // crypto_aead_aes256gcm_encrypt
         [DllImport(_dllName, CallingConvention = _callingConvention)]
-        internal static extern int crypto_aead_aes256gcm_encrypt(IntPtr cciphertextipher, out long ciphertextLength, byte[] message, long messageLength, byte[] additionalData, long additionalDataLength, byte[] nsec, byte[] nonce, byte[] key);
+        internal static extern int crypto_aead_aes256gcm_encrypt(IntPtr ciphertextPointer, out long ciphertextLength, byte[] message, long messageLength, byte[] additionalData, long additionalDataLength, byte[] nsec, byte[] nonce, byte[] key);
 
         // crypto_aead_aes256gcm_decrypt
         [DllImport(_dllName, CallingConvention = _callingConvention)]
