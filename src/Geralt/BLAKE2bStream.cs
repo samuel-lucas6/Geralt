@@ -40,8 +40,8 @@ namespace Geralt
             private int OutputLength { get; set; }
 
             /// <summary>Initializes the hash algorithm.</summary>
+            /// <remarks>The output length should be 32 or 64 bytes.</remarks>
             /// <param name="length">The length of the hash in bytes.</param>
-            /// <exception cref="KeyOutOfRangeException"></exception>
             /// <exception cref="LengthOutOfRangeException"></exception>
             public Stream(int length = HashLength)
             {
@@ -53,6 +53,7 @@ namespace Geralt
             }
 
             /// <summary>Initializes the hash algorithm.</summary>
+            /// <remarks>The authentication tag length should be 32 or 64 bytes.</remarks>
             /// <param name="key">The 32 or 64 byte key.</param>
             /// <param name="length">The length of the authentication tag in bytes.</param>
             /// <exception cref="KeyOutOfRangeException"></exception>
@@ -76,11 +77,11 @@ namespace Geralt
                 _ = LibsodiumLibrary.crypto_generichash_init(HashStatePointer, Key, Key.Length, OutputLength);
             }
 
-            override protected void HashCore(byte[] array, int arrayOffset, int bytes)
+            override protected void HashCore(byte[] array, int offset, int length)
             {
-                byte[] message = new byte[bytes];
-                Array.Copy(array, arrayOffset, message, destinationIndex: 0, bytes);
-                _ = LibsodiumLibrary.crypto_generichash_update(HashStatePointer, message, bytes);
+                byte[] message = new byte[length];
+                Array.Copy(array, offset, message, destinationIndex: 0, length);
+                _ = LibsodiumLibrary.crypto_generichash_update(HashStatePointer, message, length);
             }
 
             override protected byte[] HashFinal()
