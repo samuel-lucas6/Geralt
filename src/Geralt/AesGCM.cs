@@ -37,8 +37,8 @@ namespace Geralt
         public const int TagSize = 16;
 
         /// <summary>Check if the current CPU supports the required instructions (SSSE3, AES-NI, and PCMUL).</summary>
-        /// <returns><c>true</c> if the CPU supports the necessary instructions; otherwise, <c>false</c>.</returns>
         /// <remarks>Note that <see cref="ChaCha20Poly1305"/> is recommended over <see cref="AesGCM"/>.</remarks>
+        /// <returns><see langword="true"/> if the CPU supports the necessary instructions; otherwise, <see langword="false"/>.</returns>
         public static bool IsSupported()
         {
             GeraltCore.InitialiseLibsodium();

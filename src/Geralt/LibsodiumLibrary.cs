@@ -54,13 +54,21 @@ namespace Geralt
         [DllImport(_dllName, CallingConvention = _callingConvention)]
         internal static extern int randombytes_uniform(int upperBound);
 
+        // sodium_compare
+        [DllImport(_dllName, CallingConvention = _callingConvention)]
+        internal static extern int sodium_compare(byte[] a, byte[] b, long length);
+
         // sodium_increment
         [DllImport(_dllName, CallingConvention = _callingConvention)]
         internal static extern void sodium_increment(byte[] array, long arrayLength);
 
-        // sodium_compare
+        // sodium_add
         [DllImport(_dllName, CallingConvention = _callingConvention)]
-        internal static extern int sodium_compare(byte[] a, byte[] b, long length);
+        internal static extern void sodium_add(byte[] a, byte[] b, long arrayLength);
+
+        // sodium_sub
+        [DllImport(_dllName, CallingConvention = _callingConvention)]
+        internal static extern void sodium_sub(byte[] a, byte[] b, long arrayLength);
 
         // crypto_hash
         [DllImport(_dllName, CallingConvention = _callingConvention)]

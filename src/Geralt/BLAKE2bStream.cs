@@ -32,7 +32,6 @@ namespace Geralt
     public partial class BLAKE2b
     {
         /// <summary>Hashing streams using BLAKE2b.</summary>
-        /// <remarks>See here for more information: https://doc.libsodium.org/hashing/generic_hashing </remarks>
         public class Stream : HashAlgorithm
         {
             private IntPtr HashStatePointer { get; set; }

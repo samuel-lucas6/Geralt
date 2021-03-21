@@ -47,7 +47,6 @@ namespace Geralt
         /// <param name="length">The length of the hash in bytes.</param>
         /// <returns>The hash of the message.</returns>
         /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="KeyOutOfRangeException"></exception>
         /// <exception cref="LengthOutOfRangeException"></exception>
         public static byte[] Hash(byte[] message, int length = HashLength)
         {

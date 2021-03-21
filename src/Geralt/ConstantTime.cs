@@ -25,9 +25,19 @@
 namespace Geralt
 {
     /// <summary>Constant time methods.</summary>
-    /// <remarks>See here for more information: https://doc.libsodium.org/helpers </remarks>
     public static class ConstantTime
     {
+        /// <summary>Compares two byte arrays of equal length in constant time.</summary>
+        /// <remarks>This should be used to compare authentication tags.</remarks>
+        /// <param name="a">The first byte array.</param>
+        /// <param name="b">The second byte array.</param>
+        /// <returns><see langword="true"/> if the values are equal; otherwise, <see langword="false"/>.</returns>
+        public static bool Compare(byte[] a, byte[] b)
+        {
+            int result = LibsodiumLibrary.sodium_compare(a, b, a.Length);
+            return result == 0;
+        }
+
         /// <summary>Increments a byte array in constant time.</summary>
         /// <remarks>This should be used to increment a counter nonce.</remarks>
         /// <param name="array">The byte array to increment.</param>
@@ -38,15 +48,24 @@ namespace Geralt
             return array;
         }
 
-        /// <summary>Compares two byte arrays of the same length in constant time.</summary>
-        /// <remarks>This should be used to compare authentication tags.</remarks>
+        /// <summary>Adds two byte arrays of equal length in constant time.</summary>
         /// <param name="a">The first byte array.</param>
         /// <param name="b">The second byte array.</param>
-        /// <returns><c>true</c> if the values are equal; otherwise, <c>false</c>.</returns>
-        public static bool Compare(byte[] a, byte[] b)
+        /// <returns>The sum of the two byte arrays.</returns>
+        public static byte[] Add(byte[] a, byte[] b)
         {
-            int result = LibsodiumLibrary.sodium_compare(a, b, a.Length);
-            return result == 0;
+            LibsodiumLibrary.sodium_add(a, b, a.Length);
+            return a;
+        }
+
+        /// <summary>Subtracts two byte arrays of equal length in constant time.</summary>
+        /// <param name="a">The first byte array.</param>
+        /// <param name="b">The second byte array.</param>
+        /// <returns>The subtraction of the two byte arrays.</returns>
+        public static byte[] Subtract(byte[] a, byte[] b)
+        {
+            LibsodiumLibrary.sodium_sub(a, b, a.Length);
+            return a;
         }
     }
 }
