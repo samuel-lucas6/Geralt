@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 /*
     Geralt: A cryptographic library for .NET based on libsodium.
@@ -26,13 +27,14 @@
 
 namespace Geralt
 {
-    /// <summary>Zeroes out arrays containing sensitive data.</summary>
+    /// <summary>Clear arrays containing sensitive data.</summary>
     public static class SecureMemory
     {
         private const int _index = 0;
 
         /// <summary>Clears a byte array containing sensitive data.</summary>
         /// <param name="array">The byte array to clear.</param>
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
         public static void ZeroArray(byte[] array)
         {
             if (array != null)
@@ -43,6 +45,7 @@ namespace Geralt
 
         /// <summary>Clears a char array containing sensitive data.</summary>
         /// <param name="array">The char array to clear.</param>
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
         public static void ZeroArray(char[] array)
         {
             if (array.Length > 0)

@@ -25,10 +25,9 @@
 namespace Geralt
 {
     /// <summary>Generate cryptographically secure random data.</summary>
-    /// <remarks>See here for more information: https://doc.libsodium.org/generating_random_data </remarks>
     public static class SecureRandom
     {
-        /// <summary>Gets random bytes.</summary>
+        /// <summary>Gets cryptographically secure random bytes.</summary>
         /// <param name="count">The number of bytes to return.</param>
         /// <returns>An array of random bytes.</returns>
         public static byte[] GetBytes(int count)
@@ -38,7 +37,7 @@ namespace Geralt
             return randomBytes;
         }
 
-        /// <summary>Gets a random number.</summary>
+        /// <summary>Gets a cryptographically secure random number.</summary>
         /// <param name="upperBound">An integer between 0 and 2147483647.</param>
         /// <returns>An unpredictable value between 0 and upperBound (excluded).</returns>
         public static int GetNumber(int upperBound)
