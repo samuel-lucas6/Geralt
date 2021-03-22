@@ -1,5 +1,5 @@
 using Geralt.Exceptions;
-using System.Text;
+using System;
 
 /*
     Geralt: A cryptographic library for .NET based on libsodium.
@@ -27,49 +27,25 @@ using System.Text;
 
 namespace Geralt
 {
-    /// <summary>Short hashing using SipHash-2-4.</summary>
-    /// <remarks>See here for more information: https://doc.libsodium.org/hashing/short-input_hashing </remarks>
+    /// <summary>Short input hashing using SipHash-2-4.</summary>
+    /// <remarks>SipHash is not collision resistant. It should only be used to create hash tables.</remarks>
     public static class SipHash
     {
-        private const int _hashBytes = 8;
-        private const int _keyBytes = 16;
-
-        /// <summary>Generates a random 16 byte key.</summary>
-        /// <returns>A byte array with 16 random bytes.</returns>
-        public static byte[] GenerateKey()
-        {
-            return SecureRandom.GetBytes(_keyBytes);
-        }
+        public const int KeySize = 16;
+        public const int HashLength = 8;
 
         /// <summary>Hashes a message with a key using SipHash-2-4.</summary>
+        /// <remarks>SipHash is not collision resistant. It should only be used to create hash tables.</remarks>
         /// <param name="message">The message to be hashed.</param>
         /// <param name="key">A 16 byte key.</param>
-        /// <returns>An 8 byte hash.</returns>
-        /// <exception cref="KeyOutOfRangeException"></exception>
-        public static byte[] Hash(string message, string key)
-        {
-            return Hash(message, Encoding.UTF8.GetBytes(key));
-        }
-
-        /// <summary>Hashes a message with a key using SipHash-2-4.</summary>
-        /// <param name="message">The message to be hashed.</param>
-        /// <param name="key">A 16 byte key.</param>
-        /// <returns>An 8 byte hash.</returns>
-        /// <exception cref="KeyOutOfRangeException"></exception>
-        public static byte[] Hash(string message, byte[] key)
-        {
-            return Hash(Encoding.UTF8.GetBytes(message), key);
-        }
-
-        /// <summary>Hashes a message with a key using SipHash-2-4.</summary>
-        /// <param name="message">The message to be hashed.</param>
-        /// <param name="key">A 16 byte key.</param>
-        /// <returns>An 8 byte hash.</returns>
+        /// <returns>The 8 byte hash.</returns>
+        /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="KeyOutOfRangeException"></exception>
         public static byte[] Hash(byte[] message, byte[] key)
         {
-            ParameterValidation.Key(key, _keyBytes);
-            byte[] hash = new byte[_hashBytes];
+            ParameterValidation.Message(message);
+            ParameterValidation.Key(key, KeySize);
+            byte[] hash = new byte[HashLength];
             _ = LibsodiumLibrary.crypto_shorthash(hash, message, message.Length, key);
             return hash;
         }
