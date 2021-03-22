@@ -32,6 +32,40 @@ namespace Geralt
         public const int KeySize = 32;
         public const int SharedSecretSize = 32;
 
+        /// <summary>Generates a new key pair based on a random seed.</summary>
+        /// <returns>A key pair.</returns>
+        public static KeyPair GenerateKeyPair()
+        {
+            byte[] publicKey = new byte[KeySize];
+            byte[] privateKey = new byte[KeySize];
+            _ = LibsodiumLibrary.crypto_box_keypair(publicKey, privateKey);
+            return new KeyPair(publicKey, privateKey);
+        }
+
+        /// <summary>Generates a new key pair based on a private key.</summary>
+        /// <param name="privateKey">The 32 byte private key.</param>
+        /// <returns>A key pair.</returns>
+        /// <exception cref="SeedOutOfRangeException"></exception>
+        public static KeyPair GenerateKeyPair(byte[] privateKey)
+        {
+            ParameterValidation.PrivateKey(privateKey, KeySize);
+            byte[] publicKey = GetPublicKey(privateKey);
+            return new KeyPair(publicKey, privateKey);
+        }
+
+        /// <summary>Generates a new key pair based on a seed.</summary>
+        /// <param name="seed">The 32 byte seed.</param>
+        /// <returns>A key pair.</returns>
+        /// <exception cref="SeedOutOfRangeException"></exception>
+        public static KeyPair GenerateSeededKeyPair(byte[] seed)
+        {
+            byte[] publicKey = new byte[KeySize];
+            byte[] privateKey = new byte[KeySize];
+            ParameterValidation.Seed(seed, KeySize);
+            _ = LibsodiumLibrary.crypto_box_seed_keypair(publicKey, privateKey, seed);
+            return new KeyPair(publicKey, privateKey);
+        }
+
         /// <summary>Computes a public key from a private key.</summary>
         /// <param name="privateKey">The 32 byte private key.</param>
         /// <returns>The computed public key.</returns>
