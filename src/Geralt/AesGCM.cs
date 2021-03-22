@@ -30,6 +30,7 @@ using System.Security.Cryptography;
 namespace Geralt
 {
     /// <summary>Authenticated encryption with additional data using AES-GCM. Only supported on modern processors.</summary>
+    /// <remarks>Note that <see cref="ChaCha20Poly1305"/> is recommended over <see cref="AesGCM"/>.</remarks>
     public static class AesGCM
     {
         public const int KeySize = 32;
@@ -51,7 +52,7 @@ namespace Geralt
         /// <param name="nonce">The 12 byte nonce.</param>
         /// <param name="key">The 32 byte key.</param>
         /// <param name="additionalData">Optional, non-secret additional data to authenticate.</param>
-        /// <returns>The ciphertext and authentication tag.</returns>
+        /// <returns>The encrypted message and authentication tag.</returns>
         /// <exception cref="PlatformNotSupportedException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="NonceOutOfRangeException"></exception>
@@ -87,6 +88,7 @@ namespace Geralt
         public static byte[] Decrypt(byte[] ciphertext, byte[] nonce, byte[] key, byte[] additionalData = null)
         {
             if (!IsSupported()) { throw new PlatformNotSupportedException(); }
+            ParameterValidation.Ciphertext(ciphertext);
             additionalData = ParameterValidation.AdditionalData(additionalData);
             ParameterValidation.Nonce(nonce, NonceSize);
             ParameterValidation.Key(key, KeySize);
