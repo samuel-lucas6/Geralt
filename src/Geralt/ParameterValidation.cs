@@ -80,11 +80,11 @@ namespace Geralt
             }
         }
 
-        internal static void Personal(byte[] personal, int validPersonalLength)
+        internal static void Context(byte[] context, int validContextLength)
         {
-            if (personal == null || personal.Length != validPersonalLength)
+            if (context == null || context.Length != validContextLength)
             {
-                throw new PersonalOutOfRangeException($"Personal must be {validPersonalLength} bytes in length.");
+                throw new ContextOutOfRangeException($"Context must be {validContextLength} bytes in length.");
             }
         }
 
@@ -96,11 +96,19 @@ namespace Geralt
             }
         }
 
+        internal static void Ciphertext(byte[] ciphertext)
+        {
+            if (ciphertext == null)
+            {
+                throw new ArgumentNullException(nameof(ciphertext), "Ciphertext cannot be null.");
+            }
+        }
+
         internal static void OutputLength(int bytes, int minimumOutputBytes, int maximumOutputBytes)
         {
             if (bytes < minimumOutputBytes || bytes > maximumOutputBytes)
             {
-                throw new BytesOutOfRangeException(nameof(bytes), bytes, $"Bytes must be between {minimumOutputBytes} and {maximumOutputBytes} bytes in length.");
+                throw new LengthOutOfRangeException(nameof(bytes), bytes, $"Bytes must be between {minimumOutputBytes} and {maximumOutputBytes} bytes in length.");
             }
         }
 

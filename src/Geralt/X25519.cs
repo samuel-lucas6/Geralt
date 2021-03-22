@@ -26,34 +26,34 @@ using Geralt.Exceptions;
 
 namespace Geralt
 {
-    /// <summary>Scalar multiplication for Curve25519.</summary>
-    /// <remarks>See here for more information: https://doc.libsodium.org/advanced/scalar_multiplication </remarks>
+    /// <summary>Key exchange using X25519.</summary>
     public static class X25519
     {
-        private const int _keyBytes = 32;
+        public const int KeySize = 32;
+        public const int SharedSecretSize = 32;
 
         /// <summary>Computes a public key from a private key.</summary>
-        /// <param name="privateKey">A private key.</param>
+        /// <param name="privateKey">The 32 byte private key.</param>
         /// <returns>The computed public key.</returns>
         /// <exception cref="KeyOutOfRangeException"></exception>
         public static byte[] GetPublicKey(byte[] privateKey)
         {
-            ParameterValidation.PrivateKey(privateKey, _keyBytes);
-            byte[] publicKey = new byte[_keyBytes];
+            ParameterValidation.PrivateKey(privateKey, KeySize);
+            byte[] publicKey = new byte[KeySize];
             _ = LibsodiumLibrary.crypto_scalarmult_base(publicKey, privateKey);
             return publicKey;
         }
 
-        /// <summary>Computes a shared secret from a private key and public key.</summary>
-        /// <param name="privateKey">A private key.</param>
-        /// <param name="publicKey">A public key.</param>
+        /// <summary>Computes a shared secret from a private and public key.</summary>
+        /// <param name="privateKey">The 32 byte private key.</param>
+        /// <param name="publicKey">The 32 byte public key.</param>
         /// <returns>The computed shared secret.</returns>
         /// <exception cref="KeyOutOfRangeException"></exception>
         public static byte[] GetSharedSecret(byte[] privateKey, byte[] publicKey)
         {
-            ParameterValidation.PrivateKey(privateKey, _keyBytes);
-            ParameterValidation.PublicKey(publicKey, _keyBytes);
-            byte[] sharedSecret = new byte[_keyBytes];
+            ParameterValidation.PrivateKey(privateKey, KeySize);
+            ParameterValidation.PublicKey(publicKey, KeySize);
+            byte[] sharedSecret = new byte[KeySize];
             _ = LibsodiumLibrary.crypto_scalarmult(sharedSecret, privateKey, publicKey);
             return sharedSecret;
         }

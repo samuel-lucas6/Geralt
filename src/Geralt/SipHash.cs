@@ -41,7 +41,7 @@ namespace Geralt
         /// <returns>The 8 byte hash.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="KeyOutOfRangeException"></exception>
-        public static byte[] Hash(byte[] message, byte[] key)
+        public static byte[] Compute(byte[] message, byte[] key)
         {
             ParameterValidation.Message(message);
             ParameterValidation.Key(key, KeySize);

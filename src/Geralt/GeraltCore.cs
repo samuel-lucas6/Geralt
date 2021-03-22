@@ -37,7 +37,7 @@ namespace Geralt
             InitialiseLibsodium();
         }
 
-        /// <summary>Initialize libsodium.</summary>
+        /// <summary>Initializes libsodium.</summary>
         /// <remarks>This only needs to be done once. This method prevents repeated calls.</remarks>
         internal static void InitialiseLibsodium()
         {
@@ -48,7 +48,7 @@ namespace Geralt
             }
         }
 
-        /// <summary>Get the version of libsodium being used.</summary>
+        /// <summary>Gets the version of libsodium being used.</summary>
         /// <returns>The libsodium version.</returns>
         public static string GetLibsodiumVersion()
         {

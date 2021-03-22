@@ -110,7 +110,7 @@ namespace Geralt
             ParameterValidation.PublicKey(recipientPublicKey, _publicKeyBytes);
             byte[] ciphertext = new byte[message.Length + _tagBytes];
             int result = LibsodiumLibrary.crypto_box_easy(ciphertext, message, message.Length, nonce, recipientPublicKey, senderPrivateKey);
-            ResultValidation.EncryptResult(result);
+            ResultValidation.EncryptionResult(result);
             return ciphertext;
         }
 
@@ -131,7 +131,7 @@ namespace Geralt
             ciphertext = NullPadding.RemoveLeadingNulls(ciphertext, _tagBytes);
             byte[] message = new byte[ciphertext.Length - _tagBytes];
             int result = LibsodiumLibrary.crypto_box_open_easy(message, ciphertext, ciphertext.Length, nonce, senderPublicKey, recipientPrivateKey);
-            ResultValidation.DecryptResult(result);
+            ResultValidation.DecryptionResult(result);
             return message;
         }
     }

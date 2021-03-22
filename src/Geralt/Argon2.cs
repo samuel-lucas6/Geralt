@@ -33,9 +33,8 @@ namespace Geralt
     /// <remarks>See here for more information: https://doc.libsodium.org/password_hashing/default_phf </remarks>
     public static class Argon2
     {
-        private const int _hashStringBytes = 128;
+        public const int SaltSize = 16;
         private const int _defaultOutputLength = 32;
-        private const int _saltBytes = 16;
         private const int _minimumIterations = 3;
         private const int _iterationsInteractive = 4;
         private const int _iterationsModerate = 6;
@@ -47,7 +46,7 @@ namespace Geralt
         /// <summary>Represents the available Argon2 algorithms.</summary>
         public enum Algorithm
         {
-            /// <summary>The Argon2i algorithm. Requires 10+ iterations to be secure.</summary>
+            /// <summary>The Argon2i algorithm. Requires >10 iterations to be secure.</summary>
             Argon2i = 1,
             /// <summary>The default and recommended algorithm.</summary>
             Argon2id = 2
@@ -62,13 +61,6 @@ namespace Geralt
             Moderate,
             /// <summary>For highly sensitive data (uses 512 MiB of RAM).</summary>
             Sensitive
-        }
-
-        /// <summary>Generates a random 16 byte salt.</summary>
-        /// <returns>A byte array with 16 random bytes.</returns>
-        public static byte[] GenerateSalt()
-        {
-            return SecureRandom.GetBytes(_saltBytes);
         }
 
         /// <summary>Derives a key of any size from a password and a salt.</summary>
@@ -86,7 +78,7 @@ namespace Geralt
         public static byte[] Hash(byte[] password, byte[] salt, int iterations, int memorySize, int outputLength = _defaultOutputLength, Algorithm algorithm = Algorithm.Argon2id)
         {
             ParameterValidation.Password(password);
-            ParameterValidation.Salt(salt, _saltBytes);
+            ParameterValidation.Salt(salt, SaltSize);
             ValidateIterations(iterations);
             ValidateMemorySize(memorySize);
             ValidateOutputLength(outputLength);
@@ -172,7 +164,7 @@ namespace Geralt
             ParameterValidation.Password(password);
             ValidateIterations(iterations);
             ValidateMemorySize(memorySize);
-            byte[] hash = new byte[_hashStringBytes];
+            byte[] hash = new byte[_defaultOutputLength];
             byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
             GeraltCore.InitialiseLibsodium();
             int result = LibsodiumLibrary.crypto_pwhash_str(hash, passwordBytes, passwordBytes.Length, iterations, memorySize);

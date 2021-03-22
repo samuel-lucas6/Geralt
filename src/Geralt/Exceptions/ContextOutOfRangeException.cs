@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.CompilerServices;
+using System;
 
 /*
     Geralt: A cryptographic library for .NET based on libsodium.
@@ -25,36 +24,27 @@ using System.Runtime.CompilerServices;
     CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-namespace Geralt
+namespace Geralt.Exceptions
 {
-    /// <summary>Clear arrays containing sensitive data.</summary>
-    /// <remarks>Note that arrays must be pinned to prevent copies in memory.</remarks>
-    public static class SecureMemory
+    public class ContextOutOfRangeException : ArgumentOutOfRangeException
     {
-        private const int _index = 0;
-
-        /// <summary>Clears a byte array containing sensitive data.</summary>
-        /// <remarks>If the array isn't pinned, there might still be copies in memory after this call.</remarks>
-        /// <param name="array">The byte array to clear.</param>
-        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-        public static void ZeroArray(byte[] array)
+        public ContextOutOfRangeException()
         {
-            if (array != null)
-            {
-                Array.Clear(array, _index, array.Length);
-            }
         }
 
-        /// <summary>Clears a char array containing sensitive data.</summary>
-        /// <remarks>If the array isn't pinned, there might still be copies in memory after this call.</remarks>
-        /// <param name="array">The char array to clear.</param>
-        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-        public static void ZeroArray(char[] array)
+        public ContextOutOfRangeException(string message)
+          : base(message)
         {
-            if (array.Length > 0)
-            {
-                Array.Clear(array, _index, array.Length);
-            }
+        }
+
+        public ContextOutOfRangeException(string message, Exception inner)
+          : base(message, inner)
+        {
+        }
+
+        public ContextOutOfRangeException(string paramName, object actualValue, string message)
+          : base(paramName, actualValue, message)
+        {
         }
     }
 }
