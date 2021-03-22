@@ -30,7 +30,7 @@ namespace Geralt
     {
         internal static byte[] RemoveLeadingNulls(byte[] ciphertext, int tagBytes)
         {
-            // Check to see if there are _tagBytes of leading nulls. If so, trim.
+            // Check to see if there are tagBytes of leading nulls. If there are, remove them.
             // This is required due to an error in older versions.
             if (ciphertext[0] == 0)
             {

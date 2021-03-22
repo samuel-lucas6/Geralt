@@ -35,56 +35,56 @@ namespace Geralt
             return additionalData ?? (Array.Empty<byte>());
         }
 
-        internal static void Nonce(byte[] nonce, int validNonceLength)
+        internal static void Nonce(byte[] nonce, int validNonceSize)
         {
-            if (nonce == null || nonce.Length != validNonceLength)
+            if (nonce == null || nonce.Length != validNonceSize)
             {
-                throw new NonceOutOfRangeException(nameof(nonce), (nonce == null) ? 0 : nonce.Length, $"Nonce must be {validNonceLength} bytes in length.");
+                throw new NonceOutOfRangeException(nameof(nonce), (nonce == null) ? 0 : nonce.Length, $"Nonce must be {validNonceSize} bytes in length.");
             }
         }
 
-        internal static void Key(byte[] key, int validKeyLength)
+        internal static void Key(byte[] key, int validKeySize)
         {
-            if (key == null || key.Length != validKeyLength)
+            if (key == null || key.Length != validKeySize)
             {
-                throw new KeyOutOfRangeException(nameof(key), (key == null) ? 0 : key.Length, $"Key must be {validKeyLength} bytes in length.");
+                throw new KeyOutOfRangeException(nameof(key), (key == null) ? 0 : key.Length, $"Key must be {validKeySize} bytes in length.");
             }
         }
 
-        internal static byte[] Key(byte[] key, int minKeyLength, int maxKeyLength)
+        internal static byte[] Key(byte[] key, int minKeySize, int maxKeySize)
         {
-            return key != null && (key.Length < minKeyLength || key.Length > maxKeyLength) ? throw new KeyOutOfRangeException($"Key must be between {minKeyLength} and {maxKeyLength} bytes in length.") : key ?? Array.Empty<byte>();
+            return key != null && (key.Length < minKeySize || key.Length > maxKeySize) ? throw new KeyOutOfRangeException($"Key must be between {minKeySize} and {maxKeySize} bytes in length.") : key ?? Array.Empty<byte>();
         }
 
-        internal static void PrivateKey(byte[] privateKey, int validPrivateKeyLength)
+        internal static void PrivateKey(byte[] privateKey, int validPrivateKeySize)
         {
-            if (privateKey == null || privateKey.Length != validPrivateKeyLength)
+            if (privateKey == null || privateKey.Length != validPrivateKeySize)
             {
-                throw new KeyOutOfRangeException(nameof(privateKey), (privateKey == null) ? 0 : privateKey.Length, $"Private key must be {validPrivateKeyLength} bytes in length.");
+                throw new KeyOutOfRangeException(nameof(privateKey), (privateKey == null) ? 0 : privateKey.Length, $"Private key must be {validPrivateKeySize} bytes in length.");
             }
         }
 
-        internal static void PublicKey(byte[] publicKey, int validPublicKeyLength)
+        internal static void PublicKey(byte[] publicKey, int validPublicKeySize)
         {
-            if (publicKey == null || publicKey.Length != validPublicKeyLength)
+            if (publicKey == null || publicKey.Length != validPublicKeySize)
             {
-                throw new KeyOutOfRangeException(nameof(publicKey), (publicKey == null) ? 0 : publicKey.Length, $"Public key must be {validPublicKeyLength} bytes in length.");
+                throw new KeyOutOfRangeException(nameof(publicKey), (publicKey == null) ? 0 : publicKey.Length, $"Public key must be {validPublicKeySize} bytes in length.");
             }
         }
 
-        internal static void Salt(byte[] salt, int validSaltLength)
+        internal static void Salt(byte[] salt, int validSaltSize)
         {
-            if (salt == null || salt.Length != validSaltLength)
+            if (salt == null || salt.Length != validSaltSize)
             {
-                throw new SaltOutOfRangeException($"Salt must be {validSaltLength} bytes in length.");
+                throw new SaltOutOfRangeException($"Salt must be {validSaltSize} bytes in length.");
             }
         }
 
-        internal static void Context(byte[] context, int validContextLength)
+        internal static void Context(byte[] context, int validContextSize)
         {
-            if (context == null || context.Length != validContextLength)
+            if (context == null || context.Length != validContextSize)
             {
-                throw new ContextOutOfRangeException($"Context must be {validContextLength} bytes in length.");
+                throw new ContextOutOfRangeException($"Context must be {validContextSize} bytes in length.");
             }
         }
 
@@ -104,35 +104,35 @@ namespace Geralt
             }
         }
 
-        internal static void OutputLength(int bytes, int minimumOutputBytes, int maximumOutputBytes)
+        internal static void OutputLength(int length, int minimumOutputLength, int maximumOutputLength)
         {
-            if (bytes < minimumOutputBytes || bytes > maximumOutputBytes)
+            if (length < minimumOutputLength || length > maximumOutputLength)
             {
-                throw new LengthOutOfRangeException(nameof(bytes), bytes, $"Bytes must be between {minimumOutputBytes} and {maximumOutputBytes} bytes in length.");
+                throw new LengthOutOfRangeException(nameof(length), length, $"Length must be between {minimumOutputLength} and {maximumOutputLength} bytes in length.");
             }
         }
 
-        internal static void OutputLength(int outputLength, int minimumOutputLength)
+        internal static void Tag(byte[] tag, int validTagSize)
         {
-            if (outputLength < minimumOutputLength)
+            if (tag == null || tag.Length != validTagSize)
             {
-                throw new ArgumentOutOfRangeException(nameof(outputLength), $"Output length cannot be less than {minimumOutputLength} bytes.");
+                throw new SignatureOutOfRangeException(nameof(tag), (tag == null) ? 0 : tag.Length, $"Tag must be {validTagSize} bytes in length.");
             }
         }
 
-        internal static void Tag(byte[] tag, int validTagLength)
+        internal static void Signature(byte[] signature, int validSignatureSize)
         {
-            if (tag == null || tag.Length != validTagLength)
+            if (signature == null || signature.Length != validSignatureSize)
             {
-                throw new SignatureOutOfRangeException(nameof(tag), (tag == null) ? 0 : tag.Length, $"Tag must be {validTagLength} bytes in length.");
+                throw new SignatureOutOfRangeException(nameof(signature), (signature == null) ? 0 : signature.Length, $"Signature must be {validSignatureSize} bytes in length.");
             }
         }
 
-        internal static void Signature(byte[] signature, int validSignatureLength)
+        internal static void Seed(byte[] seed, int validSeedSize)
         {
-            if (signature == null || signature.Length != validSignatureLength)
+            if (seed == null || seed.Length != validSeedSize)
             {
-                throw new SignatureOutOfRangeException(nameof(signature), (signature == null) ? 0 : signature.Length, $"Signature must be {validSignatureLength} bytes in length.");
+                throw new SeedOutOfRangeException(nameof(seed), (seed == null) ? 0 : seed.Length, $"Seed must be {validSeedSize} bytes in length.");
             }
         }
 
@@ -141,14 +141,6 @@ namespace Geralt
             if (password == null)
             {
                 throw new ArgumentNullException(nameof(password), "Password cannot be null.");
-            }
-        }
-
-        internal static void Password(string password)
-        {
-            if (password == null)
-            {
-                throw new ArgumentNullException(nameof(password), "Password cannot be null");
             }
         }
 
@@ -164,15 +156,7 @@ namespace Geralt
         {
             if (result != 0)
             {
-                throw new OutOfMemoryException("Internal error - hashing failed. Possibly not enough memory.");
-            }
-        }
-
-        internal static void Seed(byte[] seed, int validSeedLength)
-        {
-            if (seed == null || seed.Length != validSeedLength)
-            {
-                throw new SeedOutOfRangeException(nameof(seed), (seed == null) ? 0 : seed.Length, $"Seed must be {validSeedLength} bytes in length.");
+                throw new OutOfMemoryException("Hashing failed. Possibly not enough memory.");
             }
         }
     }

@@ -31,7 +31,12 @@ namespace Geralt
     public class KeyPair : IDisposable
     {
         private readonly byte[] _privateKey;
+
+        /// <summary>Gets the public key.</summary>
         public byte[] PublicKey { get; set; }
+
+        /// <summary>Gets the private key.</summary>
+        public byte[] PrivateKey => _privateKey;
 
         /// <summary>Initializes a new instance of the <see cref="KeyPair"/> class.</summary>
         /// <param name="publicKey">The public key.</param>
@@ -51,9 +56,6 @@ namespace Geralt
         {
             Dispose();
         }
-
-        /// <summary>Gets the private key.</summary>
-        public byte[] PrivateKey => _privateKey;
 
         /// <summary>Dispose of the private key in memory.</summary>
         public void Dispose()
