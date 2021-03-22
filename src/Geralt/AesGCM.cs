@@ -70,7 +70,7 @@ namespace Geralt
             int result = LibsodiumLibrary.crypto_aead_aes256gcm_encrypt(ciphertextPointer, out long ciphertextLength, message, message.Length, additionalData, additionalData.Length, nsec: null, nonce, key);
             Marshal.Copy(ciphertextPointer, ciphertext, startIndex: 0, (int)ciphertextLength);
             Marshal.FreeHGlobal(ciphertextPointer);
-            ResultValidation.EncryptResult(result);
+            ResultValidation.EncryptionResult(result);
             return ciphertext.Length == ciphertextLength ? ciphertext : NullPadding.RemoveTrailingNulls(ciphertext, ciphertextLength);
         }
 
@@ -97,7 +97,7 @@ namespace Geralt
             int result = LibsodiumLibrary.crypto_aead_aes256gcm_decrypt(plaintextPointer, out long plaintextLength, nsec: null, ciphertext, ciphertext.Length, additionalData, additionalData.Length, nonce, key);
             Marshal.Copy(plaintextPointer, plaintext, startIndex: 0, (int)plaintextLength);
             Marshal.FreeHGlobal(plaintextPointer);
-            ResultValidation.DecryptResult(result);
+            ResultValidation.DecryptionResult(result);
             return plaintext.Length == plaintextLength ? plaintext : NullPadding.RemoveTrailingNulls(plaintext, plaintextLength);
         }
     }

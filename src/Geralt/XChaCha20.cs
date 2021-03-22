@@ -1,6 +1,6 @@
 using Geralt.Exceptions;
+using System;
 using System.Security.Cryptography;
-using System.Text;
 
 /*
     Geralt: A cryptographic library for .NET based on libsodium.
@@ -29,66 +29,30 @@ using System.Text;
 namespace Geralt
 {
     /// <summary>Unauthenticated encryption using XChaCha20.</summary>
-    /// <remarks>See here for more information: https://doc.libsodium.org/advanced/stream_ciphers/xchacha20 </remarks>
+    /// <remarks>This should only be used for custom constructions if you know what you are doing.</remarks>
     public static class XChaCha20
     {
-        private const int _keyBytes = 32;
-        private const int _nonceBytes = 24;
-
-        /// <summary>Generates a random 32 byte key.</summary>
-        /// <returns>A byte array with 32 random bytes.</returns>
-        public static byte[] GenerateKey()
-        {
-            return SecureRandom.GetBytes(_keyBytes);
-        }
-
-        /// <summary>Generates a random 24 byte nonce.</summary>
-        /// <returns>A byte array with 24 random bytes.</returns>
-        public static byte[] GenerateNonce()
-        {
-            return SecureRandom.GetBytes(_nonceBytes);
-        }
-
-        /// <summary>Increments a nonce in constant time.</summary>
-        /// <param name="nonce">The nonce to increment.</param>
-        /// <returns>The incremented byte array.</returns>
-        public static byte[] IncrementNonce(byte[] nonce)
-        {
-            return ConstantTime.Increment(nonce);
-        }
+        public const int KeySize = 32;
+        public const int NonceSize = 24;
 
         /// <summary>Encrypts a message using XChaCha20.</summary>
+        /// <remarks>The nonce should never be reused with the same key. It must be incremented in constant time.</remarks>
         /// <param name="message">The message to be encrypted.</param>
         /// <param name="nonce">The 24 byte nonce.</param>
         /// <param name="key">The 32 byte key.</param>
         /// <returns>The encrypted message.</returns>
-        /// <exception cref="KeyOutOfRangeException"></exception>
+        /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="NonceOutOfRangeException"></exception>
-        /// <exception cref="CryptographicException"></exception>
-        /// <remarks>The nonce should never be reused with the same key.</remarks>
-        /// <remarks>The recommended way to generate a nonce is to use GenerateNonce() for the first message and increment it for each subsequent message using the same key.</remarks>
-        public static byte[] Encrypt(string message, byte[] nonce, byte[] key)
-        {
-            return Encrypt(Encoding.UTF8.GetBytes(message), nonce, key);
-        }
-
-        /// <summary>Encrypts a message using XChaCha20.</summary>
-        /// <param name="message">The message to be encrypted.</param>
-        /// <param name="nonce">The 24 byte nonce.</param>
-        /// <param name="key">The 32 byte key.</param>
-        /// <returns>The encrypted message.</returns>
         /// <exception cref="KeyOutOfRangeException"></exception>
-        /// <exception cref="NonceOutOfRangeException"></exception>
         /// <exception cref="CryptographicException"></exception>
-        /// <remarks>The nonce should never be reused with the same key.</remarks>
-        /// <remarks>The recommended way to generate a nonce is to use GenerateNonce() for the first message and increment it for each subsequent message using the same key.</remarks>
         public static byte[] Encrypt(byte[] message, byte[] nonce, byte[] key)
         {
-            ParameterValidation.Nonce(nonce, _nonceBytes);
-            ParameterValidation.Key(key, _keyBytes);
+            ParameterValidation.Message(message);
+            ParameterValidation.Nonce(nonce, NonceSize);
+            ParameterValidation.Key(key, KeySize);
             byte[] ciphertext = new byte[message.Length];
             int result = LibsodiumLibrary.crypto_stream_xchacha20_xor(ciphertext, message, message.Length, nonce, key);
-            ResultValidation.EncryptResult(result);
+            ResultValidation.EncryptionResult(result);
             return ciphertext;
         }
 
@@ -96,31 +60,19 @@ namespace Geralt
         /// <param name="ciphertext">The ciphertext to be decrypted.</param>
         /// <param name="nonce">The 24 byte nonce.</param>
         /// <param name="key">The 32 byte key.</param>
-        /// <returns>The decrypted ciphertext.</returns>
-        /// <exception cref="KeyOutOfRangeException"></exception>
+        /// <returns>The decrypted message.</returns>
+        /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="NonceOutOfRangeException"></exception>
-        /// <exception cref="CryptographicException"></exception>
-        public static byte[] Decrypt(string ciphertext, byte[] nonce, byte[] key)
-        {
-            return Decrypt(Utilities.HexToBinary(ciphertext), nonce, key);
-        }
-
-
-        /// <summary>Decrypts a ciphertext message using XChaCha20.</summary>
-        /// <param name="ciphertext">The ciphertext to be decrypted.</param>
-        /// <param name="nonce">The 24 byte nonce.</param>
-        /// <param name="key">The 32 byte key.</param>
-        /// <returns>The decrypted ciphertext.</returns>
         /// <exception cref="KeyOutOfRangeException"></exception>
-        /// <exception cref="NonceOutOfRangeException"></exception>
         /// <exception cref="CryptographicException"></exception>
         public static byte[] Decrypt(byte[] ciphertext, byte[] nonce, byte[] key)
         {
-            ParameterValidation.Nonce(nonce, _nonceBytes);
-            ParameterValidation.Key(key, _keyBytes);
+            ParameterValidation.Ciphertext(ciphertext);
+            ParameterValidation.Nonce(nonce, NonceSize);
+            ParameterValidation.Key(key, KeySize);
             byte[] message = new byte[ciphertext.Length];
             int result = LibsodiumLibrary.crypto_stream_xchacha20_xor(message, ciphertext, ciphertext.Length, nonce, key);
-            ResultValidation.DecryptResult(result);
+            ResultValidation.DecryptionResult(result);
             return message;
         }
     }

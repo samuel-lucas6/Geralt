@@ -28,7 +28,7 @@ namespace Geralt
 {
     internal static class ResultValidation
     {
-        internal static void EncryptResult(int result)
+        internal static void EncryptionResult(int result)
         {
             if (result != 0)
             {
@@ -36,7 +36,7 @@ namespace Geralt
             }
         }
 
-        internal static void DecryptResult(int result)
+        internal static void DecryptionResult(int result)
         {
             if (result != 0)
             {
