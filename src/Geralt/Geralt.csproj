@@ -1,0 +1,58 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Authors>Samuel Lucas</Authors>
+        <Description>A modern cryptographic library for .NET based on libsodium.</Description>
+        <Copyright>Copyright (c) 2022 Samuel Lucas</Copyright>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <PackageProjectUrl>https://www.geralt.xyz</PackageProjectUrl>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <RepositoryUrl>https://github.com/samuel-lucas6/Geralt</RepositoryUrl>
+        <PackageTags>libsodium cryptography crypto security AEAD ChaCha20-Poly1305 XChaCha20-Poly1305 BLAKE2 BLAKE2b Argon2 Argon2i Argon2id X25519 Curve25519 Ed25519 ChaCha20 XChaCha20 CSPRNG secure-random constant-time hex Base64 hex-encoding base64-encoding padding</PackageTags>
+        <PackageIcon>Geralt.png</PackageIcon>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <AnalysisLevel>latest</AnalysisLevel>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <ErrorReport>none</ErrorReport>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="libsodium" Version="1.0.18.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="Geralt.png">
+            <Pack>True</Pack>
+            <PackagePath></PackagePath>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="Resources\wordlist.txt" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="Resources\wordlist.txt" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <Compile Update="Properties\Resources.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resources.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Update="Properties\Resources.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+    </ItemGroup>
+
+</Project>
