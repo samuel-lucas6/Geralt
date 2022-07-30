@@ -24,7 +24,6 @@ public static class Encodings
         fixed (byte* h = hex, b = data)
         {
             IntPtr ret = sodium_bin2hex(h, (nuint)hex.Length, b, (nuint)data.Length);
-            // Use returned pointer for easy conversion to string
             return Marshal.PtrToStringAnsi(ret) ?? throw new FormatException("Error converting bytes to hex.");
         }
     }
@@ -49,7 +48,6 @@ public static class Encodings
         fixed (byte* b = base64, d = data)
         {
             IntPtr ret = sodium_bin2base64(b, (nuint)base64MaxLength, d, (nuint)data.Length, (int)variant);
-            // Use returned pointer for easy conversion to string
             return Marshal.PtrToStringAnsi(ret) ?? throw new FormatException("Error converting bytes to Base64.");
         }
     }

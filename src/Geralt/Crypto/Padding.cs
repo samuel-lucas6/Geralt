@@ -21,7 +21,6 @@ public static class Padding
     {
         Validation.NotLessThanMin(nameof(unpaddedLength), unpaddedLength, minSize: 0);
         Validation.GreaterThanZero(nameof(blockSize), blockSize);
-        // Code from NSec by @ektrah
         int paddingLength = blockSize - unpaddedLength % blockSize;
         if (paddingLength > int.MaxValue - unpaddedLength) { throw new ArgumentOutOfRangeException(nameof(blockSize), "The amount of padding is too large."); }
         return unpaddedLength + paddingLength;

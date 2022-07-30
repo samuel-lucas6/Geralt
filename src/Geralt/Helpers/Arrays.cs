@@ -5,7 +5,6 @@ public static class Arrays
     public static T[] Concat<T>(params T[][] arrays)
     {
         int offset = 0;
-        // .Sum() has a checked statement internally
         var result = new T[arrays.Sum(array => array.Length)];
         foreach (var array in arrays)
         {
