@@ -10,7 +10,7 @@ public static class ConstantTime
         Validation.NotEmpty(nameof(b), b.Length);
         Sodium.Initialise();
         fixed (byte* aPtr = a, bPtr = b)
-            return sodium_memcmp(aPtr, bPtr, a.Length) == 0;
+            return sodium_memcmp(aPtr, bPtr, (nuint)a.Length) == 0;
     }
 
     public static unsafe void Increment(Span<byte> buffer)
@@ -18,7 +18,7 @@ public static class ConstantTime
         Validation.NotEmpty(nameof(buffer), buffer.Length);
         Sodium.Initialise();
         fixed (byte* b = buffer)
-            sodium_increment(b, buffer.Length);
+            sodium_increment(b, (nuint)buffer.Length);
     }
 
     public static unsafe void Add(Span<byte> buffer, ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
@@ -31,7 +31,7 @@ public static class ConstantTime
         Sodium.Initialise();
         a.CopyTo(buffer);
         fixed (byte* aPtr = buffer, bPtr = b)
-            sodium_add(aPtr, bPtr, buffer.Length);
+            sodium_add(aPtr, bPtr, (nuint)buffer.Length);
     }
 
     public static unsafe void Subtract(Span<byte> buffer, ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
@@ -44,7 +44,7 @@ public static class ConstantTime
         Sodium.Initialise();
         a.CopyTo(buffer);
         fixed (byte* aPtr = buffer, bPtr = b)
-            sodium_sub(aPtr, bPtr, buffer.Length);
+            sodium_sub(aPtr, bPtr, (nuint)buffer.Length);
     }
 
     public static unsafe bool IsLessThan(ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
@@ -54,7 +54,7 @@ public static class ConstantTime
         Validation.EqualToSize(nameof(a), a.Length, b.Length);
         Sodium.Initialise();
         fixed (byte* aPtr = a, bPtr = b)
-            return sodium_compare(aPtr, bPtr, a.Length) == -1;
+            return sodium_compare(aPtr, bPtr, (nuint)a.Length) == -1;
     }
 
     public static unsafe bool IsGreaterThan(ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
@@ -64,13 +64,13 @@ public static class ConstantTime
         Validation.EqualToSize(nameof(a), a.Length, b.Length);
         Sodium.Initialise();
         fixed (byte* aPtr = a, bPtr = b)
-            return sodium_compare(aPtr, bPtr, a.Length) == 1;
+            return sodium_compare(aPtr, bPtr, (nuint)a.Length) == 1;
     }
 
     public static unsafe bool IsAllZeros(ReadOnlySpan<byte> buffer)
     {
         Sodium.Initialise();
         fixed (byte* b = buffer)
-            return sodium_is_zero(b, buffer.Length) == 1;
+            return sodium_is_zero(b, (nuint)buffer.Length) == 1;
     }
 }

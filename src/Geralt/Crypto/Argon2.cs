@@ -28,7 +28,7 @@ public static class Argon2
         Sodium.Initialise();
         fixed (byte* ok = outputKeyingMaterial, p = password, s = salt)
         {
-            int ret = crypto_pwhash(ok, outputKeyingMaterial.Length, p, password.Length, s, iterations, memorySize, (int)algorithm);
+            int ret = crypto_pwhash(ok, (ulong)outputKeyingMaterial.Length, p, (ulong)password.Length, s, (ulong)iterations, (nuint)memorySize, (int)algorithm);
             if (ret != 0) { throw new InsufficientMemoryException("Insufficient memory to perform key derivation."); }
         }
     }
@@ -42,7 +42,7 @@ public static class Argon2
         Sodium.Initialise();
         fixed (byte* h = hash, p = password)
         {
-            int ret = crypto_pwhash_str_alg(h, p, password.Length, iterations, memorySize, (int)algorithm);
+            int ret = crypto_pwhash_str_alg(h, p, (ulong)password.Length, (ulong)iterations, (nuint)memorySize, (int)algorithm);
             if (ret != 0) { throw new InsufficientMemoryException("Insufficient memory to perform password hashing."); }
         }
     }
@@ -53,7 +53,7 @@ public static class Argon2
         Validation.NotEmpty(nameof(password), password.Length);
         Sodium.Initialise();
         fixed (byte* h = hash, p = password)
-            return crypto_pwhash_str_verify(h, p, password.Length) == 0;
+            return crypto_pwhash_str_verify(h, p, (ulong)password.Length) == 0;
     }
 
     public static unsafe bool NeedsRehash(ReadOnlySpan<byte> hash, int iterations, int memorySize)
@@ -64,7 +64,7 @@ public static class Argon2
         Sodium.Initialise();
         fixed (byte* h = hash)
         {
-            int ret = crypto_pwhash_str_needs_rehash(h, iterations, memorySize);
+            int ret = crypto_pwhash_str_needs_rehash(h, (ulong)iterations, (nuint)memorySize);
             return ret == -1 ? throw new FormatException("Invalid password hash.") : ret == 1;
         }
     }

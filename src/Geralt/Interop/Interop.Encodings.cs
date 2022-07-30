@@ -5,18 +5,18 @@ internal static partial class Interop
     internal static partial class Libsodium
     {
         [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe IntPtr sodium_bin2hex(byte* hex, long hexMaxLength, byte* binary, long binaryLength);
+        internal static extern unsafe IntPtr sodium_bin2hex(byte* hex, nuint hexMaxLength, byte* binary, nuint binaryLength);
         
         [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern int sodium_hex2bin(byte[] binary, long binaryMaxLength, string hex, long hexLength, string ignoreChars, out long binaryLength, string? hexEnd);
+        internal static extern int sodium_hex2bin(byte[] binary, nuint binaryMaxLength, string hex, nuint hexLength, string ignoreChars, out nuint binaryLength, string? hexEnd);
         
         [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern int sodium_base64_encoded_len(long binaryLength, int variant);
+        internal static extern int sodium_base64_encoded_len(nuint binaryLength, int variant);
         
         [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe IntPtr sodium_bin2base64(byte* base64, long base64MaxLength, byte* binary, long binaryLength, int variant);
+        internal static extern unsafe IntPtr sodium_bin2base64(byte* base64, nuint base64MaxLength, byte* binary, nuint binaryLength, int variant);
         
         [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern int sodium_base642bin(byte[] binary, long binaryMaxLength, string base64, long base64Length, string ignoreChars, out long binaryLength, string? base64End, int variant);
+        internal static extern int sodium_base642bin(byte[] binary, nuint binaryMaxLength, string base64, nuint base64Length, string ignoreChars, out nuint binaryLength, string? base64End, int variant);
     }
 }

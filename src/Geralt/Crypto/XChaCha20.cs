@@ -17,7 +17,7 @@ public static class XChaCha20
         Sodium.Initialise();
         fixed (byte* c = ciphertext, p = plaintext, n = nonce, k = key)
         {
-            int ret = crypto_stream_xchacha20_xor(c, p, plaintext.Length, n, k);
+            int ret = crypto_stream_xchacha20_xor(c, p, (ulong)plaintext.Length, n, k);
             if (ret != 0) { throw new CryptographicException("Error encrypting plaintext."); }
         }
     }
@@ -31,7 +31,7 @@ public static class XChaCha20
         Sodium.Initialise();
         fixed (byte* p = plaintext, c = ciphertext, n = nonce, k = key)
         {
-            int ret = crypto_stream_xchacha20_xor(p, c, ciphertext.Length, n, k);
+            int ret = crypto_stream_xchacha20_xor(p, c, (ulong)ciphertext.Length, n, k);
             if (ret != 0) { throw new CryptographicException("Error decrypting ciphertext."); }
         }
     }

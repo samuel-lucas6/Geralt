@@ -3,7 +3,7 @@ using static Interop.Libsodium;
 
 namespace Geralt;
 
-public class BLAKE2b
+public static class BLAKE2b
 {
     public const int HashSize = crypto_generichash_BYTES_MAX;
     public const int KeySize = crypto_generichash_KEYBYTES;
@@ -22,7 +22,7 @@ public class BLAKE2b
         Sodium.Initialise();
         fixed (byte* h = hash, m = message)
         {
-            int ret = crypto_generichash(h, hash.Length, m, message.Length, key: null, keyLength: 0);
+            int ret = crypto_generichash_blake2b(h, (nuint)hash.Length, m, (ulong)message.Length, key: null, keyLength: (nuint)0);
             if (ret != 0) { throw new CryptographicException("Error computing hash."); }
         }
     }
@@ -35,7 +35,7 @@ public class BLAKE2b
         Sodium.Initialise();
         fixed (byte* t = tag, m = message, k = key)
         {
-            int ret = crypto_generichash(t, tag.Length, m, message.Length, k, key.Length);
+            int ret = crypto_generichash_blake2b(t, (nuint)tag.Length, m, (ulong)message.Length, k, (nuint)key.Length);
             if (ret != 0) { throw new CryptographicException("Error computing tag."); }
         }
     }
@@ -61,7 +61,7 @@ public class BLAKE2b
         Sodium.Initialise();
         fixed (byte* ok = outputKeyingMaterial, ik = inputKeyingMaterial, p = personalisation, s = salt, i = info)
         {
-            int ret = crypto_generichash_blake2b_salt_personal(ok, outputKeyingMaterial.Length, i, info.Length, ik, inputKeyingMaterial.Length, s, p);
+            int ret = crypto_generichash_blake2b_salt_personal(ok, (nuint)outputKeyingMaterial.Length, i, (ulong)info.Length, ik, (nuint)inputKeyingMaterial.Length, s, p);
             if (ret != 0) { throw new CryptographicException("Error deriving key."); }
         }
     }

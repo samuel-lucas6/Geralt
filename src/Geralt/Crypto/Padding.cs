@@ -12,7 +12,7 @@ public static class Padding
         data.CopyTo(buffer);
         fixed (byte* b = buffer)
         {
-            int ret = sodium_pad(out int _, b, data.Length, blockSize, buffer.Length);
+            int ret = sodium_pad(out nuint _, b, (nuint)data.Length, (nuint)blockSize, (nuint)buffer.Length);
             if (ret != 0) { throw new ArgumentOutOfRangeException(nameof(buffer), $"{nameof(buffer)} is not large enough."); }
         }
     }
@@ -34,9 +34,9 @@ public static class Padding
         Sodium.Initialise();
         fixed (byte* p = paddedData)
         {
-            int ret = sodium_unpad(out int unpaddedLength, p, paddedData.Length, blockSize);
+            int ret = sodium_unpad(out nuint unpaddedLength, p, (nuint)paddedData.Length, (nuint)blockSize);
             if (ret != 0) { throw new FormatException("Incorrect padding."); }
-            return unpaddedLength;
+            return (int)unpaddedLength;
         }
     }
 }

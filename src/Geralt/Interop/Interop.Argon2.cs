@@ -15,15 +15,15 @@ internal static partial class Interop
         internal const int crypto_pwhash_SALTBYTES = 16;
         
         [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_pwhash(byte* hash, long hashLength, byte* password, long passwordLength, byte* salt, long iterations, long memorySize, int algorithm);
+        internal static extern unsafe int crypto_pwhash(byte* hash, ulong hashLength, byte* password, ulong passwordLength, byte* salt, ulong iterations, nuint memorySize, int algorithm);
 
         [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_pwhash_str_alg(byte* hash, byte* password, long passwordLength, long iterations, long memorySize, int algorithm);
+        internal static extern unsafe int crypto_pwhash_str_alg(byte* hash, byte* password, ulong passwordLength, ulong iterations, nuint memorySize, int algorithm);
 
         [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_pwhash_str_verify(byte* hash, byte* password, long passwordLength);
+        internal static extern unsafe int crypto_pwhash_str_verify(byte* hash, byte* password, ulong passwordLength);
 
         [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_pwhash_str_needs_rehash(byte* hash, long iterations, long memorySize);
+        internal static extern unsafe int crypto_pwhash_str_needs_rehash(byte* hash, ulong iterations, nuint memorySize);
     }
 }

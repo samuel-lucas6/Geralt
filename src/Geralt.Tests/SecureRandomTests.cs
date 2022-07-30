@@ -67,7 +67,7 @@ public class SecureRandomTests
     public void GetPassphrase_ValidDefaultChars()
     {
         const char separatorChar = '-';
-        char[] passphrase = SecureRandom.GetPassphrase(SecureRandom.MinPassphraseWordCount);
+        char[] passphrase = SecureRandom.GetPassphrase(SecureRandom.MinWordCount);
         Assert.IsTrue(passphrase.Contains(separatorChar));
         Assert.IsTrue(char.IsUpper(passphrase[0]));
         Assert.IsFalse(passphrase[^1] == separatorChar);
@@ -78,7 +78,7 @@ public class SecureRandomTests
     public void GetPassphrase_ValidCustomChars()
     {
         const char separatorChar = '=';
-        char[] passphrase = SecureRandom.GetPassphrase(SecureRandom.MinPassphraseWordCount, separatorChar, capitalise: false, includeNumber: true);
+        char[] passphrase = SecureRandom.GetPassphrase(SecureRandom.MinWordCount, separatorChar, capitalise: false, includeNumber: true);
         Assert.IsFalse(passphrase.Contains('-'));
         Assert.IsTrue(passphrase.Contains(separatorChar));
         Assert.IsTrue(char.IsLower(passphrase[0]));
@@ -89,8 +89,8 @@ public class SecureRandomTests
     [TestMethod]
     public void GetPassphrase_InvalidWordCount()
     {
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.GetPassphrase(SecureRandom.MinPassphraseWordCount - 1));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.GetPassphrase(SecureRandom.MaxPassphraseWordCount + 1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.GetPassphrase(SecureRandom.MinWordCount - 1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.GetPassphrase(SecureRandom.MaxWordCount + 1));
     }
     
     [TestMethod]

@@ -8,6 +8,6 @@ internal static partial class Interop
         internal const int crypto_stream_xchacha20_NONCEBYTES = 24;
 
         [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_stream_xchacha20_xor(byte* ciphertext, byte* plaintext, long plaintextLength, byte* nonce, byte* key);
+        internal static extern unsafe int crypto_stream_xchacha20_xor(byte* ciphertext, byte* plaintext, ulong plaintextLength, byte* nonce, byte* key);
     }
 }

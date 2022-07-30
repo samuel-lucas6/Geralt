@@ -25,15 +25,15 @@ internal static partial class Interop
         internal static extern unsafe int crypto_sign_ed25519_sk_to_curve25519(byte* X25519PrivateKey, byte* Ed25519PrivateKey);
 
         [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_sign(byte* signedMessage, out long signedMessageLength, byte* message, long messageLength, byte* privateKey);
+        internal static extern unsafe int crypto_sign(byte* signedMessage, out ulong signedMessageLength, byte* message, ulong messageLength, byte* privateKey);
 
         [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_sign_open(byte* message, out long messageLength, byte* signedMessage, long signedMessageLength, byte* publicKey);
+        internal static extern unsafe int crypto_sign_open(byte* message, out ulong messageLength, byte* signedMessage, ulong signedMessageLength, byte* publicKey);
 
         [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_sign_detached(byte* signature, out long signatureLength, byte* message, long messageLength, byte* privateKey);
+        internal static extern unsafe int crypto_sign_detached(byte* signature, out ulong signatureLength, byte* message, ulong messageLength, byte* privateKey);
 
         [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_sign_verify_detached(byte* signature, byte* message, long messageLength, byte* publicKey);
+        internal static extern unsafe int crypto_sign_verify_detached(byte* signature, byte* message, ulong messageLength, byte* publicKey);
     }
 }

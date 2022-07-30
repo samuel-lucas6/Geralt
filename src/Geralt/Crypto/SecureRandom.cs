@@ -15,15 +15,15 @@ public static class SecureRandom
     public const int MinUpperBound = 2;
     public const int MinStringLength = 8;
     public const int MaxStringLength = 128;
-    public const int MinPassphraseWordCount = 4;
-    public const int MaxPassphraseWordCount = 20;
+    public const int MinWordCount = 4;
+    public const int MaxWordCount = 20;
     
     public static unsafe void Fill(Span<byte> buffer)
     {
         Validation.NotEmpty(nameof(buffer), buffer.Length);
         Sodium.Initialise();
         fixed (byte* b = buffer)
-            randombytes_buf(b, buffer.Length);
+            randombytes_buf(b, (nuint)buffer.Length);
     }
     
     public static unsafe void FillDeterministic(Span<byte> buffer, ReadOnlySpan<byte> seed)
@@ -32,14 +32,14 @@ public static class SecureRandom
         Validation.EqualToSize(nameof(seed), seed.Length, SeedSize);
         Sodium.Initialise();
         fixed (byte* b = buffer, s = seed)
-            randombytes_buf_deterministic(b, buffer.Length, s);
+            randombytes_buf_deterministic(b, (nuint)buffer.Length, s);
     }
     
     public static int GetInt32(int upperBound)
     {
         Validation.NotLessThanMin(nameof(upperBound), upperBound, MinUpperBound);
         Sodium.Initialise();
-        return randombytes_uniform(upperBound);
+        return randombytes_uniform((uint)upperBound);
     }
     
     public static string GetString(int length, string characterSet = AlphanumericChars)
@@ -56,7 +56,7 @@ public static class SecureRandom
 
     public static char[] GetPassphrase(int wordCount, char separatorChar = '-', bool capitalise = true, bool includeNumber = false)
     {
-        Validation.SizeBetween(nameof(wordCount), wordCount, MinPassphraseWordCount, MaxPassphraseWordCount);
+        Validation.SizeBetween(nameof(wordCount), wordCount, MinWordCount, MaxWordCount);
         string[] wordlist = Properties.Resources.wordlist.Split(separator: new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
         int numberIndex = 0;
         if (includeNumber) { numberIndex = GetInt32(wordCount); }

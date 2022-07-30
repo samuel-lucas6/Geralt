@@ -25,21 +25,21 @@ public class BLAKE2bHashAlgorithm : HashAlgorithm
 
     public sealed override void Initialize()
     {
-        int ret = crypto_generichash_init(_state, _key, _key?.Length ?? 0, _hashSize);
+        int ret = crypto_generichash_init(_state, _key, _key == null ? (nuint)0 : (nuint)_key.Length, (nuint)_hashSize);
         if (ret != 0) { throw new CryptographicException("Error initialising hash."); }
     }
 
     protected override void HashCore(byte[] message, int offset, int size)
     {
         var buffer = Arrays.Slice(message, offset, size);
-        int ret = crypto_generichash_update(_state, buffer, buffer.Length);
+        int ret = crypto_generichash_update(_state, buffer, (ulong)buffer.Length);
         if (ret != 0) { throw new CryptographicException("Error updating hash."); }
     }
 
     protected override byte[] HashFinal()
     {
         var hash = new byte[_hashSize];
-        int ret = crypto_generichash_final(_state, hash, hash.Length);
+        int ret = crypto_generichash_final(_state, hash, (nuint)hash.Length);
         if (ret != 0) { throw new CryptographicException("Error finalising hash."); }
         return hash;
     }

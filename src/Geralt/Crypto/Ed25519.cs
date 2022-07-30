@@ -79,7 +79,7 @@ public static class Ed25519
         Sodium.Initialise();
         fixed (byte* s = signature, m = message, p = privateKey)
         {
-            int ret = crypto_sign_detached(s, signatureLength: out _, m, message.Length, p);
+            int ret = crypto_sign_detached(s, signatureLength: out _, m, (ulong)message.Length, p);
             if (ret != 0) { throw new CryptographicException("Unable to compute signature."); }
         }
     }
@@ -91,6 +91,6 @@ public static class Ed25519
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
         Sodium.Initialise();
         fixed (byte* s = signature, m = message, p = publicKey)
-            return crypto_sign_verify_detached(s, m, message.Length, p) == 0;
+            return crypto_sign_verify_detached(s, m, (ulong)message.Length, p) == 0;
     }
 }

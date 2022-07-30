@@ -16,7 +16,7 @@ public static class Poly1305
         Sodium.Initialise();
         fixed (byte* t = tag, m = message, k = oneTimeKey)
         {
-            int ret = crypto_onetimeauth(t, m, message.Length, k);
+            int ret = crypto_onetimeauth(t, m, (ulong)message.Length, k);
             if (ret != 0) { throw new CryptographicException("Error computing tag."); }
         }
     }
@@ -28,6 +28,6 @@ public static class Poly1305
         Validation.EqualToSize(nameof(oneTimeKey), oneTimeKey.Length, KeySize);
         Sodium.Initialise();
         fixed (byte* t = tag, m = message, k = oneTimeKey)
-            return crypto_onetimeauth_verify(t, m, message.Length, k) == 0;
+            return crypto_onetimeauth_verify(t, m, (ulong)message.Length, k) == 0;
     }
 }
