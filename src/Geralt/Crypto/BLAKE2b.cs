@@ -12,6 +12,8 @@ public static class BLAKE2b
     public const int PersonalSize = crypto_generichash_blake2b_PERSONALBYTES;
     public const int MinHashSize = crypto_generichash_BYTES_MIN;
     public const int MaxHashSize = crypto_generichash_BYTES_MAX;
+    public const int MinTagSize = MinHashSize;
+    public const int MaxTagSize = MaxHashSize;
     public const int MinKeySize = crypto_generichash_KEYBYTES;
     public const int MaxKeySize = crypto_generichash_KEYBYTES_MAX;
 
@@ -29,7 +31,7 @@ public static class BLAKE2b
 
     public static unsafe void ComputeTag(Span<byte> tag, ReadOnlySpan<byte> message, ReadOnlySpan<byte> key)
     {
-        Validation.SizeBetween(nameof(tag), tag.Length, MinHashSize, MaxHashSize);
+        Validation.SizeBetween(nameof(tag), tag.Length, MinTagSize, MaxTagSize);
         Validation.NotEmpty(nameof(message), message.Length);
         Validation.SizeBetween(nameof(key), key.Length, MinKeySize, MaxKeySize);
         Sodium.Initialise();
@@ -42,7 +44,7 @@ public static class BLAKE2b
 
     public static bool VerifyTag(ReadOnlySpan<byte> tag, ReadOnlySpan<byte> message, ReadOnlySpan<byte> key)
     {
-        Validation.SizeBetween(nameof(tag), tag.Length, MinHashSize, MaxHashSize);
+        Validation.SizeBetween(nameof(tag), tag.Length, MinTagSize, MaxTagSize);
         Validation.NotEmpty(nameof(message), message.Length);
         Validation.SizeBetween(nameof(key), key.Length, MinKeySize, MaxKeySize);
         Span<byte> computedTag = stackalloc byte[tag.Length];
