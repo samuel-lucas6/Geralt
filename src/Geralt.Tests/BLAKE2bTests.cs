@@ -14,7 +14,7 @@ public class BLAKE2bTests
     private static readonly byte[] Hash = Convert.FromHexString("ba80a53f981c4d0d6a2797b69f12f6e94c212f14685ac4b74b12bb6fdbffa2d17d87c5392aab792dc252d5de4533cc9518d38aa8dbf1925ab92386edd4009923");
     // Generated using libsodium-core
     private static readonly byte[] Key = Convert.FromHexString("dc1dcb9b0073a0e06dd2e04ad31d434f91cef039925218fe99d09311f4c1773f");
-    private static readonly byte[] KeyedHash = Convert.FromHexString("69fc5368a03ed0be533be600a6f5cc589c208da6e814eea28df1c57e8f6ce4d8");
+    private static readonly byte[] Tag = Convert.FromHexString("69fc5368a03ed0be533be600a6f5cc589c208da6e814eea28df1c57e8f6ce4d8");
     private static readonly byte[] DifferentKey = Convert.FromHexString("593d4b15f6fb98a16835f9ef6b67ed241678ab31756c2191dad397064b5e5849");
     private static readonly byte[] OutputKeyingMaterial = Convert.FromHexString("5fa348e4864e31b87f2b208d4191dd0395896b2a5b4d1120f43d68186542c67e");
     // Made up myself
@@ -28,6 +28,14 @@ public class BLAKE2bTests
         Span<byte> hash = stackalloc byte[BLAKE2b.MaxHashSize];
         BLAKE2b.ComputeHash(hash, Message);
         Assert.IsTrue(hash.SequenceEqual(Hash));
+    }
+    
+    [TestMethod]
+    public void ComputeHash_DifferentMessage()
+    {
+        Span<byte> hash = stackalloc byte[BLAKE2b.MaxHashSize];
+        BLAKE2b.ComputeHash(hash, Hash);
+        Assert.IsFalse(hash.SequenceEqual(Hash));
     }
     
     [TestMethod]
@@ -58,13 +66,13 @@ public class BLAKE2bTests
     }
     
     [TestMethod]
-    public void ComputeHashStream_InvalidKey()
+    public void ComputeHashStream_DifferentMessage()
     {
         var hash = new byte[BLAKE2b.MaxHashSize];
-        var key = new byte[BLAKE2b.MinKeySize - 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new BLAKE2bHashAlgorithm(hash.Length, key));
-        key = new byte[BLAKE2b.MaxKeySize + 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new BLAKE2bHashAlgorithm(hash.Length, key));
+        using var blake2b = new BLAKE2bHashAlgorithm(hash.Length, Key);
+        using var memoryStream = new MemoryStream(Hash, writable: false);
+        hash = blake2b.ComputeHash(memoryStream);
+        Assert.IsFalse(hash.SequenceEqual(Hash));
     }
     
     [TestMethod]
@@ -75,13 +83,53 @@ public class BLAKE2bTests
         hash = new byte[BLAKE2b.MaxHashSize + 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => new BLAKE2bHashAlgorithm(hash.Length));
     }
+    
+    [TestMethod]
+    public void ComputeTagStream_ValidInputs()
+    {
+        var tag = new byte[BLAKE2b.TagSize];
+        using var blake2b = new BLAKE2bHashAlgorithm(tag.Length, Key);
+        using var memoryStream = new MemoryStream(Message, writable: false);
+        tag = blake2b.ComputeHash(memoryStream);
+        Assert.IsTrue(tag.SequenceEqual(Tag));
+    }
+    
+    [TestMethod]
+    public void ComputeTagStream_DifferentKey()
+    {
+        var tag = new byte[BLAKE2b.TagSize];
+        using var blake2b = new BLAKE2bHashAlgorithm(tag.Length, DifferentKey);
+        using var memoryStream = new MemoryStream(Message, writable: false);
+        tag = blake2b.ComputeHash(memoryStream);
+        Assert.IsFalse(tag.SequenceEqual(Tag));
+    }
+    
+    [TestMethod]
+    public void ComputeTagStream_DifferentMessage()
+    {
+        var tag = new byte[BLAKE2b.TagSize];
+        using var blake2b = new BLAKE2bHashAlgorithm(tag.Length, Key);
+        using var memoryStream = new MemoryStream(Hash, writable: false);
+        tag = blake2b.ComputeHash(memoryStream);
+        Assert.IsFalse(tag.SequenceEqual(Tag));
+    }
+    
+    [TestMethod]
+    public void ComputeTagStream_InvalidKey()
+    {
+        var hash = new byte[BLAKE2b.TagSize];
+        var key = new byte[BLAKE2b.MinKeySize - 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new BLAKE2bHashAlgorithm(hash.Length, key));
+        key = new byte[BLAKE2b.MaxKeySize + 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new BLAKE2bHashAlgorithm(hash.Length, key));
+    }
 
     [TestMethod]
     public void ComputeTag_ValidInputs()
     {
         Span<byte> tag = stackalloc byte[BLAKE2b.TagSize];
         BLAKE2b.ComputeTag(tag, Message, Key);
-        Assert.IsTrue(tag.SequenceEqual(KeyedHash));
+        Assert.IsTrue(tag.SequenceEqual(Tag));
     }
     
     [TestMethod]
@@ -89,7 +137,7 @@ public class BLAKE2bTests
     {
         Span<byte> tag = stackalloc byte[BLAKE2b.TagSize];
         BLAKE2b.ComputeTag(tag, Hash, Key);
-        Assert.IsFalse(tag.SequenceEqual(KeyedHash));
+        Assert.IsFalse(tag.SequenceEqual(Tag));
     }
     
     [TestMethod]
@@ -97,15 +145,15 @@ public class BLAKE2bTests
     {
         Span<byte> tag = stackalloc byte[BLAKE2b.TagSize];
         BLAKE2b.ComputeTag(tag, Hash, DifferentKey);
-        Assert.IsFalse(tag.SequenceEqual(KeyedHash));
+        Assert.IsFalse(tag.SequenceEqual(Tag));
     }
     
     [TestMethod]
     public void ComputeTag_InvalidTag()
     {
-        var tag = new byte[BLAKE2b.MinHashSize - 1];
+        var tag = new byte[BLAKE2b.MinTagSize - 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => BLAKE2b.ComputeTag(tag, Message, Key));
-        tag = new byte[BLAKE2b.MaxHashSize + 1];
+        tag = new byte[BLAKE2b.MaxTagSize + 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => BLAKE2b.ComputeTag(tag, Message, Key));
     }
     
@@ -130,7 +178,7 @@ public class BLAKE2bTests
     [TestMethod]
     public void VerifyTag_ValidInputs()
     {
-        bool valid = BLAKE2b.VerifyTag(KeyedHash, Message, Key);
+        bool valid = BLAKE2b.VerifyTag(Tag, Message, Key);
         Assert.IsTrue(valid);
     }
     
@@ -144,23 +192,23 @@ public class BLAKE2bTests
     [TestMethod]
     public void VerifyTag_DifferentMessage()
     {
-        bool valid = BLAKE2b.VerifyTag(KeyedHash, Hash, Key);
+        bool valid = BLAKE2b.VerifyTag(Tag, Hash, Key);
         Assert.IsFalse(valid);
     }
     
     [TestMethod]
     public void VerifyTag_DifferentKey()
     {
-        bool valid = BLAKE2b.VerifyTag(KeyedHash, Message, DifferentKey);
+        bool valid = BLAKE2b.VerifyTag(Tag, Message, DifferentKey);
         Assert.IsFalse(valid);
     }
     
     [TestMethod]
     public void VerifyTag_InvalidTag()
     {
-        var tag = new byte[BLAKE2b.MinHashSize - 1];
+        var tag = new byte[BLAKE2b.MinTagSize - 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => BLAKE2b.VerifyTag(tag, Message, Key));
-        tag = new byte[BLAKE2b.MaxHashSize + 1];
+        tag = new byte[BLAKE2b.MaxTagSize + 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => BLAKE2b.VerifyTag(tag, Message, Key));
     }
     
