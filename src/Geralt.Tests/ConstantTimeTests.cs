@@ -20,8 +20,8 @@ public class ConstantTimeTests
     [TestMethod]
     public void Equals_DifferentInputLengths()
     {
-        Span<byte> a = Encoding.UTF8.GetBytes("Damn, you're ugly...");
-        Span<byte> b = Encoding.UTF8.GetBytes("Damn, you're ugly.");
+        Span<byte> a = Encoding.UTF8.GetBytes("Damn, you're ugly.");
+        Span<byte> b = Encoding.UTF8.GetBytes("Damn, you're ugly...");
         bool equal = ConstantTime.Equals(a, b);
         Assert.IsFalse(equal);
     }

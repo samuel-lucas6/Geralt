@@ -9,6 +9,8 @@ public static class ConstantTime
         Validation.NotEmpty(nameof(a), a.Length);
         Validation.NotEmpty(nameof(b), b.Length);
         Sodium.Initialise();
+        // It's impossible to prevent the lengths being leaked
+        if (a.Length != b.Length) { return false; }
         fixed (byte* aPtr = a, bPtr = b)
             return sodium_memcmp(aPtr, bPtr, (nuint)a.Length) == 0;
     }
