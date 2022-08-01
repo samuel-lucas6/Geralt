@@ -69,7 +69,7 @@ public class BLAKE2bTests
     public void ComputeHashStream_DifferentMessage()
     {
         var hash = new byte[BLAKE2b.MaxHashSize];
-        using var blake2b = new BLAKE2bHashAlgorithm(hash.Length, Key);
+        using var blake2b = new BLAKE2bHashAlgorithm(hash.Length);
         using var memoryStream = new MemoryStream(Hash, writable: false);
         hash = blake2b.ComputeHash(memoryStream);
         Assert.IsFalse(hash.SequenceEqual(Hash));
@@ -117,11 +117,11 @@ public class BLAKE2bTests
     [TestMethod]
     public void ComputeTagStream_InvalidKey()
     {
-        var hash = new byte[BLAKE2b.TagSize];
+        var tag = new byte[BLAKE2b.TagSize];
         var key = new byte[BLAKE2b.MinKeySize - 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new BLAKE2bHashAlgorithm(hash.Length, key));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new BLAKE2bHashAlgorithm(tag.Length, key));
         key = new byte[BLAKE2b.MaxKeySize + 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new BLAKE2bHashAlgorithm(hash.Length, key));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new BLAKE2bHashAlgorithm(tag.Length, key));
     }
 
     [TestMethod]
