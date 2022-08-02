@@ -10,7 +10,7 @@
         <PackageProjectUrl>https://www.geralt.xyz</PackageProjectUrl>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <RepositoryUrl>https://github.com/samuel-lucas6/Geralt</RepositoryUrl>
-        <PackageTags>libsodium cryptography crypto security AEAD ChaCha20-Poly1305 XChaCha20-Poly1305 BLAKE2 BLAKE2b Argon2 Argon2i Argon2id X25519 Curve25519 Ed25519 ChaCha20 XChaCha20 CSPRNG secure-random constant-time hex Base64 hex-encoding base64-encoding padding</PackageTags>
+        <PackageTags>libsodium cryptography crypto security AEAD ChaCha20-Poly1305 XChaCha20-Poly1305 BLAKE2 BLAKE2b Argon2 Argon2id X25519 Curve25519 Ed25519 ChaCha20 XChaCha20 CSPRNG secure-random constant-time hex Base64 hex-encoding base64-encoding padding</PackageTags>
         <PackageIcon>Geralt.png</PackageIcon>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
         <AnalysisLevel>latest</AnalysisLevel>
