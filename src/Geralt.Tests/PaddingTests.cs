@@ -25,7 +25,7 @@ public class PaddingTests
     [TestMethod]
     public void Pad_EmptyData()
     {
-        Span<byte> data = Array.Empty<byte>();
+        var data = Span<byte>.Empty;
         Span<byte> buffer = stackalloc byte[Padding.GetPaddedLength(data.Length, BlockSize)];
         Padding.Pad(buffer, data, BlockSize);
         Assert.IsTrue(buffer.SequenceEqual(FillData));
@@ -35,7 +35,7 @@ public class PaddingTests
     public void Fill_ValidInputs()
     {
         Span<byte> buffer = stackalloc byte[BlockSize];
-        Padding.Fill(buffer, BlockSize);
+        Padding.Fill(buffer);
         Assert.IsTrue(buffer.SequenceEqual(FillData));
     }
     
@@ -63,6 +63,13 @@ public class PaddingTests
     {
         var buffer = new byte[Padding.GetPaddedLength(Data.Length, BlockSize)];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Padding.Pad(buffer, Data, InvalidBlockSize));
+    }
+    
+    [TestMethod]
+    public void Fill_InvalidBuffer()
+    {
+        var buffer = Array.Empty<byte>();
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Padding.Fill(buffer));
     }
     
     [TestMethod]
