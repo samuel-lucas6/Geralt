@@ -26,6 +26,11 @@ public static class Padding
         return unpaddedLength + paddingLength;
     }
 
+    public static void Fill(Span<byte> buffer, int paddingSize)
+    {
+        Pad(buffer, ReadOnlySpan<byte>.Empty, paddingSize);
+    }
+
     public static unsafe int GetUnpaddedLength(ReadOnlySpan<byte> paddedData, int blockSize)
     {
         Validation.NotEmpty(nameof(paddedData), paddedData.Length);

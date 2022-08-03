@@ -10,6 +10,7 @@ public class PaddingTests
     // Taken from NSec
     private static readonly byte[] Data = { 0x01, 0x02 };
     private static readonly byte[] PaddedData = { 0x01, 0x02, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00 };
+    private static readonly byte[] FillData = { 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
     private const int BlockSize = 8;
     private const int InvalidBlockSize = 0;
     
@@ -27,7 +28,15 @@ public class PaddingTests
         Span<byte> data = Array.Empty<byte>();
         Span<byte> buffer = stackalloc byte[Padding.GetPaddedLength(data.Length, BlockSize)];
         Padding.Pad(buffer, data, BlockSize);
-        Assert.IsFalse(buffer.SequenceEqual(new byte[buffer.Length]));
+        Assert.IsTrue(buffer.SequenceEqual(FillData));
+    }
+    
+    [TestMethod]
+    public void Fill_ValidInputs()
+    {
+        Span<byte> buffer = stackalloc byte[BlockSize];
+        Padding.Fill(buffer, BlockSize);
+        Assert.IsTrue(buffer.SequenceEqual(FillData));
     }
     
     [TestMethod]
