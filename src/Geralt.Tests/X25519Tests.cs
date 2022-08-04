@@ -15,7 +15,9 @@ public class X25519Tests
     private static readonly byte[] SharedSecret = Convert.FromHexString("4a5d9d5ba4ce2de1728e3bf480350f25e07e21c947d19e3376f09b3c1e161742");
     // Generated using libsodium-core
     private static readonly byte[] Seed = Convert.FromHexString("b589764bb6395e13788436f93f4eaa4c858900b6a12328e8626ded5b39d2c7e9");
+    private static readonly byte[] HashedSharedSecret = Convert.FromHexString("519fb3af2f3f9e310718cf1f8bdec6e26ab64affe730f0f8b43c43b0e8ee52be");
     private static readonly byte[] PreSharedKey = Convert.FromHexString("5dbbfd1c5549181aa9319cd71b946757e1f4769aee9568bd360b651a86ea29a2");
+    private static readonly byte[] KeyedHashSharedSecret = Convert.FromHexString("a91209efc719601f61c54f74d369fe14f997a29a91b174d5771614b6c9407ad1");
     private static readonly byte[] EvePrivateKey = Convert.FromHexString("452e18802da843e0da527dc3f184a1d04aec69d67e53addd2fc3f8f5cb031a8b");
     private static readonly byte[] EvePublicKey = Convert.FromHexString("a0a219524fe1f1d496c2642c76c3ca6510e8d2620c1a325f1fdea02c59f25861");
     
@@ -169,9 +171,10 @@ public class X25519Tests
     {
         Span<byte> aliceSharedSecret = stackalloc byte[X25519.SharedSecretSize];
         X25519.DeriveSenderSharedSecret(aliceSharedSecret, AlicePrivateKey, BobPublicKey);
+        Assert.IsTrue(aliceSharedSecret.SequenceEqual(HashedSharedSecret));
         Span<byte> bobSharedSecret = stackalloc byte[X25519.SharedSecretSize];
         X25519.DeriveRecipientSharedSecret(bobSharedSecret, BobPrivateKey, AlicePublicKey);
-        Assert.IsTrue(aliceSharedSecret.SequenceEqual(bobSharedSecret));
+        Assert.IsTrue(bobSharedSecret.SequenceEqual(aliceSharedSecret));
     }
     
     [TestMethod]
@@ -179,9 +182,10 @@ public class X25519Tests
     {
         Span<byte> aliceSharedSecret = stackalloc byte[X25519.SharedSecretSize];
         X25519.DeriveSenderSharedSecret(aliceSharedSecret, AlicePrivateKey, BobPublicKey, PreSharedKey);
+        Assert.IsTrue(aliceSharedSecret.SequenceEqual(KeyedHashSharedSecret));
         Span<byte> bobSharedSecret = stackalloc byte[X25519.SharedSecretSize];
         X25519.DeriveRecipientSharedSecret(bobSharedSecret, BobPrivateKey, AlicePublicKey, PreSharedKey);
-        Assert.IsTrue(aliceSharedSecret.SequenceEqual(bobSharedSecret));
+        Assert.IsTrue(bobSharedSecret.SequenceEqual(aliceSharedSecret));
     }
     
     [TestMethod]
@@ -191,7 +195,7 @@ public class X25519Tests
         X25519.DeriveSenderSharedSecret(aliceSharedSecret, AlicePrivateKey, BobPublicKey);
         Span<byte> eveSharedSecret = stackalloc byte[X25519.SharedSecretSize];
         X25519.DeriveRecipientSharedSecret(eveSharedSecret, EvePrivateKey, AlicePublicKey);
-        Assert.IsFalse(aliceSharedSecret.SequenceEqual(eveSharedSecret));
+        Assert.IsFalse(eveSharedSecret.SequenceEqual(aliceSharedSecret));
     }
     
     [TestMethod]
@@ -201,7 +205,7 @@ public class X25519Tests
         X25519.DeriveSenderSharedSecret(aliceSharedSecret, AlicePrivateKey, BobPublicKey);
         Span<byte> bobSharedSecret = stackalloc byte[X25519.SharedSecretSize];
         X25519.DeriveRecipientSharedSecret(bobSharedSecret, BobPrivateKey, EvePublicKey);
-        Assert.IsFalse(aliceSharedSecret.SequenceEqual(bobSharedSecret));
+        Assert.IsFalse(bobSharedSecret.SequenceEqual(aliceSharedSecret));
     }
     
     [TestMethod]
@@ -211,7 +215,7 @@ public class X25519Tests
         X25519.DeriveSenderSharedSecret(aliceSharedSecret, AlicePrivateKey, BobPublicKey, PreSharedKey);
         Span<byte> bobSharedSecret = stackalloc byte[X25519.SharedSecretSize];
         X25519.DeriveRecipientSharedSecret(bobSharedSecret, BobPrivateKey, AlicePublicKey, SharedSecret);
-        Assert.IsFalse(aliceSharedSecret.SequenceEqual(bobSharedSecret));
+        Assert.IsFalse(bobSharedSecret.SequenceEqual(aliceSharedSecret));
     }
     
     [TestMethod]
