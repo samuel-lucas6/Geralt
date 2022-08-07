@@ -28,24 +28,9 @@ internal static partial class Interop
         [DllImport(DllName, CallingConvention = Convention)]
         internal static extern int crypto_generichash_final(IntPtr state, byte[] hash, nuint hashLength);
         
-        [StructLayout(LayoutKind.Sequential, Size = 384)]
-        internal struct BLAKE2bState
+        [StructLayout(LayoutKind.Explicit, Size = 384)]
+        internal struct crypto_generichash_blake2b_state
         {
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
-            internal ulong[] h;
-
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
-            internal ulong[] t;
-
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
-            internal ulong[] f;
-
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
-            internal byte[] buffer;
-
-            internal uint bufferLength;
-
-            internal byte lastNode;
         }
     }
 }

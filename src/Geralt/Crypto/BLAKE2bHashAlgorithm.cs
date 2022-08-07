@@ -16,7 +16,7 @@ public class BLAKE2bHashAlgorithm : HashAlgorithm
         Validation.SizeBetween(nameof(hashSize), hashSize, BLAKE2b.MinHashSize, BLAKE2b.MaxHashSize);
         if (key != default) { Validation.SizeBetween(nameof(key), key.Length, BLAKE2b.MinKeySize, BLAKE2b.MaxKeySize); }
         Sodium.Initialise();
-        _state = Marshal.AllocHGlobal(Marshal.SizeOf<BLAKE2bState>());
+        _state = Marshal.AllocHGlobal(Marshal.SizeOf<crypto_generichash_blake2b_state>());
         _key = key == default ? null : key.ToArray();
         _handle = GCHandle.Alloc(_key, GCHandleType.Pinned);
         _hashSize = hashSize;
