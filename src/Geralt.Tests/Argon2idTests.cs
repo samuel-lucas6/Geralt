@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -23,6 +24,42 @@ public class Argon2idTests
         Span<byte> key = stackalloc byte[Argon2id.KeySize];
         Argon2id.DeriveKey(key, Password, Salt, Iterations, MemorySize);
         Assert.IsTrue(key.SequenceEqual(Argon2idKey));
+    }
+    
+    [TestMethod]
+    public void DeriveKey_DifferentPassword()
+    {
+        Span<byte> key = stackalloc byte[Argon2id.KeySize];
+        Span<byte> password = Password.ToArray();
+        password[0]++;
+        Argon2id.DeriveKey(key, password, Salt, Iterations, MemorySize);
+        Assert.IsFalse(key.SequenceEqual(Argon2idKey));
+    }
+    
+    [TestMethod]
+    public void DeriveKey_DifferentSalt()
+    {
+        Span<byte> key = stackalloc byte[Argon2id.KeySize];
+        Span<byte> salt = Salt.ToArray();
+        salt[0]++;
+        Argon2id.DeriveKey(key, Password, salt, Iterations, MemorySize);
+        Assert.IsFalse(key.SequenceEqual(Argon2idKey));
+    }
+    
+    [TestMethod]
+    public void DeriveKey_DifferentIterations()
+    {
+        Span<byte> key = stackalloc byte[Argon2id.KeySize];
+        Argon2id.DeriveKey(key, Password, Salt, Iterations + 1, MemorySize);
+        Assert.IsFalse(key.SequenceEqual(Argon2idKey));
+    }
+    
+    [TestMethod]
+    public void DeriveKey_DifferentMemorySize()
+    {
+        Span<byte> key = stackalloc byte[Argon2id.KeySize];
+        Argon2id.DeriveKey(key, Password, Salt, Iterations, MemorySize + 1024);
+        Assert.IsFalse(key.SequenceEqual(Argon2idKey));
     }
 
     [TestMethod]
@@ -119,6 +156,16 @@ public class Argon2idTests
     {
         Span<byte> hash = Encoding.UTF8.GetBytes(WrongArgon2idHash);
         bool valid = Argon2id.VerifyHash(hash, Password);
+        Assert.IsFalse(valid);
+    }
+    
+    [TestMethod]
+    public void VerifyHash_WrongPassword()
+    {
+        Span<byte> hash = Encoding.UTF8.GetBytes(Argon2idHash);
+        Span<byte> password = Password.ToArray();
+        password[0]++;
+        bool valid = Argon2id.VerifyHash(hash, password);
         Assert.IsFalse(valid);
     }
 
