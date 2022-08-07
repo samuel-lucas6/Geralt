@@ -8,7 +8,7 @@ namespace Geralt.Tests;
 [TestClass]
 public class HChaCha20Tests
 {
-    // draft-irtf-cfrg-xchacha-01 Section 2.2.1: https://tools.ietf.org/id/draft-irtf-cfrg-xchacha-01.html#rfc.section.2.2.1
+    // draft-irtf-cfrg-xchacha Section 2.2.1: https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-xchacha#section-2.2.1
     private static readonly byte[] Output = Convert.FromHexString("82413b4227b27bfed30e42508a877d73a0f9e4d58a74a853c12ec41326d3ecdc");
     private static readonly byte[] Key = Convert.FromHexString("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
     private static readonly byte[] Nonce = Convert.FromHexString("000000090000004a0000000031415927");
