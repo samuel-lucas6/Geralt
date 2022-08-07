@@ -125,7 +125,7 @@ public class Argon2idTests
     [TestMethod]
     public void VerifyHash_InvalidHash()
     {
-        var hash = new byte[Argon2id.HashPrefix.Length - 1];
+        var hash = new byte[Argon2id.MinHashSize - 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.VerifyHash(hash, Password));
         hash = new byte[Argon2id.MaxHashSize + 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.VerifyHash(hash, Password));
@@ -166,7 +166,7 @@ public class Argon2idTests
     [TestMethod]
     public void NeedsRehash_InvalidHash()
     {
-        var hash = new byte[Argon2id.HashPrefix.Length - 1];
+        var hash = new byte[Argon2id.MinHashSize - 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.NeedsRehash(hash, Iterations, MemorySize));
         hash = new byte[Argon2id.MaxHashSize + 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.NeedsRehash(hash, Iterations, MemorySize));

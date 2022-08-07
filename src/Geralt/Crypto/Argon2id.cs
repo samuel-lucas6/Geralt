@@ -9,6 +9,7 @@ public static class Argon2id
     public const int SaltSize = crypto_pwhash_SALTBYTES;
     public const int MinIterations = crypto_pwhash_argon2id_OPSLIMIT_MIN;
     public const int MinMemorySize = 16777216;
+    public const int MinHashSize = 93;
     public const int MaxHashSize = crypto_pwhash_STRBYTES;
     public const string HashPrefix = crypto_pwhash_argon2id_STRPREFIX;
     
@@ -49,7 +50,7 @@ public static class Argon2id
     
     public static unsafe bool VerifyHash(ReadOnlySpan<byte> hash, ReadOnlySpan<byte> password)
     {
-        Validation.SizeBetween(nameof(hash), hash.Length, HashPrefix.Length, MaxHashSize);
+        Validation.SizeBetween(nameof(hash), hash.Length, MinHashSize, MaxHashSize);
         Validation.NotEmpty(nameof(password), password.Length);
         Sodium.Initialise();
         fixed (byte* h = hash, p = password)
@@ -58,7 +59,7 @@ public static class Argon2id
 
     public static unsafe bool NeedsRehash(ReadOnlySpan<byte> hash, int iterations, int memorySize)
     {
-        Validation.SizeBetween(nameof(hash), hash.Length, HashPrefix.Length, MaxHashSize);
+        Validation.SizeBetween(nameof(hash), hash.Length, MinHashSize, MaxHashSize);
         Validation.NotLessThanMin(nameof(iterations), iterations, MinIterations);
         Validation.NotLessThanMin(nameof(memorySize), memorySize, MinMemorySize);
         Sodium.Initialise();
