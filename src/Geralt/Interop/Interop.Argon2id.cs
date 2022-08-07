@@ -8,7 +8,6 @@ internal static partial class Interop
         internal const int crypto_pwhash_argon2id_ALG_ARGON2ID13 = 2;
         internal const int crypto_pwhash_BYTES_MIN = 16;
         internal const int crypto_pwhash_STRBYTES = 128;
-        internal const int crypto_pwhash_STR_HASHBYTES = 32;
         internal const string crypto_pwhash_argon2id_STRPREFIX = "$argon2id$";
         internal const int crypto_pwhash_MEMLIMIT_MIN = 8192;
         internal const long crypto_pwhash_OPSLIMIT_MAX = 4294967295;
