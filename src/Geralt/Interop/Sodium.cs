@@ -1,14 +1,14 @@
 ﻿using System.Runtime.InteropServices;
 using static Interop.Libsodium;
 
-public static class Sodium
+internal static class Sodium
 {
     private static readonly Action MisuseHandler = MisuseError;
     private static void MisuseError() => throw new InvalidOperationException("Misuse handler error.");
 
     private static int _initialised;
     
-    public static void Initialise()
+    internal static void Initialise()
     {
         if (_initialised != 0) { return; }
         try
