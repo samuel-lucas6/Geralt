@@ -5,7 +5,7 @@ internal static class Validation
     internal static void EqualToSize(string paramName, int size, int validSize)
     {
         if (size != validSize)
-            throw new ArgumentOutOfRangeException(paramName, size, $"{paramName} must be {size} bytes long.");
+            throw new ArgumentOutOfRangeException(paramName, size, $"{paramName} must be {validSize} bytes long.");
     }
 
     internal static void SizeBetween(string paramName, int size, int minSize, int maxSize)
