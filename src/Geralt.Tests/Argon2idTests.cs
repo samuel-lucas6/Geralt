@@ -27,12 +27,12 @@ public class Argon2idTests
     }
     
     [TestMethod]
-    public void DeriveKey_DifferentPassword()
+    public void DeriveKey_EmptyPassword()
     {
         Span<byte> key = stackalloc byte[Argon2id.KeySize];
-        Span<byte> password = Password.ToArray();
-        password[0]++;
+        Span<byte> password = Span<byte>.Empty;
         Argon2id.DeriveKey(key, password, Salt, Iterations, MemorySize);
+        Assert.IsFalse(key.SequenceEqual(new byte[key.Length]));
         Assert.IsFalse(key.SequenceEqual(Argon2idKey));
     }
     
@@ -68,15 +68,7 @@ public class Argon2idTests
         var key = new byte[Argon2id.MinKeySize - 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.DeriveKey(key, Password, Salt, Iterations, MemorySize));
     }
-
-    [TestMethod]
-    public void DeriveKey_InvalidPassword()
-    {
-        var key = new byte[Argon2id.KeySize];
-        var password = Array.Empty<byte>();
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.DeriveKey(key, password, Salt, Iterations, MemorySize));
-    }
-
+    
     [TestMethod]
     public void DeriveKey_InvalidSalt()
     {
@@ -111,6 +103,16 @@ public class Argon2idTests
         bool rehash = Argon2id.NeedsRehash(hash, Iterations, MemorySize);
         Assert.IsFalse(rehash);
     }
+    
+    [TestMethod]
+    public void ComputeHash_EmptyPassword()
+    {
+        Span<byte> hash = stackalloc byte[Argon2id.MaxHashSize];
+        Span<byte> password = Span<byte>.Empty;
+        Argon2id.ComputeHash(hash, password, Iterations, MemorySize);
+        bool valid = Argon2id.VerifyHash(hash, password);
+        Assert.IsTrue(valid);
+    }
 
     [TestMethod]
     public void ComputeHash_InvalidHash()
@@ -121,14 +123,6 @@ public class Argon2idTests
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.ComputeHash(hash, Password, Iterations, MemorySize));
     }
     
-    [TestMethod]
-    public void ComputeHash_InvalidPassword()
-    {
-        var hash = new byte[Argon2id.MaxHashSize];
-        var password = Array.Empty<byte>();
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.ComputeHash(hash, password, Iterations, MemorySize));
-    }
-
     [TestMethod]
     public void ComputeHash_InvalidIterations()
     {
@@ -177,15 +171,7 @@ public class Argon2idTests
         hash = new byte[Argon2id.MaxHashSize + 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.VerifyHash(hash, Password));
     }
-
-    [TestMethod]
-    public void VerifyHash_InvalidPassword()
-    {
-        var hash = Encoding.UTF8.GetBytes(Argon2idHash);
-        var password = Array.Empty<byte>();
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.VerifyHash(hash, password));
-    }
-
+    
     [TestMethod]
     public void NeedsRehash_CorrectParameters()
     {

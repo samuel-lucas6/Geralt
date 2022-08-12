@@ -188,13 +188,14 @@ public class Ed25519Tests
     }
     
     [TestMethod]
-    public void Sign_DifferentMessage()
+    public void Sign_EmptyMessage()
     {
         Span<byte> signature = stackalloc byte[Ed25519.SignatureSize];
-        Span<byte> message = Message.ToArray();
-        message[0]++;
+        Span<byte> message = Span<byte>.Empty;
         Ed25519.Sign(signature, message, AlicePrivateKey);
         Assert.IsFalse(signature.SequenceEqual(Signature));
+        bool valid = Ed25519.Verify(signature, message, AlicePublicKey);
+        Assert.IsTrue(valid);
     }
     
     [TestMethod]
@@ -213,15 +214,7 @@ public class Ed25519Tests
         signature = new byte[Ed25519.SignatureSize + 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Ed25519.Sign(signature, Message, AlicePrivateKey));
     }
-    
-    [TestMethod]
-    public void Sign_InvalidMessage()
-    {
-        var signature = new byte[Ed25519.SignatureSize];
-        var message = Array.Empty<byte>();
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Ed25519.Sign(signature, message, AlicePrivateKey));
-    }
-    
+
     [TestMethod]
     public void Sign_InvalidPrivateKey()
     {
@@ -268,15 +261,7 @@ public class Ed25519Tests
         signature = new byte[Ed25519.SignatureSize + 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Ed25519.Verify(signature, Message, AlicePublicKey));
     }
-    
-    [TestMethod]
-    public void Verify_InvalidMessage()
-    {
-        var signature = new byte[Ed25519.SignatureSize];
-        var message = Array.Empty<byte>();
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Ed25519.Verify(signature, message, AlicePublicKey));
-    }
-    
+
     [TestMethod]
     public void Verify_InvalidPublicKey()
     {
