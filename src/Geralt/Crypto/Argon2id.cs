@@ -22,7 +22,6 @@ public static class Argon2id
     public static unsafe void DeriveKey(Span<byte> outputKeyingMaterial, ReadOnlySpan<byte> password, ReadOnlySpan<byte> salt, int iterations, int memorySize)
     {
         Validation.NotLessThanMin(nameof(outputKeyingMaterial), outputKeyingMaterial.Length, MinKeySize);
-        Validation.NotEmpty(nameof(password), password.Length);
         Validation.EqualToSize(nameof(salt), salt.Length, SaltSize);
         Validation.NotLessThanMin(nameof(iterations), iterations, MinIterations);
         Validation.NotLessThanMin(nameof(memorySize), memorySize, MinMemorySize);
@@ -37,7 +36,6 @@ public static class Argon2id
     public static unsafe void ComputeHash(Span<byte> hash, ReadOnlySpan<byte> password, int iterations, int memorySize)
     {
         Validation.EqualToSize(nameof(hash), hash.Length, MaxHashSize);
-        Validation.NotEmpty(nameof(password), password.Length);
         Validation.NotLessThanMin(nameof(iterations), iterations, MinIterations);
         Validation.NotLessThanMin(nameof(memorySize), memorySize, MinMemorySize);
         Sodium.Initialise();
@@ -51,7 +49,6 @@ public static class Argon2id
     public static unsafe bool VerifyHash(ReadOnlySpan<byte> hash, ReadOnlySpan<byte> password)
     {
         Validation.SizeBetween(nameof(hash), hash.Length, MinHashSize, MaxHashSize);
-        Validation.NotEmpty(nameof(password), password.Length);
         Sodium.Initialise();
         fixed (byte* h = hash, p = password)
             return crypto_pwhash_str_verify(h, p, (ulong)password.Length) == 0;

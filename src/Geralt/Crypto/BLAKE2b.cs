@@ -20,7 +20,6 @@ public static class BLAKE2b
     public static unsafe void ComputeHash(Span<byte> hash, ReadOnlySpan<byte> message)
     {
         Validation.SizeBetween(nameof(hash), hash.Length, MinHashSize, MaxHashSize);
-        Validation.NotEmpty(nameof(message), message.Length);
         Sodium.Initialise();
         fixed (byte* h = hash, m = message)
         {
@@ -32,7 +31,6 @@ public static class BLAKE2b
     public static unsafe void ComputeTag(Span<byte> tag, ReadOnlySpan<byte> message, ReadOnlySpan<byte> key)
     {
         Validation.SizeBetween(nameof(tag), tag.Length, MinTagSize, MaxTagSize);
-        Validation.NotEmpty(nameof(message), message.Length);
         Validation.SizeBetween(nameof(key), key.Length, MinKeySize, MaxKeySize);
         Sodium.Initialise();
         fixed (byte* t = tag, m = message, k = key)
@@ -45,7 +43,6 @@ public static class BLAKE2b
     public static bool VerifyTag(ReadOnlySpan<byte> tag, ReadOnlySpan<byte> message, ReadOnlySpan<byte> key)
     {
         Validation.SizeBetween(nameof(tag), tag.Length, MinTagSize, MaxTagSize);
-        Validation.NotEmpty(nameof(message), message.Length);
         Validation.SizeBetween(nameof(key), key.Length, MinKeySize, MaxKeySize);
         Span<byte> computedTag = stackalloc byte[tag.Length];
         ComputeTag(computedTag, message, key);

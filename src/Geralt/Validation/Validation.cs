@@ -19,12 +19,6 @@ internal static class Validation
         if (size <= 0)
             throw new ArgumentOutOfRangeException(paramName, size, $"{paramName} must be greater than 0.");
     }
-    
-    internal static void GreaterThanMin(string paramName, int size, int minSize)
-    {
-        if (size <= minSize)
-            throw new ArgumentOutOfRangeException(paramName, size, $"{paramName} must be greater than {minSize}.");
-    }
 
     internal static void NotLessThanMin(string paramName, int size, int minSize)
     {

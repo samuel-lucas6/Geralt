@@ -11,7 +11,6 @@ public static class Poly1305
     public static unsafe void ComputeTag(Span<byte> tag, ReadOnlySpan<byte> message, ReadOnlySpan<byte> oneTimeKey)
     {
         Validation.EqualToSize(nameof(tag), tag.Length, TagSize);
-        Validation.NotEmpty(nameof(message), message.Length);
         Validation.EqualToSize(nameof(oneTimeKey), oneTimeKey.Length, KeySize);
         Sodium.Initialise();
         fixed (byte* t = tag, m = message, k = oneTimeKey)
@@ -24,7 +23,6 @@ public static class Poly1305
     public static unsafe bool VerifyTag(ReadOnlySpan<byte> tag, ReadOnlySpan<byte> message, ReadOnlySpan<byte> oneTimeKey)
     {
         Validation.EqualToSize(nameof(tag), tag.Length, TagSize);
-        Validation.NotEmpty(nameof(message), message.Length);
         Validation.EqualToSize(nameof(oneTimeKey), oneTimeKey.Length, KeySize);
         Sodium.Initialise();
         fixed (byte* t = tag, m = message, k = oneTimeKey)

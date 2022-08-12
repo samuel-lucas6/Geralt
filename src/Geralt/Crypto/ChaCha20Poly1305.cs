@@ -12,7 +12,6 @@ public static class ChaCha20Poly1305
     public static unsafe void Encrypt(Span<byte> ciphertext, ReadOnlySpan<byte> plaintext, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> key, ReadOnlySpan<byte> associatedData = default)
     {
         Validation.EqualToSize(nameof(ciphertext), ciphertext.Length, plaintext.Length + TagSize);
-        Validation.NotEmpty(nameof(plaintext), plaintext.Length);
         Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
         Validation.EqualToSize(nameof(key), key.Length, KeySize);
         Sodium.Initialise();
@@ -26,7 +25,7 @@ public static class ChaCha20Poly1305
     public static unsafe void Decrypt(Span<byte> plaintext, ReadOnlySpan<byte> ciphertext, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> key, ReadOnlySpan<byte> associatedData = default)
     {
         Validation.EqualToSize(nameof(plaintext), plaintext.Length, ciphertext.Length - TagSize);
-        Validation.GreaterThanMin(nameof(ciphertext), ciphertext.Length, TagSize);
+        Validation.NotLessThanMin(nameof(ciphertext), ciphertext.Length, TagSize);
         Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
         Validation.EqualToSize(nameof(key), key.Length, KeySize);
         Sodium.Initialise();

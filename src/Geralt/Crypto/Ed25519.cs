@@ -74,7 +74,6 @@ public static class Ed25519
     public static unsafe void Sign(Span<byte> signature, ReadOnlySpan<byte> message, ReadOnlySpan<byte> privateKey)
     {
         Validation.EqualToSize(nameof(signature), signature.Length, SignatureSize);
-        Validation.NotEmpty(nameof(message), message.Length);
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
         Sodium.Initialise();
         fixed (byte* s = signature, m = message, p = privateKey)
@@ -87,7 +86,6 @@ public static class Ed25519
     public static unsafe bool Verify(ReadOnlySpan<byte> signature, ReadOnlySpan<byte> message, ReadOnlySpan<byte> publicKey)
     {
         Validation.EqualToSize(nameof(signature), signature.Length, SignatureSize);
-        Validation.NotEmpty(nameof(message), message.Length);
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
         Sodium.Initialise();
         fixed (byte* s = signature, m = message, p = publicKey)
