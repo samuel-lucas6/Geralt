@@ -31,7 +31,8 @@ public class BLAKE2bHashAlgorithm : HashAlgorithm
 
     protected override void HashCore(byte[] message, int offset, int size)
     {
-        var buffer = Arrays.Slice(message, offset, size);
+        var buffer = new byte[size];
+        Array.Copy(message, offset, buffer, destinationIndex: 0, buffer.Length);
         int ret = crypto_generichash_update(_state, buffer, (ulong)buffer.Length);
         if (ret != 0) { throw new CryptographicException("Error updating hash."); }
     }
