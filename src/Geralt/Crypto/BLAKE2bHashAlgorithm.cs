@@ -6,8 +6,8 @@ namespace Geralt;
 
 public class BLAKE2bHashAlgorithm : HashAlgorithm
 {
-    private IntPtr _state;
-    private byte[]? _key;
+    private crypto_generichash_blake2b_state _state;
+    private readonly byte[]? _key;
     private readonly int _hashSize;
     private GCHandle _handle;
     
@@ -16,7 +16,6 @@ public class BLAKE2bHashAlgorithm : HashAlgorithm
         Validation.SizeBetween(nameof(hashSize), hashSize, BLAKE2b.MinHashSize, BLAKE2b.MaxHashSize);
         if (key != default) { Validation.SizeBetween(nameof(key), key.Length, BLAKE2b.MinKeySize, BLAKE2b.MaxKeySize); }
         Sodium.Initialise();
-        _state = Marshal.AllocHGlobal(Marshal.SizeOf<crypto_generichash_blake2b_state>());
         _key = key == default ? null : key.ToArray();
         _handle = GCHandle.Alloc(_key, GCHandleType.Pinned);
         _hashSize = hashSize;
@@ -25,7 +24,7 @@ public class BLAKE2bHashAlgorithm : HashAlgorithm
 
     public sealed override void Initialize()
     {
-        int ret = crypto_generichash_init(_state, _key, _key == null ? (nuint)0 : (nuint)_key.Length, (nuint)_hashSize);
+        int ret = crypto_generichash_init(ref _state, _key, _key == null ? (nuint)0 : (nuint)_key.Length, (nuint)_hashSize);
         if (ret != 0) { throw new CryptographicException("Error initialising hash."); }
     }
 
@@ -33,14 +32,14 @@ public class BLAKE2bHashAlgorithm : HashAlgorithm
     {
         var buffer = new byte[size];
         Array.Copy(message, offset, buffer, destinationIndex: 0, buffer.Length);
-        int ret = crypto_generichash_update(_state, buffer, (ulong)buffer.Length);
+        int ret = crypto_generichash_update(ref _state, buffer, (ulong)buffer.Length);
         if (ret != 0) { throw new CryptographicException("Error updating hash."); }
     }
 
     protected override byte[] HashFinal()
     {
         var hash = new byte[_hashSize];
-        int ret = crypto_generichash_final(_state, hash, (nuint)hash.Length);
+        int ret = crypto_generichash_final(ref _state, hash, (nuint)hash.Length);
         if (ret != 0) { throw new CryptographicException("Error finalising hash."); }
         return hash;
     }
@@ -50,10 +49,5 @@ public class BLAKE2bHashAlgorithm : HashAlgorithm
         CryptographicOperations.ZeroMemory(_key);
         _handle.Free();
         base.Dispose(disposing);
-    }
-
-    ~BLAKE2bHashAlgorithm()
-    {
-        Marshal.FreeHGlobal(_state);
     }
 }
