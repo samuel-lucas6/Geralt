@@ -7,8 +7,6 @@ public static class Spans
         checked
         {
             Validation.EqualToSize(nameof(buffer), buffer.Length, a.Length + b.Length);
-            Validation.NotEmpty(nameof(a), a.Length);
-            Validation.NotEmpty(nameof(b), b.Length);
             Validation.EqualToSize(nameof(a), a.Length, buffer.Length - b.Length);
             Validation.EqualToSize(nameof(b), b.Length, buffer.Length - a.Length);
             a.CopyTo(buffer.Slice(start: 0, a.Length));
@@ -21,9 +19,6 @@ public static class Spans
         checked
         {
             Validation.EqualToSize(nameof(buffer), buffer.Length, a.Length + b.Length + c.Length);
-            Validation.NotEmpty(nameof(a), a.Length);
-            Validation.NotEmpty(nameof(b), b.Length);
-            Validation.NotEmpty(nameof(c), c.Length);
             Validation.EqualToSize(nameof(a), a.Length, buffer.Length - b.Length - c.Length);
             Validation.EqualToSize(nameof(b), b.Length, buffer.Length - a.Length - c.Length);
             Validation.EqualToSize(nameof(c), c.Length, buffer.Length - a.Length - b.Length);
@@ -38,10 +33,6 @@ public static class Spans
         checked
         {
             Validation.EqualToSize(nameof(buffer), buffer.Length, a.Length + b.Length + c.Length + d.Length);
-            Validation.NotEmpty(nameof(a), a.Length);
-            Validation.NotEmpty(nameof(b), b.Length);
-            Validation.NotEmpty(nameof(c), c.Length);
-            Validation.NotEmpty(nameof(d), d.Length);
             Validation.EqualToSize(nameof(a), a.Length, buffer.Length - b.Length - c.Length - d.Length);
             Validation.EqualToSize(nameof(b), b.Length, buffer.Length - a.Length - c.Length - d.Length);
             Validation.EqualToSize(nameof(c), c.Length, buffer.Length - a.Length - b.Length - d.Length);
@@ -58,11 +49,6 @@ public static class Spans
         checked
         {
             Validation.EqualToSize(nameof(buffer), buffer.Length, a.Length + b.Length + c.Length + d.Length + e.Length);
-            Validation.NotEmpty(nameof(a), a.Length);
-            Validation.NotEmpty(nameof(b), b.Length);
-            Validation.NotEmpty(nameof(c), c.Length);
-            Validation.NotEmpty(nameof(d), d.Length);
-            Validation.NotEmpty(nameof(e), e.Length);
             Validation.EqualToSize(nameof(a), a.Length, buffer.Length - b.Length - c.Length - d.Length - e.Length);
             Validation.EqualToSize(nameof(b), b.Length, buffer.Length - a.Length - c.Length - d.Length - e.Length);
             Validation.EqualToSize(nameof(c), c.Length, buffer.Length - a.Length - b.Length - d.Length - e.Length);
@@ -81,12 +67,6 @@ public static class Spans
         checked
         {
             Validation.EqualToSize(nameof(buffer), buffer.Length, a.Length + b.Length + c.Length + d.Length + e.Length + f.Length);
-            Validation.NotEmpty(nameof(a), a.Length);
-            Validation.NotEmpty(nameof(b), b.Length);
-            Validation.NotEmpty(nameof(c), c.Length);
-            Validation.NotEmpty(nameof(d), d.Length);
-            Validation.NotEmpty(nameof(e), e.Length);
-            Validation.NotEmpty(nameof(f), f.Length);
             Validation.EqualToSize(nameof(a), a.Length, buffer.Length - b.Length - c.Length - d.Length - e.Length - f.Length);
             Validation.EqualToSize(nameof(b), b.Length, buffer.Length - a.Length - c.Length - d.Length - e.Length - f.Length);
             Validation.EqualToSize(nameof(c), c.Length, buffer.Length - a.Length - b.Length - d.Length - e.Length - f.Length);

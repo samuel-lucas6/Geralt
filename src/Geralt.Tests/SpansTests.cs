@@ -70,4 +70,27 @@ public class SpansTests
         Span<byte> expected = Concat(Array1, Array2, Array3, Array4, Array5, Array6);
         Assert.IsTrue(concatenated.SequenceEqual(expected));
     }
+    
+    [TestMethod]
+    public void Concat_TwoSpansBothEmpty()
+    {
+        Span<byte> empty1 = Span<byte>.Empty;
+        Span<byte> empty2 = Span<byte>.Empty;
+        Span<byte> concatenated = stackalloc byte[empty1.Length + empty2.Length];
+        Spans.Concat(concatenated, empty1, empty2);
+        Span<byte> expected = Concat(empty1.ToArray(), empty2.ToArray());
+        Assert.IsTrue(concatenated.SequenceEqual(expected));
+    }
+    
+    [TestMethod]
+    public void Concat_TwoSpansOneEmpty()
+    {
+        Span<byte> empty = Span<byte>.Empty;
+        Span<byte> concatenated = stackalloc byte[empty.Length + Array2.Length];
+        Spans.Concat(concatenated, empty, Array2);
+        Span<byte> expected = Concat(empty.ToArray(), Array2);
+        Assert.IsTrue(concatenated.SequenceEqual(expected));
+        Spans.Concat(concatenated, Array2, empty);
+        Assert.IsTrue(concatenated.SequenceEqual(expected));
+    }
 }
