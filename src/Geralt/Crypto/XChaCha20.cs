@@ -7,8 +7,9 @@ public static class XChaCha20
 {
     public const int KeySize = crypto_stream_xchacha20_KEYBYTES;
     public const int NonceSize = crypto_stream_xchacha20_NONCEBYTES;
+    public const int BlockSize = 64;
 
-    public static unsafe void Encrypt(Span<byte> ciphertext, ReadOnlySpan<byte> plaintext, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> key)
+    public static unsafe void Encrypt(Span<byte> ciphertext, ReadOnlySpan<byte> plaintext, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> key, ulong counter = 0)
     {
         Validation.EqualToSize(nameof(ciphertext), ciphertext.Length, plaintext.Length);
         Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
@@ -16,12 +17,12 @@ public static class XChaCha20
         Sodium.Initialise();
         fixed (byte* c = ciphertext, p = plaintext, n = nonce, k = key)
         {
-            int ret = crypto_stream_xchacha20_xor(c, p, (ulong)plaintext.Length, n, k);
+            int ret = crypto_stream_xchacha20_xor_ic(c, p, (ulong)plaintext.Length, n, counter, k);
             if (ret != 0) { throw new CryptographicException("Error encrypting plaintext."); }
         }
     }
 
-    public static unsafe void Decrypt(Span<byte> plaintext, ReadOnlySpan<byte> ciphertext, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> key)
+    public static unsafe void Decrypt(Span<byte> plaintext, ReadOnlySpan<byte> ciphertext, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> key, ulong counter = 0)
     {
         Validation.EqualToSize(nameof(plaintext), plaintext.Length, ciphertext.Length);
         Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
@@ -29,7 +30,7 @@ public static class XChaCha20
         Sodium.Initialise();
         fixed (byte* p = plaintext, c = ciphertext, n = nonce, k = key)
         {
-            int ret = crypto_stream_xchacha20_xor(p, c, (ulong)ciphertext.Length, n, k);
+            int ret = crypto_stream_xchacha20_xor_ic(p, c, (ulong)ciphertext.Length, n, counter, k);
             if (ret != 0) { throw new CryptographicException("Error decrypting ciphertext."); }
         }
     }
