@@ -8,6 +8,10 @@ namespace Geralt.Tests;
 [TestClass]
 public class ChaCha20Tests
 {
+    // RFC 8439 Section 2.6.2: https://datatracker.ietf.org/doc/html/rfc8439#section-2.6.2
+    private static readonly byte[] FillBuffer = Convert.FromHexString("8ad5a08b905f81cc815040274ab29471a833b637e3fd0da508dbb8e2fdd1a646");
+    private static readonly byte[] FillNonce = Convert.FromHexString("000000000001020304050607");
+    private static readonly byte[] FillKey = Convert.FromHexString("808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f");
     // RFC 8439 Appendix A.2: https://datatracker.ietf.org/doc/html/rfc8439#appendix-A.2
     private static readonly byte[] Plaintext = Convert.FromHexString("00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
     private static readonly byte[] Ciphertext = Convert.FromHexString("76b8e0ada0f13d90405d6ae55386bd28bdd219b8a08ded1aa836efcc8b770dc7da41597c5157488d7724e03fb8d84a376a43b8f41518a11cc387b669b2ee6586");
@@ -20,6 +24,61 @@ public class ChaCha20Tests
     private const uint Counter = 1;
     private const uint OverflowCounter = uint.MaxValue - 5;
 
+    [TestMethod]
+    public void Fill_ValidInputs()
+    {
+        Span<byte> buffer = stackalloc byte[FillBuffer.Length];
+        ChaCha20.Fill(buffer, FillNonce, FillKey);
+        Assert.IsTrue(buffer.SequenceEqual(FillBuffer));
+    }
+    
+    [TestMethod]
+    public void Fill_DifferentNonce()
+    {
+        Span<byte> buffer = stackalloc byte[FillBuffer.Length];
+        Span<byte> nonce = FillNonce.ToArray();
+        nonce[0]++;
+        ChaCha20.Fill(buffer, nonce, FillKey);
+        Assert.IsFalse(buffer.SequenceEqual(FillBuffer));
+    }
+    
+    [TestMethod]
+    public void Fill_DifferentKey()
+    {
+        Span<byte> buffer = stackalloc byte[FillBuffer.Length];
+        Span<byte> key = Key.ToArray();
+        key[0]++;
+        ChaCha20.Fill(buffer, FillNonce, key);
+        Assert.IsFalse(buffer.SequenceEqual(FillBuffer));
+    }
+    
+    [TestMethod]
+    public void Fill_InvalidBuffer()
+    {
+        var buffer = Array.Empty<byte>();
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ChaCha20.Fill(buffer, FillNonce, FillKey));
+    }
+    
+    [TestMethod]
+    public void Fill_InvalidNonce()
+    {
+        var buffer = new byte[FillBuffer.Length];
+        var nonce = new byte[ChaCha20.NonceSize - 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ChaCha20.Fill(buffer, nonce, FillKey));
+        nonce = new byte[ChaCha20.NonceSize + 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ChaCha20.Fill(buffer, nonce, FillKey));
+    }
+    
+    [TestMethod]
+    public void Fill_InvalidKey()
+    {
+        var buffer = new byte[FillBuffer.Length];
+        var key = new byte[ChaCha20.KeySize - 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ChaCha20.Fill(buffer, FillNonce, key));
+        key = new byte[ChaCha20.KeySize + 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ChaCha20.Fill(buffer, FillNonce, key));
+    }
+    
     [TestMethod]
     public void Encrypt_ValidInputs()
     {

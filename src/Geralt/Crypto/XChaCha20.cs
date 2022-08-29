@@ -9,6 +9,19 @@ public static class XChaCha20
     public const int NonceSize = crypto_stream_xchacha20_NONCEBYTES;
     public const int BlockSize = 64;
 
+    public static unsafe void Fill(Span<byte> buffer, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> key)
+    {
+        Validation.NotEmpty(nameof(buffer), buffer.Length);
+        Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
+        Validation.EqualToSize(nameof(key), key.Length, KeySize);
+        Sodium.Initialise();
+        fixed (byte* b = buffer, n = nonce, k = key)
+        {
+            int ret = crypto_stream_xchacha20(b, (ulong)buffer.Length, n, k);
+            if (ret != 0) { throw new CryptographicException("Error computing pseudorandom bytes."); }
+        }
+    }
+    
     public static unsafe void Encrypt(Span<byte> ciphertext, ReadOnlySpan<byte> plaintext, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> key, ulong counter = 0)
     {
         Validation.EqualToSize(nameof(ciphertext), ciphertext.Length, plaintext.Length);
