@@ -18,15 +18,15 @@ internal static partial class Interop
 
         [DllImport(DllName, CallingConvention = Convention)]
         internal static extern unsafe int crypto_generichash_blake2b_salt_personal(byte* hash, nuint hashLength, byte* message, ulong messageLength, byte* key, nuint keyLength, byte* salt, byte* personal);
-        
+
         [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern int crypto_generichash_init(ref crypto_generichash_blake2b_state state, byte[]? key, nuint keyLength, nuint outputLength);
-        
+        internal static extern unsafe int crypto_generichash_init(ref crypto_generichash_blake2b_state state, byte* key, nuint keyLength, nuint hashLength);
+
         [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern int crypto_generichash_update(ref crypto_generichash_blake2b_state state, byte[] message, ulong messageLength);
-        
+        internal static extern unsafe int crypto_generichash_update(ref crypto_generichash_blake2b_state state, byte* message, ulong messageLength);
+
         [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern int crypto_generichash_final(ref crypto_generichash_blake2b_state state, byte[] hash, nuint hashLength);
+        internal static extern unsafe int crypto_generichash_final(ref crypto_generichash_blake2b_state state, byte* hash, nuint hashLength);
         
         [StructLayout(LayoutKind.Explicit, Size = 384)]
         internal struct crypto_generichash_blake2b_state

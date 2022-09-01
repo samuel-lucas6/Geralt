@@ -4,7 +4,7 @@ using static Interop.Libsodium;
 
 namespace Geralt;
 
-public class BLAKE2bHashAlgorithm : HashAlgorithm
+public sealed class BLAKE2bHashAlgorithm : HashAlgorithm
 {
     private crypto_generichash_blake2b_state _state;
     private readonly byte[]? _key;
@@ -22,25 +22,34 @@ public class BLAKE2bHashAlgorithm : HashAlgorithm
         Initialize();
     }
 
-    public sealed override void Initialize()
+    public override unsafe void Initialize()
     {
-        int ret = crypto_generichash_init(ref _state, _key, _key == null ? (nuint)0 : (nuint)_key.Length, (nuint)_hashSize);
-        if (ret != 0) { throw new CryptographicException("Error initialising hash."); }
+        fixed (byte* k = _key)
+        {
+            int ret = crypto_generichash_init(ref _state, k, _key == null ? 0 : (nuint)_key.Length, (nuint)_hashSize);
+            if (ret != 0) { throw new CryptographicException("Error initialising hash."); }
+        }
     }
 
-    protected override void HashCore(byte[] message, int offset, int size)
+    protected override unsafe void HashCore(byte[] message, int offset, int size)
     {
         var buffer = new byte[size];
         Array.Copy(message, offset, buffer, destinationIndex: 0, buffer.Length);
-        int ret = crypto_generichash_update(ref _state, buffer, (ulong)buffer.Length);
-        if (ret != 0) { throw new CryptographicException("Error updating hash."); }
+        fixed (byte* b = buffer)
+        {
+            int ret = crypto_generichash_update(ref _state, b, (ulong)buffer.Length);
+            if (ret != 0) { throw new CryptographicException("Error updating hash."); }
+        }
     }
 
-    protected override byte[] HashFinal()
+    protected override unsafe byte[] HashFinal()
     {
         var hash = new byte[_hashSize];
-        int ret = crypto_generichash_final(ref _state, hash, (nuint)hash.Length);
-        if (ret != 0) { throw new CryptographicException("Error finalising hash."); }
+        fixed (byte* h = hash)
+        {
+            int ret = crypto_generichash_final(ref _state, h, (nuint)hash.Length);
+            if (ret != 0) { throw new CryptographicException("Error finalising hash."); }
+        }
         return hash;
     }
 

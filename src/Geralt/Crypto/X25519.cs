@@ -60,12 +60,12 @@ public static class X25519
         ComputeXCoordinate(xCoordinate, senderPrivateKey, recipientPublicKey);
         Span<byte> senderPublicKey = stackalloc byte[PublicKeySize];
         ComputePublicKey(senderPublicKey, senderPrivateKey);
-        Span<byte> message = stackalloc byte[xCoordinate.Length + senderPublicKey.Length + recipientPublicKey.Length];
-        Spans.Concat(message, xCoordinate, senderPublicKey, recipientPublicKey);
-        if (preSharedKey == default) { BLAKE2b.ComputeHash(sharedSecret, message); }
-        else { BLAKE2b.ComputeTag(sharedSecret, message, preSharedKey); }
+        using var blake2b = new IncrementalBLAKE2b(sharedSecret.Length, preSharedKey);
+        blake2b.Update(xCoordinate);
+        blake2b.Update(senderPublicKey);
+        blake2b.Update(recipientPublicKey);
+        blake2b.Finalize(sharedSecret);
         CryptographicOperations.ZeroMemory(xCoordinate);
-        CryptographicOperations.ZeroMemory(message);
     }
     
     public static unsafe void DeriveRecipientSharedSecret(Span<byte> sharedSecret, ReadOnlySpan<byte> recipientPrivateKey, ReadOnlySpan<byte> senderPublicKey, ReadOnlySpan<byte> preSharedKey = default)
@@ -78,12 +78,12 @@ public static class X25519
         ComputeXCoordinate(xCoordinate, recipientPrivateKey, senderPublicKey);
         Span<byte> recipientPublicKey = stackalloc byte[PublicKeySize];
         ComputePublicKey(recipientPublicKey, recipientPrivateKey);
-        Span<byte> message = stackalloc byte[xCoordinate.Length + senderPublicKey.Length + recipientPublicKey.Length];
-        Spans.Concat(message, xCoordinate, senderPublicKey, recipientPublicKey);
-        if (preSharedKey == default) { BLAKE2b.ComputeHash(sharedSecret, message); }
-        else { BLAKE2b.ComputeTag(sharedSecret, message, preSharedKey); }
+        using var blake2b = new IncrementalBLAKE2b(sharedSecret.Length, preSharedKey);
+        blake2b.Update(xCoordinate);
+        blake2b.Update(senderPublicKey);
+        blake2b.Update(recipientPublicKey);
+        blake2b.Finalize(sharedSecret);
         CryptographicOperations.ZeroMemory(xCoordinate);
-        CryptographicOperations.ZeroMemory(message);
     }
     
     public static unsafe void ComputeXCoordinate(Span<byte> xCoordinate, ReadOnlySpan<byte> senderPrivateKey, ReadOnlySpan<byte> recipientPublicKey)

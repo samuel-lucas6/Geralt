@@ -57,7 +57,9 @@ public class Poly1305Tests
     [TestMethod]
     public void ComputeTag_InvalidTag()
     {
-        var tag = Array.Empty<byte>();
+        var tag = new byte[Poly1305.TagSize - 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Poly1305.ComputeTag(tag, Message, Key));
+        tag = new byte[Poly1305.TagSize + 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Poly1305.ComputeTag(tag, Message, Key));
     }
     
@@ -116,5 +118,62 @@ public class Poly1305Tests
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Poly1305.VerifyTag(tag, Message, key));
         key = new byte[Poly1305.KeySize + 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Poly1305.VerifyTag(tag, Message, key));
+    }
+    
+    [TestMethod]
+    public void Incremental_ValidInputs()
+    {
+        Span<byte> tag = stackalloc byte[Poly1305.TagSize];
+        using var poly1305 = new IncrementalPoly1305(Key);
+        poly1305.Update(Message);
+        poly1305.Finalize(tag);
+        Assert.IsTrue(tag.SequenceEqual(Tag));
+    }
+    
+    [TestMethod]
+    public void Incremental_EmptyMessage()
+    {
+        Span<byte> tag = stackalloc byte[Poly1305.TagSize];
+        Span<byte> message = Span<byte>.Empty;
+        using var poly1305 = new IncrementalPoly1305(Key);
+        poly1305.Update(message);
+        poly1305.Finalize(tag);
+        Assert.IsFalse(tag.SequenceEqual(Tag));
+        bool valid = Poly1305.VerifyTag(tag, message, Key);
+        Assert.IsTrue(valid);
+    }
+    
+    [TestMethod]
+    public void Incremental_DifferentKey()
+    {
+        Span<byte> tag = stackalloc byte[Poly1305.TagSize];
+        Span<byte> key = Key.ToArray();
+        key[0]++;
+        using var poly1305 = new IncrementalPoly1305(key);
+        poly1305.Update(Message);
+        poly1305.Finalize(tag);
+        Assert.IsFalse(tag.SequenceEqual(Tag));
+        bool valid = Poly1305.VerifyTag(tag, Message, key);
+        Assert.IsTrue(valid);
+    }
+    
+    [TestMethod]
+    public void Incremental_InvalidKey()
+    {
+        var key = new byte[Poly1305.KeySize - 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new IncrementalPoly1305(key));
+        key = new byte[Poly1305.KeySize + 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new IncrementalPoly1305(key));
+    }
+    
+    [TestMethod]
+    public void Incremental_InvalidTag()
+    {
+        using var poly1305 = new IncrementalPoly1305(Key);
+        poly1305.Update(Message);
+        var tag = new byte[Poly1305.TagSize - 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => poly1305.Finalize(tag));
+        tag = new byte[Poly1305.TagSize + 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => poly1305.Finalize(tag));
     }
 }

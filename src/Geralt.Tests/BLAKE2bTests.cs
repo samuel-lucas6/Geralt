@@ -304,4 +304,82 @@ public class BLAKE2bTests
         salt = new byte[BLAKE2b.SaltSize + 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => BLAKE2b.DeriveKey(outputKeyingMaterial, Key, Personalisation, salt, Info));
     }
+    
+    [TestMethod]
+    public void IncrementalHash_ValidInputs()
+    {
+        Span<byte> hash = stackalloc byte[BLAKE2b.MaxHashSize];
+        using var blake2b = new IncrementalBLAKE2b(hash.Length);
+        blake2b.Update(Message);
+        blake2b.Finalize(hash);
+        Assert.IsTrue(hash.SequenceEqual(Hash));
+    }
+    
+    [TestMethod]
+    public void IncrementalHash_EmptyMessage()
+    {
+        Span<byte> hash = stackalloc byte[BLAKE2b.MaxHashSize];
+        Span<byte> message = Span<byte>.Empty;
+        using var blake2b = new IncrementalBLAKE2b(hash.Length);
+        blake2b.Update(message);
+        blake2b.Finalize(hash);
+        Assert.IsFalse(hash.SequenceEqual(new byte[hash.Length]));
+        Assert.IsFalse(hash.SequenceEqual(Hash));
+    }
+    
+    [TestMethod]
+    public void IncrementalHash_InvalidHash()
+    {
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new IncrementalBLAKE2b(BLAKE2b.MinHashSize - 1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new IncrementalBLAKE2b(BLAKE2b.MaxHashSize + 1));
+        using var blake2b = new IncrementalBLAKE2b(BLAKE2b.MaxHashSize);
+        blake2b.Update(Message);
+        var hash = new byte[BLAKE2b.MaxHashSize - 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => blake2b.Finalize(hash));
+        hash = new byte[BLAKE2b.MaxHashSize + 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => blake2b.Finalize(hash));
+    }
+    
+    [TestMethod]
+    public void IncrementalTag_ValidInputs()
+    {
+        Span<byte> tag = stackalloc byte[BLAKE2b.TagSize];
+        using var blake2b = new IncrementalBLAKE2b(tag.Length, Key);
+        blake2b.Update(Message);
+        blake2b.Finalize(tag);
+        Assert.IsTrue(tag.SequenceEqual(Tag));
+    }
+    
+    [TestMethod]
+    public void IncrementalTag_EmptyMessage()
+    {
+        Span<byte> tag = stackalloc byte[BLAKE2b.TagSize];
+        Span<byte> message = Span<byte>.Empty;
+        using var blake2b = new IncrementalBLAKE2b(tag.Length, Key);
+        blake2b.Update(message);
+        blake2b.Finalize(tag);
+        Assert.IsFalse(tag.SequenceEqual(new byte[tag.Length]));
+        Assert.IsFalse(tag.SequenceEqual(Tag));
+    }
+    
+    [TestMethod]
+    public void IncrementalTag_DifferentKey()
+    {
+        Span<byte> tag = stackalloc byte[BLAKE2b.TagSize];
+        Span<byte> key = Key.ToArray();
+        key[0]++;
+        using var blake2b = new IncrementalBLAKE2b(tag.Length, key);
+        blake2b.Update(Message);
+        blake2b.Finalize(tag);
+        Assert.IsFalse(tag.SequenceEqual(Tag));
+    }
+    
+    [TestMethod]
+    public void IncrementalTag_InvalidKey()
+    {
+        var key = new byte[BLAKE2b.MinKeySize - 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new IncrementalBLAKE2b(BLAKE2b.TagSize, key));
+        key = new byte[BLAKE2b.MaxKeySize + 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new IncrementalBLAKE2b(BLAKE2b.TagSize, key));
+    }
 }
