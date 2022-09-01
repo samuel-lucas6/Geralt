@@ -155,6 +155,14 @@ public class ChaCha20Poly1305Tests
         plaintext = new byte[Ciphertext.Length - ChaCha20Poly1305.TagSize - 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => ChaCha20Poly1305.Decrypt(plaintext, Ciphertext, Nonce, Key));
     }
+    
+    [TestMethod]
+    public void Decrypt_InvalidCiphertext()
+    {
+        var plaintext = new byte[Ciphertext.Length - ChaCha20Poly1305.TagSize];
+        var ciphertext = new byte[ChaCha20Poly1305.TagSize - 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ChaCha20Poly1305.Decrypt(plaintext, ciphertext, Nonce, Key));
+    }
 
     [TestMethod]
     public void Decrypt_InvalidNonce()

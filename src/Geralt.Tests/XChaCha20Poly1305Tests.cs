@@ -73,15 +73,7 @@ public class XChaCha20Poly1305Tests
         ciphertext = new byte[Plaintext.Length + XChaCha20Poly1305.TagSize - 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Encrypt(ciphertext, Plaintext, Nonce, Key));
     }
-    
-    [TestMethod]
-    public void Encrypt_InvalidPlaintext()
-    {
-        var ciphertext = new byte[Plaintext.Length + XChaCha20Poly1305.TagSize];
-        var plaintext = Array.Empty<byte>();
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Encrypt(ciphertext, plaintext, Nonce, Key));
-    }
-    
+
     [TestMethod]
     public void Encrypt_InvalidNonce()
     {
@@ -162,6 +154,14 @@ public class XChaCha20Poly1305Tests
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Decrypt(plaintext, Ciphertext, Nonce, Key));
         plaintext = new byte[Ciphertext.Length - XChaCha20Poly1305.TagSize - 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Decrypt(plaintext, Ciphertext, Nonce, Key));
+    }
+
+    [TestMethod]
+    public void Decrypt_InvalidCiphertext()
+    {
+        var plaintext = new byte[Ciphertext.Length - XChaCha20Poly1305.TagSize];
+        var ciphertext = new byte[XChaCha20Poly1305.TagSize - 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Decrypt(plaintext, ciphertext, Nonce, Key));
     }
 
     [TestMethod]
