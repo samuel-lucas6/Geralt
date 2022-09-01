@@ -1,55 +1,39 @@
 ﻿using System.Runtime.InteropServices;
 using System.Security.Cryptography;
-using static Interop.Libsodium;
 
 namespace Geralt;
 
 public sealed class BLAKE2bHashAlgorithm : HashAlgorithm
 {
-    private crypto_generichash_blake2b_state _state;
+    private IncrementalBLAKE2b _blake2b;
     private readonly byte[]? _key;
     private readonly int _hashSize;
     private GCHandle _handle;
     
     public BLAKE2bHashAlgorithm(int hashSize, ReadOnlySpan<byte> key = default)
     {
-        Validation.SizeBetween(nameof(hashSize), hashSize, BLAKE2b.MinHashSize, BLAKE2b.MaxHashSize);
-        if (key != default) { Validation.SizeBetween(nameof(key), key.Length, BLAKE2b.MinKeySize, BLAKE2b.MaxKeySize); }
-        Sodium.Initialise();
+        _blake2b = new IncrementalBLAKE2b(hashSize, key);
         _key = key == default ? null : key.ToArray();
         _handle = GCHandle.Alloc(_key, GCHandleType.Pinned);
         _hashSize = hashSize;
-        Initialize();
     }
 
-    public override unsafe void Initialize()
+    public override void Initialize()
     {
-        fixed (byte* k = _key)
-        {
-            int ret = crypto_generichash_init(ref _state, k, _key == null ? 0 : (nuint)_key.Length, (nuint)_hashSize);
-            if (ret != 0) { throw new CryptographicException("Error initialising hash."); }
-        }
+        _blake2b = new IncrementalBLAKE2b(_hashSize, _key);
     }
 
-    protected override unsafe void HashCore(byte[] message, int offset, int size)
+    protected override void HashCore(byte[] message, int offset, int size)
     {
         var buffer = new byte[size];
         Array.Copy(message, offset, buffer, destinationIndex: 0, buffer.Length);
-        fixed (byte* b = buffer)
-        {
-            int ret = crypto_generichash_update(ref _state, b, (ulong)buffer.Length);
-            if (ret != 0) { throw new CryptographicException("Error updating hash."); }
-        }
+        _blake2b.Update(buffer);
     }
 
-    protected override unsafe byte[] HashFinal()
+    protected override byte[] HashFinal()
     {
         var hash = new byte[_hashSize];
-        fixed (byte* h = hash)
-        {
-            int ret = crypto_generichash_final(ref _state, h, (nuint)hash.Length);
-            if (ret != 0) { throw new CryptographicException("Error finalising hash."); }
-        }
+        _blake2b.Finalize(hash);
         return hash;
     }
 
@@ -57,6 +41,7 @@ public sealed class BLAKE2bHashAlgorithm : HashAlgorithm
     {
         CryptographicOperations.ZeroMemory(_key);
         _handle.Free();
+        _blake2b.Dispose();
         base.Dispose(disposing);
     }
 }

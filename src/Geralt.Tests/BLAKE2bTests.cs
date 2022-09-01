@@ -57,6 +57,9 @@ public class BLAKE2bTests
         using var memoryStream = new MemoryStream(Message, writable: false);
         hash = blake2b.ComputeHash(memoryStream);
         Assert.IsTrue(hash.SequenceEqual(Hash));
+        memoryStream.Position = 0;
+        hash = blake2b.ComputeHash(memoryStream);
+        Assert.IsTrue(hash.SequenceEqual(Hash));
     }
     
     [TestMethod]
@@ -132,6 +135,9 @@ public class BLAKE2bTests
         var tag = new byte[BLAKE2b.TagSize];
         using var blake2b = new BLAKE2bHashAlgorithm(tag.Length, Key);
         using var memoryStream = new MemoryStream(Message, writable: false);
+        tag = blake2b.ComputeHash(memoryStream);
+        Assert.IsTrue(tag.SequenceEqual(Tag));
+        memoryStream.Position = 0;
         tag = blake2b.ComputeHash(memoryStream);
         Assert.IsTrue(tag.SequenceEqual(Tag));
     }
