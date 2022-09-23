@@ -10,7 +10,7 @@
 - **Secure**: libsodium was [audited](https://www.privateinternetaccess.com/blog/libsodium-audit-results/) in 2017 and is the library of choice for [lots](https://doc.libsodium.org/libsodium_users) of projects and [even](https://doc.libsodium.org/libsodium_users#companies-using-libsodium) large companies.
 - **Fast**: libsodium is [faster](https://monocypher.org/speed) than many other cryptographic libraries. Furthermore, Geralt uses [Span&lt;T&gt;](https://docs.microsoft.com/en-us/archive/msdn-magazine/2017/connect/csharp-all-about-span-exploring-a-new-net-mainstay) buffers to avoid memory allocations.
 
-For more information, please view to the following resources:
+For more information, please view the following resources:
 
 |                           |                                                  |
 |:------------------------- |:------------------------------------------------ |
