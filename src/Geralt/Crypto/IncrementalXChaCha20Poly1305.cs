@@ -91,7 +91,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
 
     public unsafe void Pull(Span<byte> plaintextChunk, ReadOnlySpan<byte> ciphertextChunk, ReadOnlySpan<byte> associatedData, ref byte tag)
     {
-        if (!_forDecryption) { throw new InvalidOperationException("Cannot pull from an encryption stream. "); }
+        if (!_forDecryption) { throw new InvalidOperationException("Cannot pull from an encryption stream."); }
         Validation.EqualToSize(nameof(plaintextChunk), plaintextChunk.Length, ciphertextChunk.Length - TagSize);
         fixed (byte* c = ciphertextChunk, p = plaintextChunk, a = associatedData)
         {
@@ -102,7 +102,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
 
     public unsafe void Pull(Span<byte> plaintextChunk, ReadOnlySpan<byte> ciphertextChunk, ref byte tag)
     {
-        if (!_forDecryption) { throw new InvalidOperationException("Cannot pull from an encryption stream. "); }
+        if (!_forDecryption) { throw new InvalidOperationException("Cannot pull from an encryption stream."); }
         fixed (byte* c = ciphertextChunk, p = plaintextChunk)
         {
             int ret = crypto_secretstream_xchacha20poly1305_pull(ref _state, p, out _, ref tag, c, (ulong)ciphertextChunk.Length, null, 0);
