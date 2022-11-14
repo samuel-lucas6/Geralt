@@ -6,7 +6,7 @@ namespace Geralt;
 public sealed class IncrementalXChaCha20Poly1305 : IDisposable
 {
     private crypto_secretstream_xchacha20poly1305_state _state;
-    private bool _decryption;
+    private readonly bool _decryption;
 
     /// <summary>
     /// Size of the authentication tag which gets appended to each ciphertext chunk.
@@ -66,18 +66,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
         }
     }
 
-    public unsafe void Push(Span<byte> ciphertextChunk, ReadOnlySpan<byte> plaintextChunk, StreamFlag flag = StreamFlag.Message)
-    {
-        if (_decryption) { throw new InvalidOperationException("Cannot push into a decryption stream."); }
-        Validation.EqualToSize(nameof(ciphertextChunk), ciphertextChunk.Length, plaintextChunk.Length + TagSize);
-        fixed (byte* c = ciphertextChunk, p = plaintextChunk)
-        {
-            int ret = crypto_secretstream_xchacha20poly1305_push(ref _state, c, out _, p, (ulong)plaintextChunk.Length, null, 0, (byte)(int)flag);
-            if (ret != 0) { throw new CryptographicException("Error encrypting plaintext chunk."); }
-        }
-    }
-
-    public unsafe void Push(Span<byte> ciphertextChunk, ReadOnlySpan<byte> plaintextChunk, ReadOnlySpan<byte> associatedData, StreamFlag flag = StreamFlag.Message)
+    public unsafe void Push(Span<byte> ciphertextChunk, ReadOnlySpan<byte> plaintextChunk, StreamFlag flag = StreamFlag.Message, ReadOnlySpan<byte> associatedData = default)
     {
         if (_decryption) { throw new InvalidOperationException("Cannot push into a decryption stream."); }
         Validation.EqualToSize(nameof(ciphertextChunk), ciphertextChunk.Length, plaintextChunk.Length + TagSize);
@@ -88,7 +77,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
         }
     }
 
-    public unsafe void Pull(Span<byte> plaintextChunk, ReadOnlySpan<byte> ciphertextChunk, ReadOnlySpan<byte> associatedData, ref StreamFlag flag)
+    public unsafe void Pull(Span<byte> plaintextChunk, ReadOnlySpan<byte> ciphertextChunk, ref StreamFlag flag, ReadOnlySpan<byte> associatedData = default)
     {
         if (!_decryption) { throw new InvalidOperationException("Cannot pull from an encryption stream."); }
         Validation.EqualToSize(nameof(plaintextChunk), plaintextChunk.Length, ciphertextChunk.Length - TagSize);
