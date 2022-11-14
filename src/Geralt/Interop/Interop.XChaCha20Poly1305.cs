@@ -12,9 +12,6 @@ internal static partial class Interop
         internal const int crypto_secretstream_xchacha20poly1305_HEADERBYTES = 24;
         internal const int crypto_secretstream_xchacha20poly1305_KEYBYTES = 32;
 
-        // Not sure how or whether to handle this
-        // internal const long crypto_secretstream_xchacha20poly1305_MESSAGEBYTES_MAX = big number;
-
         internal const byte crypto_secretstream_xchacha20poly1305_TAG_MESSAGE = 0x00;
         internal const byte crypto_secretstream_xchacha20poly1305_TAG_PUSH = 0x01;
         internal const byte crypto_secretstream_xchacha20poly1305_TAG_REKEY = 0x02;
