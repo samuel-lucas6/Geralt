@@ -43,13 +43,9 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
     /// </summary>
     public const byte TagReKey = crypto_secretstream_xchacha20poly1305_TAG_REKEY;
 
-    public IncrementalXChaCha20Poly1305(bool forDecryption, Span<byte> header, ReadOnlySpan<byte> key = default)
+    public IncrementalXChaCha20Poly1305(bool forDecryption, Span<byte> header, ReadOnlySpan<byte> key)
     {
         _forDecryption = forDecryption;
-        if (_forDecryption && key == default)
-        {
-            throw new ArgumentNullException(nameof(key), $"{nameof(key)} must be provided to initialize for decryption.");
-        }
         Validation.EqualToSize(nameof(header), header.Length, HeaderBytes);
         Validation.EqualToSize(nameof(key), key.Length, KeySize);
         Sodium.Initialise();
