@@ -358,7 +358,7 @@ public class XChaCha20Poly1305Tests
         using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, header, Key);
         decryptor.Pull(plaintext[0..plaintext1Length].AsSpan(), ciphertext1, ref outFlag);
         Assert.AreEqual(IncrementalXChaCha20Poly1305.StreamFlag.Message, outFlag);
-        Assert.ThrowsException<CryptographicException>(() => decryptor.Pull(plaintext, ciphertext2, ref outFlag));
+        Assert.ThrowsException<CryptographicException>(() => decryptor.Pull(plaintext[plaintext1Length..(plaintext1Length + plaintext2Length)], ciphertext2, ref outFlag));
     }
 
     [TestMethod]

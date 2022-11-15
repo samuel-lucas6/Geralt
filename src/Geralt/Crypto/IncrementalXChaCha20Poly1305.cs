@@ -90,18 +90,6 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
         }
     }
 
-    public unsafe void Pull(Span<byte> plaintextChunk, ReadOnlySpan<byte> ciphertextChunk, ref StreamFlag flag)
-    {
-        if (!_decryption) { throw new InvalidOperationException("Cannot pull from an encryption stream."); }
-        fixed (byte* c = ciphertextChunk, p = plaintextChunk)
-        {
-            byte outFlag = 0x00;
-            int ret = crypto_secretstream_xchacha20poly1305_pull(ref _state, p, out _, ref outFlag, c, (ulong)ciphertextChunk.Length, null, 0);
-            flag = (StreamFlag)(int)outFlag;
-            if (ret != 0) { throw new CryptographicException("Error decrypting ciphertext chunk."); }
-        }
-    }
-
     public unsafe void Rekey()
     {
         crypto_secretstream_xchacha20poly1305_rekey(ref _state);
