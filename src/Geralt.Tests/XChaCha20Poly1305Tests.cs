@@ -230,7 +230,7 @@ public class XChaCha20Poly1305Tests
         Span<byte> header = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
         Span<byte> plaintext = stackalloc byte[Plaintext.Length];
         Span<byte> ciphertext = stackalloc byte[Plaintext.Length + IncrementalXChaCha20Poly1305.TagSize];
-        Span<byte> associatedData = new byte[] { 0x01, 0x02, 0x03, 0x04 };
+        Span<byte> associatedData = stackalloc byte[] { 0x01, 0x02, 0x03, 0x04 };
         IncrementalXChaCha20Poly1305.StreamFlag outFlag = IncrementalXChaCha20Poly1305.StreamFlag.Message;
         using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, header, Key);
         encryptor.Push(ciphertext, Plaintext, IncrementalXChaCha20Poly1305.StreamFlag.Final, associatedData);
@@ -241,7 +241,7 @@ public class XChaCha20Poly1305Tests
     }
 
     [TestMethod]
-    public void IncrementalEncryptDecrypt_ValidInputs_WithReKey()
+    public void IncrementalEncryptDecrypt_ValidInputs_WithRekey()
     {
         Span<byte> header = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
         int plaintext1Length = 50, plaintext2Length = 50;
@@ -340,7 +340,7 @@ public class XChaCha20Poly1305Tests
     }
 
     [TestMethod]
-    public void IncrementalEncryptDecrypt_MissingReKeyDuringEncryption()
+    public void IncrementalEncryptDecrypt_MissingRekeyDuringEncryption()
     {
         Span<byte> header = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
         int plaintext1Length = 50, plaintext2Length = 50;
