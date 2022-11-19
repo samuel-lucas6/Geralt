@@ -269,7 +269,6 @@ public class XChaCha20Poly1305Tests
         Span<byte> header = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
         byte[] plaintext = new byte[Plaintext.Length];
         byte[] ciphertext = new byte[Plaintext.Length + IncrementalXChaCha20Poly1305.TagSize];
-        IncrementalXChaCha20Poly1305.StreamFlag outFlag = IncrementalXChaCha20Poly1305.StreamFlag.Message;
         using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, header, Key);
         encryptor.Push(ciphertext, Plaintext, associatedData: Span<byte>.Empty, IncrementalXChaCha20Poly1305.StreamFlag.Final);
         header[0]++;
