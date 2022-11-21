@@ -15,7 +15,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
     public enum StreamFlag
     {
         Message = crypto_secretstream_xchacha20poly1305_TAG_MESSAGE,
-        Push = crypto_secretstream_xchacha20poly1305_TAG_PUSH,
+        Boundary = crypto_secretstream_xchacha20poly1305_TAG_PUSH,
         Rekey = crypto_secretstream_xchacha20poly1305_TAG_REKEY,
         Final = crypto_secretstream_xchacha20poly1305_TAG_FINAL
     }
@@ -40,7 +40,12 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
         }
     }
 
-    public unsafe void Push(Span<byte> ciphertextChunk, ReadOnlySpan<byte> plaintextChunk, ReadOnlySpan<byte> associatedData = default, StreamFlag streamFlag = StreamFlag.Message)
+    public void Push(Span<byte> ciphertextChunk, ReadOnlySpan<byte> plaintextChunk, StreamFlag streamFlag = StreamFlag.Message)
+    {
+        Push(ciphertextChunk, plaintextChunk, associatedData: default, streamFlag);
+    }
+    
+    public unsafe void Push(Span<byte> ciphertextChunk, ReadOnlySpan<byte> plaintextChunk, ReadOnlySpan<byte> associatedData, StreamFlag streamFlag = StreamFlag.Message)
     {
         if (_decryption) { throw new InvalidOperationException("Cannot push into a decryption stream."); }
         Validation.EqualToSize(nameof(ciphertextChunk), ciphertextChunk.Length, plaintextChunk.Length + TagSize);

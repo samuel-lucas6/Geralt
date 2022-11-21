@@ -191,7 +191,7 @@ public class XChaCha20Poly1305Tests
         Span<byte> plaintext = stackalloc byte[Plaintext.Length];
         Span<byte> ciphertext = stackalloc byte[Plaintext.Length + IncrementalXChaCha20Poly1305.TagSize];
         using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, header, Key);
-        encryptor.Push(ciphertext, Plaintext, associatedData: Span<byte>.Empty, IncrementalXChaCha20Poly1305.StreamFlag.Final);
+        encryptor.Push(ciphertext, Plaintext, IncrementalXChaCha20Poly1305.StreamFlag.Final);
         using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, header, Key);
         var streamFlag = decryptor.Pull(plaintext, ciphertext);
         Assert.AreEqual(IncrementalXChaCha20Poly1305.StreamFlag.Final, streamFlag);
@@ -211,7 +211,7 @@ public class XChaCha20Poly1305Tests
         using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, header, Key);
         encryptor.Push(ciphertext1, Plaintext.AsSpan()[..plaintext1Length]);
         encryptor.Push(ciphertext2, Plaintext.AsSpan()[plaintext1Length..(plaintext1Length + plaintext2Length)]);
-        encryptor.Push(ciphertext3, Plaintext.AsSpan()[^plaintext3Length..], associatedData: Span<byte>.Empty, IncrementalXChaCha20Poly1305.StreamFlag.Final);
+        encryptor.Push(ciphertext3, Plaintext.AsSpan()[^plaintext3Length..], IncrementalXChaCha20Poly1305.StreamFlag.Final);
         using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, header, Key);
         var streamFlag = decryptor.Pull(plaintext[..plaintext1Length], ciphertext1);
         Assert.AreEqual(IncrementalXChaCha20Poly1305.StreamFlag.Message, streamFlag);
@@ -251,7 +251,7 @@ public class XChaCha20Poly1305Tests
         encryptor.Push(ciphertext1, Plaintext.AsSpan()[..plaintext1Length]);
         encryptor.Rekey();
         encryptor.Push(ciphertext2, Plaintext.AsSpan()[plaintext1Length..(plaintext1Length + plaintext2Length)]);
-        encryptor.Push(ciphertext3, Plaintext.AsSpan()[^plaintext3Length..], associatedData: Span<byte>.Empty, IncrementalXChaCha20Poly1305.StreamFlag.Final);
+        encryptor.Push(ciphertext3, Plaintext.AsSpan()[^plaintext3Length..], IncrementalXChaCha20Poly1305.StreamFlag.Final);
         using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, header, Key);
         var streamFlag = decryptor.Pull(plaintext[..plaintext1Length], ciphertext1);
         Assert.AreEqual(IncrementalXChaCha20Poly1305.StreamFlag.Message, streamFlag);
@@ -270,7 +270,7 @@ public class XChaCha20Poly1305Tests
         byte[] plaintext = new byte[Plaintext.Length];
         byte[] ciphertext = new byte[Plaintext.Length + IncrementalXChaCha20Poly1305.TagSize];
         using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, header, Key);
-        encryptor.Push(ciphertext, Plaintext, associatedData: Span<byte>.Empty, IncrementalXChaCha20Poly1305.StreamFlag.Final);
+        encryptor.Push(ciphertext, Plaintext, IncrementalXChaCha20Poly1305.StreamFlag.Final);
         header[0]++;
         using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, header, Key);
         Assert.ThrowsException<CryptographicException>(() => decryptor.Pull(plaintext, ciphertext));
@@ -283,7 +283,7 @@ public class XChaCha20Poly1305Tests
         byte[] plaintext = new byte[Plaintext.Length];
         byte[] ciphertext = new byte[Plaintext.Length + IncrementalXChaCha20Poly1305.TagSize];
         using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, header, Key);
-        encryptor.Push(ciphertext, Plaintext, associatedData: Span<byte>.Empty, IncrementalXChaCha20Poly1305.StreamFlag.Final);
+        encryptor.Push(ciphertext, Plaintext, IncrementalXChaCha20Poly1305.StreamFlag.Final);
         ciphertext[0]++;
         using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, header, Key);
         Assert.ThrowsException<CryptographicException>(() => decryptor.Pull(plaintext, ciphertext));
@@ -296,7 +296,7 @@ public class XChaCha20Poly1305Tests
         byte[] plaintext = new byte[Plaintext.Length];
         byte[] ciphertext = new byte[Plaintext.Length + IncrementalXChaCha20Poly1305.TagSize];
         using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, header, Key);
-        encryptor.Push(ciphertext, Plaintext, associatedData: Span<byte>.Empty, IncrementalXChaCha20Poly1305.StreamFlag.Final);
+        encryptor.Push(ciphertext, Plaintext, IncrementalXChaCha20Poly1305.StreamFlag.Final);
         ciphertext[^1]++;
         using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, header, Key);
         Assert.ThrowsException<CryptographicException>(() => decryptor.Pull(plaintext, ciphertext));
@@ -309,7 +309,7 @@ public class XChaCha20Poly1305Tests
         byte[] plaintext = new byte[Plaintext.Length];
         byte[] ciphertext = new byte[Plaintext.Length + IncrementalXChaCha20Poly1305.TagSize];
         using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, header, Key);
-        encryptor.Push(ciphertext, Plaintext, associatedData: Span<byte>.Empty, IncrementalXChaCha20Poly1305.StreamFlag.Final);
+        encryptor.Push(ciphertext, Plaintext, IncrementalXChaCha20Poly1305.StreamFlag.Final);
         var key = Key.ToArray();
         key[0]++;
         using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, header, key);
@@ -344,7 +344,7 @@ public class XChaCha20Poly1305Tests
         encryptor.Push(ciphertext1, Plaintext.AsSpan()[..plaintext1Length]);
         encryptor.Rekey();
         encryptor.Push(ciphertext2, Plaintext.AsSpan()[plaintext1Length..(plaintext1Length + plaintext2Length)]);
-        encryptor.Push(ciphertext3, Plaintext.AsSpan()[^plaintext3Length..], associatedData: Span<byte>.Empty, IncrementalXChaCha20Poly1305.StreamFlag.Final);
+        encryptor.Push(ciphertext3, Plaintext.AsSpan()[^plaintext3Length..], IncrementalXChaCha20Poly1305.StreamFlag.Final);
         using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, header, Key);
         var streamFlag = decryptor.Pull(plaintext.AsSpan()[..plaintext1Length], ciphertext1);
         Assert.AreEqual(IncrementalXChaCha20Poly1305.StreamFlag.Message, streamFlag);
@@ -368,7 +368,7 @@ public class XChaCha20Poly1305Tests
         byte[] plaintext = new byte[Plaintext.Length];
         byte[] ciphertext = new byte[Plaintext.Length + IncrementalXChaCha20Poly1305.TagSize];
         using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, header, Key);
-        encryptor.Push(ciphertext, Plaintext, associatedData: Span<byte>.Empty, IncrementalXChaCha20Poly1305.StreamFlag.Final);
+        encryptor.Push(ciphertext, Plaintext, IncrementalXChaCha20Poly1305.StreamFlag.Final);
         using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, header, Key);
         Assert.ThrowsException<InvalidOperationException>(() => decryptor.Push(ciphertext, plaintext));
     }
