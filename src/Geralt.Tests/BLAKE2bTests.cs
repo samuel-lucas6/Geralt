@@ -52,23 +52,21 @@ public class BLAKE2bTests
     [TestMethod]
     public void ComputeHashStream_ValidInputs()
     {
-        var hash = new byte[BLAKE2b.MaxHashSize];
-        using var blake2b = new BLAKE2bHashAlgorithm(hash.Length);
-        using var memoryStream = new MemoryStream(Message, writable: false);
-        hash = blake2b.ComputeHash(memoryStream);
+        Span<byte> hash = stackalloc byte[BLAKE2b.MaxHashSize];
+        using var message = new MemoryStream(Message, writable: false);
+        BLAKE2b.ComputeHash(hash, message);
         Assert.IsTrue(hash.SequenceEqual(Hash));
-        memoryStream.Position = 0;
-        hash = blake2b.ComputeHash(memoryStream);
+        message.Position = 0;
+        BLAKE2b.ComputeHash(hash, message);
         Assert.IsTrue(hash.SequenceEqual(Hash));
     }
     
     [TestMethod]
     public void ComputeHashStream_EmptyMessage()
     {
-        var hash = new byte[BLAKE2b.MaxHashSize];
-        using var blake2b = new BLAKE2bHashAlgorithm(hash.Length);
-        using var memoryStream = new MemoryStream(Array.Empty<byte>(), writable: false);
-        hash = blake2b.ComputeHash(memoryStream);
+        Span<byte> hash = stackalloc byte[BLAKE2b.MaxHashSize];
+        using var message = new MemoryStream(Array.Empty<byte>(), writable: false);
+        BLAKE2b.ComputeHash(hash, message);
         Assert.IsFalse(hash.SequenceEqual(new byte[hash.Length]));
         Assert.IsFalse(hash.SequenceEqual(Hash));
     }
@@ -77,9 +75,18 @@ public class BLAKE2bTests
     public void ComputeHashStream_InvalidHash()
     {
         var hash = new byte[BLAKE2b.MinHashSize - 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new BLAKE2bHashAlgorithm(hash.Length));
+        using var message = new MemoryStream(Message, writable: false);
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => BLAKE2b.ComputeHash(hash, message));
         hash = new byte[BLAKE2b.MaxHashSize + 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new BLAKE2bHashAlgorithm(hash.Length));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => BLAKE2b.ComputeHash(hash, message));
+    }
+    
+    [TestMethod]
+    public void ComputeHashStream_InvalidMessage()
+    {
+        var hash = new byte[BLAKE2b.MaxHashSize];
+        using MemoryStream message = null;
+        Assert.ThrowsException<ArgumentNullException>(() => BLAKE2b.ComputeHash(hash, message));
     }
     
     [TestMethod]
@@ -127,50 +134,6 @@ public class BLAKE2bTests
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => BLAKE2b.ComputeTag(tag, Message, key));
         key = new byte[BLAKE2b.MaxKeySize + 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => BLAKE2b.ComputeTag(tag, Message, key));
-    }
-    
-    [TestMethod]
-    public void ComputeTagStream_ValidInputs()
-    {
-        var tag = new byte[BLAKE2b.TagSize];
-        using var blake2b = new BLAKE2bHashAlgorithm(tag.Length, Key);
-        using var memoryStream = new MemoryStream(Message, writable: false);
-        tag = blake2b.ComputeHash(memoryStream);
-        Assert.IsTrue(tag.SequenceEqual(Tag));
-        memoryStream.Position = 0;
-        tag = blake2b.ComputeHash(memoryStream);
-        Assert.IsTrue(tag.SequenceEqual(Tag));
-    }
-    
-    [TestMethod]
-    public void ComputeTagStream_DifferentKey()
-    {
-        var tag = new byte[BLAKE2b.TagSize];
-        using var blake2b = new BLAKE2bHashAlgorithm(tag.Length, DifferentKey);
-        using var memoryStream = new MemoryStream(Message, writable: false);
-        tag = blake2b.ComputeHash(memoryStream);
-        Assert.IsFalse(tag.SequenceEqual(Tag));
-    }
-    
-    [TestMethod]
-    public void ComputeTagStream_EmptyMessage()
-    {
-        var tag = new byte[BLAKE2b.TagSize];
-        using var blake2b = new BLAKE2bHashAlgorithm(tag.Length, Key);
-        using var memoryStream = new MemoryStream(Array.Empty<byte>(), writable: false);
-        tag = blake2b.ComputeHash(memoryStream);
-        Assert.IsFalse(tag.SequenceEqual(new byte[tag.Length]));
-        Assert.IsFalse(tag.SequenceEqual(Tag));
-    }
-    
-    [TestMethod]
-    public void ComputeTagStream_InvalidKey()
-    {
-        var tag = new byte[BLAKE2b.TagSize];
-        var key = new byte[BLAKE2b.MinKeySize - 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new BLAKE2bHashAlgorithm(tag.Length, key));
-        key = new byte[BLAKE2b.MaxKeySize + 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new BLAKE2bHashAlgorithm(tag.Length, key));
     }
 
     [TestMethod]

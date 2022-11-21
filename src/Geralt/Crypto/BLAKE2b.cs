@@ -16,6 +16,7 @@ public static class BLAKE2b
     public const int MaxTagSize = MaxHashSize;
     public const int MinKeySize = crypto_generichash_KEYBYTES;
     public const int MaxKeySize = crypto_generichash_KEYBYTES_MAX;
+    private const int StreamBufferSize = 4096;
 
     public static unsafe void ComputeHash(Span<byte> hash, ReadOnlySpan<byte> message)
     {
@@ -23,9 +24,24 @@ public static class BLAKE2b
         Sodium.Initialise();
         fixed (byte* h = hash, m = message)
         {
-            int ret = crypto_generichash_blake2b(h, (nuint)hash.Length, m, (ulong)message.Length, key: null, keyLength: (nuint)0);
+            int ret = crypto_generichash_blake2b(h, (nuint)hash.Length, m, (ulong)message.Length, key: null, keyLength: 0);
             if (ret != 0) { throw new CryptographicException("Error computing hash."); }
         }
+    }
+    
+    public static void ComputeHash(Span<byte> hash, Stream message)
+    {
+        Validation.SizeBetween(nameof(hash), hash.Length, MinHashSize, MaxHashSize);
+        Validation.NotNull(nameof(message), message);
+        int bytesRead;
+        Span<byte> buffer = new byte[StreamBufferSize];
+        using var blake2b = new IncrementalBLAKE2b(hash.Length);
+        while ((bytesRead = message.Read(buffer)) > 0)
+        {
+            blake2b.Update(buffer[..bytesRead]);
+        }
+        CryptographicOperations.ZeroMemory(buffer);
+        blake2b.Finalize(hash);
     }
 
     public static unsafe void ComputeTag(Span<byte> tag, ReadOnlySpan<byte> message, ReadOnlySpan<byte> key)
