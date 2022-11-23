@@ -30,10 +30,10 @@ internal static partial class Interop
         internal static extern unsafe int crypto_secretstream_xchacha20poly1305_init_pull(ref crypto_secretstream_xchacha20poly1305_state state, byte* header, byte* key);
 
         [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_secretstream_xchacha20poly1305_push(ref crypto_secretstream_xchacha20poly1305_state state, byte* ciphertextChunk, out ulong ciphertextChunkLength, byte* plaintextChunk, ulong plaintextChunkLength, byte* associatedData, ulong associatedDataLength, byte streamFlag);
+        internal static extern unsafe int crypto_secretstream_xchacha20poly1305_push(ref crypto_secretstream_xchacha20poly1305_state state, byte* ciphertextChunk, out ulong ciphertextChunkLength, byte* plaintextChunk, ulong plaintextChunkLength, byte* associatedData, ulong associatedDataLength, byte chunkFlag);
 
         [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_secretstream_xchacha20poly1305_pull(ref crypto_secretstream_xchacha20poly1305_state state, byte* plaintext, out ulong plaintextLength, out byte streamFlag, byte* ciphertextChunk, ulong ciphertextChunkLength, byte* associatedData, ulong associatedDataLength);
+        internal static extern unsafe int crypto_secretstream_xchacha20poly1305_pull(ref crypto_secretstream_xchacha20poly1305_state state, byte* plaintext, out ulong plaintextLength, out byte chunkFlag, byte* ciphertextChunk, ulong ciphertextChunkLength, byte* associatedData, ulong associatedDataLength);
 
         [DllImport(DllName, CallingConvention = Convention)]
         internal static extern void crypto_secretstream_xchacha20poly1305_rekey(ref crypto_secretstream_xchacha20poly1305_state state);

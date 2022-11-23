@@ -12,7 +12,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
     public const int HeaderSize = crypto_secretstream_xchacha20poly1305_HEADERBYTES;
     public const int TagSize = crypto_secretstream_xchacha20poly1305_ABYTES;
 
-    public enum StreamFlag
+    public enum ChunkFlag
     {
         Message = crypto_secretstream_xchacha20poly1305_TAG_MESSAGE,
         Boundary = crypto_secretstream_xchacha20poly1305_TAG_PUSH,
@@ -40,31 +40,31 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
         }
     }
 
-    public void Push(Span<byte> ciphertextChunk, ReadOnlySpan<byte> plaintextChunk, StreamFlag streamFlag = StreamFlag.Message)
+    public void Push(Span<byte> ciphertextChunk, ReadOnlySpan<byte> plaintextChunk, ChunkFlag chunkFlag = ChunkFlag.Message)
     {
-        Push(ciphertextChunk, plaintextChunk, associatedData: default, streamFlag);
+        Push(ciphertextChunk, plaintextChunk, associatedData: default, chunkFlag);
     }
     
-    public unsafe void Push(Span<byte> ciphertextChunk, ReadOnlySpan<byte> plaintextChunk, ReadOnlySpan<byte> associatedData, StreamFlag streamFlag = StreamFlag.Message)
+    public unsafe void Push(Span<byte> ciphertextChunk, ReadOnlySpan<byte> plaintextChunk, ReadOnlySpan<byte> associatedData, ChunkFlag chunkFlag = ChunkFlag.Message)
     {
         if (_decryption) { throw new InvalidOperationException("Cannot push into a decryption stream."); }
         Validation.EqualToSize(nameof(ciphertextChunk), ciphertextChunk.Length, plaintextChunk.Length + TagSize);
         fixed (byte* c = ciphertextChunk, p = plaintextChunk, a = associatedData)
         {
-            int ret = crypto_secretstream_xchacha20poly1305_push(ref _state, c, out _, p, (ulong)plaintextChunk.Length, a, (ulong)associatedData.Length, (byte)streamFlag);
+            int ret = crypto_secretstream_xchacha20poly1305_push(ref _state, c, out _, p, (ulong)plaintextChunk.Length, a, (ulong)associatedData.Length, (byte)chunkFlag);
             if (ret != 0) { throw new CryptographicException("Error encrypting plaintext chunk."); }
         }
     }
 
-    public unsafe StreamFlag Pull(Span<byte> plaintextChunk, ReadOnlySpan<byte> ciphertextChunk, ReadOnlySpan<byte> associatedData = default)
+    public unsafe ChunkFlag Pull(Span<byte> plaintextChunk, ReadOnlySpan<byte> ciphertextChunk, ReadOnlySpan<byte> associatedData = default)
     {
         if (!_decryption) { throw new InvalidOperationException("Cannot pull from an encryption stream."); }
         Validation.EqualToSize(nameof(plaintextChunk), plaintextChunk.Length, ciphertextChunk.Length - TagSize);
         fixed (byte* p = plaintextChunk, c = ciphertextChunk, a = associatedData)
         {
-            int ret = crypto_secretstream_xchacha20poly1305_pull(ref _state, p, out _, out byte streamFlag, c, (ulong)ciphertextChunk.Length, a, (ulong)associatedData.Length);
+            int ret = crypto_secretstream_xchacha20poly1305_pull(ref _state, p, out _, out byte chunkFlag, c, (ulong)ciphertextChunk.Length, a, (ulong)associatedData.Length);
             if (ret != 0) { throw new CryptographicException("Error decrypting ciphertext chunk."); }
-            return (StreamFlag)streamFlag;
+            return (ChunkFlag)chunkFlag;
         }
     }
 
