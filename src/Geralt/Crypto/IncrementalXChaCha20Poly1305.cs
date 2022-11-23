@@ -31,7 +31,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
 
     private unsafe void Initialize(Span<byte> header, ReadOnlySpan<byte> key)
     {
-        fixed (byte* k = key, h = header)
+        fixed (byte* h = header, k = key)
         {
             int ret = _decryption
                 ? crypto_secretstream_xchacha20poly1305_init_pull(ref _state, h, k)
