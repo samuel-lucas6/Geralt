@@ -5,13 +5,23 @@ namespace Geralt;
 
 public sealed class IncrementalBLAKE2b : IDisposable
 {
+    public const int HashSize = BLAKE2b.HashSize;
+    public const int KeySize = BLAKE2b.KeySize;
+    public const int TagSize = BLAKE2b.TagSize;
+    public const int MinHashSize = BLAKE2b.MinHashSize;
+    public const int MaxHashSize = BLAKE2b.MaxHashSize;
+    public const int MinTagSize = MinHashSize;
+    public const int MaxTagSize = MaxHashSize;
+    public const int MinKeySize = BLAKE2b.MinKeySize;
+    public const int MaxKeySize = BLAKE2b.MaxKeySize;
+    
     private crypto_generichash_blake2b_state _state;
     private readonly int _hashSize;
 
     public IncrementalBLAKE2b(int hashSize, ReadOnlySpan<byte> key = default)
     {
-        Validation.SizeBetween(nameof(hashSize), hashSize, BLAKE2b.MinHashSize, BLAKE2b.MaxHashSize);
-        if (key != default) { Validation.SizeBetween(nameof(key), key.Length, BLAKE2b.MinKeySize, BLAKE2b.MaxKeySize); }
+        Validation.SizeBetween(nameof(hashSize), hashSize, MinHashSize, MaxHashSize);
+        if (key != default) { Validation.SizeBetween(nameof(key), key.Length, MinKeySize, MaxKeySize); }
         Sodium.Initialise();
         _hashSize = hashSize;
         Initialize(key);

@@ -123,7 +123,7 @@ public class Poly1305Tests
     [TestMethod]
     public void Incremental_ValidInputs()
     {
-        Span<byte> tag = stackalloc byte[Poly1305.TagSize];
+        Span<byte> tag = stackalloc byte[IncrementalPoly1305.TagSize];
         using var poly1305 = new IncrementalPoly1305(Key);
         poly1305.Update(Message);
         poly1305.Finalize(tag);
@@ -133,7 +133,7 @@ public class Poly1305Tests
     [TestMethod]
     public void Incremental_EmptyMessage()
     {
-        Span<byte> tag = stackalloc byte[Poly1305.TagSize];
+        Span<byte> tag = stackalloc byte[IncrementalPoly1305.TagSize];
         Span<byte> message = Span<byte>.Empty;
         using var poly1305 = new IncrementalPoly1305(Key);
         poly1305.Update(message);
@@ -146,7 +146,7 @@ public class Poly1305Tests
     [TestMethod]
     public void Incremental_DifferentKey()
     {
-        Span<byte> tag = stackalloc byte[Poly1305.TagSize];
+        Span<byte> tag = stackalloc byte[IncrementalPoly1305.TagSize];
         Span<byte> key = Key.ToArray();
         key[0]++;
         using var poly1305 = new IncrementalPoly1305(key);
@@ -160,9 +160,9 @@ public class Poly1305Tests
     [TestMethod]
     public void Incremental_InvalidKey()
     {
-        var key = new byte[Poly1305.KeySize - 1];
+        var key = new byte[IncrementalPoly1305.KeySize - 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => new IncrementalPoly1305(key));
-        key = new byte[Poly1305.KeySize + 1];
+        key = new byte[IncrementalPoly1305.KeySize + 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => new IncrementalPoly1305(key));
     }
     
@@ -171,9 +171,9 @@ public class Poly1305Tests
     {
         using var poly1305 = new IncrementalPoly1305(Key);
         poly1305.Update(Message);
-        var tag = new byte[Poly1305.TagSize - 1];
+        var tag = new byte[IncrementalPoly1305.TagSize - 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => poly1305.Finalize(tag));
-        tag = new byte[Poly1305.TagSize + 1];
+        tag = new byte[IncrementalPoly1305.TagSize + 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => poly1305.Finalize(tag));
     }
 }

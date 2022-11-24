@@ -5,11 +5,14 @@ namespace Geralt;
 
 public sealed class IncrementalPoly1305 : IDisposable
 {
+    public const int KeySize = Poly1305.KeySize;
+    public const int TagSize = Poly1305.TagSize;
+    
     private crypto_onetimeauth_state _state;
     
     public IncrementalPoly1305(ReadOnlySpan<byte> oneTimeKey)
     {
-        Validation.EqualToSize(nameof(oneTimeKey), oneTimeKey.Length, Poly1305.KeySize);
+        Validation.EqualToSize(nameof(oneTimeKey), oneTimeKey.Length, KeySize);
         Sodium.Initialise();
         Initialize(oneTimeKey);
     }
@@ -34,7 +37,7 @@ public sealed class IncrementalPoly1305 : IDisposable
 
     public unsafe void Finalize(Span<byte> tag)
     {
-        Validation.EqualToSize(nameof(tag), tag.Length, Poly1305.TagSize);
+        Validation.EqualToSize(nameof(tag), tag.Length, TagSize);
         fixed (byte* t = tag)
         {
             int ret = crypto_onetimeauth_final(ref _state, t);

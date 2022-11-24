@@ -5,13 +5,13 @@ namespace Geralt;
 
 public sealed class IncrementalXChaCha20Poly1305 : IDisposable
 {
-    private crypto_secretstream_xchacha20poly1305_state _state;
-    private readonly bool _decryption;
-    
     public const int KeySize = crypto_secretstream_xchacha20poly1305_KEYBYTES;
     public const int HeaderSize = crypto_secretstream_xchacha20poly1305_HEADERBYTES;
     public const int TagSize = crypto_secretstream_xchacha20poly1305_ABYTES;
-
+    
+    private crypto_secretstream_xchacha20poly1305_state _state;
+    private readonly bool _decryption;
+    
     public enum ChunkFlag
     {
         Message = crypto_secretstream_xchacha20poly1305_TAG_MESSAGE,
