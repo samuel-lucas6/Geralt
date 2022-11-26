@@ -59,6 +59,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
     public unsafe ChunkFlag Pull(Span<byte> plaintextChunk, ReadOnlySpan<byte> ciphertextChunk, ReadOnlySpan<byte> associatedData = default)
     {
         if (!_decryption) { throw new InvalidOperationException("Cannot pull from an encryption stream."); }
+        Validation.NotLessThanMin(nameof(ciphertextChunk), ciphertextChunk.Length, TagSize);
         Validation.EqualToSize(nameof(plaintextChunk), plaintextChunk.Length, ciphertextChunk.Length - TagSize);
         fixed (byte* p = plaintextChunk, c = ciphertextChunk, a = associatedData)
         {
