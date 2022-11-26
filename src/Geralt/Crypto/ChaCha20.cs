@@ -52,7 +52,6 @@ public static class ChaCha20
     
     private static void CounterOverflow(int messageSize, uint counter)
     {
-        if (counter <= 1) { return; }
         long blockCount = (-1L + messageSize + BlockSize) / BlockSize;
         if (counter + blockCount > uint.MaxValue)
             throw new CryptographicException("Counter overflow prevented.");
