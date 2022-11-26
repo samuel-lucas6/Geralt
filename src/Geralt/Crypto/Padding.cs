@@ -7,7 +7,6 @@ public static class Padding
     public static unsafe void Pad(Span<byte> buffer, ReadOnlySpan<byte> data, int blockSize)
     {
         Validation.EqualToSize(nameof(buffer), buffer.Length, GetPaddedLength(data.Length, blockSize));
-        Validation.GreaterThanZero(nameof(blockSize), blockSize);
         Sodium.Initialise();
         data.CopyTo(buffer);
         fixed (byte* b = buffer)
