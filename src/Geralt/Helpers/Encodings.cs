@@ -21,9 +21,9 @@ public static class Encodings
         Validation.NotEmpty(nameof(data), data.Length);
         Sodium.Initialise();
         ReadOnlySpan<byte> hex = stackalloc byte[data.Length * 2 + 1];
-        fixed (byte* h = hex, b = data)
+        fixed (byte* h = hex, d = data)
         {
-            IntPtr ret = sodium_bin2hex(h, (nuint)hex.Length, b, (nuint)data.Length);
+            IntPtr ret = sodium_bin2hex(h, (nuint)hex.Length, d, (nuint)data.Length);
             return Marshal.PtrToStringAnsi(ret) ?? throw new FormatException("Error converting bytes to hex.");
         }
     }
