@@ -8,9 +8,10 @@ public static class X25519
     public const int PublicKeySize = crypto_kx_PUBLICKEYBYTES;
     public const int PrivateKeySize = crypto_kx_SECRETKEYBYTES;
     public const int SeedSize = crypto_kx_SEEDBYTES;
-    public const int SharedSecretSize = crypto_kx_SESSIONKEYBYTES;
+    public const int SharedSecretSize = crypto_scalarmult_BYTES;
+    public const int SharedKeySize = crypto_kx_SESSIONKEYBYTES;
     public const int PreSharedKeySize = BLAKE2b.KeySize;
-    public const int MinPreSharedKeySize = BLAKE2b.KeySize;
+    public const int MinPreSharedKeySize = BLAKE2b.MinKeySize;
     public const int MaxPreSharedKeySize = BLAKE2b.MaxKeySize;
 
     public static unsafe void GenerateKeyPair(Span<byte> publicKey, Span<byte> privateKey)
@@ -50,49 +51,49 @@ public static class X25519
         }
     }
 
-    public static unsafe void DeriveSenderSharedSecret(Span<byte> sharedSecret, ReadOnlySpan<byte> senderPrivateKey, ReadOnlySpan<byte> recipientPublicKey, ReadOnlySpan<byte> preSharedKey = default)
+    public static unsafe void DeriveSenderSharedKey(Span<byte> sharedKey, ReadOnlySpan<byte> senderPrivateKey, ReadOnlySpan<byte> recipientPublicKey, ReadOnlySpan<byte> preSharedKey = default)
     {
-        Validation.EqualToSize(nameof(sharedSecret), sharedSecret.Length, SharedSecretSize);
+        Validation.EqualToSize(nameof(sharedKey), sharedKey.Length, SharedKeySize);
         Validation.EqualToSize(nameof(senderPrivateKey), senderPrivateKey.Length, PrivateKeySize);
         Validation.EqualToSize(nameof(recipientPublicKey), recipientPublicKey.Length, PublicKeySize);
         if (preSharedKey != default) { Validation.SizeBetween(nameof(preSharedKey), preSharedKey.Length, MinPreSharedKeySize, MaxPreSharedKeySize); }
-        Span<byte> xCoordinate = stackalloc byte[SharedSecretSize];
-        ComputeXCoordinate(xCoordinate, senderPrivateKey, recipientPublicKey);
+        Span<byte> sharedSecret = stackalloc byte[SharedSecretSize];
+        ComputeSharedSecret(sharedSecret, senderPrivateKey, recipientPublicKey);
         Span<byte> senderPublicKey = stackalloc byte[PublicKeySize];
         ComputePublicKey(senderPublicKey, senderPrivateKey);
-        using var blake2b = new IncrementalBLAKE2b(sharedSecret.Length, preSharedKey);
-        blake2b.Update(xCoordinate);
+        using var blake2b = new IncrementalBLAKE2b(sharedKey.Length, preSharedKey);
+        blake2b.Update(sharedSecret);
         blake2b.Update(senderPublicKey);
         blake2b.Update(recipientPublicKey);
-        blake2b.Finalize(sharedSecret);
-        CryptographicOperations.ZeroMemory(xCoordinate);
+        blake2b.Finalize(sharedKey);
+        CryptographicOperations.ZeroMemory(sharedSecret);
     }
     
-    public static unsafe void DeriveRecipientSharedSecret(Span<byte> sharedSecret, ReadOnlySpan<byte> recipientPrivateKey, ReadOnlySpan<byte> senderPublicKey, ReadOnlySpan<byte> preSharedKey = default)
+    public static unsafe void DeriveRecipientSharedKey(Span<byte> sharedKey, ReadOnlySpan<byte> recipientPrivateKey, ReadOnlySpan<byte> senderPublicKey, ReadOnlySpan<byte> preSharedKey = default)
     {
-        Validation.EqualToSize(nameof(sharedSecret), sharedSecret.Length, SharedSecretSize);
+        Validation.EqualToSize(nameof(sharedKey), sharedKey.Length, SharedKeySize);
         Validation.EqualToSize(nameof(recipientPrivateKey), recipientPrivateKey.Length, PrivateKeySize);
         Validation.EqualToSize(nameof(senderPublicKey), senderPublicKey.Length, PublicKeySize);
         if (preSharedKey != default) { Validation.SizeBetween(nameof(preSharedKey), preSharedKey.Length, MinPreSharedKeySize, MaxPreSharedKeySize); }
-        Span<byte> xCoordinate = stackalloc byte[SharedSecretSize];
-        ComputeXCoordinate(xCoordinate, recipientPrivateKey, senderPublicKey);
+        Span<byte> sharedSecret = stackalloc byte[SharedSecretSize];
+        ComputeSharedSecret(sharedSecret, recipientPrivateKey, senderPublicKey);
         Span<byte> recipientPublicKey = stackalloc byte[PublicKeySize];
         ComputePublicKey(recipientPublicKey, recipientPrivateKey);
-        using var blake2b = new IncrementalBLAKE2b(sharedSecret.Length, preSharedKey);
-        blake2b.Update(xCoordinate);
+        using var blake2b = new IncrementalBLAKE2b(sharedKey.Length, preSharedKey);
+        blake2b.Update(sharedSecret);
         blake2b.Update(senderPublicKey);
         blake2b.Update(recipientPublicKey);
-        blake2b.Finalize(sharedSecret);
-        CryptographicOperations.ZeroMemory(xCoordinate);
+        blake2b.Finalize(sharedKey);
+        CryptographicOperations.ZeroMemory(sharedSecret);
     }
     
-    public static unsafe void ComputeXCoordinate(Span<byte> xCoordinate, ReadOnlySpan<byte> senderPrivateKey, ReadOnlySpan<byte> recipientPublicKey)
+    public static unsafe void ComputeSharedSecret(Span<byte> sharedSecret, ReadOnlySpan<byte> senderPrivateKey, ReadOnlySpan<byte> recipientPublicKey)
     {
-        Validation.EqualToSize(nameof(xCoordinate), xCoordinate.Length, SharedSecretSize);
+        Validation.EqualToSize(nameof(sharedSecret), sharedSecret.Length, SharedSecretSize);
         Validation.EqualToSize(nameof(senderPrivateKey), senderPrivateKey.Length, PrivateKeySize);
         Validation.EqualToSize(nameof(recipientPublicKey), recipientPublicKey.Length, PublicKeySize);
         Sodium.Initialise();
-        fixed (byte* x = xCoordinate, s = senderPrivateKey, p = recipientPublicKey)
+        fixed (byte* x = sharedSecret, s = senderPrivateKey, p = recipientPublicKey)
         {
             int ret = crypto_scalarmult(x, s, p);
             if (ret != 0) { throw new CryptographicException("Invalid public key."); }

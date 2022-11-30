@@ -15,9 +15,9 @@ public class X25519Tests
     private static readonly byte[] SharedSecret = Convert.FromHexString("4a5d9d5ba4ce2de1728e3bf480350f25e07e21c947d19e3376f09b3c1e161742");
     // Generated using libsodium-core
     private static readonly byte[] Seed = Convert.FromHexString("b589764bb6395e13788436f93f4eaa4c858900b6a12328e8626ded5b39d2c7e9");
-    private static readonly byte[] HashedSharedSecret = Convert.FromHexString("519fb3af2f3f9e310718cf1f8bdec6e26ab64affe730f0f8b43c43b0e8ee52be");
+    private static readonly byte[] SharedKey = Convert.FromHexString("519fb3af2f3f9e310718cf1f8bdec6e26ab64affe730f0f8b43c43b0e8ee52be");
     private static readonly byte[] PreSharedKey = Convert.FromHexString("5dbbfd1c5549181aa9319cd71b946757e1f4769aee9568bd360b651a86ea29a2");
-    private static readonly byte[] KeyedHashSharedSecret = Convert.FromHexString("a91209efc719601f61c54f74d369fe14f997a29a91b174d5771614b6c9407ad1");
+    private static readonly byte[] SharedKeyWithPreSharedKey = Convert.FromHexString("a91209efc719601f61c54f74d369fe14f997a29a91b174d5771614b6c9407ad1");
     private static readonly byte[] EvePrivateKey = Convert.FromHexString("452e18802da843e0da527dc3f184a1d04aec69d67e53addd2fc3f8f5cb031a8b");
     private static readonly byte[] EvePublicKey = Convert.FromHexString("a0a219524fe1f1d496c2642c76c3ca6510e8d2620c1a325f1fdea02c59f25861");
     
@@ -128,149 +128,149 @@ public class X25519Tests
     }
     
     [TestMethod]
-    public void ComputeXCoordinate_ValidInputs()
-    {
-        Span<byte> aliceXCoordinate = stackalloc byte[X25519.SharedSecretSize];
-        X25519.ComputeXCoordinate(aliceXCoordinate, AlicePrivateKey, BobPublicKey);
-        Assert.IsTrue(aliceXCoordinate.SequenceEqual(SharedSecret));
-        Span<byte> bobXCoordinate = stackalloc byte[X25519.SharedSecretSize];
-        X25519.ComputeXCoordinate(bobXCoordinate, BobPrivateKey, AlicePublicKey);
-        Assert.IsTrue(bobXCoordinate.SequenceEqual(aliceXCoordinate));
-    }
-    
-    [TestMethod]
-    public void ComputeXCoordinate_WeakPublicKey()
-    {
-        var xCoordinate = new byte[X25519.SharedSecretSize];
-        var publicKey = new byte[X25519.PublicKeySize];
-        Assert.ThrowsException<CryptographicException>(() => X25519.ComputeXCoordinate(xCoordinate, AlicePrivateKey, publicKey));
-    }
-    
-    [TestMethod]
-    public void ComputeXCoordinate_InvalidPublicKey()
-    {
-        var xCoordinate = new byte[X25519.SharedSecretSize];
-        var publicKey = new byte[X25519.PublicKeySize - 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.ComputeXCoordinate(xCoordinate, AlicePrivateKey, publicKey));
-        publicKey = new byte[X25519.PublicKeySize + 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.ComputeXCoordinate(xCoordinate, AlicePrivateKey, publicKey));
-    }
-    
-    [TestMethod]
-    public void ComputeXCoordinate_InvalidPrivateKey()
-    {
-        var xCoordinate = new byte[X25519.SharedSecretSize];
-        var privateKey = new byte[X25519.PrivateKeySize - 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.ComputeXCoordinate(xCoordinate, privateKey, BobPublicKey));
-        privateKey = new byte[X25519.PrivateKeySize + 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.ComputeXCoordinate(xCoordinate, privateKey, BobPublicKey));
-    }
-    
-    [TestMethod]
-    public void DeriveSharedSecret_ValidInputs()
+    public void ComputeSharedSecret_ValidInputs()
     {
         Span<byte> aliceSharedSecret = stackalloc byte[X25519.SharedSecretSize];
-        X25519.DeriveSenderSharedSecret(aliceSharedSecret, AlicePrivateKey, BobPublicKey);
-        Assert.IsTrue(aliceSharedSecret.SequenceEqual(HashedSharedSecret));
+        X25519.ComputeSharedSecret(aliceSharedSecret, AlicePrivateKey, BobPublicKey);
+        Assert.IsTrue(aliceSharedSecret.SequenceEqual(SharedSecret));
         Span<byte> bobSharedSecret = stackalloc byte[X25519.SharedSecretSize];
-        X25519.DeriveRecipientSharedSecret(bobSharedSecret, BobPrivateKey, AlicePublicKey);
+        X25519.ComputeSharedSecret(bobSharedSecret, BobPrivateKey, AlicePublicKey);
         Assert.IsTrue(bobSharedSecret.SequenceEqual(aliceSharedSecret));
     }
     
     [TestMethod]
-    public void DeriveSharedSecretWithPreSharedKey_ValidInputs()
-    {
-        Span<byte> aliceSharedSecret = stackalloc byte[X25519.SharedSecretSize];
-        X25519.DeriveSenderSharedSecret(aliceSharedSecret, AlicePrivateKey, BobPublicKey, PreSharedKey);
-        Assert.IsTrue(aliceSharedSecret.SequenceEqual(KeyedHashSharedSecret));
-        Span<byte> bobSharedSecret = stackalloc byte[X25519.SharedSecretSize];
-        X25519.DeriveRecipientSharedSecret(bobSharedSecret, BobPrivateKey, AlicePublicKey, PreSharedKey);
-        Assert.IsTrue(bobSharedSecret.SequenceEqual(aliceSharedSecret));
-    }
-    
-    [TestMethod]
-    public void DeriveSharedSecret_DifferentPrivateKeys()
-    {
-        Span<byte> aliceSharedSecret = stackalloc byte[X25519.SharedSecretSize];
-        X25519.DeriveSenderSharedSecret(aliceSharedSecret, AlicePrivateKey, BobPublicKey);
-        Span<byte> eveSharedSecret = stackalloc byte[X25519.SharedSecretSize];
-        X25519.DeriveRecipientSharedSecret(eveSharedSecret, EvePrivateKey, AlicePublicKey);
-        Assert.IsFalse(eveSharedSecret.SequenceEqual(aliceSharedSecret));
-    }
-    
-    [TestMethod]
-    public void DeriveSharedSecret_DifferentPublicKeys()
-    {
-        Span<byte> aliceSharedSecret = stackalloc byte[X25519.SharedSecretSize];
-        X25519.DeriveSenderSharedSecret(aliceSharedSecret, AlicePrivateKey, BobPublicKey);
-        Span<byte> bobSharedSecret = stackalloc byte[X25519.SharedSecretSize];
-        X25519.DeriveRecipientSharedSecret(bobSharedSecret, BobPrivateKey, EvePublicKey);
-        Assert.IsFalse(bobSharedSecret.SequenceEqual(aliceSharedSecret));
-    }
-    
-    [TestMethod]
-    public void DeriveSharedSecret_DifferentPreSharedKey()
-    {
-        Span<byte> aliceSharedSecret = stackalloc byte[X25519.SharedSecretSize];
-        X25519.DeriveSenderSharedSecret(aliceSharedSecret, AlicePrivateKey, BobPublicKey, PreSharedKey);
-        Span<byte> bobSharedSecret = stackalloc byte[X25519.SharedSecretSize];
-        X25519.DeriveRecipientSharedSecret(bobSharedSecret, BobPrivateKey, AlicePublicKey, SharedSecret);
-        Assert.IsFalse(bobSharedSecret.SequenceEqual(aliceSharedSecret));
-    }
-    
-    [TestMethod]
-    public void DeriveSharedSecret_InvalidSharedSecret()
-    {
-        var sharedSecret = new byte[X25519.SharedSecretSize - 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedSecret(sharedSecret, AlicePrivateKey, BobPublicKey));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedSecret(sharedSecret, BobPrivateKey, AlicePublicKey));
-        sharedSecret = new byte[X25519.SharedSecretSize + 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedSecret(sharedSecret, AlicePrivateKey, BobPublicKey));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedSecret(sharedSecret, BobPrivateKey, AlicePublicKey));
-    }
-    
-    [TestMethod]
-    public void DeriveSharedSecret_InvalidPublicKey()
-    {
-        var sharedSecret = new byte[X25519.SharedSecretSize];
-        var publicKey = new byte[X25519.PublicKeySize - 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedSecret(sharedSecret, AlicePrivateKey, publicKey));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedSecret(sharedSecret, BobPrivateKey, publicKey));
-        publicKey = new byte[X25519.PublicKeySize + 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedSecret(sharedSecret, AlicePrivateKey, publicKey));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedSecret(sharedSecret, BobPrivateKey, publicKey));
-    }
-    
-    [TestMethod]
-    public void DeriveSharedSecret_WeakPublicKey()
+    public void ComputeSharedSecret_WeakPublicKey()
     {
         var sharedSecret = new byte[X25519.SharedSecretSize];
         var publicKey = new byte[X25519.PublicKeySize];
-        Assert.ThrowsException<CryptographicException>(() => X25519.DeriveSenderSharedSecret(sharedSecret, AlicePrivateKey, publicKey));
-        Assert.ThrowsException<CryptographicException>(() => X25519.DeriveRecipientSharedSecret(sharedSecret, BobPrivateKey, publicKey));
+        Assert.ThrowsException<CryptographicException>(() => X25519.ComputeSharedSecret(sharedSecret, AlicePrivateKey, publicKey));
     }
     
     [TestMethod]
-    public void DeriveSharedSecret_InvalidPrivateKey()
+    public void ComputeSharedSecret_InvalidPublicKey()
+    {
+        var sharedSecret = new byte[X25519.SharedSecretSize];
+        var publicKey = new byte[X25519.PublicKeySize - 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.ComputeSharedSecret(sharedSecret, AlicePrivateKey, publicKey));
+        publicKey = new byte[X25519.PublicKeySize + 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.ComputeSharedSecret(sharedSecret, AlicePrivateKey, publicKey));
+    }
+    
+    [TestMethod]
+    public void ComputeSharedSecret_InvalidPrivateKey()
     {
         var sharedSecret = new byte[X25519.SharedSecretSize];
         var privateKey = new byte[X25519.PrivateKeySize - 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedSecret(sharedSecret, privateKey, BobPublicKey));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedSecret(sharedSecret, privateKey, AlicePublicKey));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.ComputeSharedSecret(sharedSecret, privateKey, BobPublicKey));
         privateKey = new byte[X25519.PrivateKeySize + 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedSecret(sharedSecret, privateKey, BobPublicKey));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedSecret(sharedSecret, privateKey, AlicePublicKey));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.ComputeSharedSecret(sharedSecret, privateKey, BobPublicKey));
     }
     
     [TestMethod]
-    public void DeriveSharedSecret_InvalidPreSharedKey()
+    public void DeriveSharedKey_ValidInputs()
     {
-        var sharedSecret = new byte[X25519.SharedSecretSize];
+        Span<byte> aliceSharedKey = stackalloc byte[X25519.SharedKeySize];
+        X25519.DeriveSenderSharedKey(aliceSharedKey, AlicePrivateKey, BobPublicKey);
+        Assert.IsTrue(aliceSharedKey.SequenceEqual(SharedKey));
+        Span<byte> bobSharedKey = stackalloc byte[X25519.SharedKeySize];
+        X25519.DeriveRecipientSharedKey(bobSharedKey, BobPrivateKey, AlicePublicKey);
+        Assert.IsTrue(bobSharedKey.SequenceEqual(aliceSharedKey));
+    }
+    
+    [TestMethod]
+    public void DeriveSharedKeyWithPreSharedKey_ValidInputs()
+    {
+        Span<byte> aliceSharedKey = stackalloc byte[X25519.SharedKeySize];
+        X25519.DeriveSenderSharedKey(aliceSharedKey, AlicePrivateKey, BobPublicKey, PreSharedKey);
+        Assert.IsTrue(aliceSharedKey.SequenceEqual(SharedKeyWithPreSharedKey));
+        Span<byte> bobSharedKey = stackalloc byte[X25519.SharedKeySize];
+        X25519.DeriveRecipientSharedKey(bobSharedKey, BobPrivateKey, AlicePublicKey, PreSharedKey);
+        Assert.IsTrue(bobSharedKey.SequenceEqual(aliceSharedKey));
+    }
+    
+    [TestMethod]
+    public void DeriveSharedKey_DifferentPrivateKeys()
+    {
+        Span<byte> aliceSharedKey = stackalloc byte[X25519.SharedKeySize];
+        X25519.DeriveSenderSharedKey(aliceSharedKey, AlicePrivateKey, BobPublicKey);
+        Span<byte> eveSharedKey = stackalloc byte[X25519.SharedKeySize];
+        X25519.DeriveRecipientSharedKey(eveSharedKey, EvePrivateKey, AlicePublicKey);
+        Assert.IsFalse(eveSharedKey.SequenceEqual(aliceSharedKey));
+    }
+    
+    [TestMethod]
+    public void DeriveSharedKey_DifferentPublicKeys()
+    {
+        Span<byte> aliceSharedKey = stackalloc byte[X25519.SharedKeySize];
+        X25519.DeriveSenderSharedKey(aliceSharedKey, AlicePrivateKey, BobPublicKey);
+        Span<byte> bobSharedKey = stackalloc byte[X25519.SharedKeySize];
+        X25519.DeriveRecipientSharedKey(bobSharedKey, BobPrivateKey, EvePublicKey);
+        Assert.IsFalse(bobSharedKey.SequenceEqual(aliceSharedKey));
+    }
+    
+    [TestMethod]
+    public void DeriveSharedKey_DifferentPreSharedKey()
+    {
+        Span<byte> aliceSharedKey = stackalloc byte[X25519.SharedKeySize];
+        X25519.DeriveSenderSharedKey(aliceSharedKey, AlicePrivateKey, BobPublicKey, PreSharedKey);
+        Span<byte> bobSharedKey = stackalloc byte[X25519.SharedKeySize];
+        X25519.DeriveRecipientSharedKey(bobSharedKey, BobPrivateKey, AlicePublicKey, SharedSecret);
+        Assert.IsFalse(bobSharedKey.SequenceEqual(aliceSharedKey));
+    }
+    
+    [TestMethod]
+    public void DeriveSharedKey_InvalidSharedKey()
+    {
+        var sharedKey = new byte[X25519.SharedKeySize - 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedKey(sharedKey, AlicePrivateKey, BobPublicKey));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedKey(sharedKey, BobPrivateKey, AlicePublicKey));
+        sharedKey = new byte[X25519.SharedKeySize + 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedKey(sharedKey, AlicePrivateKey, BobPublicKey));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedKey(sharedKey, BobPrivateKey, AlicePublicKey));
+    }
+    
+    [TestMethod]
+    public void DeriveSharedKey_InvalidPublicKey()
+    {
+        var sharedKey = new byte[X25519.SharedKeySize];
+        var publicKey = new byte[X25519.PublicKeySize - 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedKey(sharedKey, AlicePrivateKey, publicKey));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedKey(sharedKey, BobPrivateKey, publicKey));
+        publicKey = new byte[X25519.PublicKeySize + 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedKey(sharedKey, AlicePrivateKey, publicKey));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedKey(sharedKey, BobPrivateKey, publicKey));
+    }
+    
+    [TestMethod]
+    public void DeriveSharedKey_WeakPublicKey()
+    {
+        var sharedKey = new byte[X25519.SharedKeySize];
+        var publicKey = new byte[X25519.PublicKeySize];
+        Assert.ThrowsException<CryptographicException>(() => X25519.DeriveSenderSharedKey(sharedKey, AlicePrivateKey, publicKey));
+        Assert.ThrowsException<CryptographicException>(() => X25519.DeriveRecipientSharedKey(sharedKey, BobPrivateKey, publicKey));
+    }
+    
+    [TestMethod]
+    public void DeriveSharedKey_InvalidPrivateKey()
+    {
+        var sharedKey = new byte[X25519.SharedKeySize];
+        var privateKey = new byte[X25519.PrivateKeySize - 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedKey(sharedKey, privateKey, BobPublicKey));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedKey(sharedKey, privateKey, AlicePublicKey));
+        privateKey = new byte[X25519.PrivateKeySize + 1];
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedKey(sharedKey, privateKey, BobPublicKey));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedKey(sharedKey, privateKey, AlicePublicKey));
+    }
+    
+    [TestMethod]
+    public void DeriveSharedKey_InvalidPreSharedKey()
+    {
+        var sharedKey = new byte[X25519.SharedKeySize];
         var preSharedKey = new byte[X25519.MinPreSharedKeySize - 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedSecret(sharedSecret, AlicePrivateKey, BobPublicKey, preSharedKey));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedSecret(sharedSecret, BobPrivateKey, AlicePublicKey, preSharedKey));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedKey(sharedKey, AlicePrivateKey, BobPublicKey, preSharedKey));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedKey(sharedKey, BobPrivateKey, AlicePublicKey, preSharedKey));
         preSharedKey = new byte[X25519.MaxPreSharedKeySize + 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedSecret(sharedSecret, AlicePrivateKey, BobPublicKey, preSharedKey));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedSecret(sharedSecret, BobPrivateKey, AlicePublicKey, preSharedKey));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedKey(sharedKey, AlicePrivateKey, BobPublicKey, preSharedKey));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedKey(sharedKey, BobPrivateKey, AlicePublicKey, preSharedKey));
     }
 }

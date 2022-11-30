@@ -8,7 +8,6 @@ internal static partial class Interop
         internal const int crypto_kx_SECRETKEYBYTES = 32;
         internal const int crypto_kx_SEEDBYTES = 32;
         internal const int crypto_kx_SESSIONKEYBYTES = 32;
-        internal const int crypto_scalarmult_SCALARBYTES = 32;
         internal const int crypto_scalarmult_BYTES = 32;
 
         [DllImport(DllName, CallingConvention = Convention)]
