@@ -29,5 +29,22 @@ internal static partial class Interop
         
         [DllImport(DllName, CallingConvention = Convention)]
         internal static extern unsafe int crypto_sign_verify_detached(byte* signature, byte* message, ulong messageLength, byte* publicKey);
+        
+        [DllImport(DllName, CallingConvention = Convention)]
+        internal static extern int crypto_sign_init(ref crypto_sign_state state);
+        
+        [DllImport(DllName, CallingConvention = Convention)]
+        internal static extern unsafe int crypto_sign_update(ref crypto_sign_state state, byte* message, ulong messageLength);
+        
+        [DllImport(DllName, CallingConvention = Convention)]
+        internal static extern unsafe int crypto_sign_final_create(ref crypto_sign_state state, byte* signature, out ulong signatureLength, byte* privateKey);
+        
+        [DllImport(DllName, CallingConvention = Convention)]
+        internal static extern unsafe int crypto_sign_final_verify(ref crypto_sign_state state, byte* signature, byte* publicKey);
+        
+        [StructLayout(LayoutKind.Explicit, Size = 208)]
+        internal struct crypto_sign_state
+        {
+        }
     }
 }
