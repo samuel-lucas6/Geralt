@@ -54,7 +54,7 @@ public static class SecureRandom
         return stringBuilder.ToString();
     }
 
-    public static char[] GetPassphrase(int wordCount, char separatorChar = '-', bool capitalise = true, bool includeNumber = false)
+    public static char[] GetPassphrase(int wordCount, char separatorChar = '-', bool capitalise = false, bool includeNumber = false)
     {
         Validation.SizeBetween(nameof(wordCount), wordCount, MinWordCount, MaxWordCount);
         string[] wordlist = Properties.Resources.wordlist.Split(separator: new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
