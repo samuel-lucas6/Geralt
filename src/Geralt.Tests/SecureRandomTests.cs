@@ -69,7 +69,7 @@ public class SecureRandomTests
         const char separatorChar = '-';
         char[] passphrase = SecureRandom.GetPassphrase(SecureRandom.MinWordCount);
         Assert.IsTrue(passphrase.Contains(separatorChar));
-        Assert.IsTrue(char.IsUpper(passphrase[0]));
+        Assert.IsTrue(char.IsLower(passphrase[0]));
         Assert.IsFalse(passphrase[^1] == separatorChar);
         Assert.IsFalse(passphrase.Any(char.IsDigit));
     }
