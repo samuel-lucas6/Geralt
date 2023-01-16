@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Geralt.Tests;
@@ -270,5 +269,69 @@ public class Ed25519Tests
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Ed25519.Verify(signature, Message, publicKey));
         publicKey = new byte[Ed25519.PublicKeySize + 1];
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Ed25519.Verify(signature, Message, publicKey));
+    }
+
+    [TestMethod]
+    [DataRow("98a70222f0b8121aa9d30f813d683f809e462b469c7ff87639499bb94e6dae4131f85042463c2a355a2003d062adf5aaa10b8c61e636062aaad11c2a26083406", "616263", "833fe62409237b9d62ec77587520911e9a759cec1d19755b7da901b96dca3d42ec172b93ad5e563bf4932c70e1245034c35467ef2efd4d64ebf819683467e2bf")]
+    public void Incremental_Sign_Valid(string signature, string message, string privateKey)
+    {
+        Span<byte> sig = stackalloc byte[IncrementalEd25519.SignatureSize];
+        Span<byte> msg = Convert.FromHexString(message);
+        Span<byte> sk = Convert.FromHexString(privateKey);
+        
+        using var ed25519ph = new IncrementalEd25519();
+        ed25519ph.Update(msg);
+        ed25519ph.Finalize(sig, sk);
+        
+        Assert.AreEqual(signature, Convert.ToHexString(sig).ToLower());
+    }
+    
+    [TestMethod]
+    [DataRow(IncrementalEd25519.SignatureSize + 1, 3, IncrementalEd25519.PrivateKeySize)]
+    [DataRow(IncrementalEd25519.SignatureSize - 1, 3, IncrementalEd25519.PrivateKeySize)]
+    [DataRow(IncrementalEd25519.SignatureSize, 3, IncrementalEd25519.PrivateKeySize + 1)]
+    [DataRow(IncrementalEd25519.SignatureSize, 3, IncrementalEd25519.PrivateKeySize - 1)]
+    public void Incremental_Sign_Invalid(int signatureSize, int messageSize, int privateKeySize)
+    {
+        var sig = new byte[signatureSize];
+        var msg = new byte[messageSize];
+        var sk = new byte[privateKeySize];
+        
+        using var ed25519ph = new IncrementalEd25519();
+        ed25519ph.Update(msg);
+        
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ed25519ph.Finalize(sig, sk));
+    }
+    
+    [TestMethod]
+    [DataRow("98a70222f0b8121aa9d30f813d683f809e462b469c7ff87639499bb94e6dae4131f85042463c2a355a2003d062adf5aaa10b8c61e636062aaad11c2a26083406", "616263", "ec172b93ad5e563bf4932c70e1245034c35467ef2efd4d64ebf819683467e2bf")]
+    public void Incremental_Verify_Valid(string signature, string message, string publicKey)
+    {
+        Span<byte> sig = Convert.FromHexString(signature);
+        Span<byte> msg = Convert.FromHexString(message);
+        Span<byte> pk = Convert.FromHexString(publicKey);
+        
+        using var ed25519ph = new IncrementalEd25519();
+        ed25519ph.Update(msg);
+        bool valid = ed25519ph.Verify(sig, pk);
+        
+        Assert.IsTrue(valid);
+    }
+    
+    [TestMethod]
+    [DataRow(IncrementalEd25519.SignatureSize + 1, 3, IncrementalEd25519.PublicKeySize)]
+    [DataRow(IncrementalEd25519.SignatureSize - 1, 3, IncrementalEd25519.PublicKeySize)]
+    [DataRow(IncrementalEd25519.SignatureSize, 3, IncrementalEd25519.PublicKeySize + 1)]
+    [DataRow(IncrementalEd25519.SignatureSize, 3, IncrementalEd25519.PublicKeySize - 1)]
+    public void Incremental_Verify_Invalid(int signatureSize, int messageSize, int publicKeySize)
+    {
+        var sig = new byte[signatureSize];
+        var msg = new byte[messageSize];
+        var pk = new byte[publicKeySize];
+        
+        using var ed25519ph = new IncrementalEd25519();
+        ed25519ph.Update(msg);
+        
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ed25519ph.Verify(sig, pk));
     }
 }
