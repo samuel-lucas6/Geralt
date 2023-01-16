@@ -18,7 +18,7 @@ public static class X25519
     {
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* p = publicKey, s = privateKey)
         {
             int ret = crypto_kx_keypair(p, s);
@@ -31,7 +31,7 @@ public static class X25519
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
         Validation.EqualToSize(nameof(seed), seed.Length, SeedSize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* pk = publicKey, sk = privateKey, s = seed)
         {
             int ret = crypto_kx_seed_keypair(pk, sk, s);
@@ -43,7 +43,7 @@ public static class X25519
     {
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* p = publicKey, s = privateKey)
         {
             int ret = crypto_scalarmult_base(p, s);
@@ -92,7 +92,7 @@ public static class X25519
         Validation.EqualToSize(nameof(sharedSecret), sharedSecret.Length, SharedSecretSize);
         Validation.EqualToSize(nameof(senderPrivateKey), senderPrivateKey.Length, PrivateKeySize);
         Validation.EqualToSize(nameof(recipientPublicKey), recipientPublicKey.Length, PublicKeySize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* x = sharedSecret, s = senderPrivateKey, p = recipientPublicKey)
         {
             int ret = crypto_scalarmult(x, s, p);

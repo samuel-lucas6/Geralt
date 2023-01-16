@@ -14,7 +14,7 @@ public static class XChaCha20
         Validation.NotEmpty(nameof(buffer), buffer.Length);
         Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
         Validation.EqualToSize(nameof(key), key.Length, KeySize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* b = buffer, n = nonce, k = key)
         {
             int ret = crypto_stream_xchacha20(b, (ulong)buffer.Length, n, k);
@@ -27,7 +27,7 @@ public static class XChaCha20
         Validation.EqualToSize(nameof(ciphertext), ciphertext.Length, plaintext.Length);
         Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
         Validation.EqualToSize(nameof(key), key.Length, KeySize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* c = ciphertext, p = plaintext, n = nonce, k = key)
         {
             int ret = crypto_stream_xchacha20_xor_ic(c, p, (ulong)plaintext.Length, n, counter, k);
@@ -40,7 +40,7 @@ public static class XChaCha20
         Validation.EqualToSize(nameof(plaintext), plaintext.Length, ciphertext.Length);
         Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
         Validation.EqualToSize(nameof(key), key.Length, KeySize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* p = plaintext, c = ciphertext, n = nonce, k = key)
         {
             int ret = crypto_stream_xchacha20_xor_ic(p, c, (ulong)ciphertext.Length, n, counter, k);

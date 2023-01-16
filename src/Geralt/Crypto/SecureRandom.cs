@@ -21,7 +21,7 @@ public static class SecureRandom
     public static unsafe void Fill(Span<byte> buffer)
     {
         Validation.NotEmpty(nameof(buffer), buffer.Length);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* b = buffer)
             randombytes_buf(b, (nuint)buffer.Length);
     }
@@ -30,7 +30,7 @@ public static class SecureRandom
     {
         Validation.NotEmpty(nameof(buffer), buffer.Length);
         Validation.EqualToSize(nameof(seed), seed.Length, SeedSize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* b = buffer, s = seed)
             randombytes_buf_deterministic(b, (nuint)buffer.Length, s);
     }
@@ -38,7 +38,7 @@ public static class SecureRandom
     public static int GetInt32(int upperBound)
     {
         Validation.NotLessThanMin(nameof(upperBound), upperBound, MinUpperBound);
-        Sodium.Initialise();
+        Sodium.Initialize();
         return randombytes_uniform((uint)upperBound);
     }
     

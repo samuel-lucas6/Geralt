@@ -8,7 +8,7 @@ public static class ConstantTime
     {
         Validation.NotEmpty(nameof(a), a.Length);
         Validation.NotEmpty(nameof(b), b.Length);
-        Sodium.Initialise();
+        Sodium.Initialize();
         // It's impossible to prevent the lengths being leaked
         if (a.Length != b.Length) { return false; }
         fixed (byte* aPtr = a, bPtr = b)
@@ -18,7 +18,7 @@ public static class ConstantTime
     public static unsafe void Increment(Span<byte> buffer)
     {
         Validation.NotEmpty(nameof(buffer), buffer.Length);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* b = buffer)
             sodium_increment(b, (nuint)buffer.Length);
     }
@@ -30,7 +30,7 @@ public static class ConstantTime
         Validation.NotEmpty(nameof(b), b.Length);
         Validation.EqualToSize(nameof(a), a.Length, buffer.Length);
         Validation.EqualToSize(nameof(a), a.Length, b.Length);
-        Sodium.Initialise();
+        Sodium.Initialize();
         a.CopyTo(buffer);
         fixed (byte* aPtr = buffer, bPtr = b)
             sodium_add(aPtr, bPtr, (nuint)buffer.Length);
@@ -43,7 +43,7 @@ public static class ConstantTime
         Validation.NotEmpty(nameof(b), b.Length);
         Validation.EqualToSize(nameof(a), a.Length, buffer.Length);
         Validation.EqualToSize(nameof(a), a.Length, b.Length);
-        Sodium.Initialise();
+        Sodium.Initialize();
         a.CopyTo(buffer);
         fixed (byte* aPtr = buffer, bPtr = b)
             sodium_sub(aPtr, bPtr, (nuint)buffer.Length);
@@ -54,7 +54,7 @@ public static class ConstantTime
         Validation.NotEmpty(nameof(a), a.Length);
         Validation.NotEmpty(nameof(b), b.Length);
         Validation.EqualToSize(nameof(a), a.Length, b.Length);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* aPtr = a, bPtr = b)
             return sodium_compare(aPtr, bPtr, (nuint)a.Length) == -1;
     }
@@ -64,14 +64,14 @@ public static class ConstantTime
         Validation.NotEmpty(nameof(a), a.Length);
         Validation.NotEmpty(nameof(b), b.Length);
         Validation.EqualToSize(nameof(a), a.Length, b.Length);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* aPtr = a, bPtr = b)
             return sodium_compare(aPtr, bPtr, (nuint)a.Length) == 1;
     }
 
     public static unsafe bool IsAllZeros(ReadOnlySpan<byte> buffer)
     {
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* b = buffer)
             return sodium_is_zero(b, (nuint)buffer.Length) == 1;
     }

@@ -13,7 +13,7 @@ public sealed class IncrementalPoly1305 : IDisposable
     public IncrementalPoly1305(ReadOnlySpan<byte> oneTimeKey)
     {
         Validation.EqualToSize(nameof(oneTimeKey), oneTimeKey.Length, KeySize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         Initialize(oneTimeKey);
     }
 

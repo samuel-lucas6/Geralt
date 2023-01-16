@@ -19,7 +19,7 @@ public static class Encodings
     public static unsafe string ToHex(ReadOnlySpan<byte> data)
     {
         Validation.NotEmpty(nameof(data), data.Length);
-        Sodium.Initialise();
+        Sodium.Initialize();
         ReadOnlySpan<byte> hex = stackalloc byte[data.Length * 2 + 1];
         fixed (byte* h = hex, d = data)
         {
@@ -31,7 +31,7 @@ public static class Encodings
     public static byte[] FromHex(string hex, string ignoreChars = HexIgnoreChars)
     {
         Validation.NotNullOrEmpty(nameof(hex), hex);
-        Sodium.Initialise();
+        Sodium.Initialize();
         var binary = new byte[hex.Length >> 1];
         int ret = sodium_hex2bin(binary, (nuint)binary.Length, hex, (nuint)hex.Length, ignoreChars, out nuint binaryLength, hexEnd: null);
         if (ret != 0) { throw new FormatException("Unable to parse the hex string."); }
@@ -42,7 +42,7 @@ public static class Encodings
     public static unsafe string ToBase64(ReadOnlySpan<byte> data, Base64Variant variant = Base64Variant.Original)
     {
         Validation.NotEmpty(nameof(data), data.Length);
-        Sodium.Initialise();
+        Sodium.Initialize();
         int base64MaxLength = sodium_base64_encoded_len((nuint)data.Length, (int)variant);
         Span<byte> base64 = stackalloc byte[base64MaxLength];
         fixed (byte* b = base64, d = data)
@@ -55,7 +55,7 @@ public static class Encodings
     public static byte[] FromBase64(string base64, Base64Variant variant = Base64Variant.Original, string ignoreChars = Base64IgnoreChars)
     {
         Validation.NotNullOrEmpty(nameof(base64), base64);
-        Sodium.Initialise();
+        Sodium.Initialize();
         var binary = new byte[base64.Length];
         int ret = sodium_base642bin(binary, (nuint)binary.Length, base64, (nuint)base64.Length, ignoreChars, out nuint binaryLength, base64End: null, (int)variant);
         if (ret != 0) { throw new FormatException("Unable to parse the Base64 string."); }

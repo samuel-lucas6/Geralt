@@ -14,7 +14,7 @@ public static class Ed25519
     {
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* p = publicKey, s = privateKey)
         {
             int ret = crypto_sign_keypair(p, s);
@@ -27,7 +27,7 @@ public static class Ed25519
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
         Validation.EqualToSize(nameof(seed), seed.Length, SeedSize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* pk = publicKey, sk = privateKey, s = seed)
         {
             int ret = crypto_sign_seed_keypair(pk, sk, s);
@@ -39,7 +39,7 @@ public static class Ed25519
     {
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* p = publicKey, s = privateKey)
         {
             int ret = crypto_sign_ed25519_sk_to_pk(p, s);
@@ -51,7 +51,7 @@ public static class Ed25519
     {
         Validation.EqualToSize(nameof(X25519PublicKey), X25519PublicKey.Length, X25519.PublicKeySize);
         Validation.EqualToSize(nameof(Ed25519PublicKey), Ed25519PublicKey.Length, PublicKeySize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* x = X25519PublicKey, e = Ed25519PublicKey)
         {
             int ret = crypto_sign_ed25519_pk_to_curve25519(x, e);
@@ -63,7 +63,7 @@ public static class Ed25519
     {
         Validation.EqualToSize(nameof(X25519PrivateKey), X25519PrivateKey.Length, X25519.PrivateKeySize);
         Validation.EqualToSize(nameof(Ed25519PrivateKey), Ed25519PrivateKey.Length, PrivateKeySize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* x = X25519PrivateKey, e = Ed25519PrivateKey)
         {
             int ret = crypto_sign_ed25519_sk_to_curve25519(x, e);
@@ -75,7 +75,7 @@ public static class Ed25519
     {
         Validation.EqualToSize(nameof(signature), signature.Length, SignatureSize);
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* s = signature, m = message, p = privateKey)
         {
             int ret = crypto_sign_detached(s, signatureLength: out _, m, (ulong)message.Length, p);
@@ -87,7 +87,7 @@ public static class Ed25519
     {
         Validation.EqualToSize(nameof(signature), signature.Length, SignatureSize);
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* s = signature, m = message, p = publicKey)
             return crypto_sign_verify_detached(s, m, (ulong)message.Length, p) == 0;
     }

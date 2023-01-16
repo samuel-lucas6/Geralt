@@ -14,7 +14,7 @@ public sealed class IncrementalEd25519 : IDisposable
     
     public IncrementalEd25519()
     {
-        Sodium.Initialise();
+        Sodium.Initialize();
         Initialize();
     }
     

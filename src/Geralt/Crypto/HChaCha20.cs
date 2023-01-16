@@ -16,7 +16,7 @@ public static class HChaCha20
         Validation.EqualToSize(nameof(inputKeyingMaterial), inputKeyingMaterial.Length, KeySize);
         Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
         if (personalisation != default) { Validation.EqualToSize(nameof(personalisation), personalisation.Length, PersonalSize); }
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* ok = outputKeyingMaterial, ik = inputKeyingMaterial, n = nonce, p = personalisation)
         {
             int ret = crypto_core_hchacha20(ok, n, ik, p);

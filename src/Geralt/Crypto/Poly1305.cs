@@ -12,7 +12,7 @@ public static class Poly1305
     {
         Validation.EqualToSize(nameof(tag), tag.Length, TagSize);
         Validation.EqualToSize(nameof(oneTimeKey), oneTimeKey.Length, KeySize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* t = tag, m = message, k = oneTimeKey)
         {
             int ret = crypto_onetimeauth(t, m, (ulong)message.Length, k);
@@ -24,7 +24,7 @@ public static class Poly1305
     {
         Validation.EqualToSize(nameof(tag), tag.Length, TagSize);
         Validation.EqualToSize(nameof(oneTimeKey), oneTimeKey.Length, KeySize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* t = tag, m = message, k = oneTimeKey)
             return crypto_onetimeauth_verify(t, m, (ulong)message.Length, k) == 0;
     }

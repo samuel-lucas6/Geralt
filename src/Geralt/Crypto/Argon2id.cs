@@ -25,7 +25,7 @@ public static class Argon2id
         Validation.EqualToSize(nameof(salt), salt.Length, SaltSize);
         Validation.NotLessThanMin(nameof(iterations), iterations, MinIterations);
         Validation.NotLessThanMin(nameof(memorySize), memorySize, MinMemorySize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* ok = outputKeyingMaterial, p = password, s = salt)
         {
             int ret = crypto_pwhash(ok, (ulong)outputKeyingMaterial.Length, p, (ulong)password.Length, s, (ulong)iterations, (nuint)memorySize, (int)Algorithm.Argon2id);
@@ -38,7 +38,7 @@ public static class Argon2id
         Validation.EqualToSize(nameof(hash), hash.Length, MaxHashSize);
         Validation.NotLessThanMin(nameof(iterations), iterations, MinIterations);
         Validation.NotLessThanMin(nameof(memorySize), memorySize, MinMemorySize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* h = hash, p = password)
         {
             int ret = crypto_pwhash_str_alg(h, p, (ulong)password.Length, (ulong)iterations, (nuint)memorySize, (int)Algorithm.Argon2id);
@@ -49,7 +49,7 @@ public static class Argon2id
     public static unsafe bool VerifyHash(ReadOnlySpan<byte> hash, ReadOnlySpan<byte> password)
     {
         Validation.SizeBetween(nameof(hash), hash.Length, MinHashSize, MaxHashSize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* h = hash, p = password)
             return crypto_pwhash_str_verify(h, p, (ulong)password.Length) == 0;
     }
@@ -59,7 +59,7 @@ public static class Argon2id
         Validation.SizeBetween(nameof(hash), hash.Length, MinHashSize, MaxHashSize);
         Validation.NotLessThanMin(nameof(iterations), iterations, MinIterations);
         Validation.NotLessThanMin(nameof(memorySize), memorySize, MinMemorySize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* h = hash)
         {
             int ret = crypto_pwhash_str_needs_rehash(h, (ulong)iterations, (nuint)memorySize);

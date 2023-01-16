@@ -25,7 +25,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
         _decryption = decryption;
         Validation.EqualToSize(nameof(header), header.Length, HeaderSize);
         Validation.EqualToSize(nameof(key), key.Length, KeySize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         Initialize(header, key);
     }
 

@@ -22,7 +22,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
     {
         Validation.SizeBetween(nameof(hashSize), hashSize, MinHashSize, MaxHashSize);
         if (key != default) { Validation.SizeBetween(nameof(key), key.Length, MinKeySize, MaxKeySize); }
-        Sodium.Initialise();
+        Sodium.Initialize();
         _hashSize = hashSize;
         Initialize(key);
     }

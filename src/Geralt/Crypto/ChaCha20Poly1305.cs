@@ -14,7 +14,7 @@ public static class ChaCha20Poly1305
         Validation.EqualToSize(nameof(ciphertext), ciphertext.Length, plaintext.Length + TagSize);
         Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
         Validation.EqualToSize(nameof(key), key.Length, KeySize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* c = ciphertext, p = plaintext, n = nonce, k = key, a = associatedData)
         {
             int ret = crypto_aead_chacha20poly1305_ietf_encrypt(c, ciphertextLength: out _, p, (ulong)plaintext.Length, a, (ulong)associatedData.Length, nsec: null, n, k);
@@ -28,7 +28,7 @@ public static class ChaCha20Poly1305
         Validation.EqualToSize(nameof(plaintext), plaintext.Length, ciphertext.Length - TagSize);
         Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
         Validation.EqualToSize(nameof(key), key.Length, KeySize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* p = plaintext, c = ciphertext, n = nonce, k = key, a = associatedData)
         {
             int ret = crypto_aead_chacha20poly1305_ietf_decrypt(p, plaintextLength: out _, nsec: null, c, (ulong)ciphertext.Length, a, (ulong)associatedData.Length, n, k);

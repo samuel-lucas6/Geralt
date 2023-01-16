@@ -21,7 +21,7 @@ public static class BLAKE2b
     public static unsafe void ComputeHash(Span<byte> hash, ReadOnlySpan<byte> message)
     {
         Validation.SizeBetween(nameof(hash), hash.Length, MinHashSize, MaxHashSize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* h = hash, m = message)
         {
             int ret = crypto_generichash_blake2b(h, (nuint)hash.Length, m, (ulong)message.Length, key: null, keyLength: 0);
@@ -48,7 +48,7 @@ public static class BLAKE2b
     {
         Validation.SizeBetween(nameof(tag), tag.Length, MinTagSize, MaxTagSize);
         Validation.SizeBetween(nameof(key), key.Length, MinKeySize, MaxKeySize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* t = tag, m = message, k = key)
         {
             int ret = crypto_generichash_blake2b(t, (nuint)tag.Length, m, (ulong)message.Length, k, (nuint)key.Length);
@@ -73,7 +73,7 @@ public static class BLAKE2b
         Validation.SizeBetween(nameof(inputKeyingMaterial), inputKeyingMaterial.Length, MinKeySize, MaxKeySize);
         Validation.EqualToSize(nameof(personalisation), personalisation.Length, PersonalSize);
         Validation.EqualToSize(nameof(salt), salt.Length, SaltSize);
-        Sodium.Initialise();
+        Sodium.Initialize();
         fixed (byte* ok = outputKeyingMaterial, ik = inputKeyingMaterial, p = personalisation, s = salt, i = info)
         {
             int ret = crypto_generichash_blake2b_salt_personal(ok, (nuint)outputKeyingMaterial.Length, i, (ulong)info.Length, ik, (nuint)inputKeyingMaterial.Length, s, p);

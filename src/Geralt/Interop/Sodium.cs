@@ -6,11 +6,11 @@ internal static class Sodium
     private static readonly Action MisuseHandler = MisuseError;
     private static void MisuseError() => throw new InvalidOperationException("libsodium misuse handler error.");
 
-    private static int _initialised;
+    private static int _initialized;
     
-    internal static void Initialise()
+    internal static void Initialize()
     {
-        if (_initialised != 0) { return; }
+        if (_initialized != 0) { return; }
         try
         {
             if (sodium_library_version_major() != SODIUM_LIBRARY_VERSION_MAJOR || sodium_library_version_minor() != SODIUM_LIBRARY_VERSION_MINOR)
@@ -26,6 +26,6 @@ internal static class Sodium
         {
             throw new PlatformNotSupportedException("Unable to access the libsodium DLL. Geralt may not be supported on this platform, or this machine may be missing the Visual C++ Redistributable on Windows.", ex);
         }
-        Interlocked.Exchange(ref _initialised, value: 1);
+        Interlocked.Exchange(ref _initialized, value: 1);
     }
 }
