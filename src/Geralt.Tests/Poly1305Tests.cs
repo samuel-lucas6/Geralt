@@ -30,35 +30,35 @@ public class Poly1305Tests
     [DynamicData(nameof(Rfc8439TestVectors), DynamicDataSourceType.Method)]
     public void ComputeTag_Valid(string tag, string message, string oneTimeKey)
     {
-        Span<byte> mac = Convert.FromHexString(tag);
-        Span<byte> msg = Convert.FromHexString(message);
-        Span<byte> key = Convert.FromHexString(oneTimeKey);
+        Span<byte> t = Convert.FromHexString(tag);
+        Span<byte> m = Convert.FromHexString(message);
+        Span<byte> k = Convert.FromHexString(oneTimeKey);
         
-        Poly1305.ComputeTag(mac, msg, key);
+        Poly1305.ComputeTag(t, m, k);
         
-        Assert.AreEqual(tag, Convert.ToHexString(mac).ToLower());
+        Assert.AreEqual(tag, Convert.ToHexString(t).ToLower());
     }
 
     [TestMethod]
     [DynamicData(nameof(InvalidParameterSizes), DynamicDataSourceType.Method)]
     public void ComputeTag_Invalid(int tagSize, int messageSize, int keySize)
     {
-        var mac = new byte[tagSize];
-        var msg = new byte[messageSize];
-        var key = new byte[keySize];
+        var t = new byte[tagSize];
+        var m = new byte[messageSize];
+        var k = new byte[keySize];
         
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Poly1305.ComputeTag(mac, msg, key));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Poly1305.ComputeTag(t, m, k));
     }
 
     [TestMethod]
     [DynamicData(nameof(Rfc8439TestVectors), DynamicDataSourceType.Method)]
     public void VerifyTag_Valid(string tag, string message, string oneTimeKey)
     {
-        Span<byte> mac = Convert.FromHexString(tag);
-        Span<byte> msg = Convert.FromHexString(message);
-        Span<byte> key = Convert.FromHexString(oneTimeKey);
+        Span<byte> t = Convert.FromHexString(tag);
+        Span<byte> m = Convert.FromHexString(message);
+        Span<byte> k = Convert.FromHexString(oneTimeKey);
         
-        bool valid = Poly1305.VerifyTag(mac, msg, key);
+        bool valid = Poly1305.VerifyTag(t, m, k);
         
         Assert.IsTrue(valid);
     }
@@ -86,43 +86,43 @@ public class Poly1305Tests
     [DynamicData(nameof(InvalidParameterSizes), DynamicDataSourceType.Method)]
     public void VerifyTag_Invalid(int tagSize, int messageSize, int keySize)
     {
-        var mac = new byte[tagSize];
-        var msg = new byte[messageSize];
-        var key = new byte[keySize];
+        var t = new byte[tagSize];
+        var m = new byte[messageSize];
+        var k = new byte[keySize];
         
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Poly1305.VerifyTag(mac, msg, key));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Poly1305.VerifyTag(t, m, k));
     }
     
     [TestMethod]
     [DynamicData(nameof(Rfc8439TestVectors), DynamicDataSourceType.Method)]
     public void Incremental_Valid(string tag, string message, string oneTimeKey)
     {
-        Span<byte> mac = Convert.FromHexString(tag);
-        Span<byte> msg = Convert.FromHexString(message);
-        Span<byte> key = Convert.FromHexString(oneTimeKey);
+        Span<byte> t = Convert.FromHexString(tag);
+        Span<byte> m = Convert.FromHexString(message);
+        Span<byte> k = Convert.FromHexString(oneTimeKey);
         
-        using var poly1305 = new IncrementalPoly1305(key);
-        poly1305.Update(msg);
-        poly1305.Finalize(mac);
+        using var poly1305 = new IncrementalPoly1305(k);
+        poly1305.Update(m);
+        poly1305.Finalize(t);
         
-        Assert.AreEqual(tag, Convert.ToHexString(mac).ToLower());
+        Assert.AreEqual(tag, Convert.ToHexString(t).ToLower());
     }
     
     [TestMethod]
     [DynamicData(nameof(InvalidParameterSizes), DynamicDataSourceType.Method)]
     public void Incremental_Invalid(int tagSize, int messageSize, int keySize)
     {
-        var mac = new byte[tagSize];
-        var msg = new byte[messageSize];
-        var key = new byte[keySize];
+        var t = new byte[tagSize];
+        var m = new byte[messageSize];
+        var k = new byte[keySize];
 
         if (keySize != IncrementalPoly1305.KeySize) {
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => new IncrementalPoly1305(key));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => new IncrementalPoly1305(k));
         }
         else if (tagSize != IncrementalPoly1305.TagSize) {
-            using var poly1305 = new IncrementalPoly1305(key);
-            poly1305.Update(msg);
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => poly1305.Finalize(mac));
+            using var poly1305 = new IncrementalPoly1305(k);
+            poly1305.Update(m);
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => poly1305.Finalize(t));
         }
     }
 }
