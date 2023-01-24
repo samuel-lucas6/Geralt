@@ -1,6 +1,6 @@
 using System;
-using System.Linq;
 using System.Text;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Geralt.Tests;
@@ -8,130 +8,138 @@ namespace Geralt.Tests;
 [TestClass]
 public class EncodingsTests
 {
-    // Generated using libsodium-core
-    private static readonly byte[] HexData = Encoding.UTF8.GetBytes("You disgust me. And deserve to die.");
-    private static readonly byte[] Base64Data = Convert.FromHexString("f9971d7fd1e2de4540c817991dbcd9791c81f9faae6e8253d294dfe6de3a2411");
-    private const string Hex = "596f752064697367757374206d652e20416e64206465736572766520746f206469652e";
-    private const string HexWithSpaces = "59 6f 75 20 64 69 73 67 75 7374206d652e20416e64206465736572766520746f206469652e";
-    private const string Base64 = "+Zcdf9Hi3kVAyBeZHbzZeRyB+fquboJT0pTf5t46JBE=";
-    private const string Base64WithSpaces = "+Zc df 9Hi3k VAyBeZHbzZe RyB+fqub oJT0pT f5t46JBE=";
-    private const string Base64NoPadding = "+Zcdf9Hi3kVAyBeZHbzZeRyB+fquboJT0pTf5t46JBE";
-    private const string Base64Url = "-Zcdf9Hi3kVAyBeZHbzZeRyB-fquboJT0pTf5t46JBE=";
-    private const string Base64UrlNoPadding = "-Zcdf9Hi3kVAyBeZHbzZeRyB-fquboJT0pTf5t46JBE";
-
-    [TestMethod]
-    public void ToHex_ValidInput()
+    // https://www.rfc-editor.org/rfc/rfc4648#section-10
+    public static IEnumerable<object[]> Rfc4648TestVectors()
     {
-        string hex = Encodings.ToHex(HexData);
-        Assert.IsTrue(hex.Equals(Hex));
+        yield return new object[] { "Zg==", "f", Encodings.Base64Variant.Original };
+        yield return new object[] { "Zm8=", "fo", Encodings.Base64Variant.Original };
+        yield return new object[] { "Zm9v", "foo", Encodings.Base64Variant.Original };
+        yield return new object[] { "Zm9vYg==", "foob", Encodings.Base64Variant.Original };
+        yield return new object[] { "Zm9vYmE=", "fooba", Encodings.Base64Variant.Original };
+        yield return new object[] { "Zm9vYmFy", "foobar", Encodings.Base64Variant.Original };
+    }
+    
+    // https://eprint.iacr.org/2022/361
+    // https://base64.guru/standards/base64url
+    public static IEnumerable<object[]> Base64VariantTestVectors()
+    {
+        yield return new object[] { "SGVsbG8=", "Hello", Encodings.Base64Variant.Original };
+        yield return new object[] { "SGVsbA==", "Hell", Encodings.Base64Variant.Original };
+        yield return new object[] { "PDw/Pz8+Pg", "<<???>>", Encodings.Base64Variant.OriginalNoPadding };
+        yield return new object[] { "PDw_Pz8-Pg==", "<<???>>", Encodings.Base64Variant.Url };
+        yield return new object[] { "PDw_Pz8-Pg", "<<???>>", Encodings.Base64Variant.UrlNoPadding };
     }
     
     [TestMethod]
-    public void ToHex_InvalidInput()
+    [DataRow("596f752064697367757374206d652e20416e64206465736572766520746f206469652e", "You disgust me. And deserve to die.")]
+    public void ToHex_Valid(string hex, string data)
     {
-        var data = Array.Empty<byte>();
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Encodings.ToHex(data));
+        Span<byte> d = Encoding.UTF8.GetBytes(data);
+        
+        string h = Encodings.ToHex(d);
+        
+        Assert.AreEqual(hex, h);
     }
     
     [TestMethod]
-    public void FromHex_ValidInput()
+    [DataRow(0)]
+    public void ToHex_Invalid(int dataSize)
     {
-        byte[] data = Encodings.FromHex(Hex);
-        Assert.IsTrue(data.SequenceEqual(HexData));
+        var d = new byte[dataSize];
+        
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Encodings.ToHex(d));
     }
     
     [TestMethod]
-    public void FromHex_HexWithSpaces()
+    [DataRow("fo", "666f", "")]
+    [DataRow("foo", "666F6F", "")]
+    [DataRow("foob", "66 6f 6f 62", " ")]
+    [DataRow("fooba", "66:6f:6f:62:61", ":")]
+    [DataRow("foobar", "66 : 6f : 6f : 62 : 61 : 72", ": ")]
+    public void FromHex_Valid(string data, string hex, string ignoreChars)
     {
-        byte[] data = Encodings.FromHex(HexWithSpaces, ignoreChars: " ");
-        Assert.IsTrue(data.SequenceEqual(HexData));
-    }
-
-    [TestMethod]
-    public void FromHex_InvalidHex()
-    {
-        Assert.ThrowsException<FormatException>(() => Encodings.FromHex(Base64));
-    }
-    
-    [TestMethod]
-    public void ToBase64_ValidInput()
-    {
-        string base64 = Encodings.ToBase64(Base64Data);
-        Assert.IsTrue(base64.Equals(Base64));
+        byte[] d = Encodings.FromHex(hex, ignoreChars);
+        
+        Assert.AreEqual(data, Encoding.UTF8.GetString(d));
     }
     
     [TestMethod]
-    public void ToBase64NoPadding_ValidInput()
+    [DataRow(null)]
+    [DataRow("")]
+    [DataRow("Zg==")]
+    [DataRow("66/6f/6f")]
+    public void FromHex_Invalid(string hex)
     {
-        string base64NoPadding = Encodings.ToBase64(Base64Data, Encodings.Base64Variant.OriginalNoPadding);
-        Assert.IsTrue(base64NoPadding.Equals(Base64NoPadding));
+        if (hex == null) {
+            Assert.ThrowsException<ArgumentNullException>(() => Encodings.FromHex(hex));
+        }
+        else if (hex == "") {
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => Encodings.FromHex(hex));
+        }
+        else {
+            Assert.ThrowsException<FormatException>(() => Encodings.FromHex(hex));
+        }
     }
     
     [TestMethod]
-    public void ToBase64Url_ValidInput()
+    [DynamicData(nameof(Rfc4648TestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Base64VariantTestVectors), DynamicDataSourceType.Method)]
+    public void ToBase64_Valid(string base64, string data, Encodings.Base64Variant variant)
     {
-        string base64Url = Encodings.ToBase64(Base64Data, Encodings.Base64Variant.Url);
-        Assert.IsTrue(base64Url.Equals(Base64Url));
+        Span<byte> d = Encoding.UTF8.GetBytes(data);
+        
+        string b = Encodings.ToBase64(d, variant);
+        
+        Assert.AreEqual(base64, b);
     }
     
     [TestMethod]
-    public void ToBase64UrlNoPadding_ValidInput()
+    [DataRow(0)]
+    public void ToBase64_Invalid(int dataSize)
     {
-        string base64UrlNoPadding = Encodings.ToBase64(Base64Data, Encodings.Base64Variant.UrlNoPadding);
-        Assert.IsTrue(base64UrlNoPadding.Equals(Base64UrlNoPadding));
+        var d = new byte[dataSize];
+        
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Encodings.ToBase64(d));
     }
     
     [TestMethod]
-    public void ToBase64_InvalidInput()
+    [DynamicData(nameof(Rfc4648TestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Base64VariantTestVectors), DynamicDataSourceType.Method)]
+    public void FromBase64_Valid(string base64, string data, Encodings.Base64Variant variant)
     {
-        var data = Array.Empty<byte>();
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Encodings.ToBase64(data));
+        byte[] d = Encodings.FromBase64(base64, variant);
+        
+        Assert.AreEqual(data, Encoding.UTF8.GetString(d));
     }
     
     [TestMethod]
-    public void FromBase64_ValidInput()
+    [DataRow(null, Encodings.Base64Variant.Original)]
+    [DataRow("", Encodings.Base64Variant.Original)]
+    // https://eprint.iacr.org/2022/361
+    [DataRow("SGVsbG9=", Encodings.Base64Variant.Original)]
+    [DataRow("SGVsbG9", Encodings.Base64Variant.Original)]
+    [DataRow("SGVsbA=", Encodings.Base64Variant.Original)]
+    [DataRow("SGVsbA", Encodings.Base64Variant.Original)]
+    [DataRow("SGVsbA====", Encodings.Base64Variant.Original)]
+    // https://base64.guru/standards/base64url
+    [DataRow("PDw_Pz8-Pg==", Encodings.Base64Variant.Original)]
+    [DataRow("PDw/Pz8+Pg", Encodings.Base64Variant.Original)]
+    [DataRow("PDw_Pz8-Pg", Encodings.Base64Variant.OriginalNoPadding)]
+    [DataRow("PDw/Pz8+Pg==", Encodings.Base64Variant.OriginalNoPadding)]
+    [DataRow("PDw/Pz8+Pg==", Encodings.Base64Variant.Url)]
+    [DataRow("PDw_Pz8-Pg", Encodings.Base64Variant.Url)]
+    [DataRow("PDw/Pz8+Pg", Encodings.Base64Variant.UrlNoPadding)]
+    [DataRow("PDw_Pz8-Pg==", Encodings.Base64Variant.UrlNoPadding)]
+    public void FromBase64_Invalid(string base64, Encodings.Base64Variant variant)
     {
-        byte[] data = Encodings.FromBase64(Base64);
-        Assert.IsTrue(data.SequenceEqual(Base64Data));
-    }
-    
-    [TestMethod]
-    public void FromBase64_Base64WithSpaces()
-    {
-        byte[] data = Encodings.FromBase64(Base64WithSpaces, ignoreChars: " ");
-        Assert.IsTrue(data.SequenceEqual(Base64Data));
-    }
-    
-    [TestMethod]
-    public void FromBase64NoPadding_ValidInput()
-    {
-        byte[] data = Encodings.FromBase64(Base64NoPadding, Encodings.Base64Variant.OriginalNoPadding);
-        Assert.IsTrue(data.SequenceEqual(Base64Data));
-    }
-    
-    [TestMethod]
-    public void FromBase64Url_ValidInput()
-    {
-        byte[] data = Encodings.FromBase64(Base64Url, Encodings.Base64Variant.Url);
-        Assert.IsTrue(data.SequenceEqual(Base64Data));
-    }
-    
-    [TestMethod]
-    public void FromBase64UrlNoPadding_ValidInput()
-    {
-        byte[] data = Encodings.FromBase64(Base64UrlNoPadding, Encodings.Base64Variant.UrlNoPadding);
-        Assert.IsTrue(data.SequenceEqual(Base64Data));
-    }
-
-    [TestMethod]
-    public void FromBase64_InvalidBase64()
-    {
-        Assert.ThrowsException<FormatException>(() => Encodings.FromBase64(Hex));
-    }
-    
-    [TestMethod]
-    public void FromBase64_WrongBase64Variant()
-    {
-        Assert.ThrowsException<FormatException>(() => Encodings.FromBase64(Base64Url, Encodings.Base64Variant.OriginalNoPadding));
+        if (base64 == null) {
+            Assert.ThrowsException<ArgumentNullException>(() => Encodings.FromBase64(base64, variant));
+        }
+        else if (base64 == "") {
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => Encodings.FromBase64(base64, variant));
+        }
+        else {
+            Assert.ThrowsException<FormatException>(() => Encodings.FromBase64(base64, variant));
+        }
     }
 }
