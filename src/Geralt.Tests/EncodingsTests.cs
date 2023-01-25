@@ -42,10 +42,9 @@ public class EncodingsTests
     }
     
     [TestMethod]
-    [DataRow(0)]
-    public void ToHex_Invalid(int dataSize)
+    public void ToHex_Invalid()
     {
-        var d = new byte[dataSize];
+        var d = Array.Empty<byte>();
         
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Encodings.ToHex(d));
     }
@@ -94,10 +93,9 @@ public class EncodingsTests
     }
     
     [TestMethod]
-    [DataRow(0)]
-    public void ToBase64_Invalid(int dataSize)
+    public void ToBase64_Invalid()
     {
-        var d = new byte[dataSize];
+        var d = Array.Empty<byte>();
         
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Encodings.ToBase64(d));
     }
