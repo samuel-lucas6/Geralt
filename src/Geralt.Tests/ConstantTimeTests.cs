@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Geralt.Tests;
@@ -7,181 +8,173 @@ namespace Geralt.Tests;
 [TestClass]
 public class ConstantTimeTests
 {
-    [TestMethod]
-    public void Equals_IdenticalInputs()
+    public static IEnumerable<object[]> AddSubtractInvalidParameterSizes()
     {
-        const string quote = "Lambert, Lambert, what a prick.";
-        Span<byte> a = Encoding.UTF8.GetBytes(quote);
-        Span<byte> b = Encoding.UTF8.GetBytes(quote);
+        yield return new object[] { 0, 1, 1 };
+        yield return new object[] { 1, 0, 1 };
+        yield return new object[] { 1, 1, 0 };
+        yield return new object[] { 1, 1, 2 };
+        yield return new object[] { 1, 2, 1 };
+        yield return new object[] { 2, 1, 1 };
+    }
+    
+    public static IEnumerable<object[]> GreaterLessInvalidParameterSizes()
+    {
+        yield return new object[] { 0, 1 };
+        yield return new object[] { 1, 0 };
+        yield return new object[] { 4, 2 };
+    }
+    
+    [TestMethod]
+    [DataRow(true, "Lambert, Lambert, what a prick.", "Lambert, Lambert, what a prick.")]
+    [DataRow(false, "Evil is evil.", "Good is good.")]
+    [DataRow(false, "Damn, you're ugly.", "Damn, you're ugly...")]
+    public void Equals_Valid(bool expected, string aString, string bString)
+    {
+        Span<byte> a = Encoding.UTF8.GetBytes(aString);
+        Span<byte> b = Encoding.UTF8.GetBytes(bString);
+        
         bool equal = ConstantTime.Equals(a, b);
-        Assert.IsTrue(equal);
+        
+        Assert.IsTrue(equal == expected);
     }
     
     [TestMethod]
-    public void Equals_DifferentInputLengths()
+    [DataRow(0, 1)]
+    [DataRow(1, 0)]
+    public void Equals_Invalid(int aSize, int bSize)
     {
-        Span<byte> a = Encoding.UTF8.GetBytes("Damn, you're ugly.");
-        Span<byte> b = Encoding.UTF8.GetBytes("Damn, you're ugly...");
-        bool equal = ConstantTime.Equals(a, b);
-        Assert.IsFalse(equal);
+        var a = new byte[aSize];
+        var b = new byte[bSize];
+        
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ConstantTime.Equals(a, b));
     }
     
     [TestMethod]
-    public void Equals_DifferentInputs()
+    public void Increment_Valid()
     {
-        Span<byte> a = Encoding.UTF8.GetBytes("Evil is evil.");
-        Span<byte> b = Encoding.UTF8.GetBytes("Good is good.");
-        bool equal = ConstantTime.Equals(a, b);
-        Assert.IsFalse(equal);
+        Span<byte> b = stackalloc byte[ChaCha20Poly1305.NonceSize];
+        b.Clear();
+        
+        ConstantTime.Increment(b);
+        
+        Assert.IsTrue(b[0] == 1);
     }
     
     [TestMethod]
-    public void Increment_ValidBuffer()
+    public void Increment_Invalid()
     {
-        Span<byte> original = stackalloc byte[ChaCha20Poly1305.NonceSize];
-        Span<byte> counter = stackalloc byte[ChaCha20Poly1305.NonceSize];
-        ConstantTime.Increment(counter);
-        Assert.IsFalse(counter.SequenceEqual(original));
+        var b = Array.Empty<byte>();
+        
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ConstantTime.Increment(b));
     }
     
     [TestMethod]
-    public void Increment_InvalidBuffer()
+    [DataRow(true, "")]
+    [DataRow(true, "0000")]
+    [DataRow(false, "0001")]
+    public void IsAllZeros_Valid(bool expected, string buffer)
     {
-        var counter = Array.Empty<byte>();
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ConstantTime.Increment(counter));
+        Span<byte> b = Convert.FromHexString(buffer);
+        
+        bool allZeros = ConstantTime.IsAllZeros(b);
+        
+        Assert.IsTrue(allZeros == expected);
     }
     
     [TestMethod]
-    public void IsAllZeros_AllZeroBuffer()
+    [DataRow("03", "01", "02")]
+    [DataRow("03", "02", "01")]
+    public void Add_Valid(string buffer, string aString, string bString)
     {
-        Span<byte> buffer = stackalloc byte[ChaCha20Poly1305.NonceSize];
-        bool allZeros = ConstantTime.IsAllZeros(buffer);
-        Assert.IsTrue(allZeros);
+        Span<byte> a = Convert.FromHexString(aString);
+        Span<byte> b = Convert.FromHexString(bString);
+        Span<byte> buf = stackalloc byte[a.Length];
+        
+        ConstantTime.Add(buf, a, b);
+        
+        Assert.AreEqual(buffer, Convert.ToHexString(buf).ToLower());
     }
     
     [TestMethod]
-    public void IsAllZeros_NonZeroBuffer()
+    [DynamicData(nameof(AddSubtractInvalidParameterSizes), DynamicDataSourceType.Method)]
+    public void Add_Invalid(int bufferSize, int aSize, int bSize)
     {
-        Span<byte> buffer = Encoding.UTF8.GetBytes("I believe in the sword.");
-        bool allZeros = ConstantTime.IsAllZeros(buffer);
-        Assert.IsFalse(allZeros);
+        var buf = new byte[bufferSize];
+        var a = new byte[aSize];
+        var b = new byte[bSize];
+        
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ConstantTime.Add(buf, a, b));
     }
     
     [TestMethod]
-    public void IsAllZeros_EmptyBuffer()
+    [DataRow("01", "02", "01")]
+    [DataRow("00", "02", "02")]
+    public void Subtract_Valid(string buffer, string aString, string bString)
     {
-        byte[]? buffer = null;
-        bool allZeros = ConstantTime.IsAllZeros(buffer);
-        Assert.IsTrue(allZeros);
+        Span<byte> a = Convert.FromHexString(aString);
+        Span<byte> b = Convert.FromHexString(bString);
+        Span<byte> buf = stackalloc byte[a.Length];
+        
+        ConstantTime.Subtract(buf, a, b);
+        
+        Assert.AreEqual(buffer, Convert.ToHexString(buf).ToLower());
     }
     
     [TestMethod]
-    public void Add_ValidInputs()
+    [DynamicData(nameof(AddSubtractInvalidParameterSizes), DynamicDataSourceType.Method)]
+    public void Subtract_Invalid(int bufferSize, int aSize, int bSize)
     {
-        byte[] a = {0x01};
-        byte[] b = {0x02};
-        byte[] expected = {0x03};
-        Span<byte> buffer = stackalloc byte[a.Length];
-        ConstantTime.Add(buffer, a, b);
-        Assert.IsTrue(buffer.SequenceEqual(expected));
+        var buf = new byte[bufferSize];
+        var a = new byte[aSize];
+        var b = new byte[bSize];
+        
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ConstantTime.Subtract(buf, a, b));
     }
     
     [TestMethod]
-    public void Add_InvalidInputs()
+    [DataRow(true, "01", "02")]
+    [DataRow(false, "02", "01")]
+    public void IsLessThan_Valid(bool expected, string aString, string bString)
     {
-        byte[] a = {0x01};
-        byte[] b = {0x02, 0x05};
-        var buffer = new byte[a.Length];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ConstantTime.Add(buffer, a, b));
-    }
-    
-    [TestMethod]
-    public void Add_InvalidBuffer()
-    {
-        var buffer = Array.Empty<byte>();
-        byte[] a = {0x01};
-        byte[] b = {0x02};
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ConstantTime.Add(buffer, a, b));
-    }
-    
-    [TestMethod]
-    public void Subtract_ValidInputs()
-    {
-        byte[] a = {0x02};
-        byte[] b = {0x01};
-        byte[] expected = {0x01};
-        Span<byte> buffer = stackalloc byte[a.Length];
-        ConstantTime.Subtract(buffer, a, b);
-        Assert.IsTrue(buffer.SequenceEqual(expected));
-    }
-    
-    [TestMethod]
-    public void Subtract_InvalidInputs()
-    {
-        byte[] a = {0x01};
-        byte[] b = {0x02, 0x05};
-        var buffer = new byte[a.Length];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ConstantTime.Subtract(buffer, a, b));
-    }
-    
-    [TestMethod]
-    public void Subtract_InvalidBuffer()
-    {
-        var buffer = Array.Empty<byte>();
-        byte[] a = {0x02};
-        byte[] b = {0x01};
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ConstantTime.Subtract(buffer, a, b));
-    }
-    
-    [TestMethod]
-    public void IsLessThan_False()
-    {
-        byte[] a = {0x02};
-        byte[] b = {0x01};
+        Span<byte> a = Convert.FromHexString(aString);
+        Span<byte> b = Convert.FromHexString(bString);
+        
         bool aLessThan = ConstantTime.IsLessThan(a, b);
-        Assert.IsFalse(aLessThan);
+        
+        Assert.IsTrue(aLessThan == expected);
     }
     
     [TestMethod]
-    public void IsLessThan_True()
+    [DynamicData(nameof(GreaterLessInvalidParameterSizes), DynamicDataSourceType.Method)]
+    public void IsLessThan_Invalid(int aSize, int bSize)
     {
-        byte[] a = {0x01};
-        byte[] b = {0x02};
-        bool aLessThan = ConstantTime.IsLessThan(a, b);
-        Assert.IsTrue(aLessThan);
-    }
-    
-    [TestMethod]
-    public void IsLessThan_InvalidInputs()
-    {
-        byte[] a = {0x01};
-        byte[] b = {0x02, 0x05};
+        var a = new byte[aSize];
+        var b = new byte[bSize];
+        
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => ConstantTime.IsLessThan(a, b));
     }
-
+    
     [TestMethod]
-    public void IsGreaterThan_False()
+    [DataRow(true, "02", "01")]
+    [DataRow(false, "01", "02")]
+    public void IsGreaterThan_Valid(bool expected, string aString, string bString)
     {
-        byte[] a = {0x01};
-        byte[] b = {0x02};
+        Span<byte> a = Convert.FromHexString(aString);
+        Span<byte> b = Convert.FromHexString(bString);
+        
         bool aGreaterThan = ConstantTime.IsGreaterThan(a, b);
-        Assert.IsFalse(aGreaterThan);
+        
+        Assert.IsTrue(aGreaterThan == expected);
     }
     
     [TestMethod]
-    public void IsGreaterThan_True()
+    [DynamicData(nameof(GreaterLessInvalidParameterSizes), DynamicDataSourceType.Method)]
+    public void IsGreaterThan_Invalid(int aSize, int bSize)
     {
-        byte[] a = {0x02};
-        byte[] b = {0x01};
-        bool aGreaterThan = ConstantTime.IsGreaterThan(a, b);
-        Assert.IsTrue(aGreaterThan);
-    }
-    
-    [TestMethod]
-    public void IsGreaterThan_InvalidInputs()
-    {
-        byte[] a = {0x01};
-        byte[] b = {0x02, 0x05};
+        var a = new byte[aSize];
+        var b = new byte[bSize];
+        
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => ConstantTime.IsGreaterThan(a, b));
     }
 }
