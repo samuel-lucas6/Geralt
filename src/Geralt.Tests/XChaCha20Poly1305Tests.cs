@@ -1,5 +1,5 @@
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -8,368 +8,284 @@ namespace Geralt.Tests;
 [TestClass]
 public class XChaCha20Poly1305Tests
 {
-    // draft-irtf-cfrg-xchacha Section A.3.1: https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-xchacha#appendix-A.3.1
-    private static readonly byte[] Plaintext = Convert.FromHexString("4c616469657320616e642047656e746c656d656e206f662074686520636c617373206f66202739393a204966204920636f756c64206f6666657220796f75206f6e6c79206f6e652074697020666f7220746865206675747572652c2073756e73637265656e20776f756c642062652069742e");
-    private static readonly byte[] Ciphertext = Convert.FromHexString("bd6d179d3e83d43b9576579493c0e939572a1700252bfaccbed2902c21396cbb731c7f1b0b4aa6440bf3a82f4eda7e39ae64c6708c54c216cb96b72e1213b4522f8c9ba40db5d945b11b69b982c1bb9e3f3fac2bc369488f76b2383565d3fff921f9664c97637da9768812f615c68b13b52ec0875924c1c7987947deafd8780acf49");
-    private static readonly byte[] Nonce = Convert.FromHexString("404142434445464748494a4b4c4d4e4f5051525354555657");
-    private static readonly byte[] Key = Convert.FromHexString("808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f");
-    private static readonly byte[] AssociatedData = Convert.FromHexString("50515253c0c1c2c3c4c5c6c7");
-    
-    [TestMethod]
-    public void Encrypt_ValidInputs()
+    // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-xchacha#appendix-A.3.1
+    public static IEnumerable<object[]> DraftXChaChaTestVectors()
     {
-        Span<byte> ciphertext = stackalloc byte[Plaintext.Length + XChaCha20Poly1305.TagSize];
-        XChaCha20Poly1305.Encrypt(ciphertext, Plaintext, Nonce, Key, AssociatedData);
-        Assert.IsTrue(ciphertext.SequenceEqual(Ciphertext));
+        yield return new object[]
+        {
+            "bd6d179d3e83d43b9576579493c0e939572a1700252bfaccbed2902c21396cbb731c7f1b0b4aa6440bf3a82f4eda7e39ae64c6708c54c216cb96b72e1213b4522f8c9ba40db5d945b11b69b982c1bb9e3f3fac2bc369488f76b2383565d3fff921f9664c97637da9768812f615c68b13b52ec0875924c1c7987947deafd8780acf49",
+            "4c616469657320616e642047656e746c656d656e206f662074686520636c617373206f66202739393a204966204920636f756c64206f6666657220796f75206f6e6c79206f6e652074697020666f7220746865206675747572652c2073756e73637265656e20776f756c642062652069742e",
+            "404142434445464748494a4b4c4d4e4f5051525354555657",
+            "808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f",
+            "50515253c0c1c2c3c4c5c6c7"
+        };
     }
     
-    [TestMethod]
-    public void Encrypt_EmptyPlaintext()
+    public static IEnumerable<object[]> IncrementalEncryptParameters()
     {
-        Span<byte> plaintext = Span<byte>.Empty;
-        Span<byte> ciphertext = stackalloc byte[plaintext.Length + XChaCha20Poly1305.TagSize];
-        XChaCha20Poly1305.Encrypt(ciphertext, plaintext, Nonce, Key);
-        Assert.IsFalse(ciphertext.SequenceEqual(new byte[ciphertext.Length]));
-        Span<byte> decrypted = stackalloc byte[plaintext.Length];
-        XChaCha20Poly1305.Decrypt(decrypted, ciphertext, Nonce, Key);
-        Assert.IsTrue(plaintext.SequenceEqual(decrypted));
+        yield return new object[]
+        {
+            "808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f",
+            "0421d1d53971008907219aa2e371102a1f722a42b761a7eaf1d48a972f680bd27ea5c45efb51b91a7a7a4cd0de23b32d70ea706fee3d2ef6a64d8f44d996e164",
+            "50515253c0c1c2c3c4c5c6c7"
+        };
     }
     
-    [TestMethod]
-    public void Encrypt_DifferentNonce()
+    public static IEnumerable<object[]> IncrementalDecryptTestVectors()
     {
-        Span<byte> ciphertext = stackalloc byte[Plaintext.Length + XChaCha20Poly1305.TagSize];
-        Span<byte> nonce = Nonce.ToArray();
-        nonce[0]++;
-        XChaCha20Poly1305.Encrypt(ciphertext, Plaintext, nonce, Key);
-        Assert.IsFalse(ciphertext.SequenceEqual(Ciphertext));
+        yield return new object[]
+        {
+            "d08a6b1c74e2ffbf158eef1ba3fb42b48a9a2c49bbc6255b",
+            "808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f",
+            "4c616469657320616e642047656e746c656d656e206f662074686520636c617373206f66202739393a204966204920636f756c64206f6666657220796f75206f6e6c79206f6e652074697020666f7220746865206675747572652c2073756e73637265656e20776f756c642062652069742e",
+            "23eb1e60c81fcc46aaf0f5321786a970473801a348a673a18928378c324254a075f201efb219c134c17daca9769a6fdee4dc72da0107f35a3ced05f7cad103d79a06d26cf29c457b72cd0fa79ed39ce381d14c2dcc5b56e45a1f626eb68f2eae8dcf08eee8c24049bea3822cb835f30e929310bb33ba6eb383bdd8e12ebba1074ea52a",
+            "50515253c0c1c2c3c4c5c6c7"
+        };
     }
     
-    [TestMethod]
-    public void Encrypt_DifferentKey()
+    public static IEnumerable<object[]> InvalidParameterSizes()
     {
-        Span<byte> ciphertext = stackalloc byte[Plaintext.Length + XChaCha20Poly1305.TagSize];
-        Span<byte> key = Key.ToArray();
-        key[0]++;
-        XChaCha20Poly1305.Encrypt(ciphertext, Plaintext, Nonce, key);
-        Assert.IsFalse(ciphertext.SequenceEqual(Ciphertext));
+        yield return new object[] { XChaCha20Poly1305.TagSize, 1, XChaCha20Poly1305.NonceSize, XChaCha20Poly1305.KeySize, XChaCha20Poly1305.TagSize };
+        yield return new object[] { XChaCha20Poly1305.TagSize, 0, XChaCha20Poly1305.NonceSize + 1, XChaCha20Poly1305.KeySize, XChaCha20Poly1305.TagSize };
+        yield return new object[] { XChaCha20Poly1305.TagSize, 0, XChaCha20Poly1305.NonceSize - 1, XChaCha20Poly1305.KeySize, XChaCha20Poly1305.TagSize };
+        yield return new object[] { XChaCha20Poly1305.TagSize, 0, XChaCha20Poly1305.NonceSize, XChaCha20Poly1305.KeySize + 1, XChaCha20Poly1305.TagSize };
+        yield return new object[] { XChaCha20Poly1305.TagSize, 0, XChaCha20Poly1305.NonceSize, XChaCha20Poly1305.KeySize - 1, XChaCha20Poly1305.TagSize };
     }
     
-    [TestMethod]
-    public void Encrypt_DifferentAssociatedData()
+    public static IEnumerable<object[]> InvalidIncrementalParameterSizes()
     {
-        Span<byte> ciphertext = stackalloc byte[Plaintext.Length + XChaCha20Poly1305.TagSize];
-        Span<byte> associatedData = AssociatedData.ToArray();
-        associatedData[0]++;
-        XChaCha20Poly1305.Encrypt(ciphertext, Plaintext, Nonce, Key, associatedData);
-        Assert.IsFalse(ciphertext.SequenceEqual(Ciphertext));
+        yield return new object[] { IncrementalXChaCha20Poly1305.HeaderSize + 1, IncrementalXChaCha20Poly1305.KeySize, IncrementalXChaCha20Poly1305.TagSize, 0 };
+        yield return new object[] { IncrementalXChaCha20Poly1305.HeaderSize - 1, IncrementalXChaCha20Poly1305.KeySize, IncrementalXChaCha20Poly1305.TagSize, 0 };
+        yield return new object[] { IncrementalXChaCha20Poly1305.HeaderSize, IncrementalXChaCha20Poly1305.KeySize + 1, IncrementalXChaCha20Poly1305.TagSize, 0 };
+        yield return new object[] { IncrementalXChaCha20Poly1305.HeaderSize, IncrementalXChaCha20Poly1305.KeySize - 1, IncrementalXChaCha20Poly1305.TagSize, 0 };
+        yield return new object[] { IncrementalXChaCha20Poly1305.HeaderSize, IncrementalXChaCha20Poly1305.KeySize, IncrementalXChaCha20Poly1305.TagSize, 1 };
     }
     
     [TestMethod]
-    public void Encrypt_InvalidCiphertext()
+    [DynamicData(nameof(DraftXChaChaTestVectors), DynamicDataSourceType.Method)]
+    public void Encrypt_Valid(string ciphertext, string plaintext, string nonce, string key, string associatedData)
     {
-        var ciphertext = new byte[Plaintext.Length + XChaCha20Poly1305.TagSize + 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Encrypt(ciphertext, Plaintext, Nonce, Key));
-        ciphertext = new byte[Plaintext.Length + XChaCha20Poly1305.TagSize - 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Encrypt(ciphertext, Plaintext, Nonce, Key));
-    }
-
-    [TestMethod]
-    public void Encrypt_InvalidNonce()
-    {
-        var ciphertext = new byte[Plaintext.Length + XChaCha20Poly1305.TagSize];
-        var nonce = new byte[XChaCha20Poly1305.NonceSize - 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Encrypt(ciphertext, Plaintext, nonce, Key));
-        nonce = new byte[XChaCha20Poly1305.NonceSize + 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Encrypt(ciphertext, Plaintext, nonce, Key));
+        Span<byte> p = Convert.FromHexString(plaintext);
+        Span<byte> n = Convert.FromHexString(nonce);
+        Span<byte> k = Convert.FromHexString(key);
+        Span<byte> a = Convert.FromHexString(associatedData);
+        Span<byte> c = stackalloc byte[p.Length + XChaCha20Poly1305.TagSize];
+        
+        XChaCha20Poly1305.Encrypt(c, p, n, k, a);
+        
+        Assert.AreEqual(ciphertext, Convert.ToHexString(c).ToLower());
     }
     
     [TestMethod]
-    public void Encrypt_InvalidKey()
+    [DynamicData(nameof(InvalidParameterSizes), DynamicDataSourceType.Method)]
+    public void Encrypt_Invalid(int ciphertextSize, int plaintextSize, int nonceSize, int keySize, int associatedDataSize)
     {
-        var ciphertext = new byte[Plaintext.Length + XChaCha20Poly1305.TagSize];
-        var key = new byte[XChaCha20Poly1305.KeySize - 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Encrypt(ciphertext, Plaintext, Nonce, key));
-        key = new byte[XChaCha20Poly1305.KeySize + 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Encrypt(ciphertext, Plaintext, Nonce, key));
+        var c = new byte[ciphertextSize];
+        var p = new byte[plaintextSize];
+        var n = new byte[nonceSize];
+        var k = new byte[keySize];
+        var a = new byte[associatedDataSize];
+        
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Encrypt(c, p, n, k, a));
     }
     
     [TestMethod]
-    public void Decrypt_ValidInputs()
+    [DynamicData(nameof(DraftXChaChaTestVectors), DynamicDataSourceType.Method)]
+    public void Decrypt_Valid(string ciphertext, string plaintext, string nonce, string key, string associatedData)
     {
-        Span<byte> plaintext = stackalloc byte[Ciphertext.Length - XChaCha20Poly1305.TagSize];
-        XChaCha20Poly1305.Decrypt(plaintext, Ciphertext, Nonce, Key, AssociatedData);
-        Assert.IsTrue(plaintext.SequenceEqual(Plaintext));
+        Span<byte> c = Convert.FromHexString(ciphertext);
+        Span<byte> n = Convert.FromHexString(nonce);
+        Span<byte> k = Convert.FromHexString(key);
+        Span<byte> a = Convert.FromHexString(associatedData);
+        Span<byte> p = stackalloc byte[c.Length - XChaCha20Poly1305.TagSize];
+        
+        XChaCha20Poly1305.Decrypt(p, c, n, k, a);
+        
+        Assert.AreEqual(plaintext, Convert.ToHexString(p).ToLower());
     }
     
     [TestMethod]
-    public void Decrypt_WrongCiphertext()
+    [DynamicData(nameof(DraftXChaChaTestVectors), DynamicDataSourceType.Method)]
+    public void Decrypt_Tampered(string ciphertext, string plaintext, string nonce, string key, string associatedData)
     {
-        var plaintext = new byte[Ciphertext.Length - XChaCha20Poly1305.TagSize];
-        var ciphertext = Ciphertext.ToArray();
-        ciphertext[0]++;
-        Assert.ThrowsException<CryptographicException>(() => XChaCha20Poly1305.Decrypt(plaintext, ciphertext, Nonce, Key, AssociatedData));
+        var parameters = new List<byte[]>
+        {
+            Convert.FromHexString(ciphertext),
+            Convert.FromHexString(nonce),
+            Convert.FromHexString(key),
+            Convert.FromHexString(associatedData)
+        };
+        var p = new byte[parameters[0].Length - XChaCha20Poly1305.TagSize];
+        
+        foreach (var param in parameters) {
+            param[0]++;
+            Assert.ThrowsException<CryptographicException>(() => XChaCha20Poly1305.Decrypt(p, parameters[0], parameters[1], parameters[2], parameters[3]));
+            param[0]--;
+        }
     }
     
     [TestMethod]
-    public void Decrypt_WrongTag()
+    [DynamicData(nameof(InvalidParameterSizes), DynamicDataSourceType.Method)]
+    public void Decrypt_Invalid(int ciphertextSize, int plaintextSize, int nonceSize, int keySize, int associatedDataSize)
     {
-        var plaintext = new byte[Ciphertext.Length - XChaCha20Poly1305.TagSize];
-        var ciphertext = Ciphertext.ToArray();
-        ciphertext[^1]++;
-        Assert.ThrowsException<CryptographicException>(() => XChaCha20Poly1305.Decrypt(plaintext, ciphertext, Nonce, Key, AssociatedData));
-    }
-
-    [TestMethod]
-    public void Decrypt_WrongNonce()
-    {
-        var plaintext = new byte[Ciphertext.Length - XChaCha20Poly1305.TagSize];
-        var nonce = Nonce.ToArray();
-        nonce[0]++;
-        Assert.ThrowsException<CryptographicException>(() => XChaCha20Poly1305.Decrypt(plaintext, Ciphertext, nonce, Key, AssociatedData));
+        var c = new byte[ciphertextSize];
+        var p = new byte[plaintextSize];
+        var n = new byte[nonceSize];
+        var k = new byte[keySize];
+        var a = new byte[associatedDataSize];
+        
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Decrypt(p, c, n, k, a));
     }
     
     [TestMethod]
-    public void Decrypt_WrongKey()
+    [DynamicData(nameof(IncrementalEncryptParameters), DynamicDataSourceType.Method)]
+    public void Incremental_Valid(string key, string plaintext, string associatedData)
     {
-        var plaintext = new byte[Ciphertext.Length - XChaCha20Poly1305.TagSize];
-        var key = Key.ToArray();
-        key[0]++;
-        Assert.ThrowsException<CryptographicException>(() => XChaCha20Poly1305.Decrypt(plaintext, Ciphertext, Nonce, key, AssociatedData));
-    }
-    
-    [TestMethod]
-    public void Decrypt_WrongAssociatedData()
-    {
-        var plaintext = new byte[Ciphertext.Length - XChaCha20Poly1305.TagSize];
-        var associatedData = AssociatedData.ToArray();
-        associatedData[0]++;
-        Assert.ThrowsException<CryptographicException>(() => XChaCha20Poly1305.Decrypt(plaintext, Ciphertext, Nonce, Key, associatedData));
-    }
-    
-    [TestMethod]
-    public void Decrypt_InvalidPlaintext()
-    {
-        var plaintext = new byte[Ciphertext.Length - XChaCha20Poly1305.TagSize + 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Decrypt(plaintext, Ciphertext, Nonce, Key));
-        plaintext = new byte[Ciphertext.Length - XChaCha20Poly1305.TagSize - 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Decrypt(plaintext, Ciphertext, Nonce, Key));
-    }
-
-    [TestMethod]
-    public void Decrypt_InvalidCiphertext()
-    {
-        var plaintext = new byte[Ciphertext.Length - XChaCha20Poly1305.TagSize];
-        var ciphertext = new byte[XChaCha20Poly1305.TagSize - 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Decrypt(plaintext, ciphertext, Nonce, Key));
-    }
-
-    [TestMethod]
-    public void Decrypt_InvalidNonce()
-    {
-        var plaintext = new byte[Ciphertext.Length - XChaCha20Poly1305.TagSize];
-        var nonce = new byte[XChaCha20Poly1305.NonceSize - 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Decrypt(plaintext, Ciphertext, nonce, Key));
-        nonce = new byte[XChaCha20Poly1305.NonceSize + 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Decrypt(plaintext, Ciphertext, nonce, Key));
-    }
-    
-    [TestMethod]
-    public void Decrypt_InvalidKey()
-    {
-        var plaintext = new byte[Ciphertext.Length - XChaCha20Poly1305.TagSize];
-        var key = new byte[XChaCha20Poly1305.KeySize - 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Decrypt(plaintext, Ciphertext, Nonce, key));
-        key = new byte[XChaCha20Poly1305.KeySize + 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Decrypt(plaintext, Ciphertext, Nonce, key));
-    }
-
-    [TestMethod]
-    public void IncrementalEncryptDecrypt_ValidInputs()
-    {
-        Span<byte> header = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
-        Span<byte> plaintext = stackalloc byte[Plaintext.Length];
-        Span<byte> ciphertext = stackalloc byte[Plaintext.Length + IncrementalXChaCha20Poly1305.TagSize];
-        using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, header, Key);
-        encryptor.Push(ciphertext, Plaintext, IncrementalXChaCha20Poly1305.ChunkFlag.Final);
-        using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, header, Key);
-        var chunkFlag = decryptor.Pull(plaintext, ciphertext);
+        Span<byte> h = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
+        Span<byte> k = Convert.FromHexString(key);
+        Span<byte> p = Convert.FromHexString(plaintext);
+        Span<byte> c = stackalloc byte[p.Length + IncrementalXChaCha20Poly1305.TagSize];
+        
+        using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, h, k);
+        encryptor.Push(c, p, IncrementalXChaCha20Poly1305.ChunkFlag.Final);
+        p.Clear();
+        
+        using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, h, k);
+        var chunkFlag = decryptor.Pull(p, c);
+        
         Assert.AreEqual(IncrementalXChaCha20Poly1305.ChunkFlag.Final, chunkFlag);
-        Assert.IsTrue(plaintext.SequenceEqual(Plaintext));
+        Assert.AreEqual(plaintext, Convert.ToHexString(p).ToLower());
     }
-
+    
     [TestMethod]
-    public void IncrementalEncryptDecrypt_Chunked_ValidInputs()
+    [DynamicData(nameof(IncrementalEncryptParameters), DynamicDataSourceType.Method)]
+    public void IncrementalAssociatedData_Valid(string key, string plaintext, string associatedData)
     {
-        Span<byte> header = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
-        const int plaintext1Length = 50, plaintext2Length = 50;
-        int plaintext3Length = Plaintext.Length - plaintext1Length - plaintext2Length;
-        Span<byte> plaintext = stackalloc byte[Plaintext.Length];
-        Span<byte> ciphertext1 = stackalloc byte[plaintext1Length + IncrementalXChaCha20Poly1305.TagSize];
-        Span<byte> ciphertext2 = stackalloc byte[plaintext2Length + IncrementalXChaCha20Poly1305.TagSize];
-        Span<byte> ciphertext3 = stackalloc byte[plaintext3Length + IncrementalXChaCha20Poly1305.TagSize];
-        using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, header, Key);
-        encryptor.Push(ciphertext1, Plaintext.AsSpan()[..plaintext1Length]);
-        encryptor.Push(ciphertext2, Plaintext.AsSpan()[plaintext1Length..(plaintext1Length + plaintext2Length)], IncrementalXChaCha20Poly1305.ChunkFlag.Boundary);
-        encryptor.Push(ciphertext3, Plaintext.AsSpan()[^plaintext3Length..], IncrementalXChaCha20Poly1305.ChunkFlag.Final);
-        using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, header, Key);
-        var chunkFlag = decryptor.Pull(plaintext[..plaintext1Length], ciphertext1);
-        Assert.AreEqual(IncrementalXChaCha20Poly1305.ChunkFlag.Message, chunkFlag);
-        chunkFlag = decryptor.Pull(plaintext[plaintext1Length..(plaintext1Length + plaintext2Length)], ciphertext2);
-        Assert.AreEqual(IncrementalXChaCha20Poly1305.ChunkFlag.Boundary, chunkFlag);
-        chunkFlag = decryptor.Pull(plaintext[^plaintext3Length..], ciphertext3);
+        Span<byte> h = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
+        Span<byte> k = Convert.FromHexString(key);
+        Span<byte> p = Convert.FromHexString(plaintext);
+        Span<byte> a = Convert.FromHexString(associatedData);
+        Span<byte> c = stackalloc byte[p.Length + IncrementalXChaCha20Poly1305.TagSize];
+        
+        using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, h, k);
+        encryptor.Push(c, p, a, IncrementalXChaCha20Poly1305.ChunkFlag.Final);
+        p.Clear();
+        
+        using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, h, k);
+        var chunkFlag = decryptor.Pull(p, c, a);
+        
         Assert.AreEqual(IncrementalXChaCha20Poly1305.ChunkFlag.Final, chunkFlag);
-        Assert.IsTrue(plaintext.SequenceEqual(Plaintext));
+        Assert.AreEqual(plaintext, Convert.ToHexString(p).ToLower());
     }
-
+    
     [TestMethod]
-    public void IncrementalEncryptDecrypt_ValidInputs_WithAssociatedData()
+    [DynamicData(nameof(IncrementalEncryptParameters), DynamicDataSourceType.Method)]
+    public void IncrementalChunked_Valid(string key, string plaintext, string associatedData)
     {
-        Span<byte> header = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
-        Span<byte> plaintext = stackalloc byte[Plaintext.Length];
-        Span<byte> ciphertext = stackalloc byte[Plaintext.Length + IncrementalXChaCha20Poly1305.TagSize];
-        Span<byte> associatedData = stackalloc byte[] { 0x01, 0x02, 0x03, 0x04 };
-        using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, header, Key);
-        encryptor.Push(ciphertext, Plaintext, associatedData, IncrementalXChaCha20Poly1305.ChunkFlag.Final);
-        using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, header, Key);
-        var chunkFlag = decryptor.Pull(plaintext, ciphertext, associatedData);
-        Assert.AreEqual(IncrementalXChaCha20Poly1305.ChunkFlag.Final, chunkFlag);
-        Assert.IsTrue(plaintext.SequenceEqual(Plaintext));
-    }
-
-    [TestMethod]
-    public void IncrementalEncryptDecrypt_ValidInputs_WithRekey()
-    {
-        Span<byte> header = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
-        const int plaintext1Length = 50, plaintext2Length = 50;
-        int plaintext3Length = Plaintext.Length - plaintext1Length - plaintext2Length;
-        Span<byte> plaintext = stackalloc byte[Plaintext.Length];
-        Span<byte> ciphertext1 = stackalloc byte[plaintext1Length + IncrementalXChaCha20Poly1305.TagSize];
-        Span<byte> ciphertext2 = stackalloc byte[plaintext2Length + IncrementalXChaCha20Poly1305.TagSize];
-        Span<byte> ciphertext3 = stackalloc byte[plaintext3Length + IncrementalXChaCha20Poly1305.TagSize];
-        using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, header, Key);
-        encryptor.Push(ciphertext1, Plaintext.AsSpan()[..plaintext1Length]);
+        Span<byte> h = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
+        Span<byte> k = Convert.FromHexString(key);
+        
+        Span<byte> p = Convert.FromHexString(plaintext);
+        Span<byte> p1 = p[..16], p2 = p[16..32], p3 = p[32..48], p4 = p[48..];
+        
+        Span<byte> c = stackalloc byte[p.Length + IncrementalXChaCha20Poly1305.TagSize * 4];
+        Span<byte> c1 = c[..33], c2 = c[33..66], c3 = c[66..99], c4 = c[99..];
+        
+        using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, h, k);
+        encryptor.Push(c1, p1, IncrementalXChaCha20Poly1305.ChunkFlag.Message);
         encryptor.Rekey();
-        encryptor.Push(ciphertext2, Plaintext.AsSpan()[plaintext1Length..(plaintext1Length + plaintext2Length)], IncrementalXChaCha20Poly1305.ChunkFlag.Rekey);
-        encryptor.Push(ciphertext3, Plaintext.AsSpan()[^plaintext3Length..], IncrementalXChaCha20Poly1305.ChunkFlag.Final);
-        using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, header, Key);
-        var chunkFlag = decryptor.Pull(plaintext[..plaintext1Length], ciphertext1);
+        encryptor.Push(c2, p2, IncrementalXChaCha20Poly1305.ChunkFlag.Boundary);
+        encryptor.Push(c3, p3, IncrementalXChaCha20Poly1305.ChunkFlag.Rekey);
+        encryptor.Push(c4, p4, IncrementalXChaCha20Poly1305.ChunkFlag.Final);
+        p1.Clear(); p2.Clear(); p3.Clear(); p4.Clear();
+        
+        using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, h, k);
+        var chunkFlag = decryptor.Pull(p1, c1);
         Assert.AreEqual(IncrementalXChaCha20Poly1305.ChunkFlag.Message, chunkFlag);
+        
         decryptor.Rekey();
-        chunkFlag = decryptor.Pull(plaintext[plaintext1Length..(plaintext1Length + plaintext2Length)], ciphertext2);
+        
+        chunkFlag = decryptor.Pull(p2, c2);
+        Assert.AreEqual(IncrementalXChaCha20Poly1305.ChunkFlag.Boundary, chunkFlag);
+        
+        chunkFlag = decryptor.Pull(p3, c3);
         Assert.AreEqual(IncrementalXChaCha20Poly1305.ChunkFlag.Rekey, chunkFlag);
-        chunkFlag = decryptor.Pull(plaintext[^plaintext3Length..], ciphertext3);
+        
+        chunkFlag = decryptor.Pull(p4, c4);
         Assert.AreEqual(IncrementalXChaCha20Poly1305.ChunkFlag.Final, chunkFlag);
-        Assert.IsTrue(plaintext.SequenceEqual(Plaintext));
+        
+        Assert.AreEqual(plaintext, Convert.ToHexString(p).ToLower());
     }
-
+    
     [TestMethod]
-    public void IncrementalEncryptDecrypt_WrongHeader()
+    [DynamicData(nameof(InvalidIncrementalParameterSizes), DynamicDataSourceType.Method)]
+    public void Incremental_Invalid(int headerSize, int keySize, int ciphertextSize, int plaintextSize)
     {
-        Span<byte> header = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
-        byte[] plaintext = new byte[Plaintext.Length];
-        byte[] ciphertext = new byte[Plaintext.Length + IncrementalXChaCha20Poly1305.TagSize];
-        using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, header, Key);
-        encryptor.Push(ciphertext, Plaintext, IncrementalXChaCha20Poly1305.ChunkFlag.Final);
-        header[0]++;
-        using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, header, Key);
-        Assert.ThrowsException<CryptographicException>(() => decryptor.Pull(plaintext, ciphertext));
+        var h = new byte[headerSize];
+        var k = new byte[keySize];
+        var c = new byte[ciphertextSize];
+        var p = new byte[plaintextSize];
+        
+        if (headerSize != IncrementalXChaCha20Poly1305.HeaderSize || keySize != IncrementalXChaCha20Poly1305.KeySize) {
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => new IncrementalXChaCha20Poly1305(decryption: false, h, k));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => new IncrementalXChaCha20Poly1305(decryption: true, h, k));
+        }
+        else {
+            using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, h, k);
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => encryptor.Push(c, p));
+            
+            using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, h, k);
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => decryptor.Pull(p, c));
+        }
     }
-
+    
     [TestMethod]
-    public void IncrementalEncryptDecrypt_WrongCiphertext()
+    public void Incremental_InvalidOperation()
     {
-        Span<byte> header = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
-        byte[] plaintext = new byte[Plaintext.Length];
-        byte[] ciphertext = new byte[Plaintext.Length + IncrementalXChaCha20Poly1305.TagSize];
-        using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, header, Key);
-        encryptor.Push(ciphertext, Plaintext, IncrementalXChaCha20Poly1305.ChunkFlag.Final);
-        ciphertext[0]++;
-        using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, header, Key);
-        Assert.ThrowsException<CryptographicException>(() => decryptor.Pull(plaintext, ciphertext));
+        Span<byte> h = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
+        Span<byte> k = stackalloc byte[IncrementalXChaCha20Poly1305.KeySize];
+        var p = new byte[h.Length];
+        var c = new byte[p.Length + IncrementalXChaCha20Poly1305.TagSize];
+        
+        using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, h, k);
+        Assert.ThrowsException<InvalidOperationException>(() => encryptor.Pull(p, c));
+        
+        using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, h, k);
+        Assert.ThrowsException<InvalidOperationException>(() => decryptor.Push(c, p));
     }
-
+    
     [TestMethod]
-    public void IncrementalEncryptDecrypt_WrongTag()
+    [DynamicData(nameof(IncrementalDecryptTestVectors), DynamicDataSourceType.Method)]
+    public void IncrementalDecrypt_Tampered(string header, string key, string plaintext, string ciphertext, string associatedData)
     {
-        Span<byte> header = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
-        byte[] plaintext = new byte[Plaintext.Length];
-        byte[] ciphertext = new byte[Plaintext.Length + IncrementalXChaCha20Poly1305.TagSize];
-        using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, header, Key);
-        encryptor.Push(ciphertext, Plaintext, IncrementalXChaCha20Poly1305.ChunkFlag.Final);
-        ciphertext[^1]++;
-        using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, header, Key);
-        Assert.ThrowsException<CryptographicException>(() => decryptor.Pull(plaintext, ciphertext));
+        var parameters = new List<byte[]>
+        {
+            Convert.FromHexString(header),
+            Convert.FromHexString(key),
+            Convert.FromHexString(ciphertext),
+            Convert.FromHexString(associatedData)
+        };
+        var p = new byte[parameters[2].Length - IncrementalXChaCha20Poly1305.TagSize];
+        
+        foreach (var param in parameters) {
+            param[0]++;
+            using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, parameters[0], parameters[1]);
+            Assert.ThrowsException<CryptographicException>(() => decryptor.Pull(p, parameters[2], parameters[3]));
+            param[0]--;
+        }
     }
-
+    
     [TestMethod]
-    public void IncrementalEncryptDecrypt_WrongKey()
+    [DataRow("3677e196fb57f611fe71cf25cbd892481f7a7179c2827102", "808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f", "4c616469657320616e642047656e746c656d656e206f662074686520636c617373206f66202739393a204966204920636f756c64206f6666657220796f75206f6e6c79206f6e652074697020666f7220746865206675747572652c2073756e73637265656e20776f756c642062652069742e", "cc55781c4cb5443c19b856b695a2a6fc801935832c9c8278da67de429c3760231c846838d5a58a89815a99d572bfcf6ec14ed725931c6ac1fb7445eb25cad39773502f9550670fd918638c89d83ddfda7297b59281b6012f780c0b3f0cb6309345573c7967fbcfb8843ce04db7912754fe861f5963c83dc6ad066c0d04b3235ade74ca", "")]
+    public void IncrementalDecrypt_MissingRekey(string header, string key, string plaintext, string ciphertext, string associatedData)
     {
-        Span<byte> header = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
-        byte[] plaintext = new byte[Plaintext.Length];
-        byte[] ciphertext = new byte[Plaintext.Length + IncrementalXChaCha20Poly1305.TagSize];
-        using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, header, Key);
-        encryptor.Push(ciphertext, Plaintext, IncrementalXChaCha20Poly1305.ChunkFlag.Final);
-        var key = Key.ToArray();
-        key[0]++;
-        using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, header, key);
-        Assert.ThrowsException<CryptographicException>(() => decryptor.Pull(plaintext, ciphertext));
-    }
-
-    [TestMethod]
-    public void IncrementalEncryptDecrypt_WrongAssociatedData()
-    {
-        Span<byte> header = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
-        byte[] plaintext = new byte[Plaintext.Length];
-        byte[] ciphertext = new byte[Plaintext.Length + IncrementalXChaCha20Poly1305.TagSize];
-        byte[] associatedData = { 0x01, 0x02, 0x03, 0x04 };
-        using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, header, Key);
-        encryptor.Push(ciphertext, Plaintext, associatedData, IncrementalXChaCha20Poly1305.ChunkFlag.Final);
-        using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, header, Key);
-        associatedData[0]++;
-        Assert.ThrowsException<CryptographicException>(() => decryptor.Pull(plaintext, ciphertext, associatedData));
-    }
-
-    [TestMethod]
-    public void IncrementalEncryptDecrypt_MissingRekeyDuringEncryption()
-    {
-        Span<byte> header = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
-        const int plaintext1Length = 50, plaintext2Length = 50;
-        int plaintext3Length = Plaintext.Length - plaintext1Length - plaintext2Length;
-        byte[] plaintext = new byte[Plaintext.Length];
-        Span<byte> ciphertext1 = stackalloc byte[plaintext1Length + IncrementalXChaCha20Poly1305.TagSize];
-        byte[] ciphertext2 = new byte[plaintext2Length + IncrementalXChaCha20Poly1305.TagSize];
-        Span<byte> ciphertext3 = stackalloc byte[plaintext3Length + IncrementalXChaCha20Poly1305.TagSize];
-        using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, header, Key);
-        encryptor.Push(ciphertext1, Plaintext.AsSpan()[..plaintext1Length]);
-        encryptor.Rekey();
-        encryptor.Push(ciphertext2, Plaintext.AsSpan()[plaintext1Length..(plaintext1Length + plaintext2Length)]);
-        encryptor.Push(ciphertext3, Plaintext.AsSpan()[^plaintext3Length..], IncrementalXChaCha20Poly1305.ChunkFlag.Final);
-        using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, header, Key);
-        var chunkFlag = decryptor.Pull(plaintext.AsSpan()[..plaintext1Length], ciphertext1);
-        Assert.AreEqual(IncrementalXChaCha20Poly1305.ChunkFlag.Message, chunkFlag);
-        Assert.ThrowsException<CryptographicException>(() => decryptor.Pull(plaintext.AsSpan()[plaintext1Length..(plaintext1Length + plaintext2Length)], ciphertext2));
-    }
-
-    [TestMethod]
-    public void IncrementalEncryptDecrypt_CannotDecryptEncryptionStream()
-    {
-        Span<byte> header = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
-        byte[] plaintext = new byte[Plaintext.Length];
-        byte[] ciphertext = new byte[Plaintext.Length + IncrementalXChaCha20Poly1305.TagSize];
-        using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, header, Key);
-        Assert.ThrowsException<InvalidOperationException>(() => encryptor.Pull(plaintext, ciphertext));
-    }
-
-    [TestMethod]
-    public void IncrementalEncryptDecrypt_CannotEncryptDecryptionStream()
-    {
-        Span<byte> header = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
-        byte[] plaintext = new byte[Plaintext.Length];
-        byte[] ciphertext = new byte[Plaintext.Length + IncrementalXChaCha20Poly1305.TagSize];
-        using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, header, Key);
-        encryptor.Push(ciphertext, Plaintext, IncrementalXChaCha20Poly1305.ChunkFlag.Final);
-        using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, header, Key);
-        Assert.ThrowsException<InvalidOperationException>(() => decryptor.Push(ciphertext, plaintext));
+        var h = Convert.FromHexString(header);
+        var k = Convert.FromHexString(key);
+        var c = Convert.FromHexString(ciphertext);
+        var p = new byte[c.Length - IncrementalXChaCha20Poly1305.TagSize];
+        
+        using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, h, k);
+        // Should rekey here
+        Assert.ThrowsException<CryptographicException>(() => decryptor.Pull(p, c));
     }
 }
