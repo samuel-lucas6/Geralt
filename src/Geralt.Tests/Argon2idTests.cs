@@ -1,6 +1,6 @@
 using System;
-using System.Linq;
 using System.Text;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Geralt.Tests;
@@ -8,221 +8,162 @@ namespace Geralt.Tests;
 [TestClass]
 public class Argon2idTests
 {
-    // Generated using libsodium-core
-    private static readonly byte[] Argon2idKey = Convert.FromHexString("9108d194ef44c4a2ca75be1107a931359a99b0c9a41187bf9f2c0cb22ec73318");
-    private static readonly byte[] Password = Encoding.UTF8.GetBytes("correct horse battery staple");
-    private static readonly byte[] Salt = Convert.FromHexString("bca21536da522787b9267be10c1b7499");
-    private const string Argon2idHash = "$argon2id$v=19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us";
-    private const string WrongArgon2idHash = "$argon2id$v=19$m=16384,t=1,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us";
-    // Smallest memory size for testing
-    private const int Iterations = 3;
-    private const int MemorySize = 16777216;
-    
-    [TestMethod]
-    public void DeriveKey_ValidInputs()
+    // https://github.com/jedisct1/libsodium/blob/master/test/default/pwhash_argon2id.c
+    public static IEnumerable<object[]> StringTestVectors()
     {
-        Span<byte> key = stackalloc byte[Argon2id.KeySize];
-        Argon2id.DeriveKey(key, Password, Salt, Iterations, MemorySize);
-        Assert.IsTrue(key.SequenceEqual(Argon2idKey));
+        yield return new object[]
+        {
+            true,
+            "$argon2id$v=19$m=4882,t=2,p=1$bA81arsiXysd3WbTRzmEOw$Nm8QBM+7RH1DXo9rvp5cwKEOOOfD2g6JuxlXihoNcpE",
+            ""
+        };
+        yield return new object[]
+        {
+            true,
+            "$argon2id$v=19$m=4096,t=19,p=1$PkEgMTYtYnl0ZXMgc2FsdA$ltB/ue1kPtBMBGfsysMpPigE6hiNEKZ9vs8vLNVDQGA",
+            "^T5H$JYt39n%K*j:W]!1s?vg!:jGi]Ax?..l7[p0v:1jHTpla9;]bUN;?bWyCbtqg "
+        };
+        yield return new object[]
+        {
+            true,
+            "$argon2id$v=19$m=4096,t=1,p=3$PkEgcHJldHR5IGxvbmcgc2FsdA$HUqx5Z1b/ZypnUrvvJ5UC2Q+T6Q1WwASK/Kr9dRbGA0",
+            "K3S=KyH#)36_?]LxeR8QNKw6X=gFbxai$C%29V*"
+        };
+        yield return new object[]
+        {
+            false,
+            "$argon2id$v=19$m=4096,t=0,p=1$X1NhbHQAAAAAAAAAAAAAAA$bWh++MKN1OiFHKgIWTLvIi1iHicmHH7+Fv3K88ifFfI",
+            ""
+        };
+        yield return new object[]
+        {
+            false,
+            "$argon2id$v=19$m=2048,t=4,p=1$SWkxaUhpY21ISDcrRnYzSw$Mbg/Eck1kpZir5T9io7C64cpffdTBaORgyriLQFgQj8",
+            ""
+        };
+        yield return new object[]
+        {
+            false,
+            "$argon2id$v=19$m=4096,t=0,p=1$PkEgMTYtYnl0ZXMgc2FsdA$ltB/ue1kPtBMBGfsysMpPigE6hiNEKZ9vs8vLNVDQGA",
+            "^T5H$JYt39n%K*j:W]!1s?vg!:jGi]Ax?..l7[p0v:1jHTpla9;]bUN;?bWyCbtqg "
+        };
     }
     
     [TestMethod]
-    public void DeriveKey_EmptyPassword()
+    [DataRow("9108d194ef44c4a2ca75be1107a931359a99b0c9a41187bf9f2c0cb22ec73318", "correct horse battery staple", "bca21536da522787b9267be10c1b7499", 3, 16777216)]
+    public void DeriveKey_Valid(string outputKeyingMaterial, string password, string salt, int iterations, int memorySize)
     {
-        Span<byte> key = stackalloc byte[Argon2id.KeySize];
-        Span<byte> password = Span<byte>.Empty;
-        Argon2id.DeriveKey(key, password, Salt, Iterations, MemorySize);
-        Assert.IsFalse(key.SequenceEqual(new byte[key.Length]));
-        Assert.IsFalse(key.SequenceEqual(Argon2idKey));
+        Span<byte> o = stackalloc byte[outputKeyingMaterial.Length / 2];
+        Span<byte> p = Encoding.UTF8.GetBytes(password);
+        Span<byte> s = Convert.FromHexString(salt);
+        
+        Argon2id.DeriveKey(o, p, s, iterations, memorySize);
+        
+        Assert.AreEqual(outputKeyingMaterial, Convert.ToHexString(o).ToLower());
     }
     
     [TestMethod]
-    public void DeriveKey_DifferentSalt()
+    [DataRow(Argon2id.MinKeySize - 1, Argon2id.KeySize, Argon2id.SaltSize, Argon2id.MinIterations, Argon2id.MinMemorySize)]
+    [DataRow(Argon2id.MinKeySize, Argon2id.KeySize, Argon2id.SaltSize + 1, Argon2id.MinIterations, Argon2id.MinMemorySize)]
+    [DataRow(Argon2id.MinKeySize, Argon2id.KeySize, Argon2id.SaltSize - 1, Argon2id.MinIterations, Argon2id.MinMemorySize)]
+    [DataRow(Argon2id.MinKeySize, Argon2id.KeySize, Argon2id.SaltSize, Argon2id.MinIterations - 1, Argon2id.MinMemorySize)]
+    [DataRow(Argon2id.MinKeySize, Argon2id.KeySize, Argon2id.SaltSize, Argon2id.MinIterations, Argon2id.MinMemorySize - 1 )]
+    public void DeriveKey_Invalid(int outputKeyingMaterialSize, int passwordSize, int saltSize, int iterations, int memorySize)
     {
-        Span<byte> key = stackalloc byte[Argon2id.KeySize];
-        Span<byte> salt = Salt.ToArray();
-        salt[0]++;
-        Argon2id.DeriveKey(key, Password, salt, Iterations, MemorySize);
-        Assert.IsFalse(key.SequenceEqual(Argon2idKey));
+        var o = new byte[outputKeyingMaterialSize];
+        var p = new byte[passwordSize];
+        var s = new byte[saltSize];
+        
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.DeriveKey(o, p, s, iterations, memorySize));
     }
     
     [TestMethod]
-    public void DeriveKey_DifferentIterations()
+    [DataRow("correct horse battery staple", 3, 16777216)]
+    public void ComputeHash_Valid(string password, int iterations, int memorySize)
     {
-        Span<byte> key = stackalloc byte[Argon2id.KeySize];
-        Argon2id.DeriveKey(key, Password, Salt, Iterations + 1, MemorySize);
-        Assert.IsFalse(key.SequenceEqual(Argon2idKey));
-    }
-    
-    [TestMethod]
-    public void DeriveKey_DifferentMemorySize()
-    {
-        Span<byte> key = stackalloc byte[Argon2id.KeySize];
-        Argon2id.DeriveKey(key, Password, Salt, Iterations, MemorySize + 1024);
-        Assert.IsFalse(key.SequenceEqual(Argon2idKey));
-    }
-
-    [TestMethod]
-    public void DeriveKey_InvalidKey()
-    {
-        var key = new byte[Argon2id.MinKeySize - 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.DeriveKey(key, Password, Salt, Iterations, MemorySize));
-    }
-    
-    [TestMethod]
-    public void DeriveKey_InvalidSalt()
-    {
-        var key = new byte[Argon2id.KeySize];
-        var salt = new byte[Argon2id.SaltSize - 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.DeriveKey(key, Password, salt, Iterations, MemorySize));
-        salt = new byte[Argon2id.SaltSize + 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.DeriveKey(key, Password, salt, Iterations, MemorySize));
-    }
-    
-    [TestMethod]
-    public void DeriveKey_InvalidIterations()
-    {
-        var key = new byte[Argon2id.KeySize];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.DeriveKey(key, Password, Salt, Argon2id.MinIterations - 1, MemorySize));
-    }
-    
-    [TestMethod]
-    public void DeriveKey_InvalidMemorySize()
-    {
-        var key = new byte[Argon2id.KeySize];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.DeriveKey(key, Password, Salt, Iterations, Argon2id.MinMemorySize - 1));
-    }
-
-    [TestMethod]
-    public void ComputeHash_ValidInputs()
-    {
-        Span<byte> hash = stackalloc byte[Argon2id.MaxHashSize];
-        Argon2id.ComputeHash(hash, Password, Iterations, MemorySize);
-        bool valid = Argon2id.VerifyHash(hash, Password);
+        Span<byte> h = stackalloc byte[Argon2id.MaxHashSize];
+        Span<byte> p = Encoding.UTF8.GetBytes(password);
+        
+        Argon2id.ComputeHash(h, p, iterations, memorySize);
+        
+        Assert.IsFalse(h.SequenceEqual(new byte[h.Length]));
+        
+        bool valid = Argon2id.VerifyHash(h, p);
         Assert.IsTrue(valid);
-        bool rehash = Argon2id.NeedsRehash(hash, Iterations, MemorySize);
+        
+        bool rehash = Argon2id.NeedsRehash(h, iterations, memorySize);
         Assert.IsFalse(rehash);
     }
     
     [TestMethod]
-    public void ComputeHash_EmptyPassword()
+    [DataRow(Argon2id.MaxHashSize + 1, Argon2id.KeySize, Argon2id.MinIterations, Argon2id.MinMemorySize)]
+    [DataRow(Argon2id.MaxHashSize - 1, Argon2id.KeySize, Argon2id.MinIterations, Argon2id.MinMemorySize)]
+    [DataRow(Argon2id.MaxHashSize, Argon2id.KeySize, Argon2id.MinIterations - 1, Argon2id.MinMemorySize)]
+    [DataRow(Argon2id.MaxHashSize, Argon2id.KeySize, Argon2id.MinIterations, Argon2id.MinMemorySize - 1)]
+    public void ComputeHash_Invalid(int hashSize, int passwordSize, int iterations, int memorySize)
     {
-        Span<byte> hash = stackalloc byte[Argon2id.MaxHashSize];
-        Span<byte> password = Span<byte>.Empty;
-        Argon2id.ComputeHash(hash, password, Iterations, MemorySize);
-        bool valid = Argon2id.VerifyHash(hash, password);
-        Assert.IsTrue(valid);
-    }
-
-    [TestMethod]
-    public void ComputeHash_InvalidHash()
-    {
-        var hash = new byte[Argon2id.MaxHashSize - 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.ComputeHash(hash, Password, Iterations, MemorySize));
-        hash = new byte[Argon2id.MaxHashSize + 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.ComputeHash(hash, Password, Iterations, MemorySize));
+        var h = new byte[hashSize];
+        var p = new byte[passwordSize];
+        
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.ComputeHash(h, p, iterations, memorySize));
     }
     
     [TestMethod]
-    public void ComputeHash_InvalidIterations()
+    [DynamicData(nameof(StringTestVectors), DynamicDataSourceType.Method)]
+    public void VerifyHash_Valid(bool expected, string hash, string password)
     {
-        var hash = new byte[Argon2id.MaxHashSize];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.ComputeHash(hash, Password, Argon2id.MinIterations - 1, MemorySize));
-    }
-
-    [TestMethod]
-    public void ComputeHash_InvalidMemorySize()
-    {
-        var hash = new byte[Argon2id.MaxHashSize];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.ComputeHash(hash, Password, Iterations, Argon2id.MinMemorySize - 1));
-    }
-
-    [TestMethod]
-    public void VerifyHash_ValidInputs()
-    {
-        Span<byte> hash = Encoding.UTF8.GetBytes(Argon2idHash);
-        bool valid = Argon2id.VerifyHash(hash, Password);
-        Assert.IsTrue(valid);
-    }
-
-    [TestMethod]
-    public void VerifyHash_WrongHash()
-    {
-        Span<byte> hash = Encoding.UTF8.GetBytes(WrongArgon2idHash);
-        bool valid = Argon2id.VerifyHash(hash, Password);
-        Assert.IsFalse(valid);
+        Span<byte> h = Encoding.UTF8.GetBytes(hash);
+        Span<byte> p = Encoding.UTF8.GetBytes(password);
+        
+        bool valid = Argon2id.VerifyHash(h, p);
+        
+        Assert.IsTrue(valid == expected);
     }
     
     [TestMethod]
-    public void VerifyHash_WrongPassword()
+    [DataRow(Argon2id.MaxHashSize + 1, Argon2id.KeySize)]
+    [DataRow(Argon2id.MinHashSize - 1, Argon2id.KeySize)]
+    public void VerifyHash_Invalid(int hashSize, int passwordSize)
     {
-        Span<byte> hash = Encoding.UTF8.GetBytes(Argon2idHash);
-        Span<byte> password = Password.ToArray();
-        password[0]++;
-        bool valid = Argon2id.VerifyHash(hash, password);
-        Assert.IsFalse(valid);
-    }
-
-    [TestMethod]
-    public void VerifyHash_InvalidHash()
-    {
-        var hash = new byte[Argon2id.MinHashSize - 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.VerifyHash(hash, Password));
-        hash = new byte[Argon2id.MaxHashSize + 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.VerifyHash(hash, Password));
+        var h = new byte[hashSize];
+        var p = new byte[passwordSize];
+        
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.VerifyHash(h, p));
     }
     
     [TestMethod]
-    public void NeedsRehash_CorrectParameters()
+    [DataRow(false, "$argon2id$v=19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 3, 16777216)]
+    [DataRow(true, "$argon2id$v=19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 4, 16777216)]
+    [DataRow(true, "$argon2id$v=19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 3, 26777216)]
+    public void NeedsRehash_Valid(bool expected, string hash, int iterations, int memorySize)
     {
-        Span<byte> hash = Encoding.UTF8.GetBytes(Argon2idHash);
-        bool rehash = Argon2id.NeedsRehash(hash, Iterations, MemorySize);
-        Assert.IsFalse(rehash);
-    }
-
-    [TestMethod]
-    public void NeedsRehash_WrongIterations()
-    {
-        Span<byte> hash = Encoding.UTF8.GetBytes(Argon2idHash);
-        bool rehash = Argon2id.NeedsRehash(hash, Iterations + 1, MemorySize);
-        Assert.IsTrue(rehash);
-    }
-
-    [TestMethod]
-    public void NeedsRehash_WrongMemorySize()
-    {
-        Span<byte> hash = Encoding.UTF8.GetBytes(Argon2idHash);
-        bool rehash = Argon2id.NeedsRehash(hash, Iterations, MemorySize * 2);
-        Assert.IsTrue(rehash);
-    }
-
-    [TestMethod]
-    public void NeedsRehash_InvalidHash()
-    {
-        var hash = new byte[Argon2id.MinHashSize - 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.NeedsRehash(hash, Iterations, MemorySize));
-        hash = new byte[Argon2id.MaxHashSize + 1];
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.NeedsRehash(hash, Iterations, MemorySize));
+        Span<byte> h = Encoding.UTF8.GetBytes(hash);
+        
+        bool rehash = Argon2id.NeedsRehash(h, iterations, memorySize);
+        
+        Assert.IsTrue(rehash == expected);
     }
     
     [TestMethod]
-    public void NeedsRehash_CorruptHash()
+    [DataRow("argon2id$v=19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 3, 16777216)]
+    [DataRow("$argon2id$v19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 3, 16777216)]
+    [DataRow("$argon2id$v=19$m=16384t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 3, 16777216)]
+    public void NeedsRehash_Tampered(string hash, int iterations, int memorySize)
     {
-        var hash = Encoding.UTF8.GetBytes(Argon2idHash.Trim('$'));
-        Assert.ThrowsException<FormatException>(() => Argon2id.NeedsRehash(hash, Iterations, MemorySize));
+        var h = Encoding.UTF8.GetBytes(hash);
+        
+        Assert.ThrowsException<FormatException>(() => Argon2id.NeedsRehash(h, iterations, memorySize));
     }
     
     [TestMethod]
-    public void NeedsRehash_InvalidIterations()
+    [DataRow(Argon2id.MaxHashSize + 1, Argon2id.MinIterations, Argon2id.MinMemorySize)]
+    [DataRow(Argon2id.MinHashSize - 1, Argon2id.MinIterations, Argon2id.MinMemorySize)]
+    [DataRow(Argon2id.MinHashSize, Argon2id.MinIterations - 1, Argon2id.MinMemorySize)]
+    [DataRow(Argon2id.MinHashSize, Argon2id.MinIterations, Argon2id.MinMemorySize - 1)]
+    public void NeedsRehash_Invalid(int hashSize, int iterations, int memorySize)
     {
-        var hash = Encoding.UTF8.GetBytes(Argon2idHash);
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.NeedsRehash(hash, Argon2id.MinIterations - 1, MemorySize));
-    }
-    
-    [TestMethod]
-    public void NeedsRehash_InvalidMemorySize()
-    {
-        var hash = Encoding.UTF8.GetBytes(Argon2idHash);
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.NeedsRehash(hash, Iterations, Argon2id.MinMemorySize - 1));
+        var h = new byte[hashSize];
+        
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.NeedsRehash(h, iterations, memorySize));
     }
 }
