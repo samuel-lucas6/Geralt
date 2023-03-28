@@ -52,7 +52,7 @@ public class XChaCha20Poly1305Tests
         yield return new object[] { XChaCha20Poly1305.TagSize, 0, XChaCha20Poly1305.NonceSize, XChaCha20Poly1305.KeySize - 1, XChaCha20Poly1305.TagSize };
     }
     
-    public static IEnumerable<object[]> InvalidIncrementalParameterSizes()
+    public static IEnumerable<object[]> IncrementalInvalidParameterSizes()
     {
         yield return new object[] { IncrementalXChaCha20Poly1305.HeaderSize + 1, IncrementalXChaCha20Poly1305.KeySize, IncrementalXChaCha20Poly1305.TagSize, 0 };
         yield return new object[] { IncrementalXChaCha20Poly1305.HeaderSize - 1, IncrementalXChaCha20Poly1305.KeySize, IncrementalXChaCha20Poly1305.TagSize, 0 };
@@ -218,7 +218,7 @@ public class XChaCha20Poly1305Tests
     }
     
     [TestMethod]
-    [DynamicData(nameof(InvalidIncrementalParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(IncrementalInvalidParameterSizes), DynamicDataSourceType.Method)]
     public void Incremental_Invalid(int headerSize, int keySize, int ciphertextSize, int plaintextSize)
     {
         var h = new byte[headerSize];
