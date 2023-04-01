@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -199,11 +200,11 @@ public class BLAKE2bTests
         var parameters = new List<byte[]>
         {
             Convert.FromHexString(tag),
-            message.Length > 0 ? Convert.FromHexString(message) : new byte[1],
+            Convert.FromHexString(message),
             Convert.FromHexString(key)
         };
         
-        foreach (var param in parameters) {
+        foreach (var param in parameters.Where(param => param.Length != 0)) {
             param[0]++;
             bool valid = BLAKE2b.VerifyTag(parameters[0], parameters[1], parameters[2]);
             param[0]--;
