@@ -115,6 +115,19 @@ public class X25519Tests
     }
     
     [TestMethod]
+    public void Constants_Valid()
+    {
+        Assert.AreEqual(32, X25519.PublicKeySize);
+        Assert.AreEqual(32, X25519.PrivateKeySize);
+        Assert.AreEqual(32, X25519.SeedSize);
+        Assert.AreEqual(32, X25519.SharedSecretSize);
+        Assert.AreEqual(32, X25519.SharedKeySize);
+        Assert.AreEqual(32, X25519.PreSharedKeySize);
+        Assert.AreEqual(32, X25519.MinPreSharedKeySize);
+        Assert.AreEqual(64, X25519.MaxPreSharedKeySize);
+    }
+    
+    [TestMethod]
     public void GenerateKeyPair_Valid()
     {
         Span<byte> pk = stackalloc byte[X25519.PublicKeySize];

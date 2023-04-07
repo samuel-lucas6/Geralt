@@ -7,6 +7,15 @@ namespace Geralt.Tests;
 public class HChaCha20Tests
 {
     [TestMethod]
+    public void Constants_Valid()
+    {
+        Assert.AreEqual(32, HChaCha20.OutputSize);
+        Assert.AreEqual(32, HChaCha20.KeySize);
+        Assert.AreEqual(16, HChaCha20.NonceSize);
+        Assert.AreEqual(16, HChaCha20.PersonalSize);
+    }
+    
+    [TestMethod]
     // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-xchacha#section-2.2.1
     [DataRow("82413b4227b27bfed30e42508a877d73a0f9e4d58a74a853c12ec41326d3ecdc", "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f", "000000090000004a0000000031415927")]
     public void DeriveKey_Valid(string output, string key, string nonce)

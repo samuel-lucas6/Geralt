@@ -104,6 +104,36 @@ public class BLAKE2bTests
     }
     
     [TestMethod]
+    public void Constants_Valid()
+    {
+        Assert.AreEqual(64, BLAKE2b.HashSize);
+        Assert.AreEqual(32, BLAKE2b.KeySize);
+        Assert.AreEqual(32, BLAKE2b.TagSize);
+        Assert.AreEqual(16, BLAKE2b.SaltSize);
+        Assert.AreEqual(16, BLAKE2b.PersonalSize);
+        Assert.AreEqual(16, BLAKE2b.MinHashSize);
+        Assert.AreEqual(64, BLAKE2b.MaxHashSize);
+        Assert.AreEqual(16, BLAKE2b.MinTagSize);
+        Assert.AreEqual(64, BLAKE2b.MaxTagSize);
+        Assert.AreEqual(32, BLAKE2b.MinKeySize);
+        Assert.AreEqual(64, BLAKE2b.MaxKeySize);
+    }
+    
+    [TestMethod]
+    public void IncrementalConstants_Valid()
+    {
+        Assert.AreEqual(64, IncrementalBLAKE2b.HashSize);
+        Assert.AreEqual(32, IncrementalBLAKE2b.KeySize);
+        Assert.AreEqual(32, IncrementalBLAKE2b.TagSize);
+        Assert.AreEqual(16, IncrementalBLAKE2b.MinHashSize);
+        Assert.AreEqual(64, IncrementalBLAKE2b.MaxHashSize);
+        Assert.AreEqual(16, IncrementalBLAKE2b.MinTagSize);
+        Assert.AreEqual(64, IncrementalBLAKE2b.MaxTagSize);
+        Assert.AreEqual(32, IncrementalBLAKE2b.MinKeySize);
+        Assert.AreEqual(64, IncrementalBLAKE2b.MaxKeySize);
+    }
+    
+    [TestMethod]
     [DynamicData(nameof(UnkeyedTestVectors), DynamicDataSourceType.Method)]
     public void ComputeHash_Valid(string hash, string message)
     {

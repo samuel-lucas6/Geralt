@@ -8,6 +8,22 @@ namespace Geralt.Tests;
 public class SecureRandomTests
 {
     [TestMethod]
+    public void Constants_Valid()
+    {
+        Assert.AreEqual(32, SecureRandom.SeedSize);
+        Assert.AreEqual("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", SecureRandom.AlphabeticChars);
+        Assert.AreEqual("0123456789", SecureRandom.NumericChars);
+        Assert.AreEqual("!#$%&'()*+,-./:;<=>?@[]^_`{}~", SecureRandom.SymbolChars);
+        Assert.AreEqual(SecureRandom.AlphabeticChars + SecureRandom.NumericChars, SecureRandom.AlphanumericChars);
+        Assert.AreEqual(SecureRandom.AlphanumericChars + SecureRandom.SymbolChars, SecureRandom.AlphanumericSymbolChars);
+        Assert.AreEqual(2, SecureRandom.MinUpperBound);
+        Assert.AreEqual(8, SecureRandom.MinStringLength);
+        Assert.AreEqual(128, SecureRandom.MaxStringLength);
+        Assert.AreEqual(4, SecureRandom.MinWordCount);
+        Assert.AreEqual(20, SecureRandom.MaxWordCount);
+    }
+    
+    [TestMethod]
     public void Fill_Valid()
     {
         Span<byte> buffer = stackalloc byte[ChaCha20Poly1305.KeySize];

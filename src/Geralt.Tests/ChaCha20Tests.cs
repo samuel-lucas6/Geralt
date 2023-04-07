@@ -97,6 +97,14 @@ public class ChaCha20Tests
     }
     
     [TestMethod]
+    public void Constants_Valid()
+    {
+        Assert.AreEqual(32, ChaCha20.KeySize);
+        Assert.AreEqual(12, ChaCha20.NonceSize);
+        Assert.AreEqual(64, ChaCha20.BlockSize);
+    }
+    
+    [TestMethod]
     [DynamicData(nameof(Rfc8439FillTestVectors), DynamicDataSourceType.Method)]
     public void Fill_Valid(string buffer, string nonce, string key)
     {

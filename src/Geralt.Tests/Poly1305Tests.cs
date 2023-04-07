@@ -27,6 +27,20 @@ public class Poly1305Tests
     }
     
     [TestMethod]
+    public void Constants_Valid()
+    {
+        Assert.AreEqual(32, Poly1305.KeySize);
+        Assert.AreEqual(16, Poly1305.TagSize);
+    }
+    
+    [TestMethod]
+    public void IncrementalConstants_Valid()
+    {
+        Assert.AreEqual(32, IncrementalPoly1305.KeySize);
+        Assert.AreEqual(16, IncrementalPoly1305.TagSize);
+    }
+    
+    [TestMethod]
     [DynamicData(nameof(Rfc8439TestVectors), DynamicDataSourceType.Method)]
     public void ComputeTag_Valid(string tag, string message, string oneTimeKey)
     {

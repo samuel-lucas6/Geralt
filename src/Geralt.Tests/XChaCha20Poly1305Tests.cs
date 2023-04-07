@@ -62,6 +62,22 @@ public class XChaCha20Poly1305Tests
     }
     
     [TestMethod]
+    public void Constants_Valid()
+    {
+        Assert.AreEqual(32, XChaCha20Poly1305.KeySize);
+        Assert.AreEqual(24, XChaCha20Poly1305.NonceSize);
+        Assert.AreEqual(16, XChaCha20Poly1305.TagSize);
+    }
+    
+    [TestMethod]
+    public void IncrementalConstants_Valid()
+    {
+        Assert.AreEqual(32, IncrementalXChaCha20Poly1305.KeySize);
+        Assert.AreEqual(24, IncrementalXChaCha20Poly1305.HeaderSize);
+        Assert.AreEqual(17, IncrementalXChaCha20Poly1305.TagSize);
+    }
+    
+    [TestMethod]
     [DynamicData(nameof(DraftXChaChaTestVectors), DynamicDataSourceType.Method)]
     public void Encrypt_Valid(string ciphertext, string plaintext, string nonce, string key, string associatedData)
     {

@@ -73,6 +73,24 @@ public class Ed25519Tests
     }
     
     [TestMethod]
+    public void Constants_Valid()
+    {
+        Assert.AreEqual(32, Ed25519.PublicKeySize);
+        Assert.AreEqual(64, Ed25519.PrivateKeySize);
+        Assert.AreEqual(64, Ed25519.SignatureSize);
+        Assert.AreEqual(32, Ed25519.SeedSize);
+    }
+    
+    [TestMethod]
+    public void IncrementalConstants_Valid()
+    {
+        Assert.AreEqual(32, IncrementalEd25519.PublicKeySize);
+        Assert.AreEqual(64, IncrementalEd25519.PrivateKeySize);
+        Assert.AreEqual(64, IncrementalEd25519.SignatureSize);
+        Assert.AreEqual(32, IncrementalEd25519.SeedSize);
+    }
+    
+    [TestMethod]
     public void GenerateKeyPair_Valid()
     {
         Span<byte> pk = stackalloc byte[Ed25519.PublicKeySize];

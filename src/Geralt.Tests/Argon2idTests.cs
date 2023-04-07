@@ -50,6 +50,19 @@ public class Argon2idTests
     }
     
     [TestMethod]
+    public void Constants_Valid()
+    {
+        Assert.AreEqual(32, Argon2id.KeySize);
+        Assert.AreEqual(32, Argon2id.MinKeySize);
+        Assert.AreEqual(16, Argon2id.SaltSize);
+        Assert.AreEqual(1, Argon2id.MinIterations);
+        Assert.AreEqual(16777216, Argon2id.MinMemorySize);
+        Assert.AreEqual(93, Argon2id.MinHashSize);
+        Assert.AreEqual(128, Argon2id.MaxHashSize);
+        Assert.AreEqual("$argon2id$", Argon2id.HashPrefix);
+    }
+    
+    [TestMethod]
     [DataRow("9108d194ef44c4a2ca75be1107a931359a99b0c9a41187bf9f2c0cb22ec73318", "correct horse battery staple", "bca21536da522787b9267be10c1b7499", 3, 16777216)]
     public void DeriveKey_Valid(string outputKeyingMaterial, string password, string salt, int iterations, int memorySize)
     {
