@@ -8,7 +8,6 @@ public sealed class IncrementalEd25519 : IDisposable
     public const int PublicKeySize = Ed25519.PublicKeySize;
     public const int PrivateKeySize = Ed25519.PrivateKeySize;
     public const int SignatureSize = Ed25519.SignatureSize;
-    public const int SeedSize = Ed25519.SeedSize;
     
     private crypto_sign_state _state;
     

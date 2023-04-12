@@ -87,7 +87,6 @@ public class Ed25519Tests
         Assert.AreEqual(32, IncrementalEd25519.PublicKeySize);
         Assert.AreEqual(64, IncrementalEd25519.PrivateKeySize);
         Assert.AreEqual(64, IncrementalEd25519.SignatureSize);
-        Assert.AreEqual(32, IncrementalEd25519.SeedSize);
     }
     
     [TestMethod]
