@@ -17,9 +17,9 @@ public static class HChaCha20
         Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
         if (personalisation != default) { Validation.EqualToSize(nameof(personalisation), personalisation.Length, PersonalSize); }
         Sodium.Initialize();
-        fixed (byte* ok = outputKeyingMaterial, ik = inputKeyingMaterial, n = nonce, p = personalisation)
+        fixed (byte* okm = outputKeyingMaterial, ikm = inputKeyingMaterial, n = nonce, p = personalisation)
         {
-            int ret = crypto_core_hchacha20(ok, n, ik, p);
+            int ret = crypto_core_hchacha20(okm, n, ikm, p);
             if (ret != 0) { throw new CryptographicException("Error deriving key."); }
         }
     }

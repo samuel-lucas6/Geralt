@@ -257,15 +257,15 @@ public class BLAKE2bTests
     [DynamicData(nameof(KeyDerivationTestVectors), DynamicDataSourceType.Method)]
     public void DeriveKey_Valid(string outputKeyingMaterial, string inputKeyingMaterial, string personalisation, string salt, string info)
     {
-        Span<byte> o = stackalloc byte[outputKeyingMaterial.Length / 2];
-        Span<byte> k = Convert.FromHexString(inputKeyingMaterial);
+        Span<byte> okm = stackalloc byte[outputKeyingMaterial.Length / 2];
+        Span<byte> ikm = Convert.FromHexString(inputKeyingMaterial);
         Span<byte> p = Convert.FromHexString(personalisation);
         Span<byte> s = Convert.FromHexString(salt);
         Span<byte> i = Convert.FromHexString(info);
         
-        BLAKE2b.DeriveKey(o, k, p, s, i);
+        BLAKE2b.DeriveKey(okm, ikm, p, s, i);
         
-        Assert.AreEqual(outputKeyingMaterial, Convert.ToHexString(o).ToLower());
+        Assert.AreEqual(outputKeyingMaterial, Convert.ToHexString(okm).ToLower());
     }
     
     [TestMethod]
@@ -279,13 +279,13 @@ public class BLAKE2bTests
     [DataRow(BLAKE2b.KeySize, BLAKE2b.KeySize, BLAKE2b.PersonalSize, BLAKE2b.SaltSize - 1, 1)]
     public void DeriveKey_Invalid(int outputKeyingMaterialSize, int inputKeyingMaterialSize, int personalisationSize, int saltSize, int infoSize)
     {
-        var o = new byte[outputKeyingMaterialSize];
-        var k = new byte[inputKeyingMaterialSize];
+        var okm = new byte[outputKeyingMaterialSize];
+        var ikm = new byte[inputKeyingMaterialSize];
         var p = new byte[personalisationSize];
         var s = new byte[saltSize];
         var i = new byte[infoSize];
         
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => BLAKE2b.DeriveKey(o, k, p, s, i));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => BLAKE2b.DeriveKey(okm, ikm, p, s, i));
     }
     
     [TestMethod]

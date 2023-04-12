@@ -15,9 +15,9 @@ public static class XChaCha20Poly1305
         Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
         Validation.EqualToSize(nameof(key), key.Length, KeySize);
         Sodium.Initialize();
-        fixed (byte* c = ciphertext, p = plaintext, n = nonce, k = key, a = associatedData)
+        fixed (byte* c = ciphertext, p = plaintext, n = nonce, k = key, ad = associatedData)
         {
-            int ret = crypto_aead_xchacha20poly1305_ietf_encrypt(c, ciphertextLength: out _, p, (ulong)plaintext.Length, a, (ulong)associatedData.Length, nsec: null, n, k);
+            int ret = crypto_aead_xchacha20poly1305_ietf_encrypt(c, ciphertextLength: out _, p, (ulong)plaintext.Length, ad, (ulong)associatedData.Length, nsec: null, n, k);
             if (ret != 0) { throw new CryptographicException("Error encrypting plaintext."); }
         }
     }
@@ -29,9 +29,9 @@ public static class XChaCha20Poly1305
         Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
         Validation.EqualToSize(nameof(key), key.Length, KeySize);
         Sodium.Initialize();
-        fixed (byte* p = plaintext, c = ciphertext, n = nonce, k = key, a = associatedData)
+        fixed (byte* p = plaintext, c = ciphertext, n = nonce, k = key, ad = associatedData)
         {
-            int ret = crypto_aead_xchacha20poly1305_ietf_decrypt(p, plaintextLength: out _, nsec: null, c, (ulong)ciphertext.Length, a, (ulong)associatedData.Length, n, k);
+            int ret = crypto_aead_xchacha20poly1305_ietf_decrypt(p, plaintextLength: out _, nsec: null, c, (ulong)ciphertext.Length, ad, (ulong)associatedData.Length, n, k);
             if (ret != 0) { throw new CryptographicException("Invalid authentication tag for the given inputs."); }
         }
     }

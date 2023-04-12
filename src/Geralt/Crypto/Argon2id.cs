@@ -26,9 +26,9 @@ public static class Argon2id
         Validation.NotLessThanMin(nameof(iterations), iterations, MinIterations);
         Validation.NotLessThanMin(nameof(memorySize), memorySize, MinMemorySize);
         Sodium.Initialize();
-        fixed (byte* ok = outputKeyingMaterial, p = password, s = salt)
+        fixed (byte* okm = outputKeyingMaterial, p = password, s = salt)
         {
-            int ret = crypto_pwhash(ok, (ulong)outputKeyingMaterial.Length, p, (ulong)password.Length, s, (ulong)iterations, (nuint)memorySize, (int)Algorithm.Argon2id);
+            int ret = crypto_pwhash(okm, (ulong)outputKeyingMaterial.Length, p, (ulong)password.Length, s, (ulong)iterations, (nuint)memorySize, (int)Algorithm.Argon2id);
             if (ret != 0) { throw new InsufficientMemoryException("Insufficient memory to perform key derivation."); }
         }
     }

@@ -37,9 +37,9 @@ public sealed class IncrementalEd25519 : IDisposable
     {
         Validation.EqualToSize(nameof(signature), signature.Length, SignatureSize);
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
-        fixed (byte* s = signature, p = privateKey)
+        fixed (byte* s = signature, sk = privateKey)
         {
-            int ret = crypto_sign_final_create(ref _state, s, signatureLength: out _, p);
+            int ret = crypto_sign_final_create(ref _state, s, signatureLength: out _, sk);
             if (ret != 0) { throw new CryptographicException("Error finalising signature."); }
         }
     }
@@ -48,9 +48,9 @@ public sealed class IncrementalEd25519 : IDisposable
     {
         Validation.EqualToSize(nameof(signature), signature.Length, SignatureSize);
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
-        fixed (byte* s = signature, p = publicKey)
+        fixed (byte* s = signature, pk = publicKey)
         {
-            return crypto_sign_final_verify(ref _state, s, p) == 0;
+            return crypto_sign_final_verify(ref _state, s, pk) == 0;
         }
     }
     

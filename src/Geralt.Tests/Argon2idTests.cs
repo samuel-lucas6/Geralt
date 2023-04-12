@@ -66,13 +66,13 @@ public class Argon2idTests
     [DataRow("9108d194ef44c4a2ca75be1107a931359a99b0c9a41187bf9f2c0cb22ec73318", "correct horse battery staple", "bca21536da522787b9267be10c1b7499", 3, 16777216)]
     public void DeriveKey_Valid(string outputKeyingMaterial, string password, string salt, int iterations, int memorySize)
     {
-        Span<byte> o = stackalloc byte[outputKeyingMaterial.Length / 2];
+        Span<byte> okm = stackalloc byte[outputKeyingMaterial.Length / 2];
         Span<byte> p = Encoding.UTF8.GetBytes(password);
         Span<byte> s = Convert.FromHexString(salt);
         
-        Argon2id.DeriveKey(o, p, s, iterations, memorySize);
+        Argon2id.DeriveKey(okm, p, s, iterations, memorySize);
         
-        Assert.AreEqual(outputKeyingMaterial, Convert.ToHexString(o).ToLower());
+        Assert.AreEqual(outputKeyingMaterial, Convert.ToHexString(okm).ToLower());
     }
     
     [TestMethod]
@@ -83,11 +83,11 @@ public class Argon2idTests
     [DataRow(Argon2id.MinKeySize, Argon2id.KeySize, Argon2id.SaltSize, Argon2id.MinIterations, Argon2id.MinMemorySize - 1 )]
     public void DeriveKey_Invalid(int outputKeyingMaterialSize, int passwordSize, int saltSize, int iterations, int memorySize)
     {
-        var o = new byte[outputKeyingMaterialSize];
+        var okm = new byte[outputKeyingMaterialSize];
         var p = new byte[passwordSize];
         var s = new byte[saltSize];
         
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.DeriveKey(o, p, s, iterations, memorySize));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.DeriveKey(okm, p, s, iterations, memorySize));
     }
     
     [TestMethod]

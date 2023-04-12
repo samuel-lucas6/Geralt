@@ -248,10 +248,10 @@ public class X25519Tests
         Span<byte> rs = stackalloc byte[X25519.SharedKeySize];
         Span<byte> rsk = Convert.FromHexString(recipientPrivateKey);
         Span<byte> spk = Convert.FromHexString(senderPublicKey);
-        Span<byte> p = preSharedKey.Length > 0 ? Convert.FromHexString(preSharedKey) : Span<byte>.Empty;
+        Span<byte> psk = preSharedKey.Length > 0 ? Convert.FromHexString(preSharedKey) : Span<byte>.Empty;
         
-        X25519.DeriveSenderSharedKey(ss, ssk, rpk, p);
-        X25519.DeriveRecipientSharedKey(rs, rsk, spk, p);
+        X25519.DeriveSenderSharedKey(ss, ssk, rpk, psk);
+        X25519.DeriveRecipientSharedKey(rs, rsk, spk, psk);
         
         Assert.AreEqual(sharedKey, Convert.ToHexString(ss).ToLower());
         Assert.AreEqual(sharedKey, Convert.ToHexString(rs).ToLower());
@@ -264,9 +264,9 @@ public class X25519Tests
         var s = new byte[sharedKeySize];
         var sk = new byte[privateKeySize];
         var pk = new byte[publicKeySize];
-        var p = new byte[preSharedKeySize];
+        var psk = new byte[preSharedKeySize];
         
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedKey(s, sk, pk, p));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedKey(s, sk, pk, p));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedKey(s, sk, pk, psk));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedKey(s, sk, pk, psk));
     }
 }

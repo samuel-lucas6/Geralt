@@ -84,10 +84,10 @@ public class XChaCha20Poly1305Tests
         Span<byte> p = Convert.FromHexString(plaintext);
         Span<byte> n = Convert.FromHexString(nonce);
         Span<byte> k = Convert.FromHexString(key);
-        Span<byte> a = Convert.FromHexString(associatedData);
+        Span<byte> ad = Convert.FromHexString(associatedData);
         Span<byte> c = stackalloc byte[p.Length + XChaCha20Poly1305.TagSize];
         
-        XChaCha20Poly1305.Encrypt(c, p, n, k, a);
+        XChaCha20Poly1305.Encrypt(c, p, n, k, ad);
         
         Assert.AreEqual(ciphertext, Convert.ToHexString(c).ToLower());
     }
@@ -100,9 +100,9 @@ public class XChaCha20Poly1305Tests
         var p = new byte[plaintextSize];
         var n = new byte[nonceSize];
         var k = new byte[keySize];
-        var a = new byte[associatedDataSize];
+        var ad = new byte[associatedDataSize];
         
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Encrypt(c, p, n, k, a));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Encrypt(c, p, n, k, ad));
     }
     
     [TestMethod]
@@ -112,10 +112,10 @@ public class XChaCha20Poly1305Tests
         Span<byte> c = Convert.FromHexString(ciphertext);
         Span<byte> n = Convert.FromHexString(nonce);
         Span<byte> k = Convert.FromHexString(key);
-        Span<byte> a = Convert.FromHexString(associatedData);
+        Span<byte> ad = Convert.FromHexString(associatedData);
         Span<byte> p = stackalloc byte[c.Length - XChaCha20Poly1305.TagSize];
         
-        XChaCha20Poly1305.Decrypt(p, c, n, k, a);
+        XChaCha20Poly1305.Decrypt(p, c, n, k, ad);
         
         Assert.AreEqual(plaintext, Convert.ToHexString(p).ToLower());
     }
@@ -148,9 +148,9 @@ public class XChaCha20Poly1305Tests
         var p = new byte[plaintextSize];
         var n = new byte[nonceSize];
         var k = new byte[keySize];
-        var a = new byte[associatedDataSize];
+        var ad = new byte[associatedDataSize];
         
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Decrypt(p, c, n, k, a));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => XChaCha20Poly1305.Decrypt(p, c, n, k, ad));
     }
     
     [TestMethod]
@@ -180,15 +180,15 @@ public class XChaCha20Poly1305Tests
         Span<byte> h = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
         Span<byte> k = Convert.FromHexString(key);
         Span<byte> p = Convert.FromHexString(plaintext);
-        Span<byte> a = Convert.FromHexString(associatedData);
+        Span<byte> ad = Convert.FromHexString(associatedData);
         Span<byte> c = stackalloc byte[p.Length + IncrementalXChaCha20Poly1305.TagSize];
         
         using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, h, k);
-        encryptor.Push(c, p, a, IncrementalXChaCha20Poly1305.ChunkFlag.Final);
+        encryptor.Push(c, p, ad, IncrementalXChaCha20Poly1305.ChunkFlag.Final);
         p.Clear();
         
         using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, h, k);
-        var chunkFlag = decryptor.Pull(p, c, a);
+        var chunkFlag = decryptor.Pull(p, c, ad);
         
         Assert.AreEqual(IncrementalXChaCha20Poly1305.ChunkFlag.Final, chunkFlag);
         Assert.AreEqual(plaintext, Convert.ToHexString(p).ToLower());

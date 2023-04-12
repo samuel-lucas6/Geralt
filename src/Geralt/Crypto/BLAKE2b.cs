@@ -74,9 +74,9 @@ public static class BLAKE2b
         Validation.EqualToSize(nameof(personalisation), personalisation.Length, PersonalSize);
         Validation.EqualToSize(nameof(salt), salt.Length, SaltSize);
         Sodium.Initialize();
-        fixed (byte* ok = outputKeyingMaterial, ik = inputKeyingMaterial, p = personalisation, s = salt, i = info)
+        fixed (byte* okm = outputKeyingMaterial, ikm = inputKeyingMaterial, p = personalisation, s = salt, i = info)
         {
-            int ret = crypto_generichash_blake2b_salt_personal(ok, (nuint)outputKeyingMaterial.Length, i, (ulong)info.Length, ik, (nuint)inputKeyingMaterial.Length, s, p);
+            int ret = crypto_generichash_blake2b_salt_personal(okm, (nuint)outputKeyingMaterial.Length, i, (ulong)info.Length, ikm, (nuint)inputKeyingMaterial.Length, s, p);
             if (ret != 0) { throw new CryptographicException("Error deriving key."); }
         }
     }

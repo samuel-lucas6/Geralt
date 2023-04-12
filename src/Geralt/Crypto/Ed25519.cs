@@ -15,9 +15,9 @@ public static class Ed25519
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
         Sodium.Initialize();
-        fixed (byte* p = publicKey, s = privateKey)
+        fixed (byte* pk = publicKey, sk = privateKey)
         {
-            int ret = crypto_sign_keypair(p, s);
+            int ret = crypto_sign_keypair(pk, sk);
             if (ret != 0) { throw new CryptographicException("Unable to generate key pair."); }
         }
     }
@@ -40,9 +40,9 @@ public static class Ed25519
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
         Sodium.Initialize();
-        fixed (byte* p = publicKey, s = privateKey)
+        fixed (byte* pk = publicKey, sk = privateKey)
         {
-            int ret = crypto_sign_ed25519_sk_to_pk(p, s);
+            int ret = crypto_sign_ed25519_sk_to_pk(pk, sk);
             if (ret != 0) { throw new CryptographicException("Unable to compute public key from private key."); }
         }
     }
@@ -76,9 +76,9 @@ public static class Ed25519
         Validation.EqualToSize(nameof(signature), signature.Length, SignatureSize);
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
         Sodium.Initialize();
-        fixed (byte* s = signature, m = message, p = privateKey)
+        fixed (byte* s = signature, m = message, sk = privateKey)
         {
-            int ret = crypto_sign_detached(s, signatureLength: out _, m, (ulong)message.Length, p);
+            int ret = crypto_sign_detached(s, signatureLength: out _, m, (ulong)message.Length, sk);
             if (ret != 0) { throw new CryptographicException("Unable to compute signature."); }
         }
     }
@@ -88,7 +88,7 @@ public static class Ed25519
         Validation.EqualToSize(nameof(signature), signature.Length, SignatureSize);
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
         Sodium.Initialize();
-        fixed (byte* s = signature, m = message, p = publicKey)
-            return crypto_sign_verify_detached(s, m, (ulong)message.Length, p) == 0;
+        fixed (byte* s = signature, m = message, pk = publicKey)
+            return crypto_sign_verify_detached(s, m, (ulong)message.Length, pk) == 0;
     }
 }

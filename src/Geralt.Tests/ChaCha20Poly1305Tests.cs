@@ -54,10 +54,10 @@ public class ChaCha20Poly1305Tests
         Span<byte> p = Convert.FromHexString(plaintext);
         Span<byte> n = Convert.FromHexString(nonce);
         Span<byte> k = Convert.FromHexString(key);
-        Span<byte> a = Convert.FromHexString(associatedData);
+        Span<byte> ad = Convert.FromHexString(associatedData);
         Span<byte> c = stackalloc byte[p.Length + ChaCha20Poly1305.TagSize];
         
-        ChaCha20Poly1305.Encrypt(c, p, n, k, a);
+        ChaCha20Poly1305.Encrypt(c, p, n, k, ad);
         
         Assert.AreEqual(ciphertext, Convert.ToHexString(c).ToLower());
     }
@@ -70,9 +70,9 @@ public class ChaCha20Poly1305Tests
         var p = new byte[plaintextSize];
         var n = new byte[nonceSize];
         var k = new byte[keySize];
-        var a = new byte[associatedDataSize];
+        var ad = new byte[associatedDataSize];
         
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ChaCha20Poly1305.Encrypt(c, p, n, k, a));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ChaCha20Poly1305.Encrypt(c, p, n, k, ad));
     }
     
     [TestMethod]
@@ -82,10 +82,10 @@ public class ChaCha20Poly1305Tests
         Span<byte> c = Convert.FromHexString(ciphertext);
         Span<byte> n = Convert.FromHexString(nonce);
         Span<byte> k = Convert.FromHexString(key);
-        Span<byte> a = Convert.FromHexString(associatedData);
+        Span<byte> ad = Convert.FromHexString(associatedData);
         Span<byte> p = stackalloc byte[c.Length - ChaCha20Poly1305.TagSize];
         
-        ChaCha20Poly1305.Decrypt(p, c, n, k, a);
+        ChaCha20Poly1305.Decrypt(p, c, n, k, ad);
         
         Assert.AreEqual(plaintext, Convert.ToHexString(p).ToLower());
     }
@@ -118,8 +118,8 @@ public class ChaCha20Poly1305Tests
         var p = new byte[plaintextSize];
         var n = new byte[nonceSize];
         var k = new byte[keySize];
-        var a = new byte[associatedDataSize];
+        var ad = new byte[associatedDataSize];
         
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ChaCha20Poly1305.Decrypt(p, c, n, k, a));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ChaCha20Poly1305.Decrypt(p, c, n, k, ad));
     }
 }

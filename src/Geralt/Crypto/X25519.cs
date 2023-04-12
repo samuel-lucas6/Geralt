@@ -19,9 +19,9 @@ public static class X25519
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
         Sodium.Initialize();
-        fixed (byte* p = publicKey, s = privateKey)
+        fixed (byte* pk = publicKey, sk = privateKey)
         {
-            int ret = crypto_kx_keypair(p, s);
+            int ret = crypto_kx_keypair(pk, sk);
             if (ret != 0) { throw new CryptographicException("Unable to generate key pair."); }
         }
     }
@@ -44,9 +44,9 @@ public static class X25519
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
         Sodium.Initialize();
-        fixed (byte* p = publicKey, s = privateKey)
+        fixed (byte* pk = publicKey, sk = privateKey)
         {
-            int ret = crypto_scalarmult_base(p, s);
+            int ret = crypto_scalarmult_base(pk, sk);
             if (ret != 0) { throw new CryptographicException("Unable to compute public key from private key."); }
         }
     }
@@ -93,9 +93,9 @@ public static class X25519
         Validation.EqualToSize(nameof(senderPrivateKey), senderPrivateKey.Length, PrivateKeySize);
         Validation.EqualToSize(nameof(recipientPublicKey), recipientPublicKey.Length, PublicKeySize);
         Sodium.Initialize();
-        fixed (byte* x = sharedSecret, s = senderPrivateKey, p = recipientPublicKey)
+        fixed (byte* s = sharedSecret, sk = senderPrivateKey, pk = recipientPublicKey)
         {
-            int ret = crypto_scalarmult(x, s, p);
+            int ret = crypto_scalarmult(s, sk, pk);
             if (ret != 0) { throw new CryptographicException("Invalid public key."); }
         }
     }

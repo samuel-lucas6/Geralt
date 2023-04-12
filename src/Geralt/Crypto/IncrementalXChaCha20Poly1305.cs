@@ -49,9 +49,9 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
     {
         if (_decryption) { throw new InvalidOperationException("Cannot push into a decryption stream."); }
         Validation.EqualToSize(nameof(ciphertextChunk), ciphertextChunk.Length, plaintextChunk.Length + TagSize);
-        fixed (byte* c = ciphertextChunk, p = plaintextChunk, a = associatedData)
+        fixed (byte* c = ciphertextChunk, p = plaintextChunk, ad = associatedData)
         {
-            int ret = crypto_secretstream_xchacha20poly1305_push(ref _state, c, out _, p, (ulong)plaintextChunk.Length, a, (ulong)associatedData.Length, (byte)chunkFlag);
+            int ret = crypto_secretstream_xchacha20poly1305_push(ref _state, c, out _, p, (ulong)plaintextChunk.Length, ad, (ulong)associatedData.Length, (byte)chunkFlag);
             if (ret != 0) { throw new CryptographicException("Error encrypting plaintext chunk."); }
         }
     }
@@ -61,9 +61,9 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
         if (!_decryption) { throw new InvalidOperationException("Cannot pull from an encryption stream."); }
         Validation.NotLessThanMin(nameof(ciphertextChunk), ciphertextChunk.Length, TagSize);
         Validation.EqualToSize(nameof(plaintextChunk), plaintextChunk.Length, ciphertextChunk.Length - TagSize);
-        fixed (byte* p = plaintextChunk, c = ciphertextChunk, a = associatedData)
+        fixed (byte* p = plaintextChunk, c = ciphertextChunk, ad = associatedData)
         {
-            int ret = crypto_secretstream_xchacha20poly1305_pull(ref _state, p, out _, out byte chunkFlag, c, (ulong)ciphertextChunk.Length, a, (ulong)associatedData.Length);
+            int ret = crypto_secretstream_xchacha20poly1305_pull(ref _state, p, out _, out byte chunkFlag, c, (ulong)ciphertextChunk.Length, ad, (ulong)associatedData.Length);
             if (ret != 0) { throw new CryptographicException("Error decrypting ciphertext chunk."); }
             return (ChunkFlag)chunkFlag;
         }
