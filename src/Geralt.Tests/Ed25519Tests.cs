@@ -37,6 +37,35 @@ public class Ed25519Tests
         };
     }
     
+    // https://github.com/google/wycheproof/blob/master/testvectors_v1/ed25519_test.json
+    public static IEnumerable<object[]> WycheproofTestVectors()
+    {
+        yield return new object[]
+        {
+            "647c1492402ab5ce03e2c3a7f0384d051b9cf3570f1207fc78c1bcc98c281c2b1d125e5538f38afbcc1c84e489521083041d24bc6240767029da063271a1ff0c",
+            "313233343030",
+            "7d4d0e7f6153a69b6242b522abbee685fda4420f8834b108c3bdae369ef549fa"
+        };
+        yield return new object[]
+        {
+            "0971f86d2c9c78582524a103cb9cf949522ae528f8054dc20107d999be673ff4e25ebf2f2928766b1248bec6e91697775f8446639ede46ad4df4053000000010",
+            "6a0bc2b0057cedfc0fa2e3f7f7d39279b30f454a69dfd1117c758d86b19d85e0",
+            "100fdf47fb94f1536a4f7c3fda27383fa03375a8f527c537e6f1703c47f94f86"
+        };
+        yield return new object[]
+        {
+            "0100000000000000000000000000000000000000000000000000000000000000ecd3f55c1a631258d69cf7a2def9de1400000000000000000000000000000010",
+            "3f",
+            "7d4d0e7f6153a69b6242b522abbee685fda4420f8834b108c3bdae369ef549fa"
+        };
+        yield return new object[]
+        {
+            "7c38e026f29e14aabd059a0f2db8b0cd783040609a8be684db12f82a27774ab067654bce3832c2d76f8f6f5dafc08d9339d4eef676573336a5c51eb6f946b31d",
+            "54657374",
+            "7d4d0e7f6153a69b6242b522abbee685fda4420f8834b108c3bdae369ef549fa"
+        };
+    }
+    
     // https://www.rfc-editor.org/rfc/rfc8032.html#section-7.3
     public static IEnumerable<object[]> Rfc8032Ed25519phTestVectors()
     {
@@ -248,22 +277,16 @@ public class Ed25519Tests
     }
     
     [TestMethod]
-    [DynamicData(nameof(Rfc8032Ed25519TestVectors), DynamicDataSourceType.Method)]
-    public void Verify_Tampered(string signature, string message, string privateKey)
+    [DynamicData(nameof(WycheproofTestVectors), DynamicDataSourceType.Method)]
+    public void Verify_Tampered(string signature, string message, string publicKey)
     {
-        var parameters = new List<byte[]>
-        {
-            Convert.FromHexString(signature),
-            Convert.FromHexString(message),
-            Convert.FromHexString(privateKey)[^Ed25519.PublicKeySize..]
-        };
+        Span<byte> s = Convert.FromHexString(signature);
+        Span<byte> m = Convert.FromHexString(message);
+        Span<byte> pk = Convert.FromHexString(publicKey);
         
-        foreach (var param in parameters.Where(param => param.Length != 0)) {
-            param[0]++;
-            bool valid = Ed25519.Verify(parameters[0], parameters[1], parameters[2]);
-            param[0]--;
-            Assert.IsFalse(valid);
-        }
+        bool valid = Ed25519.Verify(s, m, pk);
+        
+        Assert.IsFalse(valid);
     }
     
     [TestMethod]
