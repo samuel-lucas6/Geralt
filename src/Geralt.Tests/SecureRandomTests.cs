@@ -81,15 +81,21 @@ public class SecureRandomTests
     }
     
     [TestMethod]
-    public void GetPassphrase_Valid()
+    [DataRow(SecureRandom.MinWordCount, ' ', false, false)]
+    [DataRow(SecureRandom.MaxWordCount, ' ', false, false)]
+    [DataRow(SecureRandom.MinWordCount, '_', false, false)]
+    [DataRow(SecureRandom.MinWordCount, ' ', true, false)]
+    [DataRow(SecureRandom.MinWordCount, ' ', false, true)]
+    [DataRow(SecureRandom.MinWordCount, ' ', true, true)]
+    public void GetPassphrase_Valid(int wordCount, char separatorChar, bool capitalise, bool includeNumber)
     {
-        const char separatorChar = ' ';
-        char[] passphrase = SecureRandom.GetPassphrase(SecureRandom.MinWordCount, separatorChar, capitalise: false, includeNumber: true);
+        char[] passphrase = SecureRandom.GetPassphrase(wordCount, separatorChar, capitalise, includeNumber);
         
-        Assert.IsTrue(passphrase.Contains(separatorChar));
+        Assert.AreEqual(wordCount - 1, passphrase.Count(c => c == separatorChar));
         Assert.IsFalse(passphrase[^1] == separatorChar);
-        Assert.IsTrue(char.IsLower(passphrase[0]));
-        Assert.IsTrue(passphrase.Any(char.IsDigit));
+        Assert.AreEqual(capitalise ? wordCount : 0, passphrase.Count(c => char.IsUpper(c)));
+        Assert.AreEqual(capitalise, char.IsUpper(passphrase[0]));
+        Assert.AreEqual(includeNumber, passphrase.Any(char.IsDigit));
     }
     
     [TestMethod]
