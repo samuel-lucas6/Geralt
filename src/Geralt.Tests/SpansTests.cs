@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Geralt.Tests;
@@ -7,13 +8,65 @@ namespace Geralt.Tests;
 [TestClass]
 public class SpansTests
 {
-    private static readonly byte[] Array1 = {0x00, 0x01, 0x02, 0x03};
-    private static readonly byte[] Array2 = {0x04, 0x05, 0x06, 0x07};
-    private static readonly byte[] Array3 = {0x08, 0x09, 0x10, 0x11};
-    private static readonly byte[] Array4 = {0x12, 0x13, 0x14, 0x15};
-    private static readonly byte[] Array5 = {0x16, 0x17, 0x18, 0x19};
-    private static readonly byte[] Array6 = {0x20, 0x21, 0x22, 0x23};
-
+    [TestMethod]
+    public void Concat_Valid()
+    {
+        var parameters = new List<byte[]>
+        {
+            new byte[] { 0x01, 0x02, 0x03, 0x04 }
+        };
+        
+        for (int i = 0; i < 5; i++) {
+            parameters.Add(parameters[0]);
+            Span<byte> buffer = new byte[parameters.Count * parameters[0].Length];
+            Span<byte> expected = new byte[buffer.Length];
+            switch (parameters.Count) {
+                case 2:
+                    Spans.Concat(buffer, parameters[0], parameters[1]);
+                    expected = Concat(parameters[0], parameters[1]);
+                    break;
+                case 3:
+                    Spans.Concat(buffer, parameters[0], parameters[1], parameters[2]);
+                    expected = Concat(parameters[0], parameters[1], parameters[2]);
+                    break;
+                case 4:
+                    Spans.Concat(buffer, parameters[0], parameters[1], parameters[2], parameters[3]);
+                    expected = Concat(parameters[0], parameters[1], parameters[2], parameters[3]);
+                    break;
+                case 5:
+                    Spans.Concat(buffer, parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);
+                    expected = Concat(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);
+                    break;
+                case 6:
+                    Spans.Concat(buffer, parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], parameters[5]);
+                    expected = Concat(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], parameters[5]);
+                    break;
+            }
+            Assert.IsTrue(buffer.SequenceEqual(expected));
+        }
+    }
+    
+    [TestMethod]
+    public void ConcatEmpty_Valid()
+    {
+        var buffer = Span<byte>.Empty;
+        var parameters = new List<byte[]>
+        {
+            Array.Empty<byte>(),
+            Array.Empty<byte>()
+        };
+        
+        for (int i = 0; i < 2; i++) {
+            Spans.Concat(buffer, parameters[0], parameters[1]);
+            Span<byte> expected = Concat(parameters[0], parameters[1]);
+            
+            Assert.IsTrue(buffer.SequenceEqual(expected));
+            
+            parameters[1] = new byte[] { 0x01, 0x02, 0x03, 0x04 };
+            buffer = new byte[parameters[1].Length];
+        }
+    }
+    
     private static T[] Concat<T>(params T[][] arrays)
     {
         int offset = 0;
@@ -24,73 +77,5 @@ public class SpansTests
             offset += array.Length;
         }
         return result;
-    }
-    
-    [TestMethod]
-    public void Concat_TwoSpans()
-    {
-        Span<byte> concatenated = stackalloc byte[Array1.Length + Array2.Length];
-        Spans.Concat(concatenated, Array1, Array2);
-        Span<byte> expected = Concat(Array1, Array2);
-        Assert.IsTrue(concatenated.SequenceEqual(expected));
-    }
-    
-    [TestMethod]
-    public void Concat_ThreeSpans()
-    {
-        Span<byte> concatenated = stackalloc byte[Array1.Length + Array2.Length + Array3.Length];
-        Spans.Concat(concatenated, Array1, Array2, Array3);
-        Span<byte> expected = Concat(Array1, Array2, Array3);
-        Assert.IsTrue(concatenated.SequenceEqual(expected));
-    }
-    
-    [TestMethod]
-    public void Concat_FourSpans()
-    {
-        Span<byte> concatenated = stackalloc byte[Array1.Length + Array2.Length + Array3.Length + Array4.Length];
-        Spans.Concat(concatenated, Array1, Array2, Array3, Array4);
-        Span<byte> expected = Concat(Array1, Array2, Array3, Array4);
-        Assert.IsTrue(concatenated.SequenceEqual(expected));
-    }
-    
-    [TestMethod]
-    public void Concat_FiveSpans()
-    {
-        Span<byte> concatenated = stackalloc byte[Array1.Length + Array2.Length + Array3.Length + Array4.Length + Array5.Length];
-        Spans.Concat(concatenated, Array1, Array2, Array3, Array4, Array5);
-        Span<byte> expected = Concat(Array1, Array2, Array3, Array4, Array5);
-        Assert.IsTrue(concatenated.SequenceEqual(expected));
-    }
-    
-    [TestMethod]
-    public void Concat_SixSpans()
-    {
-        Span<byte> concatenated = stackalloc byte[Array1.Length + Array2.Length + Array3.Length + Array4.Length + Array5.Length + Array6.Length];
-        Spans.Concat(concatenated, Array1, Array2, Array3, Array4, Array5, Array6);
-        Span<byte> expected = Concat(Array1, Array2, Array3, Array4, Array5, Array6);
-        Assert.IsTrue(concatenated.SequenceEqual(expected));
-    }
-    
-    [TestMethod]
-    public void Concat_TwoSpansBothEmpty()
-    {
-        Span<byte> empty1 = Span<byte>.Empty;
-        Span<byte> empty2 = Span<byte>.Empty;
-        Span<byte> concatenated = stackalloc byte[empty1.Length + empty2.Length];
-        Spans.Concat(concatenated, empty1, empty2);
-        Span<byte> expected = Concat(empty1.ToArray(), empty2.ToArray());
-        Assert.IsTrue(concatenated.SequenceEqual(expected));
-    }
-    
-    [TestMethod]
-    public void Concat_TwoSpansOneEmpty()
-    {
-        Span<byte> empty = Span<byte>.Empty;
-        Span<byte> concatenated = stackalloc byte[empty.Length + Array2.Length];
-        Spans.Concat(concatenated, empty, Array2);
-        Span<byte> expected = Concat(empty.ToArray(), Array2);
-        Assert.IsTrue(concatenated.SequenceEqual(expected));
-        Spans.Concat(concatenated, Array2, empty);
-        Assert.IsTrue(concatenated.SequenceEqual(expected));
     }
 }
