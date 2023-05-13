@@ -71,8 +71,7 @@ public class SpansTests
     {
         int offset = 0;
         var result = new T[arrays.Sum(array => array.Length)];
-        foreach (var array in arrays)
-        {
+        foreach (var array in arrays) {
             Array.Copy(array, sourceIndex: 0, result, offset, array.Length);
             offset += array.Length;
         }

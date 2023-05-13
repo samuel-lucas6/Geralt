@@ -36,8 +36,7 @@ public static class BLAKE2b
         int bytesRead;
         Span<byte> buffer = new byte[StreamBufferSize];
         using var blake2b = new IncrementalBLAKE2b(hash.Length);
-        while ((bytesRead = message.Read(buffer)) > 0)
-        {
+        while ((bytesRead = message.Read(buffer)) > 0) {
             blake2b.Update(buffer[..bytesRead]);
         }
         CryptographicOperations.ZeroMemory(buffer);

@@ -47,8 +47,7 @@ public static class SecureRandom
         Validation.SizeBetween(nameof(length), length, MinStringLength, MaxStringLength);
         Validation.NotNullOrEmpty(nameof(characterSet), characterSet);
         var stringBuilder = new StringBuilder();
-        for (int i = 0; i < length; i++)
-        {
+        for (int i = 0; i < length; i++) {
             stringBuilder.Append(characterSet[GetInt32(characterSet.Length)]);
         }
         return stringBuilder.ToString();
@@ -61,8 +60,7 @@ public static class SecureRandom
         int numberIndex = 0;
         if (includeNumber) { numberIndex = GetInt32(wordCount); }
         var passphrase = new List<char>();
-        for (int i = 0; i < wordCount; i++)
-        {
+        for (int i = 0; i < wordCount; i++) {
             int randomIndex = GetInt32(wordlist.Length);
             passphrase.AddRange(capitalize ? CultureInfo.InvariantCulture.TextInfo.ToTitleCase(wordlist[randomIndex]) : wordlist[randomIndex]);
             if (includeNumber && i == numberIndex) { passphrase.Add(char.Parse(GetInt32(NumericChars.Length).ToString())); }
