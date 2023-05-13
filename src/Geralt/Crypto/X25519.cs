@@ -56,7 +56,7 @@ public static class X25519
         Validation.EqualToSize(nameof(sharedKey), sharedKey.Length, SharedKeySize);
         Validation.EqualToSize(nameof(senderPrivateKey), senderPrivateKey.Length, PrivateKeySize);
         Validation.EqualToSize(nameof(recipientPublicKey), recipientPublicKey.Length, PublicKeySize);
-        if (preSharedKey != default) { Validation.SizeBetween(nameof(preSharedKey), preSharedKey.Length, MinPreSharedKeySize, MaxPreSharedKeySize); }
+        if (preSharedKey.Length != 0) { Validation.SizeBetween(nameof(preSharedKey), preSharedKey.Length, MinPreSharedKeySize, MaxPreSharedKeySize); }
         Span<byte> sharedSecret = stackalloc byte[SharedSecretSize];
         ComputeSharedSecret(sharedSecret, senderPrivateKey, recipientPublicKey);
         Span<byte> senderPublicKey = stackalloc byte[PublicKeySize];
@@ -74,7 +74,7 @@ public static class X25519
         Validation.EqualToSize(nameof(sharedKey), sharedKey.Length, SharedKeySize);
         Validation.EqualToSize(nameof(recipientPrivateKey), recipientPrivateKey.Length, PrivateKeySize);
         Validation.EqualToSize(nameof(senderPublicKey), senderPublicKey.Length, PublicKeySize);
-        if (preSharedKey != default) { Validation.SizeBetween(nameof(preSharedKey), preSharedKey.Length, MinPreSharedKeySize, MaxPreSharedKeySize); }
+        if (preSharedKey.Length != 0) { Validation.SizeBetween(nameof(preSharedKey), preSharedKey.Length, MinPreSharedKeySize, MaxPreSharedKeySize); }
         Span<byte> sharedSecret = stackalloc byte[SharedSecretSize];
         ComputeSharedSecret(sharedSecret, recipientPrivateKey, senderPublicKey);
         Span<byte> recipientPublicKey = stackalloc byte[PublicKeySize];

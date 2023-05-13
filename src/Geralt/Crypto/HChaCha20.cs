@@ -15,7 +15,7 @@ public static class HChaCha20
         Validation.EqualToSize(nameof(outputKeyingMaterial), outputKeyingMaterial.Length, OutputSize);
         Validation.EqualToSize(nameof(inputKeyingMaterial), inputKeyingMaterial.Length, KeySize);
         Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
-        if (personalization != default) { Validation.EqualToSize(nameof(personalization), personalization.Length, PersonalSize); }
+        if (personalization.Length != 0) { Validation.EqualToSize(nameof(personalization), personalization.Length, PersonalSize); }
         Sodium.Initialize();
         fixed (byte* okm = outputKeyingMaterial, ikm = inputKeyingMaterial, n = nonce, p = personalization)
         {

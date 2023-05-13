@@ -248,7 +248,7 @@ public class X25519Tests
         Span<byte> rs = stackalloc byte[X25519.SharedKeySize];
         Span<byte> rsk = Convert.FromHexString(recipientPrivateKey);
         Span<byte> spk = Convert.FromHexString(senderPublicKey);
-        Span<byte> psk = preSharedKey.Length > 0 ? Convert.FromHexString(preSharedKey) : Span<byte>.Empty;
+        Span<byte> psk = Convert.FromHexString(preSharedKey);
         
         X25519.DeriveSenderSharedKey(ss, ssk, rpk, psk);
         X25519.DeriveRecipientSharedKey(rs, rsk, spk, psk);

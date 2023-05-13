@@ -21,7 +21,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
     public IncrementalBLAKE2b(int hashSize, ReadOnlySpan<byte> key = default)
     {
         Validation.SizeBetween(nameof(hashSize), hashSize, MinHashSize, MaxHashSize);
-        if (key != default) { Validation.SizeBetween(nameof(key), key.Length, MinKeySize, MaxKeySize); }
+        if (key.Length != 0) { Validation.SizeBetween(nameof(key), key.Length, MinKeySize, MaxKeySize); }
         Sodium.Initialize();
         _hashSize = hashSize;
         Initialize(key);
