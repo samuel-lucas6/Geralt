@@ -2,16 +2,16 @@
 
     <PropertyGroup>
         <TargetFrameworks>net7.0;net6.0</TargetFrameworks>
-        <Version>2.0.0</Version>
+        <Version>2.1.0</Version>
         <Authors>Samuel Lucas</Authors>
         <Description>A modern cryptographic library for .NET based on libsodium.</Description>
-        <Copyright>Copyright (c) 2022 Samuel Lucas</Copyright>
+        <Copyright>Copyright (c) 2022-2023 Samuel Lucas</Copyright>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageProjectUrl>https://www.geralt.xyz</PackageProjectUrl>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <RepositoryUrl>https://github.com/samuel-lucas6/Geralt</RepositoryUrl>
-        <PackageTags>libsodium cryptography crypto security aead chacha20-poly1305 xchacha20-poly1305 blake2b argon2id x25519 curve25519 ed25519 chacha20 xchacha20 hchacha20 poly1305 secure-random constant-time hex base64 padding</PackageTags>
+        <PackageTags>libsodium cryptography crypto security aead chacha20-poly1305 xchacha20-poly1305 blake2b argon2id x25519 curve25519 ed25519 ed25519ph chacha20 xchacha20 hchacha20 poly1305 secretstream secure-random constant-time hex base64 padding</PackageTags>
         <PackageIcon>Geralt.png</PackageIcon>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
         <AnalysisLevel>latest</AnalysisLevel>
