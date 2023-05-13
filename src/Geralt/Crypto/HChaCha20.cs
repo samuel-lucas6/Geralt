@@ -10,14 +10,14 @@ public static class HChaCha20
     public const int NonceSize = crypto_core_hchacha20_INPUTBYTES;
     public const int PersonalSize = crypto_core_hchacha20_CONSTBYTES;
     
-    public static unsafe void DeriveKey(Span<byte> outputKeyingMaterial, ReadOnlySpan<byte> inputKeyingMaterial, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> personalisation = default)
+    public static unsafe void DeriveKey(Span<byte> outputKeyingMaterial, ReadOnlySpan<byte> inputKeyingMaterial, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> personalization = default)
     {
         Validation.EqualToSize(nameof(outputKeyingMaterial), outputKeyingMaterial.Length, OutputSize);
         Validation.EqualToSize(nameof(inputKeyingMaterial), inputKeyingMaterial.Length, KeySize);
         Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
-        if (personalisation != default) { Validation.EqualToSize(nameof(personalisation), personalisation.Length, PersonalSize); }
+        if (personalization != default) { Validation.EqualToSize(nameof(personalization), personalization.Length, PersonalSize); }
         Sodium.Initialize();
-        fixed (byte* okm = outputKeyingMaterial, ikm = inputKeyingMaterial, n = nonce, p = personalisation)
+        fixed (byte* okm = outputKeyingMaterial, ikm = inputKeyingMaterial, n = nonce, p = personalization)
         {
             int ret = crypto_core_hchacha20(okm, n, ikm, p);
             if (ret != 0) { throw new CryptographicException("Error deriving key."); }

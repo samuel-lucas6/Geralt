@@ -38,12 +38,12 @@ public class HChaCha20Tests
     [DataRow(HChaCha20.OutputSize, HChaCha20.KeySize, HChaCha20.NonceSize - 1, HChaCha20.PersonalSize)]
     [DataRow(HChaCha20.OutputSize, HChaCha20.KeySize, HChaCha20.NonceSize, HChaCha20.PersonalSize + 1)]
     [DataRow(HChaCha20.OutputSize, HChaCha20.KeySize, HChaCha20.NonceSize, HChaCha20.PersonalSize - 1)]
-    public void DeriveKey_Invalid(int outputKeyingMaterialSize, int inputKeyingMaterialSize, int nonceSize, int personalisationSize)
+    public void DeriveKey_Invalid(int outputKeyingMaterialSize, int inputKeyingMaterialSize, int nonceSize, int personalizationSize)
     {
         var okm = new byte[outputKeyingMaterialSize];
         var ikm = new byte[inputKeyingMaterialSize];
         var n = new byte[nonceSize];
-        var p = new byte[personalisationSize];
+        var p = new byte[personalizationSize];
         
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => HChaCha20.DeriveKey(okm, ikm, n, p));
     }

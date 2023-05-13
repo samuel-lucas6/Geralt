@@ -271,11 +271,11 @@ public class BLAKE2bTests
     
     [TestMethod]
     [DynamicData(nameof(KeyDerivationTestVectors), DynamicDataSourceType.Method)]
-    public void DeriveKey_Valid(string outputKeyingMaterial, string inputKeyingMaterial, string personalisation, string salt, string info)
+    public void DeriveKey_Valid(string outputKeyingMaterial, string inputKeyingMaterial, string personalization, string salt, string info)
     {
         Span<byte> okm = stackalloc byte[outputKeyingMaterial.Length / 2];
         Span<byte> ikm = Convert.FromHexString(inputKeyingMaterial);
-        Span<byte> p = Convert.FromHexString(personalisation);
+        Span<byte> p = Convert.FromHexString(personalization);
         Span<byte> s = Convert.FromHexString(salt);
         Span<byte> i = Convert.FromHexString(info);
         
@@ -293,11 +293,11 @@ public class BLAKE2bTests
     [DataRow(BLAKE2b.KeySize, BLAKE2b.KeySize, BLAKE2b.PersonalSize - 1, BLAKE2b.SaltSize, 1)]
     [DataRow(BLAKE2b.KeySize, BLAKE2b.KeySize, BLAKE2b.PersonalSize, BLAKE2b.SaltSize + 1, 1)]
     [DataRow(BLAKE2b.KeySize, BLAKE2b.KeySize, BLAKE2b.PersonalSize, BLAKE2b.SaltSize - 1, 1)]
-    public void DeriveKey_Invalid(int outputKeyingMaterialSize, int inputKeyingMaterialSize, int personalisationSize, int saltSize, int infoSize)
+    public void DeriveKey_Invalid(int outputKeyingMaterialSize, int inputKeyingMaterialSize, int personalizationSize, int saltSize, int infoSize)
     {
         var okm = new byte[outputKeyingMaterialSize];
         var ikm = new byte[inputKeyingMaterialSize];
-        var p = new byte[personalisationSize];
+        var p = new byte[personalizationSize];
         var s = new byte[saltSize];
         var i = new byte[infoSize];
         
