@@ -32,7 +32,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
         fixed (byte* k = key)
         {
             int ret = crypto_generichash_init(ref _state, k, (nuint)key.Length, (nuint)_hashSize);
-            if (ret != 0) { throw new CryptographicException("Error initialising hash."); }
+            if (ret != 0) { throw new CryptographicException("Error initializing hash."); }
         }
     }
 
@@ -51,7 +51,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
         fixed (byte* h = hash)
         {
             int ret = crypto_generichash_final(ref _state, h, (nuint)hash.Length);
-            if (ret != 0) { throw new CryptographicException("Error finalising hash."); }
+            if (ret != 0) { throw new CryptographicException("Error finalizing hash."); }
         }
     }
 

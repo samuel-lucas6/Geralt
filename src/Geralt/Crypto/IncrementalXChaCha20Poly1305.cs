@@ -36,7 +36,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
             int ret = _decryption
                 ? crypto_secretstream_xchacha20poly1305_init_pull(ref _state, h, k)
                 : crypto_secretstream_xchacha20poly1305_init_push(ref _state, h, k);
-            if (ret != 0) { throw new CryptographicException(_decryption ? "Error initialising stream decryption." : "Error initialising stream encryption."); }
+            if (ret != 0) { throw new CryptographicException(_decryption ? "Error initializing stream decryption." : "Error initializing stream encryption."); }
         }
     }
 

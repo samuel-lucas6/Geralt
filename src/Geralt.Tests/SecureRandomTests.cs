@@ -87,14 +87,14 @@ public class SecureRandomTests
     [DataRow(SecureRandom.MinWordCount, ' ', true, false)]
     [DataRow(SecureRandom.MinWordCount, ' ', false, true)]
     [DataRow(SecureRandom.MinWordCount, ' ', true, true)]
-    public void GetPassphrase_Valid(int wordCount, char separatorChar, bool capitalise, bool includeNumber)
+    public void GetPassphrase_Valid(int wordCount, char separatorChar, bool capitalize, bool includeNumber)
     {
-        char[] passphrase = SecureRandom.GetPassphrase(wordCount, separatorChar, capitalise, includeNumber);
+        char[] passphrase = SecureRandom.GetPassphrase(wordCount, separatorChar, capitalize, includeNumber);
         
         Assert.AreEqual(wordCount - 1, passphrase.Count(c => c == separatorChar));
         Assert.IsFalse(passphrase[^1] == separatorChar);
-        Assert.AreEqual(capitalise ? wordCount : 0, passphrase.Count(c => char.IsUpper(c)));
-        Assert.AreEqual(capitalise, char.IsUpper(passphrase[0]));
+        Assert.AreEqual(capitalize ? wordCount : 0, passphrase.Count(c => char.IsUpper(c)));
+        Assert.AreEqual(capitalize, char.IsUpper(passphrase[0]));
         Assert.AreEqual(includeNumber, passphrase.Any(char.IsDigit));
     }
     

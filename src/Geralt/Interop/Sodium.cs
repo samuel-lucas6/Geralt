@@ -32,7 +32,7 @@ internal static class Sodium
             }
             
             if (sodium_init() < 0) {
-                throw new InvalidOperationException("Unable to initialise libsodium.");
+                throw new InvalidOperationException("Unable to initialize libsodium.");
             }
         }
         catch (Exception ex) when (ex is DllNotFoundException or BadImageFormatException)

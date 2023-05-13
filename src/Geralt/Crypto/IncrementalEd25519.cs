@@ -20,7 +20,7 @@ public sealed class IncrementalEd25519 : IDisposable
     private void Initialize()
     {
         int ret = crypto_sign_init(ref _state);
-        if (ret != 0) { throw new CryptographicException("Error initialising signature scheme."); }
+        if (ret != 0) { throw new CryptographicException("Error initializing signature scheme."); }
     }
     
     public unsafe void Update(ReadOnlySpan<byte> message)
@@ -39,7 +39,7 @@ public sealed class IncrementalEd25519 : IDisposable
         fixed (byte* s = signature, sk = privateKey)
         {
             int ret = crypto_sign_final_create(ref _state, s, signatureLength: out _, sk);
-            if (ret != 0) { throw new CryptographicException("Error finalising signature."); }
+            if (ret != 0) { throw new CryptographicException("Error finalizing signature."); }
         }
     }
     
