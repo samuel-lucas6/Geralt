@@ -67,12 +67,12 @@ public static class BLAKE2b
         return equal;
     }
 
-    public static unsafe void DeriveKey(Span<byte> outputKeyingMaterial, ReadOnlySpan<byte> inputKeyingMaterial, ReadOnlySpan<byte> personalisation, ReadOnlySpan<byte> salt, ReadOnlySpan<byte> info = default)
+    public static unsafe void DeriveKey(Span<byte> outputKeyingMaterial, ReadOnlySpan<byte> inputKeyingMaterial, ReadOnlySpan<byte> personalisation, ReadOnlySpan<byte> salt = default, ReadOnlySpan<byte> info = default)
     {
         Validation.SizeBetween(nameof(outputKeyingMaterial), outputKeyingMaterial.Length, MinKeySize, MaxKeySize);
         Validation.SizeBetween(nameof(inputKeyingMaterial), inputKeyingMaterial.Length, MinKeySize, MaxKeySize);
         Validation.EqualToSize(nameof(personalisation), personalisation.Length, PersonalSize);
-        Validation.EqualToSize(nameof(salt), salt.Length, SaltSize);
+        if (salt.Length != 0) { Validation.EqualToSize(nameof(salt), salt.Length, SaltSize); }
         Sodium.Initialize();
         fixed (byte* okm = outputKeyingMaterial, ikm = inputKeyingMaterial, p = personalisation, s = salt, i = info)
         {
