@@ -5,7 +5,7 @@ namespace Geralt;
 
 public static class BLAKE2b
 {
-    public const int HashSize = crypto_generichash_BYTES_MAX;
+    public const int HashSize = crypto_generichash_BYTES;
     public const int KeySize = crypto_generichash_KEYBYTES;
     public const int TagSize = crypto_generichash_BYTES;
     public const int SaltSize = crypto_generichash_blake2b_SALTBYTES;
@@ -14,7 +14,7 @@ public static class BLAKE2b
     public const int MaxHashSize = crypto_generichash_BYTES_MAX;
     public const int MinTagSize = MinHashSize;
     public const int MaxTagSize = MaxHashSize;
-    public const int MinKeySize = crypto_generichash_KEYBYTES;
+    public const int MinKeySize = crypto_generichash_KEYBYTES_MIN;
     public const int MaxKeySize = crypto_generichash_KEYBYTES_MAX;
     private const int StreamBufferSize = 4096;
 

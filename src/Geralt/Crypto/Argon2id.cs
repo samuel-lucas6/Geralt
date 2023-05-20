@@ -5,11 +5,11 @@ namespace Geralt;
 public static class Argon2id
 {
     public const int KeySize = 32;
-    public const int MinKeySize = KeySize;
+    public const int MinKeySize = crypto_pwhash_BYTES_MIN;
     public const int SaltSize = crypto_pwhash_SALTBYTES;
     public const int MinIterations = crypto_pwhash_argon2id_OPSLIMIT_MIN;
-    public const int MinMemorySize = 16777216;
-    public const int MinHashSize = 93;
+    public const int MinMemorySize = crypto_pwhash_MEMLIMIT_MIN;
+    public const int MinHashSize = 92;
     public const int MaxHashSize = crypto_pwhash_STRBYTES;
     public const string HashPrefix = crypto_pwhash_argon2id_STRPREFIX;
     

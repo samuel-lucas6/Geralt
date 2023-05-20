@@ -53,11 +53,11 @@ public class Argon2idTests
     public void Constants_Valid()
     {
         Assert.AreEqual(32, Argon2id.KeySize);
-        Assert.AreEqual(32, Argon2id.MinKeySize);
+        Assert.AreEqual(16, Argon2id.MinKeySize);
         Assert.AreEqual(16, Argon2id.SaltSize);
         Assert.AreEqual(1, Argon2id.MinIterations);
-        Assert.AreEqual(16777216, Argon2id.MinMemorySize);
-        Assert.AreEqual(93, Argon2id.MinHashSize);
+        Assert.AreEqual(8192, Argon2id.MinMemorySize);
+        Assert.AreEqual(92, Argon2id.MinHashSize);
         Assert.AreEqual(128, Argon2id.MaxHashSize);
         Assert.AreEqual("$argon2id$", Argon2id.HashPrefix);
     }

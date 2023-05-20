@@ -123,7 +123,7 @@ public class X25519Tests
         Assert.AreEqual(32, X25519.SharedSecretSize);
         Assert.AreEqual(32, X25519.SharedKeySize);
         Assert.AreEqual(32, X25519.PreSharedKeySize);
-        Assert.AreEqual(32, X25519.MinPreSharedKeySize);
+        Assert.AreEqual(16, X25519.MinPreSharedKeySize);
         Assert.AreEqual(64, X25519.MaxPreSharedKeySize);
     }
     

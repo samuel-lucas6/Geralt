@@ -8,9 +8,9 @@ internal static partial class Interop
         internal const int crypto_aead_xchacha20poly1305_ietf_NPUBBYTES = 24;
         internal const int crypto_aead_xchacha20poly1305_ietf_ABYTES = 16;
 
-        internal const int crypto_secretstream_xchacha20poly1305_ABYTES = 17;
-        internal const int crypto_secretstream_xchacha20poly1305_HEADERBYTES = 24;
         internal const int crypto_secretstream_xchacha20poly1305_KEYBYTES = 32;
+        internal const int crypto_secretstream_xchacha20poly1305_HEADERBYTES = 24;
+        internal const int crypto_secretstream_xchacha20poly1305_ABYTES = 17;
 
         internal const byte crypto_secretstream_xchacha20poly1305_TAG_MESSAGE = 0x00;
         internal const byte crypto_secretstream_xchacha20poly1305_TAG_PUSH = 0x01;
