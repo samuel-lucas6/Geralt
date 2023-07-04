@@ -4,7 +4,7 @@
         <TargetFrameworks>net7.0;net6.0</TargetFrameworks>
         <Version>2.1.0</Version>
         <Authors>Samuel Lucas</Authors>
-        <Description>A modern cryptographic library for .NET based on libsodium.</Description>
+        <Description>A modern cryptographic library for .NET 6+ based on libsodium and inspired by Monocypher.</Description>
         <Copyright>Copyright (c) 2022-2023 Samuel Lucas</Copyright>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -13,10 +13,6 @@
         <RepositoryUrl>https://github.com/samuel-lucas6/Geralt</RepositoryUrl>
         <PackageTags>libsodium cryptography crypto security aead chacha20-poly1305 xchacha20-poly1305 blake2b argon2id x25519 curve25519 ed25519 ed25519ph chacha20 xchacha20 hchacha20 poly1305 secretstream secure-random constant-time hex base64 padding</PackageTags>
         <PackageIcon>Geralt.png</PackageIcon>
-        <EnableNETAnalyzers>true</EnableNETAnalyzers>
-        <AnalysisLevel>latest</AnalysisLevel>
-        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-        <ErrorReport>none</ErrorReport>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
@@ -40,7 +36,7 @@
     <ItemGroup>
         <EmbeddedResource Include="Resources\wordlist.txt" />
     </ItemGroup>
-    
+
     <ItemGroup>
         <Compile Update="Properties\Resources.Designer.cs">
             <DesignTime>True</DesignTime>
