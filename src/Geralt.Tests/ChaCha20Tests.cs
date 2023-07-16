@@ -37,7 +37,7 @@ public class ChaCha20Tests
             "1c9240a5eb55d38af333888604f6b5f0473917c1402b80099dca5cbc207075c0"
         };
     }
-    
+
     public static IEnumerable<object[]> FillInvalidParameterSizes()
     {
         yield return new object[] { 0, ChaCha20.NonceSize, ChaCha20.KeySize };
@@ -46,7 +46,7 @@ public class ChaCha20Tests
         yield return new object[] { ChaCha20.BlockSize, ChaCha20.NonceSize, ChaCha20.KeySize + 1 };
         yield return new object[] { ChaCha20.BlockSize, ChaCha20.NonceSize, ChaCha20.KeySize - 1 };
     }
-    
+
     // https://datatracker.ietf.org/doc/html/rfc8439#section-2.4.2
     // https://datatracker.ietf.org/doc/html/rfc8439#appendix-A.2
     public static IEnumerable<object[]> Rfc8439EncryptTestVectors()
@@ -84,7 +84,7 @@ public class ChaCha20Tests
             (uint)42
         };
     }
-    
+
     public static IEnumerable<object[]> EncryptInvalidParameterSizes()
     {
         yield return new object[] { ChaCha20.BlockSize, ChaCha20.BlockSize + 1, ChaCha20.NonceSize, ChaCha20.KeySize, (uint)0 };
@@ -95,7 +95,7 @@ public class ChaCha20Tests
         yield return new object[] { ChaCha20.BlockSize, ChaCha20.BlockSize, ChaCha20.NonceSize, ChaCha20.KeySize - 1, (uint)0 };
         yield return new object[] { ChaCha20.BlockSize, ChaCha20.BlockSize, ChaCha20.NonceSize, ChaCha20.KeySize, uint.MaxValue };
     }
-    
+
     [TestMethod]
     public void Constants_Valid()
     {
@@ -103,7 +103,7 @@ public class ChaCha20Tests
         Assert.AreEqual(12, ChaCha20.NonceSize);
         Assert.AreEqual(64, ChaCha20.BlockSize);
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(Rfc8439FillTestVectors), DynamicDataSourceType.Method)]
     public void Fill_Valid(string buffer, string nonce, string key)
@@ -111,12 +111,12 @@ public class ChaCha20Tests
         Span<byte> b = stackalloc byte[buffer.Length / 2];
         Span<byte> n = Convert.FromHexString(nonce);
         Span<byte> k = Convert.FromHexString(key);
-        
+
         ChaCha20.Fill(b, n, k);
-        
+
         Assert.AreEqual(buffer, Convert.ToHexString(b).ToLower());
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(FillInvalidParameterSizes), DynamicDataSourceType.Method)]
     public void Fill_Invalid(int bufferSize, int nonceSize, int keySize)
@@ -124,24 +124,24 @@ public class ChaCha20Tests
         var b = new byte[bufferSize];
         var n = new byte[nonceSize];
         var k = new byte[keySize];
-        
+
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => ChaCha20.Fill(b, n, k));
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(Rfc8439EncryptTestVectors), DynamicDataSourceType.Method)]
     public void Encrypt_Valid(string ciphertext, string plaintext, string nonce, string key, uint counter)
     {
+        Span<byte> c = stackalloc byte[ciphertext.Length / 2];
         Span<byte> p = Convert.FromHexString(plaintext);
-        Span<byte> c = stackalloc byte[p.Length];
         Span<byte> n = Convert.FromHexString(nonce);
         Span<byte> k = Convert.FromHexString(key);
-        
+
         ChaCha20.Encrypt(c, p, n, k, counter);
-        
+
         Assert.AreEqual(ciphertext, Convert.ToHexString(c).ToLower());
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(EncryptInvalidParameterSizes), DynamicDataSourceType.Method)]
     public void Encrypt_Invalid(int ciphertextSize, int plaintextSize, int nonceSize, int keySize, uint counter)
@@ -150,7 +150,7 @@ public class ChaCha20Tests
         var p = new byte[plaintextSize];
         var n = new byte[nonceSize];
         var k = new byte[keySize];
-        
+
         if (counter < uint.MaxValue) {
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => ChaCha20.Encrypt(c, p, n, k, counter));
         }
@@ -158,30 +158,30 @@ public class ChaCha20Tests
             Assert.ThrowsException<CryptographicException>(() => ChaCha20.Encrypt(c, p, n, k, counter));
         }
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(Rfc8439EncryptTestVectors), DynamicDataSourceType.Method)]
     public void Decrypt_Valid(string ciphertext, string plaintext, string nonce, string key, uint counter)
     {
+        Span<byte> p = stackalloc byte[plaintext.Length / 2];
         Span<byte> c = Convert.FromHexString(ciphertext);
-        Span<byte> p = stackalloc byte[c.Length];
         Span<byte> n = Convert.FromHexString(nonce);
         Span<byte> k = Convert.FromHexString(key);
-        
+
         ChaCha20.Decrypt(p, c, n, k, counter);
-        
+
         Assert.AreEqual(plaintext, Convert.ToHexString(p).ToLower());
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(EncryptInvalidParameterSizes), DynamicDataSourceType.Method)]
     public void Decrypt_Invalid(int ciphertextSize, int plaintextSize, int nonceSize, int keySize, uint counter)
     {
-        var c = new byte[ciphertextSize];
         var p = new byte[plaintextSize];
+        var c = new byte[ciphertextSize];
         var n = new byte[nonceSize];
         var k = new byte[keySize];
-        
+
         if (counter < uint.MaxValue) {
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => ChaCha20.Decrypt(p, c, n, k, counter));
         }

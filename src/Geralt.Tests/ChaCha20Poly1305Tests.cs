@@ -29,7 +29,7 @@ public class ChaCha20Poly1305Tests
             "f33388860000000000004e91"
         };
     }
-    
+
     public static IEnumerable<object[]> InvalidParameterSizes()
     {
         yield return new object[] { ChaCha20Poly1305.TagSize, 1, ChaCha20Poly1305.NonceSize, ChaCha20Poly1305.KeySize, ChaCha20Poly1305.TagSize };
@@ -38,7 +38,7 @@ public class ChaCha20Poly1305Tests
         yield return new object[] { ChaCha20Poly1305.TagSize, 0, ChaCha20Poly1305.NonceSize, ChaCha20Poly1305.KeySize + 1, ChaCha20Poly1305.TagSize };
         yield return new object[] { ChaCha20Poly1305.TagSize, 0, ChaCha20Poly1305.NonceSize, ChaCha20Poly1305.KeySize - 1, ChaCha20Poly1305.TagSize };
     }
-    
+
     [TestMethod]
     public void Constants_Valid()
     {
@@ -46,7 +46,7 @@ public class ChaCha20Poly1305Tests
         Assert.AreEqual(12, ChaCha20Poly1305.NonceSize);
         Assert.AreEqual(16, ChaCha20Poly1305.TagSize);
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(Rfc8439TestVectors), DynamicDataSourceType.Method)]
     public void Encrypt_Valid(string ciphertext, string plaintext, string nonce, string key, string associatedData)
@@ -56,12 +56,12 @@ public class ChaCha20Poly1305Tests
         Span<byte> n = Convert.FromHexString(nonce);
         Span<byte> k = Convert.FromHexString(key);
         Span<byte> ad = Convert.FromHexString(associatedData);
-        
+
         ChaCha20Poly1305.Encrypt(c, p, n, k, ad);
-        
+
         Assert.AreEqual(ciphertext, Convert.ToHexString(c).ToLower());
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(InvalidParameterSizes), DynamicDataSourceType.Method)]
     public void Encrypt_Invalid(int ciphertextSize, int plaintextSize, int nonceSize, int keySize, int associatedDataSize)
@@ -71,10 +71,10 @@ public class ChaCha20Poly1305Tests
         var n = new byte[nonceSize];
         var k = new byte[keySize];
         var ad = new byte[associatedDataSize];
-        
+
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => ChaCha20Poly1305.Encrypt(c, p, n, k, ad));
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(Rfc8439TestVectors), DynamicDataSourceType.Method)]
     public void Decrypt_Valid(string ciphertext, string plaintext, string nonce, string key, string associatedData)
@@ -84,12 +84,12 @@ public class ChaCha20Poly1305Tests
         Span<byte> n = Convert.FromHexString(nonce);
         Span<byte> k = Convert.FromHexString(key);
         Span<byte> ad = Convert.FromHexString(associatedData);
-        
+
         ChaCha20Poly1305.Decrypt(p, c, n, k, ad);
-        
+
         Assert.AreEqual(plaintext, Convert.ToHexString(p).ToLower());
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(Rfc8439TestVectors), DynamicDataSourceType.Method)]
     public void Decrypt_Tampered(string ciphertext, string plaintext, string nonce, string key, string associatedData)
@@ -102,24 +102,24 @@ public class ChaCha20Poly1305Tests
             Convert.FromHexString(key),
             Convert.FromHexString(associatedData)
         };
-        
+
         foreach (var param in parameters) {
             param[0]++;
             Assert.ThrowsException<CryptographicException>(() => ChaCha20Poly1305.Decrypt(p, parameters[0], parameters[1], parameters[2], parameters[3]));
             param[0]--;
         }
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(InvalidParameterSizes), DynamicDataSourceType.Method)]
     public void Decrypt_Invalid(int ciphertextSize, int plaintextSize, int nonceSize, int keySize, int associatedDataSize)
     {
-        var c = new byte[ciphertextSize];
         var p = new byte[plaintextSize];
+        var c = new byte[ciphertextSize];
         var n = new byte[nonceSize];
         var k = new byte[keySize];
         var ad = new byte[associatedDataSize];
-        
+
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => ChaCha20Poly1305.Decrypt(p, c, n, k, ad));
     }
 }
