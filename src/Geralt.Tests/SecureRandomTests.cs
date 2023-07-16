@@ -22,36 +22,36 @@ public class SecureRandomTests
         Assert.AreEqual(4, SecureRandom.MinWordCount);
         Assert.AreEqual(20, SecureRandom.MaxWordCount);
     }
-    
+
     [TestMethod]
     public void Fill_Valid()
     {
         Span<byte> buffer = stackalloc byte[ChaCha20Poly1305.KeySize];
-        
+
         SecureRandom.Fill(buffer);
-        
+
         Assert.IsFalse(buffer.SequenceEqual(new byte[buffer.Length]));
     }
-    
+
     [TestMethod]
     public void Fill_Invalid()
     {
         var buffer = Array.Empty<byte>();
-        
+
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.Fill(buffer));
     }
-    
+
     [TestMethod]
     public void FillDeterministic_Valid()
     {
         Span<byte> buffer = stackalloc byte[ChaCha20Poly1305.KeySize];
         Span<byte> seed = stackalloc byte[SecureRandom.SeedSize];
-        
+
         SecureRandom.FillDeterministic(buffer, seed);
-        
+
         Assert.IsFalse(buffer.SequenceEqual(new byte[buffer.Length]));
     }
-    
+
     [TestMethod]
     [DataRow(0, SecureRandom.SeedSize)]
     [DataRow(ChaCha20Poly1305.KeySize, SecureRandom.SeedSize + 1)]
@@ -60,26 +60,26 @@ public class SecureRandomTests
     {
         var buffer = new byte[bufferSize];
         var seed = new byte[seedSize];
-        
+
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.FillDeterministic(buffer, seed));
     }
-    
+
     [TestMethod]
     public void GetInt32_Valid()
     {
         int number = SecureRandom.GetInt32(SecureRandom.MinUpperBound);
-        
+
         Assert.IsTrue(number is < SecureRandom.MinUpperBound and >= 0);
     }
-    
+
     [TestMethod]
     public void GetInt32_Invalid()
     {
         int upperBound = SecureRandom.MinUpperBound - 1;
-        
+
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.GetInt32(upperBound));
     }
-    
+
     [TestMethod]
     [DataRow(SecureRandom.MinWordCount, ' ', false, false)]
     [DataRow(SecureRandom.MaxWordCount, ' ', false, false)]
@@ -90,14 +90,14 @@ public class SecureRandomTests
     public void GetPassphrase_Valid(int wordCount, char separatorChar, bool capitalize, bool includeNumber)
     {
         char[] passphrase = SecureRandom.GetPassphrase(wordCount, separatorChar, capitalize, includeNumber);
-        
+
         Assert.AreEqual(wordCount - 1, passphrase.Count(c => c == separatorChar));
-        Assert.IsFalse(passphrase[^1] == separatorChar);
+        Assert.AreNotEqual(separatorChar, passphrase[^1]);
         Assert.AreEqual(capitalize ? wordCount : 0, passphrase.Count(c => char.IsUpper(c)));
         Assert.AreEqual(capitalize, char.IsUpper(passphrase[0]));
         Assert.AreEqual(includeNumber, passphrase.Any(char.IsDigit));
     }
-    
+
     [TestMethod]
     [DataRow(SecureRandom.MaxWordCount + 1)]
     [DataRow(SecureRandom.MinWordCount - 1)]
@@ -105,17 +105,17 @@ public class SecureRandomTests
     {
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.GetPassphrase(wordCount));
     }
-    
+
     [TestMethod]
     public void GetString_Valid()
     {
         int length = SecureRandom.MaxStringLength;
         string random = SecureRandom.GetString(length, SecureRandom.AlphabeticChars);
-        
-        Assert.IsTrue(random.Length == length);
+
+        Assert.AreEqual(length, random.Length);
         Assert.IsTrue(random.All(char.IsLetter));
     }
-    
+
     [TestMethod]
     [DataRow(SecureRandom.MaxStringLength + 1)]
     [DataRow(SecureRandom.MinStringLength - 1)]

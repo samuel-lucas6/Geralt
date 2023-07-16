@@ -36,7 +36,7 @@ public class ConstantTimeTests
 
         bool equal = ConstantTime.Equals(a, b);
 
-        Assert.IsTrue(equal == expected);
+        Assert.AreEqual(expected, equal);
     }
 
     [TestMethod]
@@ -58,7 +58,7 @@ public class ConstantTimeTests
 
         ConstantTime.Increment(b);
 
-        Assert.IsTrue(b[0] == 1);
+        Assert.AreEqual(0x01, b[0]);
     }
 
     [TestMethod]
@@ -79,7 +79,7 @@ public class ConstantTimeTests
 
         bool allZeros = ConstantTime.IsAllZeros(b);
 
-        Assert.IsTrue(allZeros == expected);
+        Assert.AreEqual(expected, allZeros);
     }
 
     [TestMethod]
@@ -142,7 +142,7 @@ public class ConstantTimeTests
 
         bool aLessThan = ConstantTime.IsLessThan(a, b);
 
-        Assert.IsTrue(aLessThan == expected);
+        Assert.AreEqual(expected, aLessThan);
     }
 
     [TestMethod]
@@ -165,7 +165,7 @@ public class ConstantTimeTests
 
         bool aGreaterThan = ConstantTime.IsGreaterThan(a, b);
 
-        Assert.IsTrue(aGreaterThan == expected);
+        Assert.AreEqual(expected, aGreaterThan);
     }
 
     [TestMethod]
