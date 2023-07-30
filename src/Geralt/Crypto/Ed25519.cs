@@ -21,7 +21,7 @@ public static class Ed25519
             if (ret != 0) { throw new CryptographicException("Unable to generate key pair."); }
         }
     }
-    
+
     public static unsafe void GenerateKeyPair(Span<byte> publicKey, Span<byte> privateKey, ReadOnlySpan<byte> seed)
     {
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);

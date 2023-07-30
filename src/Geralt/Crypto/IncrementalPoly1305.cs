@@ -7,9 +7,9 @@ public sealed class IncrementalPoly1305 : IDisposable
 {
     public const int KeySize = Poly1305.KeySize;
     public const int TagSize = Poly1305.TagSize;
-    
+
     private crypto_onetimeauth_state _state;
-    
+
     public IncrementalPoly1305(ReadOnlySpan<byte> oneTimeKey)
     {
         Validation.EqualToSize(nameof(oneTimeKey), oneTimeKey.Length, KeySize);
@@ -44,7 +44,7 @@ public sealed class IncrementalPoly1305 : IDisposable
             if (ret != 0) { throw new CryptographicException("Error finalizing message authentication code."); }
         }
     }
-    
+
     public void Dispose()
     {
         GC.SuppressFinalize(this);

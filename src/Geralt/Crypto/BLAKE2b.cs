@@ -28,7 +28,7 @@ public static class BLAKE2b
             if (ret != 0) { throw new CryptographicException("Error computing hash."); }
         }
     }
-    
+
     public static void ComputeHash(Span<byte> hash, Stream message)
     {
         Validation.SizeBetween(nameof(hash), hash.Length, MinHashSize, MaxHashSize);

@@ -7,7 +7,7 @@ public static class Encodings
 {
     private const string HexIgnoreChars = ":- ";
     private const string Base64IgnoreChars = " ";
-    
+
     public enum Base64Variant
     {
         Original = 1,
@@ -15,7 +15,7 @@ public static class Encodings
         Url = 5,
         UrlNoPadding = 7
     }
-    
+
     public static unsafe string ToHex(ReadOnlySpan<byte> data)
     {
         Validation.NotEmpty(nameof(data), data.Length);
@@ -27,7 +27,7 @@ public static class Encodings
             return Marshal.PtrToStringAnsi(ret) ?? throw new FormatException("Error converting bytes to hex.");
         }
     }
-    
+
     public static byte[] FromHex(string hex, string ignoreChars = HexIgnoreChars)
     {
         Validation.NotNullOrEmpty(nameof(hex), hex);

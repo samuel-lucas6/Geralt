@@ -31,7 +31,7 @@ public static class Validation
         if (size == 0)
             throw new ArgumentOutOfRangeException(paramName, size, $"{paramName} cannot have a length of 0.");
     }
-    
+
     public static void NotNull<T>(string paramName, T value) where T: class
     {
         if (value == null)

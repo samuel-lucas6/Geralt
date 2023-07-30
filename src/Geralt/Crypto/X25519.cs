@@ -25,7 +25,7 @@ public static class X25519
             if (ret != 0) { throw new CryptographicException("Unable to generate key pair."); }
         }
     }
-    
+
     public static unsafe void GenerateKeyPair(Span<byte> publicKey, Span<byte> privateKey, ReadOnlySpan<byte> seed)
     {
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
@@ -68,7 +68,7 @@ public static class X25519
         blake2b.Finalize(sharedKey);
         CryptographicOperations.ZeroMemory(sharedSecret);
     }
-    
+
     public static unsafe void DeriveRecipientSharedKey(Span<byte> sharedKey, ReadOnlySpan<byte> recipientPrivateKey, ReadOnlySpan<byte> senderPublicKey, ReadOnlySpan<byte> preSharedKey = default)
     {
         Validation.EqualToSize(nameof(sharedKey), sharedKey.Length, SharedKeySize);
@@ -86,7 +86,7 @@ public static class X25519
         blake2b.Finalize(sharedKey);
         CryptographicOperations.ZeroMemory(sharedSecret);
     }
-    
+
     public static unsafe void ComputeSharedSecret(Span<byte> sharedSecret, ReadOnlySpan<byte> senderPrivateKey, ReadOnlySpan<byte> recipientPublicKey)
     {
         Validation.EqualToSize(nameof(sharedSecret), sharedSecret.Length, SharedSecretSize);

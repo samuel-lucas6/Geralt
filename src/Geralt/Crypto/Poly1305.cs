@@ -7,7 +7,7 @@ public static class Poly1305
 {
     public const int KeySize = crypto_onetimeauth_KEYBYTES;
     public const int TagSize = crypto_onetimeauth_BYTES;
-    
+
     public static unsafe void ComputeTag(Span<byte> tag, ReadOnlySpan<byte> message, ReadOnlySpan<byte> oneTimeKey)
     {
         Validation.EqualToSize(nameof(tag), tag.Length, TagSize);

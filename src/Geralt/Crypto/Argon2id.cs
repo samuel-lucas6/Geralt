@@ -12,7 +12,7 @@ public static class Argon2id
     public const int MinHashSize = 92;
     public const int MaxHashSize = crypto_pwhash_STRBYTES;
     public const string HashPrefix = crypto_pwhash_argon2id_STRPREFIX;
-    
+
     private enum Algorithm
     {
         Argon2id = crypto_pwhash_argon2id_ALG_ARGON2ID13,
@@ -45,7 +45,7 @@ public static class Argon2id
             if (ret != 0) { throw new InsufficientMemoryException("Insufficient memory to perform password hashing."); }
         }
     }
-    
+
     public static unsafe bool VerifyHash(ReadOnlySpan<byte> hash, ReadOnlySpan<byte> password)
     {
         Validation.SizeBetween(nameof(hash), hash.Length, MinHashSize, MaxHashSize);

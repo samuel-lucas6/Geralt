@@ -15,7 +15,7 @@ public static class Padding
             if (ret != 0) { throw new ArgumentOutOfRangeException(nameof(buffer), $"{nameof(buffer)} is not large enough."); }
         }
     }
-    
+
     public static int GetPaddedLength(int unpaddedLength, int blockSize)
     {
         Validation.NotLessThanMin(nameof(unpaddedLength), unpaddedLength, minSize: 0);

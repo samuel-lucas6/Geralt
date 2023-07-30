@@ -21,7 +21,7 @@ public static class XChaCha20
             if (ret != 0) { throw new CryptographicException("Error computing pseudorandom bytes."); }
         }
     }
-    
+
     public static unsafe void Encrypt(Span<byte> ciphertext, ReadOnlySpan<byte> plaintext, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> key, ulong counter = 0)
     {
         Validation.EqualToSize(nameof(ciphertext), ciphertext.Length, plaintext.Length);

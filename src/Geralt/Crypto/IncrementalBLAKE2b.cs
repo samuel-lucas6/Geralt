@@ -14,7 +14,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
     public const int MaxTagSize = MaxHashSize;
     public const int MinKeySize = BLAKE2b.MinKeySize;
     public const int MaxKeySize = BLAKE2b.MaxKeySize;
-    
+
     private crypto_generichash_blake2b_state _state;
     private readonly int _hashSize;
 

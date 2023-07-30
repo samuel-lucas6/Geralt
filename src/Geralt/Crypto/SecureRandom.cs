@@ -17,7 +17,7 @@ public static class SecureRandom
     public const int MaxStringLength = 128;
     public const int MinWordCount = 4;
     public const int MaxWordCount = 20;
-    
+
     public static unsafe void Fill(Span<byte> buffer)
     {
         Validation.NotEmpty(nameof(buffer), buffer.Length);
@@ -25,7 +25,7 @@ public static class SecureRandom
         fixed (byte* b = buffer)
             randombytes_buf(b, (nuint)buffer.Length);
     }
-    
+
     public static unsafe void FillDeterministic(Span<byte> buffer, ReadOnlySpan<byte> seed)
     {
         Validation.NotEmpty(nameof(buffer), buffer.Length);
@@ -34,14 +34,14 @@ public static class SecureRandom
         fixed (byte* b = buffer, s = seed)
             randombytes_buf_deterministic(b, (nuint)buffer.Length, s);
     }
-    
+
     public static int GetInt32(int upperBound)
     {
         Validation.NotLessThanMin(nameof(upperBound), upperBound, MinUpperBound);
         Sodium.Initialize();
         return randombytes_uniform((uint)upperBound);
     }
-    
+
     public static string GetString(int length, string characterSet = AlphanumericChars)
     {
         Validation.SizeBetween(nameof(length), length, MinStringLength, MaxStringLength);

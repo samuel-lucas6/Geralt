@@ -8,21 +8,21 @@ public sealed class IncrementalEd25519 : IDisposable
     public const int PublicKeySize = Ed25519.PublicKeySize;
     public const int PrivateKeySize = Ed25519.PrivateKeySize;
     public const int SignatureSize = Ed25519.SignatureSize;
-    
+
     private crypto_sign_state _state;
-    
+
     public IncrementalEd25519()
     {
         Sodium.Initialize();
         Initialize();
     }
-    
+
     private void Initialize()
     {
         int ret = crypto_sign_init(ref _state);
         if (ret != 0) { throw new CryptographicException("Error initializing signature scheme."); }
     }
-    
+
     public unsafe void Update(ReadOnlySpan<byte> message)
     {
         fixed (byte* m = message)
@@ -31,7 +31,7 @@ public sealed class IncrementalEd25519 : IDisposable
             if (ret != 0) { throw new CryptographicException("Error updating signature scheme."); }
         }
     }
-    
+
     public unsafe void Finalize(Span<byte> signature, ReadOnlySpan<byte> privateKey)
     {
         Validation.EqualToSize(nameof(signature), signature.Length, SignatureSize);
@@ -42,7 +42,7 @@ public sealed class IncrementalEd25519 : IDisposable
             if (ret != 0) { throw new CryptographicException("Error finalizing signature."); }
         }
     }
-    
+
     public unsafe bool Verify(ReadOnlySpan<byte> signature, ReadOnlySpan<byte> publicKey)
     {
         Validation.EqualToSize(nameof(signature), signature.Length, SignatureSize);
@@ -52,7 +52,7 @@ public sealed class IncrementalEd25519 : IDisposable
             return crypto_sign_final_verify(ref _state, s, pk) == 0;
         }
     }
-    
+
     public void Dispose()
     {
         GC.SuppressFinalize(this);

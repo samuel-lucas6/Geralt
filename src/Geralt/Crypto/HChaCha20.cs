@@ -9,7 +9,7 @@ public static class HChaCha20
     public const int KeySize = crypto_core_hchacha20_KEYBYTES;
     public const int NonceSize = crypto_core_hchacha20_INPUTBYTES;
     public const int PersonalSize = crypto_core_hchacha20_CONSTBYTES;
-    
+
     public static unsafe void DeriveKey(Span<byte> outputKeyingMaterial, ReadOnlySpan<byte> inputKeyingMaterial, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> personalization = default)
     {
         Validation.EqualToSize(nameof(outputKeyingMaterial), outputKeyingMaterial.Length, OutputSize);

@@ -21,7 +21,7 @@ public static class ChaCha20
             if (ret != 0) { throw new CryptographicException("Error computing pseudorandom bytes."); }
         }
     }
-    
+
     public static unsafe void Encrypt(Span<byte> ciphertext, ReadOnlySpan<byte> plaintext, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> key, uint counter = 0)
     {
         Validation.EqualToSize(nameof(ciphertext), ciphertext.Length, plaintext.Length);
@@ -49,7 +49,7 @@ public static class ChaCha20
             if (ret != 0) { throw new CryptographicException("Error decrypting ciphertext."); }
         }
     }
-    
+
     private static void CounterOverflow(int messageSize, uint counter)
     {
         long blockCount = (-1L + messageSize + BlockSize) / BlockSize;

@@ -8,10 +8,10 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
     public const int KeySize = crypto_secretstream_xchacha20poly1305_KEYBYTES;
     public const int HeaderSize = crypto_secretstream_xchacha20poly1305_HEADERBYTES;
     public const int TagSize = crypto_secretstream_xchacha20poly1305_ABYTES;
-    
+
     private crypto_secretstream_xchacha20poly1305_state _state;
     private readonly bool _decryption;
-    
+
     public enum ChunkFlag
     {
         Message = crypto_secretstream_xchacha20poly1305_TAG_MESSAGE,
@@ -44,7 +44,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
     {
         Push(ciphertextChunk, plaintextChunk, associatedData: default, chunkFlag);
     }
-    
+
     public unsafe void Push(Span<byte> ciphertextChunk, ReadOnlySpan<byte> plaintextChunk, ReadOnlySpan<byte> associatedData, ChunkFlag chunkFlag = ChunkFlag.Message)
     {
         if (_decryption) { throw new InvalidOperationException("Cannot push into a decryption stream."); }

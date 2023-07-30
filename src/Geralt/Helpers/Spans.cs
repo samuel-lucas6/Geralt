@@ -27,7 +27,7 @@ public static class Spans
             c.CopyTo(buffer.Slice(start: a.Length + b.Length, c.Length));
         }
     }
-    
+
     public static void Concat(Span<byte> buffer, ReadOnlySpan<byte> a, ReadOnlySpan<byte> b, ReadOnlySpan<byte> c, ReadOnlySpan<byte> d)
     {
         checked
@@ -43,7 +43,7 @@ public static class Spans
             d.CopyTo(buffer.Slice(start: a.Length + b.Length + c.Length, d.Length));
         }
     }
-    
+
     public static void Concat(Span<byte> buffer, ReadOnlySpan<byte> a, ReadOnlySpan<byte> b, ReadOnlySpan<byte> c, ReadOnlySpan<byte> d, ReadOnlySpan<byte> e)
     {
         checked
@@ -61,7 +61,7 @@ public static class Spans
             e.CopyTo(buffer.Slice(start: a.Length + b.Length + c.Length + d.Length, e.Length));
         }
     }
-    
+
     public static void Concat(Span<byte> buffer, ReadOnlySpan<byte> a, ReadOnlySpan<byte> b, ReadOnlySpan<byte> c, ReadOnlySpan<byte> d, ReadOnlySpan<byte> e, ReadOnlySpan<byte> f)
     {
         checked
