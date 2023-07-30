@@ -27,7 +27,7 @@ internal static partial class Interop
 
         [DllImport(DllName, CallingConvention = Convention)]
         internal static extern unsafe int crypto_generichash_final(ref crypto_generichash_blake2b_state state, byte* hash, nuint hashLength);
-        
+
         [StructLayout(LayoutKind.Explicit, Size = 384)]
         internal struct crypto_generichash_blake2b_state
         {

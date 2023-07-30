@@ -12,13 +12,13 @@ internal static partial class Interop
 
         [DllImport(DllName, CallingConvention = Convention)]
         internal static extern unsafe int crypto_kx_keypair(byte* publicKey, byte* privateKey);
-        
+
         [DllImport(DllName, CallingConvention = Convention)]
         internal static extern unsafe int crypto_kx_seed_keypair(byte* publicKey, byte* privateKey, byte* seed);
-        
+
         [DllImport(DllName, CallingConvention = Convention)]
         internal static extern unsafe int crypto_scalarmult_base(byte* publicKey, byte* privateKey);
-        
+
         [DllImport(DllName, CallingConvention = Convention)]
         internal static extern unsafe int crypto_scalarmult(byte* sharedSecret, byte* senderPrivateKey, byte* recipientPublicKey);
     }
