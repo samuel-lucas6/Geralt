@@ -15,7 +15,7 @@ public class SpansTests
         {
             new byte[] { 0x01, 0x02, 0x03, 0x04 }
         };
-        
+
         for (int i = 0; i < 5; i++) {
             parameters.Add(parameters[0]);
             Span<byte> buffer = new byte[parameters.Count * parameters[0].Length];
@@ -45,7 +45,7 @@ public class SpansTests
             Assert.IsTrue(buffer.SequenceEqual(expected));
         }
     }
-    
+
     [TestMethod]
     public void ConcatEmpty_Valid()
     {
@@ -55,18 +55,18 @@ public class SpansTests
             Array.Empty<byte>(),
             Array.Empty<byte>()
         };
-        
+
         for (int i = 0; i < 2; i++) {
             Spans.Concat(buffer, parameters[0], parameters[1]);
             Span<byte> expected = Concat(parameters[0], parameters[1]);
-            
+
             Assert.IsTrue(buffer.SequenceEqual(expected));
-            
+
             parameters[1] = new byte[] { 0x01, 0x02, 0x03, 0x04 };
             buffer = new byte[parameters[1].Length];
         }
     }
-    
+
     private static T[] Concat<T>(params T[][] arrays)
     {
         int offset = 0;

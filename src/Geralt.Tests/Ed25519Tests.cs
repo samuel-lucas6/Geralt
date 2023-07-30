@@ -36,7 +36,7 @@ public class Ed25519Tests
             "f5e5767cf153319517630f226876b86c8160cc583bc013744c6bf255f5cc0ee5278117fc144c72340f67d0f2316e8386ceffbf2b2428c9c51fef7c597f1d426e"
         };
     }
-    
+
     // https://github.com/google/wycheproof/blob/master/testvectors_v1/ed25519_test.json
     public static IEnumerable<object[]> WycheproofTestVectors()
     {
@@ -65,7 +65,7 @@ public class Ed25519Tests
             "7d4d0e7f6153a69b6242b522abbee685fda4420f8834b108c3bdae369ef549fa"
         };
     }
-    
+
     // https://www.rfc-editor.org/rfc/rfc8032.html#section-7.3
     public static IEnumerable<object[]> Rfc8032Ed25519phTestVectors()
     {
@@ -76,7 +76,7 @@ public class Ed25519Tests
             "833fe62409237b9d62ec77587520911e9a759cec1d19755b7da901b96dca3d42ec172b93ad5e563bf4932c70e1245034c35467ef2efd4d64ebf819683467e2bf"
         };
     }
-    
+
     public static IEnumerable<object[]> KeyPairInvalidParameterSizes()
     {
         yield return new object[] { Ed25519.PublicKeySize + 1, Ed25519.PrivateKeySize };
@@ -84,7 +84,7 @@ public class Ed25519Tests
         yield return new object[] { Ed25519.PublicKeySize, Ed25519.PrivateKeySize + 1 };
         yield return new object[] { Ed25519.PublicKeySize, Ed25519.PrivateKeySize - 1 };
     }
-    
+
     public static IEnumerable<object[]> SignInvalidParameterSizes()
     {
         yield return new object[] { Ed25519.SignatureSize + 1, 1, Ed25519.PrivateKeySize };
@@ -92,7 +92,7 @@ public class Ed25519Tests
         yield return new object[] { Ed25519.SignatureSize, 1, Ed25519.PrivateKeySize + 1 };
         yield return new object[] { Ed25519.SignatureSize, 1, Ed25519.PrivateKeySize - 1 };
     }
-    
+
     public static IEnumerable<object[]> VerifyInvalidParameterSizes()
     {
         yield return new object[] { Ed25519.SignatureSize + 1, 1, Ed25519.PublicKeySize };
@@ -100,7 +100,7 @@ public class Ed25519Tests
         yield return new object[] { Ed25519.SignatureSize, 1, Ed25519.PublicKeySize + 1 };
         yield return new object[] { Ed25519.SignatureSize, 1, Ed25519.PublicKeySize - 1 };
     }
-    
+
     [TestMethod]
     public void Constants_Valid()
     {
@@ -109,7 +109,7 @@ public class Ed25519Tests
         Assert.AreEqual(64, Ed25519.SignatureSize);
         Assert.AreEqual(32, Ed25519.SeedSize);
     }
-    
+
     [TestMethod]
     public void IncrementalConstants_Valid()
     {
@@ -117,29 +117,29 @@ public class Ed25519Tests
         Assert.AreEqual(64, IncrementalEd25519.PrivateKeySize);
         Assert.AreEqual(64, IncrementalEd25519.SignatureSize);
     }
-    
+
     [TestMethod]
     public void GenerateKeyPair_Valid()
     {
         Span<byte> pk = stackalloc byte[Ed25519.PublicKeySize];
         Span<byte> sk = stackalloc byte[Ed25519.PrivateKeySize];
-        
+
         Ed25519.GenerateKeyPair(pk, sk);
-        
+
         Assert.IsFalse(pk.SequenceEqual(new byte[pk.Length]));
         Assert.IsFalse(sk.SequenceEqual(new byte[sk.Length]));
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(KeyPairInvalidParameterSizes), DynamicDataSourceType.Method)]
     public void GenerateKeyPair_Invalid(int publicKeySize, int privateKeySize)
     {
         var pk = new byte[publicKeySize];
         var sk = new byte[privateKeySize];
-        
+
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Ed25519.GenerateKeyPair(pk, sk));
     }
-    
+
     [TestMethod]
     [DataRow("b5076a8474a832daee4dd5b4040983b6623b5f344aca57d4d6ee4baf3f259e6e", "421151a459faeade3d247115f94aedae42318124095afabe4d1451a559faedeeb5076a8474a832daee4dd5b4040983b6623b5f344aca57d4d6ee4baf3f259e6e", "421151a459faeade3d247115f94aedae42318124095afabe4d1451a559faedee")]
     public void GenerateKeyPairSeeded_Valid(string publicKey, string privateKey, string seed)
@@ -147,13 +147,13 @@ public class Ed25519Tests
         Span<byte> pk = stackalloc byte[Ed25519.PublicKeySize];
         Span<byte> sk = stackalloc byte[Ed25519.PrivateKeySize];
         Span<byte> s = Convert.FromHexString(seed);
-        
+
         Ed25519.GenerateKeyPair(pk, sk, s);
-        
+
         Assert.AreEqual(publicKey, Convert.ToHexString(pk).ToLower());
         Assert.AreEqual(privateKey, Convert.ToHexString(sk).ToLower());
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(KeyPairInvalidParameterSizes), DynamicDataSourceType.Method)]
     [DataRow(Ed25519.PublicKeySize, Ed25519.PrivateKeySize, Ed25519.SeedSize + 1)]
@@ -163,44 +163,44 @@ public class Ed25519Tests
         var pk = new byte[publicKeySize];
         var sk = new byte[privateKeySize];
         var s = new byte[seedSize];
-        
+
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Ed25519.GenerateKeyPair(pk, sk, s));
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(Rfc8032Ed25519TestVectors), DynamicDataSourceType.Method)]
     public void ComputePublicKey_Valid(string signature, string message, string privateKey)
     {
         Span<byte> pk = stackalloc byte[Ed25519.PublicKeySize];
         Span<byte> sk = Convert.FromHexString(privateKey);
-        
+
         Ed25519.ComputePublicKey(pk, sk);
-        
+
         Assert.AreEqual(privateKey[(privateKey.Length / 2)..], Convert.ToHexString(pk).ToLower());
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(KeyPairInvalidParameterSizes), DynamicDataSourceType.Method)]
     public void ComputePublicKey_Invalid(int publicKeySize, int privateKeySize)
     {
         var pk = new byte[publicKeySize];
         var sk = new byte[privateKeySize];
-        
+
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Ed25519.ComputePublicKey(pk, sk));
     }
-    
+
     [TestMethod]
     [DataRow("25c704c594b88afc00a76b69d1ed2b984d7e22550f3ed0802d04fbcd07d38d47", "3d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c")]
     public void GetX25519PublicKey_Valid(string x25519PublicKey, string ed25519PublicKey)
     {
         Span<byte> x = stackalloc byte[X25519.PublicKeySize];
         Span<byte> e = Convert.FromHexString(ed25519PublicKey);
-        
+
         Ed25519.GetX25519PublicKey(x, e);
-        
+
         Assert.AreEqual(x25519PublicKey, Convert.ToHexString(x).ToLower());
     }
-    
+
     [TestMethod]
     [DataRow(X25519.PublicKeySize + 1, Ed25519.PublicKeySize)]
     [DataRow(X25519.PublicKeySize - 1, Ed25519.PublicKeySize)]
@@ -210,22 +210,22 @@ public class Ed25519Tests
     {
         var x = new byte[x25519PublicKeySize];
         var e = new byte[ed25519PublicKeySize];
-        
+
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Ed25519.GetX25519PublicKey(x, e));
     }
-    
+
     [TestMethod]
     [DataRow("68bd9ed75882d52815a97585caf4790a7f6c6b3b7f821c5e259a24b02e502e51", "4ccd089b28ff96da9db6c346ec114e0f5b8a319f35aba624da8cf6ed4fb8a6fb3d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c")]
     public void GetX25519PrivateKey_Valid(string x25519PrivateKey, string ed25519PrivateKey)
     {
         Span<byte> x = stackalloc byte[X25519.PrivateKeySize];
         Span<byte> e = Convert.FromHexString(ed25519PrivateKey);
-        
+
         Ed25519.GetX25519PrivateKey(x, e);
-        
+
         Assert.AreEqual(x25519PrivateKey, Convert.ToHexString(x).ToLower());
     }
-    
+
     [TestMethod]
     [DataRow(X25519.PrivateKeySize + 1, Ed25519.PrivateKeySize)]
     [DataRow(X25519.PrivateKeySize - 1, Ed25519.PrivateKeySize)]
@@ -235,10 +235,10 @@ public class Ed25519Tests
     {
         var x = new byte[x25519PrivateKeySize];
         var e = new byte[ed25519PrivateKeySize];
-        
+
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Ed25519.GetX25519PrivateKey(x, e));
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(Rfc8032Ed25519TestVectors), DynamicDataSourceType.Method)]
     public void Sign_Valid(string signature, string message, string privateKey)
@@ -246,12 +246,12 @@ public class Ed25519Tests
         Span<byte> s = stackalloc byte[Ed25519.SignatureSize];
         Span<byte> m = Convert.FromHexString(message);
         Span<byte> sk = Convert.FromHexString(privateKey);
-        
+
         Ed25519.Sign(s, m, sk);
-        
+
         Assert.AreEqual(signature, Convert.ToHexString(s).ToLower());
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(SignInvalidParameterSizes), DynamicDataSourceType.Method)]
     public void Sign_Invalid(int signatureSize, int messageSize, int privateKeySize)
@@ -259,10 +259,10 @@ public class Ed25519Tests
         var s = new byte[signatureSize];
         var m = new byte[messageSize];
         var sk = new byte[privateKeySize];
-        
+
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Ed25519.Sign(s, m, sk));
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(Rfc8032Ed25519TestVectors), DynamicDataSourceType.Method)]
     public void Verify_Valid(string signature, string message, string privateKey)
@@ -270,12 +270,12 @@ public class Ed25519Tests
         Span<byte> s = Convert.FromHexString(signature);
         Span<byte> m = Convert.FromHexString(message);
         Span<byte> pk = Convert.FromHexString(privateKey)[^Ed25519.PublicKeySize..];
-        
+
         bool valid = Ed25519.Verify(s, m, pk);
-        
+
         Assert.IsTrue(valid);
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(WycheproofTestVectors), DynamicDataSourceType.Method)]
     public void Verify_Tampered(string signature, string message, string publicKey)
@@ -283,12 +283,12 @@ public class Ed25519Tests
         Span<byte> s = Convert.FromHexString(signature);
         Span<byte> m = Convert.FromHexString(message);
         Span<byte> pk = Convert.FromHexString(publicKey);
-        
+
         bool valid = Ed25519.Verify(s, m, pk);
-        
+
         Assert.IsFalse(valid);
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(VerifyInvalidParameterSizes), DynamicDataSourceType.Method)]
     public void Verify_Invalid(int signatureSize, int messageSize, int publicKeySize)
@@ -296,10 +296,10 @@ public class Ed25519Tests
         var s = new byte[signatureSize];
         var m = new byte[messageSize];
         var pk = new byte[publicKeySize];
-        
+
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Ed25519.Verify(s, m, pk));
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
     public void Incremental_Sign_Valid(string signature, string message, string privateKey)
@@ -307,14 +307,14 @@ public class Ed25519Tests
         Span<byte> s = stackalloc byte[IncrementalEd25519.SignatureSize];
         Span<byte> m = Convert.FromHexString(message);
         Span<byte> sk = Convert.FromHexString(privateKey);
-        
+
         using var ed25519ph = new IncrementalEd25519();
         ed25519ph.Update(m);
         ed25519ph.Finalize(s, sk);
-        
+
         Assert.AreEqual(signature, Convert.ToHexString(s).ToLower());
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(SignInvalidParameterSizes), DynamicDataSourceType.Method)]
     public void Incremental_Sign_Invalid(int signatureSize, int messageSize, int privateKeySize)
@@ -322,13 +322,13 @@ public class Ed25519Tests
         var s = new byte[signatureSize];
         var m = new byte[messageSize];
         var sk = new byte[privateKeySize];
-        
+
         using var ed25519ph = new IncrementalEd25519();
         ed25519ph.Update(m);
-        
+
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => ed25519ph.Finalize(s, sk));
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
     public void Incremental_Verify_Valid(string signature, string message, string privateKey)
@@ -336,15 +336,15 @@ public class Ed25519Tests
         Span<byte> s = Convert.FromHexString(signature);
         Span<byte> m = Convert.FromHexString(message);
         Span<byte> pk = Convert.FromHexString(privateKey)[^Ed25519.PublicKeySize..];
-        
+
         using var ed25519ph = new IncrementalEd25519();
         ed25519ph.Update(m);
-        
+
         bool valid = ed25519ph.Verify(s, pk);
-        
+
         Assert.IsTrue(valid);
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
     public void Incremental_Verify_Tampered(string signature, string message, string privateKey)
@@ -355,7 +355,7 @@ public class Ed25519Tests
             Convert.FromHexString(message),
             Convert.FromHexString(privateKey)[^Ed25519.PublicKeySize..]
         };
-        
+
         foreach (var param in parameters.Where(param => param.Length != 0)) {
             param[0]++;
             using var ed25519ph = new IncrementalEd25519();
@@ -365,7 +365,7 @@ public class Ed25519Tests
             Assert.IsFalse(valid);
         }
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(VerifyInvalidParameterSizes), DynamicDataSourceType.Method)]
     public void Incremental_Verify_Invalid(int signatureSize, int messageSize, int publicKeySize)
@@ -373,10 +373,10 @@ public class Ed25519Tests
         var s = new byte[signatureSize];
         var m = new byte[messageSize];
         var pk = new byte[publicKeySize];
-        
+
         using var ed25519ph = new IncrementalEd25519();
         ed25519ph.Update(m);
-        
+
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => ed25519ph.Verify(s, pk));
     }
 }

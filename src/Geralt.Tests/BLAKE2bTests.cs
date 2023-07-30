@@ -38,7 +38,7 @@ public class BLAKE2bTests
             "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f40414243444546"
         };
     }
-    
+
     // https://github.com/BLAKE2/BLAKE2/blob/master/testvectors/blake2b-kat.txt
     public static IEnumerable<object[]> KeyedTestVectors()
     {
@@ -73,7 +73,7 @@ public class BLAKE2bTests
             "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f"
         };
     }
-    
+
     // https://github.com/emilbayes/blake2b/blob/master/test-vectors.json
     public static IEnumerable<object[]> KeyDerivationTestVectors()
     {
@@ -110,7 +110,7 @@ public class BLAKE2bTests
             "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e"
         };
     }
-    
+
     public static IEnumerable<object[]> TagInvalidParameterSizes()
     {
         yield return new object[] { BLAKE2b.MaxTagSize + 1, 1, BLAKE2b.KeySize };
@@ -118,7 +118,7 @@ public class BLAKE2bTests
         yield return new object[] { BLAKE2b.TagSize, 1, BLAKE2b.MaxKeySize + 1 };
         yield return new object[] { BLAKE2b.TagSize, 1, BLAKE2b.MinKeySize - 1 };
     }
-    
+
     [TestMethod]
     public void Constants_Valid()
     {
@@ -134,7 +134,7 @@ public class BLAKE2bTests
         Assert.AreEqual(16, BLAKE2b.MinKeySize);
         Assert.AreEqual(64, BLAKE2b.MaxKeySize);
     }
-    
+
     [TestMethod]
     public void IncrementalConstants_Valid()
     {
@@ -148,31 +148,31 @@ public class BLAKE2bTests
         Assert.AreEqual(16, IncrementalBLAKE2b.MinKeySize);
         Assert.AreEqual(64, IncrementalBLAKE2b.MaxKeySize);
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(UnkeyedTestVectors), DynamicDataSourceType.Method)]
     public void ComputeHash_Valid(string hash, string message)
     {
         Span<byte> h = stackalloc byte[hash.Length / 2];
         Span<byte> m = Convert.FromHexString(message);
-        
+
         BLAKE2b.ComputeHash(h, m);
-        
+
         Assert.AreEqual(hash, Convert.ToHexString(h).ToLower());
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(UnkeyedTestVectors), DynamicDataSourceType.Method)]
     public void ComputeHashStream_Valid(string hash, string message)
     {
         Span<byte> h = stackalloc byte[hash.Length / 2];
         using var m = new MemoryStream(Convert.FromHexString(message), writable: false);
-        
+
         BLAKE2b.ComputeHash(h, m);
-        
+
         Assert.AreEqual(hash, Convert.ToHexString(h).ToLower());
     }
-    
+
     [TestMethod]
     [DataRow(BLAKE2b.MaxHashSize + 1, 1)]
     [DataRow(BLAKE2b.MinHashSize - 1, 1)]
@@ -180,10 +180,10 @@ public class BLAKE2bTests
     {
         var h = new byte[hashSize];
         var m = new byte[messageSize];
-        
+
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => BLAKE2b.ComputeHash(h, m));
     }
-    
+
     [TestMethod]
     [DataRow(BLAKE2b.MaxHashSize + 1, 1)]
     [DataRow(BLAKE2b.MinHashSize - 1, 1)]
@@ -191,7 +191,7 @@ public class BLAKE2bTests
     public void ComputeHashStream_Invalid(int hashSize, int messageSize)
     {
         var h = new byte[hashSize];
-        
+
         if (messageSize > 0) {
             using var m = new MemoryStream(new byte[messageSize], writable: false);
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => BLAKE2b.ComputeHash(h, m));
@@ -201,7 +201,7 @@ public class BLAKE2bTests
             Assert.ThrowsException<ArgumentNullException>(() => BLAKE2b.ComputeHash(h, m));
         }
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(KeyedTestVectors), DynamicDataSourceType.Method)]
     public void ComputeTag_Valid(string tag, string message, string key)
@@ -209,12 +209,12 @@ public class BLAKE2bTests
         Span<byte> t = stackalloc byte[tag.Length / 2];
         Span<byte> m = Convert.FromHexString(message);
         Span<byte> k = Convert.FromHexString(key);
-        
+
         BLAKE2b.ComputeTag(t, m, k);
-        
+
         Assert.AreEqual(tag, Convert.ToHexString(t).ToLower());
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(TagInvalidParameterSizes), DynamicDataSourceType.Method)]
     public void ComputeTag_Invalid(int tagSize, int messageSize, int keySize)
@@ -222,10 +222,10 @@ public class BLAKE2bTests
         var t = new byte[tagSize];
         var m = new byte[messageSize];
         var k = new byte[keySize];
-        
+
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => BLAKE2b.ComputeTag(t, m, k));
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(KeyedTestVectors), DynamicDataSourceType.Method)]
     public void VerifyTag_Valid(string tag, string message, string key)
@@ -233,12 +233,12 @@ public class BLAKE2bTests
         Span<byte> t = Convert.FromHexString(tag);
         Span<byte> m = Convert.FromHexString(message);
         Span<byte> k = Convert.FromHexString(key);
-        
+
         bool valid = BLAKE2b.VerifyTag(t, m, k);
-        
+
         Assert.IsTrue(valid);
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(KeyedTestVectors), DynamicDataSourceType.Method)]
     public void VerifyTag_Tampered(string tag, string message, string key)
@@ -249,7 +249,7 @@ public class BLAKE2bTests
             Convert.FromHexString(message),
             Convert.FromHexString(key)
         };
-        
+
         foreach (var param in parameters.Where(param => param.Length != 0)) {
             param[0]++;
             bool valid = BLAKE2b.VerifyTag(parameters[0], parameters[1], parameters[2]);
@@ -257,7 +257,7 @@ public class BLAKE2bTests
             Assert.IsFalse(valid);
         }
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(TagInvalidParameterSizes), DynamicDataSourceType.Method)]
     public void VerifyTag_Invalid(int tagSize, int messageSize, int keySize)
@@ -265,10 +265,10 @@ public class BLAKE2bTests
         var t = new byte[tagSize];
         var m = new byte[messageSize];
         var k = new byte[keySize];
-        
+
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => BLAKE2b.VerifyTag(t, m, k));
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(KeyDerivationTestVectors), DynamicDataSourceType.Method)]
     public void DeriveKey_Valid(string outputKeyingMaterial, string inputKeyingMaterial, string personalization, string salt, string info)
@@ -278,12 +278,12 @@ public class BLAKE2bTests
         Span<byte> p = Convert.FromHexString(personalization);
         Span<byte> s = Convert.FromHexString(salt);
         Span<byte> i = Convert.FromHexString(info);
-        
+
         BLAKE2b.DeriveKey(okm, ikm, p, s, i);
-        
+
         Assert.AreEqual(outputKeyingMaterial, Convert.ToHexString(okm).ToLower());
     }
-    
+
     [TestMethod]
     [DataRow(BLAKE2b.MaxKeySize + 1, BLAKE2b.KeySize, BLAKE2b.PersonalSize, BLAKE2b.SaltSize, 1)]
     [DataRow(BLAKE2b.MinKeySize - 1, BLAKE2b.KeySize, BLAKE2b.PersonalSize, BLAKE2b.SaltSize, 1)]
@@ -300,10 +300,10 @@ public class BLAKE2bTests
         var p = new byte[personalizationSize];
         var s = new byte[saltSize];
         var i = new byte[infoSize];
-        
+
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => BLAKE2b.DeriveKey(okm, ikm, p, s, i));
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(UnkeyedTestVectors), DynamicDataSourceType.Method)]
     [DynamicData(nameof(KeyedTestVectors), DynamicDataSourceType.Method)]
@@ -312,14 +312,14 @@ public class BLAKE2bTests
         Span<byte> h = stackalloc byte[hash.Length / 2];
         Span<byte> m = Convert.FromHexString(message);
         Span<byte> k = key != null ? Convert.FromHexString(key) : Span<byte>.Empty;
-        
+
         using var blake2b = new IncrementalBLAKE2b(h.Length, k);
         blake2b.Update(m);
         blake2b.Finalize(h);
-        
+
         Assert.AreEqual(hash, Convert.ToHexString(h).ToLower());
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(TagInvalidParameterSizes), DynamicDataSourceType.Method)]
     public void Incremental_Invalid(int hashSize, int messageSize, int keySize)
@@ -327,7 +327,7 @@ public class BLAKE2bTests
         var h = new byte[hashSize];
         var m = new byte[messageSize];
         var k = new byte[keySize];
-        
+
         if (keySize is < IncrementalBLAKE2b.MinKeySize or > IncrementalBLAKE2b.MaxKeySize) {
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => new IncrementalBLAKE2b(hashSize, k));
         }

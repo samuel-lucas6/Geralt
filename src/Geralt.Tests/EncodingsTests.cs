@@ -18,7 +18,7 @@ public class EncodingsTests
         yield return new object[] { "Zm9vYmE=", "fooba", Encodings.Base64Variant.Original };
         yield return new object[] { "Zm9vYmFy", "foobar", Encodings.Base64Variant.Original };
     }
-    
+
     // https://eprint.iacr.org/2022/361
     // https://base64.guru/standards/base64url
     public static IEnumerable<object[]> Base64VariantTestVectors()
@@ -29,26 +29,26 @@ public class EncodingsTests
         yield return new object[] { "PDw_Pz8-Pg==", "<<???>>", Encodings.Base64Variant.Url };
         yield return new object[] { "PDw_Pz8-Pg", "<<???>>", Encodings.Base64Variant.UrlNoPadding };
     }
-    
+
     [TestMethod]
     [DataRow("596f752064697367757374206d652e20416e64206465736572766520746f206469652e", "You disgust me. And deserve to die.")]
     public void ToHex_Valid(string hex, string data)
     {
         Span<byte> d = Encoding.UTF8.GetBytes(data);
-        
+
         string h = Encodings.ToHex(d);
-        
+
         Assert.AreEqual(hex, h);
     }
-    
+
     [TestMethod]
     public void ToHex_Invalid()
     {
         var d = Array.Empty<byte>();
-        
+
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Encodings.ToHex(d));
     }
-    
+
     [TestMethod]
     [DataRow("fo", "666f", "")]
     [DataRow("foo", "666F6F", "")]
@@ -58,10 +58,10 @@ public class EncodingsTests
     public void FromHex_Valid(string data, string hex, string ignoreChars)
     {
         byte[] d = Encodings.FromHex(hex, ignoreChars);
-        
+
         Assert.AreEqual(data, Encoding.UTF8.GetString(d));
     }
-    
+
     [TestMethod]
     [DataRow(null)]
     [DataRow("")]
@@ -79,37 +79,37 @@ public class EncodingsTests
             Assert.ThrowsException<FormatException>(() => Encodings.FromHex(hex));
         }
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(Rfc4648TestVectors), DynamicDataSourceType.Method)]
     [DynamicData(nameof(Base64VariantTestVectors), DynamicDataSourceType.Method)]
     public void ToBase64_Valid(string base64, string data, Encodings.Base64Variant variant)
     {
         Span<byte> d = Encoding.UTF8.GetBytes(data);
-        
+
         string b = Encodings.ToBase64(d, variant);
-        
+
         Assert.AreEqual(base64, b);
     }
-    
+
     [TestMethod]
     public void ToBase64_Invalid()
     {
         var d = Array.Empty<byte>();
-        
+
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Encodings.ToBase64(d));
     }
-    
+
     [TestMethod]
     [DynamicData(nameof(Rfc4648TestVectors), DynamicDataSourceType.Method)]
     [DynamicData(nameof(Base64VariantTestVectors), DynamicDataSourceType.Method)]
     public void FromBase64_Valid(string base64, string data, Encodings.Base64Variant variant)
     {
         byte[] d = Encodings.FromBase64(base64, variant);
-        
+
         Assert.AreEqual(data, Encoding.UTF8.GetString(d));
     }
-    
+
     [TestMethod]
     [DataRow(null, Encodings.Base64Variant.Original)]
     [DataRow("", Encodings.Base64Variant.Original)]
