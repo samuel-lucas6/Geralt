@@ -93,7 +93,7 @@ public class SecureRandomTests
 
         Assert.AreEqual(wordCount - 1, passphrase.Count(c => c == separatorChar));
         Assert.AreNotEqual(separatorChar, passphrase[^1]);
-        Assert.AreEqual(capitalize ? wordCount : 0, passphrase.Count(c => char.IsUpper(c)));
+        Assert.AreEqual(capitalize ? wordCount : 0, passphrase.Count(char.IsUpper));
         Assert.AreEqual(capitalize, char.IsUpper(passphrase[0]));
         Assert.AreEqual(includeNumber, passphrase.Any(char.IsDigit));
     }
