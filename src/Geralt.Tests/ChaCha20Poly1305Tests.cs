@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -108,6 +109,7 @@ public class ChaCha20Poly1305Tests
             Assert.ThrowsException<CryptographicException>(() => ChaCha20Poly1305.Decrypt(p, parameters[0], parameters[1], parameters[2], parameters[3]));
             param[0]--;
         }
+        Assert.IsTrue(p.SequenceEqual(new byte[p.Length]));
     }
 
     [TestMethod]
