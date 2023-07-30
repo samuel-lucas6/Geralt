@@ -116,7 +116,13 @@ public class Poly1305Tests
         Span<byte> k = Convert.FromHexString(oneTimeKey);
 
         using var poly1305 = new IncrementalPoly1305(k);
-        poly1305.Update(m);
+        if (m.Length > 1) {
+            poly1305.Update(m[..(m.Length / 2)]);
+            poly1305.Update(m[(m.Length / 2)..]);
+        }
+        else {
+            poly1305.Update(m);
+        }
         poly1305.Finalize(t);
 
         Assert.AreEqual(tag, Convert.ToHexString(t).ToLower());
