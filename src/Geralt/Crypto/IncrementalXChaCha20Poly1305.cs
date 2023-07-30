@@ -76,6 +76,5 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
 
     public void Dispose()
     {
-        GC.SuppressFinalize(this);
     }
 }

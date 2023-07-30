@@ -47,6 +47,5 @@ public sealed class IncrementalPoly1305 : IDisposable
 
     public void Dispose()
     {
-        GC.SuppressFinalize(this);
     }
 }

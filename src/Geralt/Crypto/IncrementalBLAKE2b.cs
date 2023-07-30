@@ -57,6 +57,5 @@ public sealed class IncrementalBLAKE2b : IDisposable
 
     public void Dispose()
     {
-        GC.SuppressFinalize(this);
     }
 }

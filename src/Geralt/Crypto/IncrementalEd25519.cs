@@ -55,6 +55,5 @@ public sealed class IncrementalEd25519 : IDisposable
 
     public void Dispose()
     {
-        GC.SuppressFinalize(this);
     }
 }
