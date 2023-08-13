@@ -27,6 +27,7 @@ public static class XChaCha20
         Validation.EqualToSize(nameof(ciphertext), ciphertext.Length, plaintext.Length);
         Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
         Validation.EqualToSize(nameof(key), key.Length, KeySize);
+        ThrowIfCounterOverflow(plaintext.Length, counter);
         Sodium.Initialize();
         fixed (byte* c = ciphertext, p = plaintext, n = nonce, k = key)
         {
@@ -40,11 +41,19 @@ public static class XChaCha20
         Validation.EqualToSize(nameof(plaintext), plaintext.Length, ciphertext.Length);
         Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
         Validation.EqualToSize(nameof(key), key.Length, KeySize);
+        ThrowIfCounterOverflow(ciphertext.Length, counter);
         Sodium.Initialize();
         fixed (byte* p = plaintext, c = ciphertext, n = nonce, k = key)
         {
             int ret = crypto_stream_xchacha20_xor_ic(p, c, (ulong)ciphertext.Length, n, counter, k);
             if (ret != 0) { throw new CryptographicException("Error decrypting ciphertext."); }
         }
+    }
+
+    private static void ThrowIfCounterOverflow(int messageSize, ulong counter)
+    {
+        long blockCount = (-1L + messageSize + BlockSize) / BlockSize;
+        if (ulong.MaxValue - (ulong)blockCount < counter)
+            throw new CryptographicException("Counter overflow prevented.");
     }
 }

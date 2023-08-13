@@ -27,7 +27,7 @@ public static class ChaCha20
         Validation.EqualToSize(nameof(ciphertext), ciphertext.Length, plaintext.Length);
         Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
         Validation.EqualToSize(nameof(key), key.Length, KeySize);
-        CounterOverflow(plaintext.Length, counter);
+        ThrowIfCounterOverflow(plaintext.Length, counter);
         Sodium.Initialize();
         fixed (byte* c = ciphertext, p = plaintext, n = nonce, k = key)
         {
@@ -41,7 +41,7 @@ public static class ChaCha20
         Validation.EqualToSize(nameof(plaintext), plaintext.Length, ciphertext.Length);
         Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
         Validation.EqualToSize(nameof(key), key.Length, KeySize);
-        CounterOverflow(ciphertext.Length, counter);
+        ThrowIfCounterOverflow(ciphertext.Length, counter);
         Sodium.Initialize();
         fixed (byte* p = plaintext, c = ciphertext, n = nonce, k = key)
         {
@@ -50,7 +50,7 @@ public static class ChaCha20
         }
     }
 
-    private static void CounterOverflow(int messageSize, uint counter)
+    private static void ThrowIfCounterOverflow(int messageSize, uint counter)
     {
         long blockCount = (-1L + messageSize + BlockSize) / BlockSize;
         if (counter + blockCount > uint.MaxValue)
