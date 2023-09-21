@@ -10,8 +10,11 @@ jobs:
 
   test-windows-x64:
     runs-on: windows-latest
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up .NET
       uses: actions/setup-dotnet@v3
       with:
@@ -28,10 +31,13 @@ jobs:
     - name: Test (.NET 6.0/Release)
       run: dotnet test -f net6.0 -c Release
 
-  test-ubuntu-x64:
+  test-linux-x64:
     runs-on: ubuntu-latest
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up .NET
       uses: actions/setup-dotnet@v3
       with:
@@ -50,8 +56,11 @@ jobs:
 
   test-macos-x64:
     runs-on: macos-latest
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up .NET
       uses: actions/setup-dotnet@v3
       with:
@@ -67,3 +76,18 @@ jobs:
       run: dotnet test -f net6.0 -c Debug
     - name: Test (.NET 6.0/Release)
       run: dotnet test -f net6.0 -c Release
+
+  test-linux-musl-x64:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/dotnet/sdk:7.0-alpine
+      env:
+        DOTNET_CLI_TELEMETRY_OPTOUT: 1
+        DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+    steps:
+    - uses: actions/checkout@v4
+    - run: dotnet --info
+    - name: Test (.NET 7.0/Debug)
+      run: dotnet test -f net7.0 -c Debug
+    - name: Test (.NET 7.0/Release)
+      run: dotnet test -f net7.0 -c Release
