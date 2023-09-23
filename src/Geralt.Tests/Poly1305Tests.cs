@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -109,7 +110,7 @@ public class Poly1305Tests
 
     [TestMethod]
     [DynamicData(nameof(Rfc8439TestVectors), DynamicDataSourceType.Method)]
-    public void Incremental_Valid(string tag, string message, string oneTimeKey)
+    public void Incremental_Compute_Valid(string tag, string message, string oneTimeKey)
     {
         Span<byte> t = stackalloc byte[Poly1305.TagSize];
         Span<byte> m = Convert.FromHexString(message);
@@ -129,6 +130,48 @@ public class Poly1305Tests
     }
 
     [TestMethod]
+    [DynamicData(nameof(Rfc8439TestVectors), DynamicDataSourceType.Method)]
+    public void Incremental_Verify_Valid(string tag, string message, string oneTimeKey)
+    {
+        Span<byte> t = Convert.FromHexString(tag);
+        Span<byte> m = Convert.FromHexString(message);
+        Span<byte> k = Convert.FromHexString(oneTimeKey);
+
+        using var poly1305 = new IncrementalPoly1305(k);
+        if (m.Length > 1) {
+            poly1305.Update(m[..(m.Length / 2)]);
+            poly1305.Update(m[(m.Length / 2)..]);
+        }
+        else {
+            poly1305.Update(m);
+        }
+        bool valid = poly1305.FinalizeAndVerify(t);
+
+        Assert.IsTrue(valid);
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(Rfc8439TestVectors), DynamicDataSourceType.Method)]
+    public void Incremental_Verify_Tampered(string tag, string message, string oneTimeKey)
+    {
+        var parameters = new List<byte[]>
+        {
+            Convert.FromHexString(tag),
+            Convert.FromHexString(message),
+            Convert.FromHexString(oneTimeKey)
+        };
+
+        foreach (var param in parameters.Where(param => param.Length > 0)) {
+            param[0]++;
+            using var poly1305 = new IncrementalPoly1305(parameters[2]);
+            poly1305.Update(parameters[1]);
+            bool valid = poly1305.FinalizeAndVerify(parameters[0]);
+            param[0]--;
+            Assert.IsFalse(valid);
+        }
+    }
+
+    [TestMethod]
     [DynamicData(nameof(InvalidParameterSizes), DynamicDataSourceType.Method)]
     public void Incremental_Invalid(int tagSize, int messageSize, int keySize)
     {
@@ -143,6 +186,7 @@ public class Poly1305Tests
             using var poly1305 = new IncrementalPoly1305(k);
             poly1305.Update(m);
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => poly1305.Finalize(t));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => poly1305.FinalizeAndVerify(t));
         }
     }
 }

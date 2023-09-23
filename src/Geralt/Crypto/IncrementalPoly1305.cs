@@ -45,6 +45,16 @@ public sealed class IncrementalPoly1305 : IDisposable
         }
     }
 
+    public bool FinalizeAndVerify(ReadOnlySpan<byte> tag)
+    {
+        Validation.EqualToSize(nameof(tag), tag.Length, TagSize);
+        Span<byte> computedTag = stackalloc byte[TagSize];
+        Finalize(computedTag);
+        bool equal = ConstantTime.Equals(tag, computedTag);
+        CryptographicOperations.ZeroMemory(computedTag);
+        return equal;
+    }
+
     public void Dispose()
     {
     }
