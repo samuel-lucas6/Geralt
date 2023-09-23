@@ -26,6 +26,12 @@ public static class Validation
             throw new ArgumentOutOfRangeException(paramName, size, $"{paramName} must be equal to or greater than {minSize}.");
     }
 
+    public static void NotGreaterThanMax(string paramName, int size, int maxSize)
+    {
+        if (size > maxSize)
+            throw new ArgumentOutOfRangeException(paramName, size, $"{paramName} must be equal to or less than {maxSize}.");
+    }
+
     public static void NotEmpty(string paramName, int size)
     {
         if (size == 0)
