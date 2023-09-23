@@ -55,6 +55,16 @@ public sealed class IncrementalBLAKE2b : IDisposable
         }
     }
 
+    public bool FinalizeAndVerify(ReadOnlySpan<byte> hash)
+    {
+        Validation.EqualToSize(nameof(hash), hash.Length, _hashSize);
+        Span<byte> computedHash = stackalloc byte[_hashSize];
+        Finalize(computedHash);
+        bool equal = ConstantTime.Equals(hash, computedHash);
+        CryptographicOperations.ZeroMemory(computedHash);
+        return equal;
+    }
+
     public void Dispose()
     {
     }

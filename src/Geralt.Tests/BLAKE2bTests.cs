@@ -307,7 +307,7 @@ public class BLAKE2bTests
     [TestMethod]
     [DynamicData(nameof(UnkeyedTestVectors), DynamicDataSourceType.Method)]
     [DynamicData(nameof(KeyedTestVectors), DynamicDataSourceType.Method)]
-    public void Incremental_Valid(string hash, string message, string? key = null)
+    public void Incremental_Compute_Valid(string hash, string message, string? key = null)
     {
         Span<byte> h = stackalloc byte[hash.Length / 2];
         Span<byte> m = Convert.FromHexString(message);
@@ -327,6 +327,48 @@ public class BLAKE2bTests
     }
 
     [TestMethod]
+    [DynamicData(nameof(KeyedTestVectors), DynamicDataSourceType.Method)]
+    public void Incremental_Verify_Valid(string hash, string message, string key)
+    {
+        Span<byte> h = Convert.FromHexString(hash);
+        Span<byte> m = Convert.FromHexString(message);
+        Span<byte> k = Convert.FromHexString(key);
+
+        using var blake2b = new IncrementalBLAKE2b(h.Length, k);
+        if (m.Length > 1) {
+            blake2b.Update(m[..(m.Length / 2)]);
+            blake2b.Update(m[(m.Length / 2)..]);
+        }
+        else {
+            blake2b.Update(m);
+        }
+        bool valid = blake2b.FinalizeAndVerify(h);
+
+        Assert.IsTrue(valid);
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(KeyedTestVectors), DynamicDataSourceType.Method)]
+    public void Incremental_Verify_Tampered(string hash, string message, string key)
+    {
+        var parameters = new List<byte[]>
+        {
+            Convert.FromHexString(hash),
+            Convert.FromHexString(message),
+            Convert.FromHexString(key)
+        };
+
+        foreach (var param in parameters.Where(param => param.Length > 0)) {
+            param[0]++;
+            using var blake2b = new IncrementalBLAKE2b(parameters[0].Length, parameters[2]);
+            blake2b.Update(parameters[1]);
+            bool valid = blake2b.FinalizeAndVerify(parameters[0]);
+            param[0]--;
+            Assert.IsFalse(valid);
+        }
+    }
+
+    [TestMethod]
     [DynamicData(nameof(TagInvalidParameterSizes), DynamicDataSourceType.Method)]
     public void Incremental_Invalid(int hashSize, int messageSize, int keySize)
     {
@@ -342,6 +384,7 @@ public class BLAKE2bTests
             using var blake2b = new IncrementalBLAKE2b(IncrementalBLAKE2b.MaxHashSize);
             blake2b.Update(m);
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => blake2b.Finalize(h));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => blake2b.FinalizeAndVerify(h));
         }
     }
 }
