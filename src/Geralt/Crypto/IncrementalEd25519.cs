@@ -43,7 +43,7 @@ public sealed class IncrementalEd25519 : IDisposable
         }
     }
 
-    public unsafe bool Verify(ReadOnlySpan<byte> signature, ReadOnlySpan<byte> publicKey)
+    public unsafe bool FinalizeAndVerify(ReadOnlySpan<byte> signature, ReadOnlySpan<byte> publicKey)
     {
         Validation.EqualToSize(nameof(signature), signature.Length, SignatureSize);
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);

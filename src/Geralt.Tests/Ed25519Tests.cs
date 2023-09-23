@@ -351,8 +351,7 @@ public class Ed25519Tests
         else {
             ed25519ph.Update(m);
         }
-
-        bool valid = ed25519ph.Verify(s, pk);
+        bool valid = ed25519ph.FinalizeAndVerify(s, pk);
 
         Assert.IsTrue(valid);
     }
@@ -372,7 +371,7 @@ public class Ed25519Tests
             param[0]++;
             using var ed25519ph = new IncrementalEd25519();
             ed25519ph.Update(parameters[1]);
-            bool valid = ed25519ph.Verify(parameters[0], parameters[2]);
+            bool valid = ed25519ph.FinalizeAndVerify(parameters[0], parameters[2]);
             param[0]--;
             Assert.IsFalse(valid);
         }
@@ -389,6 +388,6 @@ public class Ed25519Tests
         using var ed25519ph = new IncrementalEd25519();
         ed25519ph.Update(m);
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ed25519ph.Verify(s, pk));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ed25519ph.FinalizeAndVerify(s, pk));
     }
 }
