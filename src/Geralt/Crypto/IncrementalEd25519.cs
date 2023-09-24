@@ -10,10 +10,12 @@ public sealed class IncrementalEd25519 : IDisposable
     public const int SignatureSize = Ed25519.SignatureSize;
 
     private crypto_sign_state _state;
+    private bool _finalized;
 
     public IncrementalEd25519()
     {
         Sodium.Initialize();
+        _finalized = false;
         Initialize();
     }
 
@@ -25,6 +27,7 @@ public sealed class IncrementalEd25519 : IDisposable
 
     public unsafe void Update(ReadOnlySpan<byte> message)
     {
+        if (_finalized) { throw new InvalidOperationException("Cannot update after finalizing."); }
         fixed (byte* m = message)
         {
             int ret = crypto_sign_update(ref _state, m, (ulong)message.Length);
@@ -34,8 +37,10 @@ public sealed class IncrementalEd25519 : IDisposable
 
     public unsafe void Finalize(Span<byte> signature, ReadOnlySpan<byte> privateKey)
     {
+        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice."); }
         Validation.EqualToSize(nameof(signature), signature.Length, SignatureSize);
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
+        _finalized = true;
         fixed (byte* s = signature, sk = privateKey)
         {
             int ret = crypto_sign_final_create(ref _state, s, signatureLength: out _, sk);
@@ -45,8 +50,10 @@ public sealed class IncrementalEd25519 : IDisposable
 
     public unsafe bool FinalizeAndVerify(ReadOnlySpan<byte> signature, ReadOnlySpan<byte> publicKey)
     {
+        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice."); }
         Validation.EqualToSize(nameof(signature), signature.Length, SignatureSize);
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
+        _finalized = true;
         fixed (byte* s = signature, pk = publicKey)
         {
             return crypto_sign_final_verify(ref _state, s, pk) == 0;

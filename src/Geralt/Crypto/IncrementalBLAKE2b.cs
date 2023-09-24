@@ -17,6 +17,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
 
     private crypto_generichash_blake2b_state _state;
     private readonly int _hashSize;
+    private bool _finalized;
 
     public IncrementalBLAKE2b(int hashSize, ReadOnlySpan<byte> key = default)
     {
@@ -24,6 +25,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
         if (key.Length != 0) { Validation.SizeBetween(nameof(key), key.Length, MinKeySize, MaxKeySize); }
         Sodium.Initialize();
         _hashSize = hashSize;
+        _finalized = false;
         Initialize(key);
     }
 
@@ -38,6 +40,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
 
     public unsafe void Update(ReadOnlySpan<byte> message)
     {
+        if (_finalized) { throw new InvalidOperationException("Cannot update after finalizing."); }
         fixed (byte* m = message)
         {
             int ret = crypto_generichash_update(ref _state, m, (ulong)message.Length);
@@ -47,7 +50,9 @@ public sealed class IncrementalBLAKE2b : IDisposable
 
     public unsafe void Finalize(Span<byte> hash)
     {
+        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice."); }
         Validation.EqualToSize(nameof(hash), hash.Length, _hashSize);
+        _finalized = true;
         fixed (byte* h = hash)
         {
             int ret = crypto_generichash_final(ref _state, h, (nuint)hash.Length);
@@ -57,6 +62,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
 
     public bool FinalizeAndVerify(ReadOnlySpan<byte> hash)
     {
+        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice."); }
         Validation.EqualToSize(nameof(hash), hash.Length, _hashSize);
         Span<byte> computedHash = stackalloc byte[_hashSize];
         Finalize(computedHash);

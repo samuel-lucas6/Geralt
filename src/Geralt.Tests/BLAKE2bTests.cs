@@ -387,4 +387,39 @@ public class BLAKE2bTests
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => blake2b.FinalizeAndVerify(h));
         }
     }
+
+    [TestMethod]
+    [DynamicData(nameof(UnkeyedTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(KeyedTestVectors), DynamicDataSourceType.Method)]
+    public void Incremental_Compute_InvalidOperation(string hash, string message, string? key = null)
+    {
+        var h = new byte[hash.Length / 2];
+        var m = Convert.FromHexString(message);
+        var k = key != null ? Convert.FromHexString(key) : Array.Empty<byte>();
+
+        using var blake2b = new IncrementalBLAKE2b(h.Length, k);
+        blake2b.Update(m);
+        blake2b.Finalize(h);
+
+        Assert.ThrowsException<InvalidOperationException>(() => blake2b.Update(m));
+        Assert.ThrowsException<InvalidOperationException>(() => blake2b.Finalize(h));
+        Assert.ThrowsException<InvalidOperationException>(() => blake2b.FinalizeAndVerify(h));
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(KeyedTestVectors), DynamicDataSourceType.Method)]
+    public void Incremental_Verify_InvalidOperation(string hash, string message, string key)
+    {
+        var h = Convert.FromHexString(hash);
+        var m = Convert.FromHexString(message);
+        var k = Convert.FromHexString(key);
+
+        using var blake2b = new IncrementalBLAKE2b(h.Length, k);
+        blake2b.Update(m);
+        blake2b.FinalizeAndVerify(h);
+
+        Assert.ThrowsException<InvalidOperationException>(() => blake2b.Update(m));
+        Assert.ThrowsException<InvalidOperationException>(() => blake2b.Finalize(h));
+        Assert.ThrowsException<InvalidOperationException>(() => blake2b.FinalizeAndVerify(h));
+    }
 }

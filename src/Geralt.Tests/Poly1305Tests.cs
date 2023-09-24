@@ -189,4 +189,38 @@ public class Poly1305Tests
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => poly1305.FinalizeAndVerify(t));
         }
     }
+
+    [TestMethod]
+    [DynamicData(nameof(Rfc8439TestVectors), DynamicDataSourceType.Method)]
+    public void Incremental_Compute_InvalidOperation(string tag, string message, string oneTimeKey)
+    {
+        var t = new byte[Poly1305.TagSize];
+        var m = Convert.FromHexString(message);
+        var k = Convert.FromHexString(oneTimeKey);
+
+        using var poly1305 = new IncrementalPoly1305(k);
+        poly1305.Update(m);
+        poly1305.Finalize(t);
+
+        Assert.ThrowsException<InvalidOperationException>(() => poly1305.Update(m));
+        Assert.ThrowsException<InvalidOperationException>(() => poly1305.Finalize(t));
+        Assert.ThrowsException<InvalidOperationException>(() => poly1305.FinalizeAndVerify(t));
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(Rfc8439TestVectors), DynamicDataSourceType.Method)]
+    public void Incremental_Verify_InvalidOperation(string tag, string message, string oneTimeKey)
+    {
+        var t = Convert.FromHexString(tag);
+        var m = Convert.FromHexString(message);
+        var k = Convert.FromHexString(oneTimeKey);
+
+        using var poly1305 = new IncrementalPoly1305(k);
+        poly1305.Update(m);
+        poly1305.FinalizeAndVerify(t);
+
+        Assert.ThrowsException<InvalidOperationException>(() => poly1305.Update(m));
+        Assert.ThrowsException<InvalidOperationException>(() => poly1305.Finalize(t));
+        Assert.ThrowsException<InvalidOperationException>(() => poly1305.FinalizeAndVerify(t));
+    }
 }

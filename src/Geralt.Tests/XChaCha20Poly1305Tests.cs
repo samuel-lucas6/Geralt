@@ -267,9 +267,13 @@ public class XChaCha20Poly1305Tests
 
         using var encryptor = new IncrementalXChaCha20Poly1305(decryption: false, h, k);
         Assert.ThrowsException<InvalidOperationException>(() => encryptor.Pull(p, c));
+        encryptor.Push(c, p, IncrementalXChaCha20Poly1305.ChunkFlag.Final);
+        Assert.ThrowsException<InvalidOperationException>(() => encryptor.Push(c, p));
 
         using var decryptor = new IncrementalXChaCha20Poly1305(decryption: true, h, k);
         Assert.ThrowsException<InvalidOperationException>(() => decryptor.Push(c, p));
+        decryptor.Pull(p, c);
+        Assert.ThrowsException<InvalidOperationException>(() => decryptor.Pull(p, c));
     }
 
     [TestMethod]

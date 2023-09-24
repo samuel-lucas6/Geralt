@@ -9,11 +9,13 @@ public sealed class IncrementalPoly1305 : IDisposable
     public const int TagSize = Poly1305.TagSize;
 
     private crypto_onetimeauth_state _state;
+    private bool _finalized;
 
     public IncrementalPoly1305(ReadOnlySpan<byte> oneTimeKey)
     {
         Validation.EqualToSize(nameof(oneTimeKey), oneTimeKey.Length, KeySize);
         Sodium.Initialize();
+        _finalized = false;
         Initialize(oneTimeKey);
     }
 
@@ -28,6 +30,7 @@ public sealed class IncrementalPoly1305 : IDisposable
 
     public unsafe void Update(ReadOnlySpan<byte> message)
     {
+        if (_finalized) { throw new InvalidOperationException("Cannot update after finalizing."); }
         fixed (byte* m = message)
         {
             int ret = crypto_onetimeauth_update(ref _state, m, (ulong)message.Length);
@@ -37,7 +40,9 @@ public sealed class IncrementalPoly1305 : IDisposable
 
     public unsafe void Finalize(Span<byte> tag)
     {
+        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice."); }
         Validation.EqualToSize(nameof(tag), tag.Length, TagSize);
+        _finalized = true;
         fixed (byte* t = tag)
         {
             int ret = crypto_onetimeauth_final(ref _state, t);
@@ -47,6 +52,7 @@ public sealed class IncrementalPoly1305 : IDisposable
 
     public bool FinalizeAndVerify(ReadOnlySpan<byte> tag)
     {
+        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice."); }
         Validation.EqualToSize(nameof(tag), tag.Length, TagSize);
         Span<byte> computedTag = stackalloc byte[TagSize];
         Finalize(computedTag);

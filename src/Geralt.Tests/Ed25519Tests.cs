@@ -337,6 +337,24 @@ public class Ed25519Tests
 
     [TestMethod]
     [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
+    public void Incremental_Sign_InvalidOperation(string signature, string message, string privateKey)
+    {
+        var s = new byte[IncrementalEd25519.SignatureSize];
+        var m = Convert.FromHexString(message);
+        var sk = Convert.FromHexString(privateKey);
+        var pk = sk[^Ed25519.PublicKeySize..];
+
+        using var ed25519ph = new IncrementalEd25519();
+        ed25519ph.Update(m);
+        ed25519ph.Finalize(s, sk);
+
+        Assert.ThrowsException<InvalidOperationException>(() => ed25519ph.Update(m));
+        Assert.ThrowsException<InvalidOperationException>(() => ed25519ph.Finalize(s, sk));
+        Assert.ThrowsException<InvalidOperationException>(() => ed25519ph.FinalizeAndVerify(s, pk));
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
     public void Incremental_Verify_Valid(string signature, string message, string privateKey)
     {
         Span<byte> s = Convert.FromHexString(signature);
@@ -389,5 +407,23 @@ public class Ed25519Tests
         ed25519ph.Update(m);
 
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => ed25519ph.FinalizeAndVerify(s, pk));
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
+    public void Incremental_Verify_InvalidOperation(string signature, string message, string privateKey)
+    {
+        var s = Convert.FromHexString(signature);
+        var m = Convert.FromHexString(message);
+        var sk = Convert.FromHexString(privateKey);
+        var pk = sk[^Ed25519.PublicKeySize..];
+
+        using var ed25519ph = new IncrementalEd25519();
+        ed25519ph.Update(m);
+        ed25519ph.FinalizeAndVerify(s, pk);
+
+        Assert.ThrowsException<InvalidOperationException>(() => ed25519ph.Update(m));
+        Assert.ThrowsException<InvalidOperationException>(() => ed25519ph.Finalize(s, sk));
+        Assert.ThrowsException<InvalidOperationException>(() => ed25519ph.FinalizeAndVerify(s, pk));
     }
 }
