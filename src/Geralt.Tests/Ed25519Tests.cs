@@ -113,9 +113,9 @@ public class Ed25519Tests
     [TestMethod]
     public void IncrementalConstants_Valid()
     {
-        Assert.AreEqual(32, IncrementalEd25519.PublicKeySize);
-        Assert.AreEqual(64, IncrementalEd25519.PrivateKeySize);
-        Assert.AreEqual(64, IncrementalEd25519.SignatureSize);
+        Assert.AreEqual(32, IncrementalEd25519ph.PublicKeySize);
+        Assert.AreEqual(64, IncrementalEd25519ph.PrivateKeySize);
+        Assert.AreEqual(64, IncrementalEd25519ph.SignatureSize);
     }
 
     [TestMethod]
@@ -304,11 +304,11 @@ public class Ed25519Tests
     [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
     public void Incremental_Sign_Valid(string signature, string message, string privateKey)
     {
-        Span<byte> s = stackalloc byte[IncrementalEd25519.SignatureSize];
+        Span<byte> s = stackalloc byte[IncrementalEd25519ph.SignatureSize];
         Span<byte> m = Convert.FromHexString(message);
         Span<byte> sk = Convert.FromHexString(privateKey);
 
-        using var ed25519ph = new IncrementalEd25519();
+        using var ed25519ph = new IncrementalEd25519ph();
         if (m.Length > 1) {
             ed25519ph.Update(m[..(m.Length / 2)]);
             ed25519ph.Update(m[(m.Length / 2)..]);
@@ -329,7 +329,7 @@ public class Ed25519Tests
         var m = new byte[messageSize];
         var sk = new byte[privateKeySize];
 
-        using var ed25519ph = new IncrementalEd25519();
+        using var ed25519ph = new IncrementalEd25519ph();
         ed25519ph.Update(m);
 
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => ed25519ph.Finalize(s, sk));
@@ -339,12 +339,12 @@ public class Ed25519Tests
     [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
     public void Incremental_Sign_InvalidOperation(string signature, string message, string privateKey)
     {
-        var s = new byte[IncrementalEd25519.SignatureSize];
+        var s = new byte[IncrementalEd25519ph.SignatureSize];
         var m = Convert.FromHexString(message);
         var sk = Convert.FromHexString(privateKey);
         var pk = sk[^Ed25519.PublicKeySize..];
 
-        using var ed25519ph = new IncrementalEd25519();
+        using var ed25519ph = new IncrementalEd25519ph();
         ed25519ph.Update(m);
         ed25519ph.Finalize(s, sk);
 
@@ -361,7 +361,7 @@ public class Ed25519Tests
         Span<byte> m = Convert.FromHexString(message);
         Span<byte> pk = Convert.FromHexString(privateKey)[^Ed25519.PublicKeySize..];
 
-        using var ed25519ph = new IncrementalEd25519();
+        using var ed25519ph = new IncrementalEd25519ph();
         if (m.Length > 1) {
             ed25519ph.Update(m[..(m.Length / 2)]);
             ed25519ph.Update(m[(m.Length / 2)..]);
@@ -387,7 +387,7 @@ public class Ed25519Tests
 
         foreach (var param in parameters.Where(param => param.Length != 0)) {
             param[0]++;
-            using var ed25519ph = new IncrementalEd25519();
+            using var ed25519ph = new IncrementalEd25519ph();
             ed25519ph.Update(parameters[1]);
             bool valid = ed25519ph.FinalizeAndVerify(parameters[0], parameters[2]);
             param[0]--;
@@ -403,7 +403,7 @@ public class Ed25519Tests
         var m = new byte[messageSize];
         var pk = new byte[publicKeySize];
 
-        using var ed25519ph = new IncrementalEd25519();
+        using var ed25519ph = new IncrementalEd25519ph();
         ed25519ph.Update(m);
 
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => ed25519ph.FinalizeAndVerify(s, pk));
@@ -418,7 +418,7 @@ public class Ed25519Tests
         var sk = Convert.FromHexString(privateKey);
         var pk = sk[^Ed25519.PublicKeySize..];
 
-        using var ed25519ph = new IncrementalEd25519();
+        using var ed25519ph = new IncrementalEd25519ph();
         ed25519ph.Update(m);
         ed25519ph.FinalizeAndVerify(s, pk);
 

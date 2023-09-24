@@ -3,7 +3,7 @@ using static Interop.Libsodium;
 
 namespace Geralt;
 
-public sealed class IncrementalEd25519 : IDisposable
+public sealed class IncrementalEd25519ph : IDisposable
 {
     public const int PublicKeySize = Ed25519.PublicKeySize;
     public const int PrivateKeySize = Ed25519.PrivateKeySize;
@@ -12,7 +12,7 @@ public sealed class IncrementalEd25519 : IDisposable
     private crypto_sign_state _state;
     private bool _finalized;
 
-    public IncrementalEd25519()
+    public IncrementalEd25519ph()
     {
         Sodium.Initialize();
         _finalized = false;
