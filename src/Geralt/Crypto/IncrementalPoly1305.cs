@@ -24,7 +24,7 @@ public sealed class IncrementalPoly1305 : IDisposable
         fixed (byte* k = oneTimeKey)
         {
             int ret = crypto_onetimeauth_init(ref _state, k);
-            if (ret != 0) { throw new CryptographicException("Error initializing message authentication code."); }
+            if (ret != 0) { throw new CryptographicException("Error initializing message authentication code state."); }
         }
     }
 
@@ -34,7 +34,7 @@ public sealed class IncrementalPoly1305 : IDisposable
         fixed (byte* m = message)
         {
             int ret = crypto_onetimeauth_update(ref _state, m, (ulong)message.Length);
-            if (ret != 0) { throw new CryptographicException("Error updating message authentication code."); }
+            if (ret != 0) { throw new CryptographicException("Error updating message authentication code state."); }
         }
     }
 

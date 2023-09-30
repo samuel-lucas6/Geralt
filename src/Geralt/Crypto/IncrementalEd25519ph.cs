@@ -22,7 +22,7 @@ public sealed class IncrementalEd25519ph : IDisposable
     private void Initialize()
     {
         int ret = crypto_sign_init(ref _state);
-        if (ret != 0) { throw new CryptographicException("Error initializing signature scheme."); }
+        if (ret != 0) { throw new CryptographicException("Error initializing signature scheme state."); }
     }
 
     public unsafe void Update(ReadOnlySpan<byte> message)
@@ -31,7 +31,7 @@ public sealed class IncrementalEd25519ph : IDisposable
         fixed (byte* m = message)
         {
             int ret = crypto_sign_update(ref _state, m, (ulong)message.Length);
-            if (ret != 0) { throw new CryptographicException("Error updating signature scheme."); }
+            if (ret != 0) { throw new CryptographicException("Error updating signature scheme state."); }
         }
     }
 
