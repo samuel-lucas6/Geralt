@@ -77,6 +77,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
 
     public void Rekey()
     {
+        if (_finalized) { throw new InvalidOperationException("Cannot rekey after the final chunk."); }
         crypto_secretstream_xchacha20poly1305_rekey(ref _state);
     }
 
