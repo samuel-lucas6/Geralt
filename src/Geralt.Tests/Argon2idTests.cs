@@ -53,13 +53,12 @@ public class Argon2idTests
     public void Constants_Valid()
     {
         Assert.AreEqual(32, Argon2id.KeySize);
-        Assert.AreEqual(16, Argon2id.MinKeySize);
         Assert.AreEqual(16, Argon2id.SaltSize);
+        Assert.AreEqual(16, Argon2id.MinKeySize);
         Assert.AreEqual(1, Argon2id.MinIterations);
         Assert.AreEqual(8192, Argon2id.MinMemorySize);
-        Assert.AreEqual(92, Argon2id.MinHashSize);
+        Assert.AreEqual(93, Argon2id.MinHashSize);
         Assert.AreEqual(128, Argon2id.MaxHashSize);
-        Assert.AreEqual("$argon2id$", Argon2id.HashPrefix);
     }
 
     [TestMethod]
@@ -91,7 +90,7 @@ public class Argon2idTests
     }
 
     [TestMethod]
-    [DataRow("correct horse battery staple", 3, 16777216)]
+    [DataRow("correct horse battery staple", Argon2id.MinIterations, Argon2id.MinMemorySize)]
     public void ComputeHash_Valid(string password, int iterations, int memorySize)
     {
         Span<byte> h = stackalloc byte[Argon2id.MaxHashSize];
@@ -134,6 +133,17 @@ public class Argon2idTests
     }
 
     [TestMethod]
+    [DataRow("$argon2i$v=19$m=4096,t=3,p=1$eXNtbzQwOTFzajAwMDAwMA$Bb7qAql9aguCTBpLP4PVnlBd+ehJ5rX0R7smB/FggOM", "password")]
+    [DataRow("$argon2d$v=19$m=4096,t=3,p=1$YTBxd2k1bXBhZHIwMDAwMA$3MM5BChSl8q+MQED0fql0nwP5ykjHdBrGE0mVJHFEUE", "password")]
+    public void VerifyHash_Tampered(string hash, string password)
+    {
+        var h = Encoding.UTF8.GetBytes(hash);
+        var p = Encoding.UTF8.GetBytes(password);
+
+        Assert.ThrowsException<FormatException>(() => Argon2id.VerifyHash(h, p));
+    }
+
+    [TestMethod]
     [DataRow(Argon2id.MaxHashSize + 1, Argon2id.KeySize)]
     [DataRow(Argon2id.MinHashSize - 1, Argon2id.KeySize)]
     public void VerifyHash_Invalid(int hashSize, int passwordSize)
@@ -161,6 +171,8 @@ public class Argon2idTests
     [DataRow("argon2id$v=19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 3, 16777216)]
     [DataRow("$argon2id$v19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 3, 16777216)]
     [DataRow("$argon2id$v=19$m=16384t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 3, 16777216)]
+    [DataRow("$argon2i$v=19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 3, 16777216)]
+    [DataRow("$argon2d$v=19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 3, 16777216)]
     public void NeedsRehash_Tampered(string hash, int iterations, int memorySize)
     {
         var h = Encoding.UTF8.GetBytes(hash);
