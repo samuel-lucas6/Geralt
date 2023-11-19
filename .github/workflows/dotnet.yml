@@ -102,7 +102,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - run: dotnet --info
-    - name: Test (.NET 7.0/Debug)
-      run: dotnet test -f net7.0 -c Debug
-    - name: Test (.NET 7.0/Release)
-      run: dotnet test -f net7.0 -c Release
+    - name: Test (.NET 8.0/Debug)
+      run: dotnet test -f net8.0 -c Debug
+    - name: Test (.NET 8.0/Release)
+      run: dotnet test -f net8.0 -c Release
