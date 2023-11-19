@@ -1,10 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace Geralt.Tests;
+﻿namespace Geralt.Tests;
 
 [TestClass]
 public class AEGIS128LTests
