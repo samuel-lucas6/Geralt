@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFrameworks>net8.0;net7.0;net6.0</TargetFrameworks>
-        <Version>3.0.0</Version>
+        <Version>3.0.1</Version>
         <Authors>Samuel Lucas</Authors>
         <Description>A modern cryptographic library for .NET 6+ based on libsodium and inspired by Monocypher.</Description>
         <Copyright>Copyright (c) 2022-2023 Samuel Lucas</Copyright>
