@@ -5,7 +5,7 @@
         <Version>3.0.1</Version>
         <Authors>Samuel Lucas</Authors>
         <Description>A modern cryptographic library for .NET 6+ based on libsodium and inspired by Monocypher.</Description>
-        <Copyright>Copyright (c) 2022-2023 Samuel Lucas</Copyright>
+        <Copyright>Copyright (c) 2022-2024 Samuel Lucas</Copyright>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageProjectUrl>https://www.geralt.xyz</PackageProjectUrl>
