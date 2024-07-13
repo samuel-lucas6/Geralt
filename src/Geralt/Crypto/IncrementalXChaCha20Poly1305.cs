@@ -10,7 +10,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
     public const int TagSize = crypto_secretstream_xchacha20poly1305_ABYTES;
 
     private crypto_secretstream_xchacha20poly1305_state _state;
-    private readonly bool _decryption;
+    private bool _decryption;
     private bool _finalized;
 
     public enum ChunkFlag
@@ -23,16 +23,16 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
 
     public IncrementalXChaCha20Poly1305(bool decryption, Span<byte> header, ReadOnlySpan<byte> key)
     {
-        Validation.EqualToSize(nameof(header), header.Length, HeaderSize);
-        Validation.EqualToSize(nameof(key), key.Length, KeySize);
         Sodium.Initialize();
-        _decryption = decryption;
-        _finalized = false;
-        Initialize(header, key);
+        Reinitialize(decryption, header, key);
     }
 
-    private unsafe void Initialize(Span<byte> header, ReadOnlySpan<byte> key)
+    public unsafe void Reinitialize(bool decryption, Span<byte> header, ReadOnlySpan<byte> key)
     {
+        Validation.EqualToSize(nameof(header), header.Length, HeaderSize);
+        Validation.EqualToSize(nameof(key), key.Length, KeySize);
+        _decryption = decryption;
+        _finalized = false;
         fixed (byte* h = header, k = key)
         {
             int ret = _decryption

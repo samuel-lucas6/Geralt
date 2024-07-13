@@ -230,6 +230,26 @@ public class XChaCha20Poly1305Tests
     }
 
     [TestMethod]
+    [DynamicData(nameof(IncrementalEncryptParameters), DynamicDataSourceType.Method)]
+    public void Incremental_Reinitialize_Valid(string key, string plaintext, string associatedData)
+    {
+        Span<byte> h = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
+        Span<byte> k = Convert.FromHexString(key);
+        Span<byte> p = Convert.FromHexString(plaintext);
+        Span<byte> c = stackalloc byte[p.Length + IncrementalXChaCha20Poly1305.TagSize];
+
+        using var secretstream = new IncrementalXChaCha20Poly1305(decryption: false, h, k);
+        secretstream.Push(c, p, IncrementalXChaCha20Poly1305.ChunkFlag.Final);
+        p.Clear();
+
+        secretstream.Reinitialize(decryption: true, h, k);
+        var chunkFlag = secretstream.Pull(p, c);
+
+        Assert.AreEqual(IncrementalXChaCha20Poly1305.ChunkFlag.Final, chunkFlag);
+        Assert.AreEqual(plaintext, Convert.ToHexString(p).ToLower());
+    }
+
+    [TestMethod]
     [DynamicData(nameof(IncrementalInvalidParameterSizes), DynamicDataSourceType.Method)]
     public void Incremental_Invalid(int headerSize, int keySize, int ciphertextSize, int plaintextSize)
     {

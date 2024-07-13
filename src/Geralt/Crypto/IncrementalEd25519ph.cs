@@ -15,12 +15,12 @@ public sealed class IncrementalEd25519ph : IDisposable
     public IncrementalEd25519ph()
     {
         Sodium.Initialize();
-        _finalized = false;
-        Initialize();
+        Reinitialize();
     }
 
-    private void Initialize()
+    public void Reinitialize()
     {
+        _finalized = false;
         int ret = crypto_sign_init(ref _state);
         if (ret != 0) { throw new CryptographicException("Error initializing signature scheme state."); }
     }

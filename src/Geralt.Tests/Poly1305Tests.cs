@@ -126,6 +126,26 @@ public class Poly1305Tests
 
     [TestMethod]
     [DynamicData(nameof(Rfc8439TestVectors), DynamicDataSourceType.Method)]
+    public void Incremental_Compute_Reinitialize_Valid(string tag, string message, string oneTimeKey)
+    {
+        Span<byte> t = stackalloc byte[Poly1305.TagSize];
+        Span<byte> m = Convert.FromHexString(message);
+        Span<byte> k = Convert.FromHexString(oneTimeKey);
+
+        using var poly1305 = new IncrementalPoly1305(k);
+        poly1305.Update(m);
+        poly1305.Finalize(t);
+        t.Clear();
+        // WARNING: Do NOT reuse the same key in practice
+        poly1305.Reinitialize(k);
+        poly1305.Update(m);
+        poly1305.Finalize(t);
+
+        Assert.AreEqual(tag, Convert.ToHexString(t).ToLower());
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(Rfc8439TestVectors), DynamicDataSourceType.Method)]
     public void Incremental_Verify_Valid(string tag, string message, string oneTimeKey)
     {
         Span<byte> t = Convert.FromHexString(tag);
@@ -140,6 +160,25 @@ public class Poly1305Tests
         else {
             poly1305.Update(m);
         }
+        bool valid = poly1305.FinalizeAndVerify(t);
+
+        Assert.IsTrue(valid);
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(Rfc8439TestVectors), DynamicDataSourceType.Method)]
+    public void Incremental_Verify_Reinitialize_Valid(string tag, string message, string oneTimeKey)
+    {
+        Span<byte> t = Convert.FromHexString(tag);
+        Span<byte> m = Convert.FromHexString(message);
+        Span<byte> k = Convert.FromHexString(oneTimeKey);
+
+        using var poly1305 = new IncrementalPoly1305(k);
+        poly1305.Update(m);
+        poly1305.FinalizeAndVerify(t);
+        // WARNING: Do NOT reuse the same key in practice
+        poly1305.Reinitialize(k);
+        poly1305.Update(m);
         bool valid = poly1305.FinalizeAndVerify(t);
 
         Assert.IsTrue(valid);

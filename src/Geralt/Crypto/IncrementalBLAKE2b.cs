@@ -16,24 +16,24 @@ public sealed class IncrementalBLAKE2b : IDisposable
     public const int MaxKeySize = BLAKE2b.MaxKeySize;
 
     private crypto_generichash_blake2b_state _state;
-    private readonly int _hashSize;
+    private int _hashSize;
     private bool _finalized;
 
     public IncrementalBLAKE2b(int hashSize, ReadOnlySpan<byte> key = default)
     {
-        Validation.SizeBetween(nameof(hashSize), hashSize, MinHashSize, MaxHashSize);
-        if (key.Length != 0) { Validation.SizeBetween(nameof(key), key.Length, MinKeySize, MaxKeySize); }
         Sodium.Initialize();
-        _hashSize = hashSize;
-        _finalized = false;
-        Initialize(key);
+        Reinitialize(hashSize, key);
     }
 
-    private unsafe void Initialize(ReadOnlySpan<byte> key)
+    public unsafe void Reinitialize(int hashSize, ReadOnlySpan<byte> key = default)
     {
+        Validation.SizeBetween(nameof(hashSize), hashSize, MinHashSize, MaxHashSize);
+        if (key.Length != 0) { Validation.SizeBetween(nameof(key), key.Length, MinKeySize, MaxKeySize); }
+        _hashSize = hashSize;
+        _finalized = false;
         fixed (byte* k = key)
         {
-            int ret = crypto_generichash_init(ref _state, k, (nuint)key.Length, (nuint)_hashSize);
+            int ret = crypto_generichash_init(ref _state, k, (nuint)key.Length, (nuint)hashSize);
             if (ret != 0) { throw new CryptographicException("Error initializing hash function state."); }
         }
     }

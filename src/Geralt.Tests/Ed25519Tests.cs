@@ -317,6 +317,25 @@ public class Ed25519Tests
     }
 
     [TestMethod]
+    [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
+    public void Incremental_Sign_Reinitialize_Valid(string signature, string message, string privateKey)
+    {
+        Span<byte> s = stackalloc byte[IncrementalEd25519ph.SignatureSize];
+        Span<byte> m = Convert.FromHexString(message);
+        Span<byte> sk = Convert.FromHexString(privateKey);
+
+        using var ed25519ph = new IncrementalEd25519ph();
+        ed25519ph.Update(m);
+        ed25519ph.Finalize(s, sk);
+        s.Clear();
+        ed25519ph.Reinitialize();
+        ed25519ph.Update(m);
+        ed25519ph.Finalize(s, sk);
+
+        Assert.AreEqual(signature, Convert.ToHexString(s).ToLower());
+    }
+
+    [TestMethod]
     [DynamicData(nameof(SignInvalidParameterSizes), DynamicDataSourceType.Method)]
     public void Incremental_Sign_Invalid(int signatureSize, int messageSize, int privateKeySize)
     {
@@ -364,6 +383,24 @@ public class Ed25519Tests
         else {
             ed25519ph.Update(m);
         }
+        bool valid = ed25519ph.FinalizeAndVerify(s, pk);
+
+        Assert.IsTrue(valid);
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
+    public void Incremental_Verify_Reinitialize_Valid(string signature, string message, string privateKey)
+    {
+        Span<byte> s = Convert.FromHexString(signature);
+        Span<byte> m = Convert.FromHexString(message);
+        Span<byte> pk = Convert.FromHexString(privateKey)[^Ed25519.PublicKeySize..];
+
+        using var ed25519ph = new IncrementalEd25519ph();
+        ed25519ph.Update(m);
+        ed25519ph.FinalizeAndVerify(s, pk);
+        ed25519ph.Reinitialize();
+        ed25519ph.Update(m);
         bool valid = ed25519ph.FinalizeAndVerify(s, pk);
 
         Assert.IsTrue(valid);

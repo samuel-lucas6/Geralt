@@ -13,14 +13,14 @@ public sealed class IncrementalPoly1305 : IDisposable
 
     public IncrementalPoly1305(ReadOnlySpan<byte> oneTimeKey)
     {
-        Validation.EqualToSize(nameof(oneTimeKey), oneTimeKey.Length, KeySize);
         Sodium.Initialize();
-        _finalized = false;
-        Initialize(oneTimeKey);
+        Reinitialize(oneTimeKey);
     }
 
-    private unsafe void Initialize(ReadOnlySpan<byte> oneTimeKey)
+    public unsafe void Reinitialize(ReadOnlySpan<byte> oneTimeKey)
     {
+        Validation.EqualToSize(nameof(oneTimeKey), oneTimeKey.Length, KeySize);
+        _finalized = false;
         fixed (byte* k = oneTimeKey)
         {
             int ret = crypto_onetimeauth_init(ref _state, k);
