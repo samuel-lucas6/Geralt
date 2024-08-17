@@ -240,6 +240,9 @@ public class XChaCha20Poly1305Tests
 
         using var secretstream = new IncrementalXChaCha20Poly1305(decryption: false, h, k);
         secretstream.Push(c, p, IncrementalXChaCha20Poly1305.ChunkFlag.Final);
+
+        secretstream.Reinitialize(decryption: false, h, k);
+        secretstream.Push(c, p, IncrementalXChaCha20Poly1305.ChunkFlag.Final);
         p.Clear();
 
         secretstream.Reinitialize(decryption: true, h, k);
