@@ -42,7 +42,7 @@ public class SpansTests
     }
 
     [TestMethod]
-    public void ConcatEmpty_Valid()
+    public void Concat_Empty_Valid()
     {
         var buffer = Span<byte>.Empty;
         var parameters = new List<byte[]>

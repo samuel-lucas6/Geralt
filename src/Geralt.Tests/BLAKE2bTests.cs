@@ -157,7 +157,7 @@ public class BLAKE2bTests
 
     [TestMethod]
     [DynamicData(nameof(UnkeyedTestVectors), DynamicDataSourceType.Method)]
-    public void ComputeHashStream_Valid(string hash, string message)
+    public void ComputeHash_Stream_Valid(string hash, string message)
     {
         Span<byte> h = stackalloc byte[hash.Length / 2];
         using var m = new MemoryStream(Convert.FromHexString(message), writable: false);
@@ -182,7 +182,7 @@ public class BLAKE2bTests
     [DataRow(BLAKE2b.MaxHashSize + 1, 1)]
     [DataRow(BLAKE2b.MinHashSize - 1, 1)]
     [DataRow(BLAKE2b.MaxHashSize, 0)]
-    public void ComputeHashStream_Invalid(int hashSize, int messageSize)
+    public void ComputeHash_Stream_Invalid(int hashSize, int messageSize)
     {
         var h = new byte[hashSize];
 

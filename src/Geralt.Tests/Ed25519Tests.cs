@@ -137,7 +137,7 @@ public class Ed25519Tests
 
     [TestMethod]
     [DataRow("b5076a8474a832daee4dd5b4040983b6623b5f344aca57d4d6ee4baf3f259e6e", "421151a459faeade3d247115f94aedae42318124095afabe4d1451a559faedeeb5076a8474a832daee4dd5b4040983b6623b5f344aca57d4d6ee4baf3f259e6e", "421151a459faeade3d247115f94aedae42318124095afabe4d1451a559faedee")]
-    public void GenerateKeyPairSeeded_Valid(string publicKey, string privateKey, string seed)
+    public void GenerateKeyPair_Seeded_Valid(string publicKey, string privateKey, string seed)
     {
         Span<byte> pk = stackalloc byte[Ed25519.PublicKeySize];
         Span<byte> sk = stackalloc byte[Ed25519.PrivateKeySize];
@@ -153,7 +153,7 @@ public class Ed25519Tests
     [DynamicData(nameof(KeyPairInvalidParameterSizes), DynamicDataSourceType.Method)]
     [DataRow(Ed25519.PublicKeySize, Ed25519.PrivateKeySize, Ed25519.SeedSize + 1)]
     [DataRow(Ed25519.PublicKeySize, Ed25519.PrivateKeySize, Ed25519.SeedSize - 1)]
-    public void GenerateKeyPairSeeded_Invalid(int publicKeySize, int privateKeySize, int seedSize = Ed25519.SeedSize)
+    public void GenerateKeyPair_Seeded_Invalid(int publicKeySize, int privateKeySize, int seedSize = Ed25519.SeedSize)
     {
         var pk = new byte[publicKeySize];
         var sk = new byte[privateKeySize];

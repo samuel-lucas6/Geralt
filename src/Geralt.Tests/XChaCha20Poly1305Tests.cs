@@ -4,7 +4,7 @@ namespace Geralt.Tests;
 public class XChaCha20Poly1305Tests
 {
     // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-xchacha#appendix-A.3.1
-    public static IEnumerable<object[]> DraftXChaChaTestVectors()
+    public static IEnumerable<object[]> InternetDraftTestVectors()
     {
         yield return new object[]
         {
@@ -73,7 +73,7 @@ public class XChaCha20Poly1305Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(DraftXChaChaTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(InternetDraftTestVectors), DynamicDataSourceType.Method)]
     public void Encrypt_Valid(string ciphertext, string plaintext, string nonce, string key, string associatedData)
     {
         Span<byte> c = stackalloc byte[ciphertext.Length / 2];
@@ -101,7 +101,7 @@ public class XChaCha20Poly1305Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(DraftXChaChaTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(InternetDraftTestVectors), DynamicDataSourceType.Method)]
     public void Decrypt_Valid(string ciphertext, string plaintext, string nonce, string key, string associatedData)
     {
         Span<byte> p = stackalloc byte[plaintext.Length / 2];
@@ -116,7 +116,7 @@ public class XChaCha20Poly1305Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(DraftXChaChaTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(InternetDraftTestVectors), DynamicDataSourceType.Method)]
     public void Decrypt_Tampered(string ciphertext, string plaintext, string nonce, string key, string associatedData)
     {
         var p = new byte[plaintext.Length / 2];

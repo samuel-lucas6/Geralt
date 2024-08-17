@@ -62,7 +62,7 @@ public class EncodingsTests
     [DataRow("")]
     [DataRow("Zg==")]
     [DataRow("66/6f/6f")]
-    public void FromHex_Invalid(string hex)
+    public void FromHex_Invalid(string? hex)
     {
         if (hex == null) {
             Assert.ThrowsException<ArgumentNullException>(() => Encodings.FromHex(hex));
@@ -123,7 +123,7 @@ public class EncodingsTests
     [DataRow("PDw_Pz8-Pg", Encodings.Base64Variant.Url)]
     [DataRow("PDw/Pz8+Pg", Encodings.Base64Variant.UrlNoPadding)]
     [DataRow("PDw_Pz8-Pg==", Encodings.Base64Variant.UrlNoPadding)]
-    public void FromBase64_Invalid(string base64, Encodings.Base64Variant variant)
+    public void FromBase64_Invalid(string? base64, Encodings.Base64Variant variant)
     {
         if (base64 == null) {
             Assert.ThrowsException<ArgumentNullException>(() => Encodings.FromBase64(base64, variant));

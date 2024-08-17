@@ -146,7 +146,7 @@ public class X25519Tests
 
     [TestMethod]
     [DataRow("10c84ef255d4682177b9d0b43d753552fbc6b0f2cf735e6b45cba18fa1f05444", "471cfd04edcbcb7f4174a88e9c9569b9aa9464254c3d5373ff6775cb22e7483f", "b589764bb6395e13788436f93f4eaa4c858900b6a12328e8626ded5b39d2c7e9")]
-    public void GenerateKeyPairSeeded_Valid(string publicKey, string privateKey, string seed)
+    public void GenerateKeyPair_Seeded_Valid(string publicKey, string privateKey, string seed)
     {
         Span<byte> pk = stackalloc byte[X25519.PublicKeySize];
         Span<byte> sk = stackalloc byte[X25519.PrivateKeySize];
@@ -162,7 +162,7 @@ public class X25519Tests
     [DynamicData(nameof(KeyPairInvalidParameterSizes), DynamicDataSourceType.Method)]
     [DataRow(X25519.PublicKeySize, X25519.PrivateKeySize, X25519.SeedSize + 1)]
     [DataRow(X25519.PublicKeySize, X25519.PrivateKeySize, X25519.SeedSize - 1)]
-    public void GenerateKeyPairSeeded_Invalid(int publicKeySize, int privateKeySize, int seedSize = X25519.SeedSize)
+    public void GenerateKeyPair_Seeded_Invalid(int publicKeySize, int privateKeySize, int seedSize = X25519.SeedSize)
     {
         var pk = new byte[publicKeySize];
         var sk = new byte[privateKeySize];
