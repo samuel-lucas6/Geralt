@@ -30,7 +30,7 @@ public class Poly1305Tests
     }
 
     [TestMethod]
-    public void IncrementalConstants_Valid()
+    public void Incremental_Constants_Valid()
     {
         Assert.AreEqual(32, IncrementalPoly1305.KeySize);
         Assert.AreEqual(16, IncrementalPoly1305.TagSize);

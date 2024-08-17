@@ -106,7 +106,7 @@ public class Ed25519Tests
     }
 
     [TestMethod]
-    public void IncrementalConstants_Valid()
+    public void Incremental_Constants_Valid()
     {
         Assert.AreEqual(32, IncrementalEd25519ph.PublicKeySize);
         Assert.AreEqual(64, IncrementalEd25519ph.PrivateKeySize);

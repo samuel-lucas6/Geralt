@@ -130,7 +130,7 @@ public class BLAKE2bTests
     }
 
     [TestMethod]
-    public void IncrementalConstants_Valid()
+    public void Incremental_Constants_Valid()
     {
         Assert.AreEqual(32, IncrementalBLAKE2b.HashSize);
         Assert.AreEqual(32, IncrementalBLAKE2b.KeySize);

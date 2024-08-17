@@ -65,7 +65,7 @@ public class XChaCha20Poly1305Tests
     }
 
     [TestMethod]
-    public void IncrementalConstants_Valid()
+    public void Incremental_Constants_Valid()
     {
         Assert.AreEqual(32, IncrementalXChaCha20Poly1305.KeySize);
         Assert.AreEqual(24, IncrementalXChaCha20Poly1305.HeaderSize);
@@ -171,7 +171,7 @@ public class XChaCha20Poly1305Tests
 
     [TestMethod]
     [DynamicData(nameof(IncrementalEncryptParameters), DynamicDataSourceType.Method)]
-    public void IncrementalAssociatedData_Valid(string key, string plaintext, string associatedData)
+    public void Incremental_AssociatedData_Valid(string key, string plaintext, string associatedData)
     {
         Span<byte> h = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
         Span<byte> k = Convert.FromHexString(key);
@@ -192,7 +192,7 @@ public class XChaCha20Poly1305Tests
 
     [TestMethod]
     [DynamicData(nameof(IncrementalEncryptParameters), DynamicDataSourceType.Method)]
-    public void IncrementalChunked_Valid(string key, string plaintext, string associatedData)
+    public void Incremental_Chunked_Valid(string key, string plaintext, string associatedData)
     {
         Span<byte> h = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
         Span<byte> k = Convert.FromHexString(key);
@@ -295,7 +295,7 @@ public class XChaCha20Poly1305Tests
 
     [TestMethod]
     [DynamicData(nameof(IncrementalDecryptTestVectors), DynamicDataSourceType.Method)]
-    public void IncrementalDecrypt_Tampered(string header, string key, string plaintext, string ciphertext, string associatedData)
+    public void Incremental_Tampered(string header, string key, string plaintext, string ciphertext, string associatedData)
     {
         var p = new byte[plaintext.Length / 2];
         var parameters = new List<byte[]>
@@ -317,7 +317,7 @@ public class XChaCha20Poly1305Tests
 
     [TestMethod]
     [DataRow("3677e196fb57f611fe71cf25cbd892481f7a7179c2827102", "808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f", "4c616469657320616e642047656e746c656d656e206f662074686520636c617373206f66202739393a204966204920636f756c64206f6666657220796f75206f6e6c79206f6e652074697020666f7220746865206675747572652c2073756e73637265656e20776f756c642062652069742e", "cc55781c4cb5443c19b856b695a2a6fc801935832c9c8278da67de429c3760231c846838d5a58a89815a99d572bfcf6ec14ed725931c6ac1fb7445eb25cad39773502f9550670fd918638c89d83ddfda7297b59281b6012f780c0b3f0cb6309345573c7967fbcfb8843ce04db7912754fe861f5963c83dc6ad066c0d04b3235ade74ca", "")]
-    public void IncrementalDecrypt_MissingRekey(string header, string key, string plaintext, string ciphertext, string associatedData)
+    public void Incremental_MissingRekey(string header, string key, string plaintext, string ciphertext, string associatedData)
     {
         var h = Convert.FromHexString(header);
         var k = Convert.FromHexString(key);
