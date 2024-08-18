@@ -10,7 +10,6 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageProjectUrl>https://www.geralt.xyz</PackageProjectUrl>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <RepositoryUrl>https://github.com/samuel-lucas6/Geralt</RepositoryUrl>
         <PackageReleaseNotes>https://github.com/samuel-lucas6/Geralt/releases</PackageReleaseNotes>
         <PackageTags>libsodium cryptography crypto security aegis-128l aegis-256 chacha20-poly1305 xchacha20-poly1305 blake2b argon2id x25519 curve25519 ed25519 ed25519ph chacha20 xchacha20 hchacha20 poly1305 secretstream secure-random constant-time hex base64 padding</PackageTags>
