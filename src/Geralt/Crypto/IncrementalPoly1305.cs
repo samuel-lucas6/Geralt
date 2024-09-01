@@ -30,7 +30,7 @@ public sealed class IncrementalPoly1305 : IDisposable
 
     public unsafe void Update(ReadOnlySpan<byte> message)
     {
-        if (_finalized) { throw new InvalidOperationException("Cannot update after finalizing."); }
+        if (_finalized) { throw new InvalidOperationException("Cannot update after finalizing without reinitializing."); }
         fixed (byte* m = message)
         {
             int ret = crypto_onetimeauth_update(ref _state, m, (ulong)message.Length);
@@ -40,7 +40,7 @@ public sealed class IncrementalPoly1305 : IDisposable
 
     public unsafe void Finalize(Span<byte> tag)
     {
-        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice."); }
+        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
         Validation.EqualToSize(nameof(tag), tag.Length, TagSize);
         _finalized = true;
         fixed (byte* t = tag)
@@ -52,7 +52,7 @@ public sealed class IncrementalPoly1305 : IDisposable
 
     public bool FinalizeAndVerify(ReadOnlySpan<byte> tag)
     {
-        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice."); }
+        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
         Validation.EqualToSize(nameof(tag), tag.Length, TagSize);
         Span<byte> computedTag = stackalloc byte[TagSize];
         Finalize(computedTag);

@@ -27,7 +27,7 @@ public sealed class IncrementalEd25519ph : IDisposable
 
     public unsafe void Update(ReadOnlySpan<byte> message)
     {
-        if (_finalized) { throw new InvalidOperationException("Cannot update after finalizing."); }
+        if (_finalized) { throw new InvalidOperationException("Cannot update after finalizing without reinitializing."); }
         fixed (byte* m = message)
         {
             int ret = crypto_sign_update(ref _state, m, (ulong)message.Length);
@@ -37,7 +37,7 @@ public sealed class IncrementalEd25519ph : IDisposable
 
     public unsafe void Finalize(Span<byte> signature, ReadOnlySpan<byte> privateKey)
     {
-        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice."); }
+        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
         Validation.EqualToSize(nameof(signature), signature.Length, SignatureSize);
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
         _finalized = true;
@@ -50,7 +50,7 @@ public sealed class IncrementalEd25519ph : IDisposable
 
     public unsafe bool FinalizeAndVerify(ReadOnlySpan<byte> signature, ReadOnlySpan<byte> publicKey)
     {
-        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice."); }
+        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
         Validation.EqualToSize(nameof(signature), signature.Length, SignatureSize);
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
         _finalized = true;

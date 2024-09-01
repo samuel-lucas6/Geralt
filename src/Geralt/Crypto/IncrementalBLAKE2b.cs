@@ -40,7 +40,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
 
     public unsafe void Update(ReadOnlySpan<byte> message)
     {
-        if (_finalized) { throw new InvalidOperationException("Cannot update after finalizing."); }
+        if (_finalized) { throw new InvalidOperationException("Cannot update after finalizing without reinitializing."); }
         fixed (byte* m = message)
         {
             int ret = crypto_generichash_update(ref _state, m, (ulong)message.Length);
@@ -50,7 +50,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
 
     public unsafe void Finalize(Span<byte> hash)
     {
-        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice."); }
+        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
         Validation.EqualToSize(nameof(hash), hash.Length, _hashSize);
         _finalized = true;
         fixed (byte* h = hash)
@@ -62,7 +62,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
 
     public bool FinalizeAndVerify(ReadOnlySpan<byte> hash)
     {
-        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice."); }
+        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
         Validation.EqualToSize(nameof(hash), hash.Length, _hashSize);
         Span<byte> computedHash = stackalloc byte[_hashSize];
         Finalize(computedHash);

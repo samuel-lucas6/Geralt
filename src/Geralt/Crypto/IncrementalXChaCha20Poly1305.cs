@@ -50,7 +50,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
     public unsafe void Push(Span<byte> ciphertextChunk, ReadOnlySpan<byte> plaintextChunk, ReadOnlySpan<byte> associatedData, ChunkFlag chunkFlag = ChunkFlag.Message)
     {
         if (_decryption) { throw new InvalidOperationException("Cannot push into a decryption stream."); }
-        if (_finalized) { throw new InvalidOperationException("Cannot push after the final chunk."); }
+        if (_finalized) { throw new InvalidOperationException("Cannot push after the final chunk without reinitializing."); }
         Validation.EqualToSize(nameof(ciphertextChunk), ciphertextChunk.Length, plaintextChunk.Length + TagSize);
         if (chunkFlag == ChunkFlag.Final) { _finalized = true; }
         fixed (byte* c = ciphertextChunk, p = plaintextChunk, ad = associatedData)
@@ -63,7 +63,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
     public unsafe ChunkFlag Pull(Span<byte> plaintextChunk, ReadOnlySpan<byte> ciphertextChunk, ReadOnlySpan<byte> associatedData = default)
     {
         if (!_decryption) { throw new InvalidOperationException("Cannot pull from an encryption stream."); }
-        if (_finalized) { throw new InvalidOperationException("Cannot pull after the final chunk."); }
+        if (_finalized) { throw new InvalidOperationException("Cannot pull after the final chunk without reinitializing."); }
         Validation.NotLessThanMin(nameof(ciphertextChunk), ciphertextChunk.Length, TagSize);
         Validation.EqualToSize(nameof(plaintextChunk), plaintextChunk.Length, ciphertextChunk.Length - TagSize);
         fixed (byte* p = plaintextChunk, c = ciphertextChunk, ad = associatedData)
@@ -77,7 +77,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
 
     public void Rekey()
     {
-        if (_finalized) { throw new InvalidOperationException("Cannot rekey after the final chunk."); }
+        if (_finalized) { throw new InvalidOperationException("Cannot rekey after the final chunk without reinitializing."); }
         crypto_secretstream_xchacha20poly1305_rekey(ref _state);
     }
 
