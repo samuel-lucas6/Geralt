@@ -341,6 +341,31 @@ public class BLAKE2bTests
     }
 
     [TestMethod]
+    [DynamicData(nameof(UnkeyedTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(KeyedTestVectors), DynamicDataSourceType.Method)]
+    public void Incremental_Compute_CacheState_Valid(string hash, string message, string? key = null)
+    {
+        Span<byte> h = stackalloc byte[hash.Length / 2];
+        Span<byte> m = Convert.FromHexString(message);
+        Span<byte> k = key != null ? Convert.FromHexString(key) : Span<byte>.Empty;
+
+        using var blake2b = new IncrementalBLAKE2b(h.Length, k);
+        blake2b.CacheState();
+        blake2b.Update(m);
+        blake2b.Finalize(h);
+        h.Clear();
+        blake2b.RestoreCachedState();
+        blake2b.Update(m);
+        blake2b.CacheState();
+        blake2b.Finalize(h);
+        h.Clear();
+        blake2b.RestoreCachedState();
+        blake2b.Finalize(h);
+
+        Assert.AreEqual(hash, Convert.ToHexString(h).ToLower());
+    }
+
+    [TestMethod]
     [DynamicData(nameof(KeyedTestVectors), DynamicDataSourceType.Method)]
     public void Incremental_Verify_Valid(string hash, string message, string key)
     {
@@ -374,6 +399,24 @@ public class BLAKE2bTests
         blake2b.FinalizeAndVerify(h);
         blake2b.Reinitialize(h.Length, k);
         blake2b.Update(m);
+        bool valid = blake2b.FinalizeAndVerify(h);
+
+        Assert.IsTrue(valid);
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(KeyedTestVectors), DynamicDataSourceType.Method)]
+    public void Incremental_Verify_CacheState_Valid(string hash, string message, string key)
+    {
+        Span<byte> h = Convert.FromHexString(hash);
+        Span<byte> m = Convert.FromHexString(message);
+        Span<byte> k = Convert.FromHexString(key);
+
+        using var blake2b = new IncrementalBLAKE2b(h.Length, k);
+        blake2b.Update(m);
+        blake2b.CacheState();
+        blake2b.FinalizeAndVerify(h);
+        blake2b.RestoreCachedState();
         bool valid = blake2b.FinalizeAndVerify(h);
 
         Assert.IsTrue(valid);
@@ -436,6 +479,8 @@ public class BLAKE2bTests
         Assert.ThrowsException<InvalidOperationException>(() => blake2b.Update(m));
         Assert.ThrowsException<InvalidOperationException>(() => blake2b.Finalize(h));
         Assert.ThrowsException<InvalidOperationException>(() => blake2b.FinalizeAndVerify(h));
+        Assert.ThrowsException<InvalidOperationException>(() => blake2b.CacheState());
+        Assert.ThrowsException<InvalidOperationException>(() => blake2b.RestoreCachedState());
     }
 
     [TestMethod]
@@ -453,5 +498,7 @@ public class BLAKE2bTests
         Assert.ThrowsException<InvalidOperationException>(() => blake2b.Update(m));
         Assert.ThrowsException<InvalidOperationException>(() => blake2b.Finalize(h));
         Assert.ThrowsException<InvalidOperationException>(() => blake2b.FinalizeAndVerify(h));
+        Assert.ThrowsException<InvalidOperationException>(() => blake2b.CacheState());
+        Assert.ThrowsException<InvalidOperationException>(() => blake2b.RestoreCachedState());
     }
 }

@@ -16,8 +16,10 @@ public sealed class IncrementalBLAKE2b : IDisposable
     public const int MaxKeySize = BLAKE2b.MaxKeySize;
 
     private crypto_generichash_blake2b_state _state;
+    private crypto_generichash_blake2b_state _cachedState;
     private int _hashSize;
     private bool _finalized;
+    private bool _cached;
 
     public IncrementalBLAKE2b(int hashSize, ReadOnlySpan<byte> key = default)
     {
@@ -40,7 +42,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
 
     public unsafe void Update(ReadOnlySpan<byte> message)
     {
-        if (_finalized) { throw new InvalidOperationException("Cannot update after finalizing without reinitializing."); }
+        if (_finalized) { throw new InvalidOperationException("Cannot update after finalizing without reinitializing or restoring a cached state."); }
         fixed (byte* m = message)
         {
             int ret = crypto_generichash_update(ref _state, m, (ulong)message.Length);
@@ -50,7 +52,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
 
     public unsafe void Finalize(Span<byte> hash)
     {
-        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
+        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing or restoring a cached state."); }
         Validation.EqualToSize(nameof(hash), hash.Length, _hashSize);
         _finalized = true;
         fixed (byte* h = hash)
@@ -62,7 +64,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
 
     public bool FinalizeAndVerify(ReadOnlySpan<byte> hash)
     {
-        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
+        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing or restoring a cached state."); }
         Validation.EqualToSize(nameof(hash), hash.Length, _hashSize);
         Span<byte> computedHash = stackalloc byte[_hashSize];
         Finalize(computedHash);
@@ -71,7 +73,23 @@ public sealed class IncrementalBLAKE2b : IDisposable
         return equal;
     }
 
+    public void CacheState()
+    {
+        if (_finalized) { throw new InvalidOperationException("Cannot cache the state after finalizing without reinitializing."); }
+        _cachedState = _state;
+        _cached = true;
+    }
+
+    public void RestoreCachedState()
+    {
+        if (!_cached) { throw new InvalidOperationException("Cannot restore the state when it has not been cached."); }
+        _state = _cachedState;
+        _finalized = false;
+    }
+
     public void Dispose()
     {
+        _state = default;
+        _cachedState = default;
     }
 }
