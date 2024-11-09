@@ -28,10 +28,6 @@ jobs:
       run: dotnet test -f net8.0 -c Debug
     - name: Test (.NET 8.0/Release)
       run: dotnet test -f net8.0 -c Release
-    - name: Test (.NET 6.0/Debug)
-      run: dotnet test -f net6.0 -c Debug
-    - name: Test (.NET 6.0/Release)
-      run: dotnet test -f net6.0 -c Release
     - name: Pack
       run: dotnet pack -c Release
     - name: Upload artifacts
@@ -58,10 +54,6 @@ jobs:
       run: dotnet test -f net8.0 -c Debug
     - name: Test (.NET 8.0/Release)
       run: dotnet test -f net8.0 -c Release
-    - name: Test (.NET 6.0/Debug)
-      run: dotnet test -f net6.0 -c Debug
-    - name: Test (.NET 6.0/Release)
-      run: dotnet test -f net6.0 -c Release
 
   test-macos-x64:
     needs: test-linux-x64
@@ -82,10 +74,6 @@ jobs:
       run: dotnet test -f net8.0 -c Debug
     - name: Test (.NET 8.0/Release)
       run: dotnet test -f net8.0 -c Release
-    - name: Test (.NET 6.0/Debug)
-      run: dotnet test -f net6.0 -c Debug
-    - name: Test (.NET 6.0/Release)
-      run: dotnet test -f net6.0 -c Release
 
   test-linux-musl-x64:
     needs: test-macos-x64
