@@ -57,7 +57,7 @@ public class SpansTests
 
             Assert.IsTrue(buffer.SequenceEqual(expected));
 
-            parameters[1] = new byte[] { 0x01, 0x02, 0x03, 0x04 };
+            parameters[1] = [0x01, 0x02, 0x03, 0x04];
             buffer = new byte[parameters[1].Length];
         }
     }

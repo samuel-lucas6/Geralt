@@ -6,22 +6,22 @@ public class PaddingTests
     // https://github.com/ektrah/nsec/blob/master/tests/Other/Iso78164PaddingTests.cs
     public static IEnumerable<object[]> NsecTestVectors()
     {
-        yield return new object[] { "8000000000000000", "", 8 };
-        yield return new object[] { "0180000000000000", "01", 8 };
-        yield return new object[] { "0102800000000000", "0102", 8 };
-        yield return new object[] { "0102038000000000", "010203", 8 };
-        yield return new object[] { "0102030480000000", "01020304", 8 };
-        yield return new object[] { "0102030405800000", "0102030405", 8 };
-        yield return new object[] { "0102030405068000", "010203040506", 8 };
-        yield return new object[] { "0102030405060780", "01020304050607", 8 };
-        yield return new object[] { "01020304050607088000000000000000", "0102030405060708", 8 };
-        yield return new object[] { "01020304050607080980000000000000", "010203040506070809", 8 };
-        yield return new object[] { "0102030405060708090a800000000000", "0102030405060708090a", 8 };
-        yield return new object[] { "0102030405060708090a0b8000000000", "0102030405060708090a0b", 8 };
-        yield return new object[] { "0102030405060708090a0b0c80000000", "0102030405060708090a0b0c", 8 };
-        yield return new object[] { "0102030405060708090a0b0c0d800000", "0102030405060708090a0b0c0d", 8 };
-        yield return new object[] { "0102030405060708090a0b0c0d0e8000", "0102030405060708090a0b0c0d0e", 8 };
-        yield return new object[] { "0102030405060708090a0b0c0d0e0f80", "0102030405060708090a0b0c0d0e0f", 8 };
+        yield return ["8000000000000000", "", 8];
+        yield return ["0180000000000000", "01", 8];
+        yield return ["0102800000000000", "0102", 8];
+        yield return ["0102038000000000", "010203", 8];
+        yield return ["0102030480000000", "01020304", 8];
+        yield return ["0102030405800000", "0102030405", 8];
+        yield return ["0102030405068000", "010203040506", 8];
+        yield return ["0102030405060780", "01020304050607", 8];
+        yield return ["01020304050607088000000000000000", "0102030405060708", 8];
+        yield return ["01020304050607080980000000000000", "010203040506070809", 8];
+        yield return ["0102030405060708090a800000000000", "0102030405060708090a", 8];
+        yield return ["0102030405060708090a0b8000000000", "0102030405060708090a0b", 8];
+        yield return ["0102030405060708090a0b0c80000000", "0102030405060708090a0b0c", 8];
+        yield return ["0102030405060708090a0b0c0d800000", "0102030405060708090a0b0c0d", 8];
+        yield return ["0102030405060708090a0b0c0d0e8000", "0102030405060708090a0b0c0d0e", 8];
+        yield return ["0102030405060708090a0b0c0d0e0f80", "0102030405060708090a0b0c0d0e0f", 8];
     }
 
     [TestMethod]

@@ -6,23 +6,23 @@ public class EncodingsTests
     // https://www.rfc-editor.org/rfc/rfc4648#section-10
     public static IEnumerable<object[]> Rfc4648TestVectors()
     {
-        yield return new object[] { "Zg==", "f", Encodings.Base64Variant.Original };
-        yield return new object[] { "Zm8=", "fo", Encodings.Base64Variant.Original };
-        yield return new object[] { "Zm9v", "foo", Encodings.Base64Variant.Original };
-        yield return new object[] { "Zm9vYg==", "foob", Encodings.Base64Variant.Original };
-        yield return new object[] { "Zm9vYmE=", "fooba", Encodings.Base64Variant.Original };
-        yield return new object[] { "Zm9vYmFy", "foobar", Encodings.Base64Variant.Original };
+        yield return ["Zg==", "f", Encodings.Base64Variant.Original];
+        yield return ["Zm8=", "fo", Encodings.Base64Variant.Original];
+        yield return ["Zm9v", "foo", Encodings.Base64Variant.Original];
+        yield return ["Zm9vYg==", "foob", Encodings.Base64Variant.Original];
+        yield return ["Zm9vYmE=", "fooba", Encodings.Base64Variant.Original];
+        yield return ["Zm9vYmFy", "foobar", Encodings.Base64Variant.Original];
     }
 
     // https://eprint.iacr.org/2022/361
     // https://base64.guru/standards/base64url
     public static IEnumerable<object[]> Base64VariantTestVectors()
     {
-        yield return new object[] { "SGVsbG8=", "Hello", Encodings.Base64Variant.Original };
-        yield return new object[] { "SGVsbA==", "Hell", Encodings.Base64Variant.Original };
-        yield return new object[] { "PDw/Pz8+Pg", "<<???>>", Encodings.Base64Variant.OriginalNoPadding };
-        yield return new object[] { "PDw_Pz8-Pg==", "<<???>>", Encodings.Base64Variant.Url };
-        yield return new object[] { "PDw_Pz8-Pg", "<<???>>", Encodings.Base64Variant.UrlNoPadding };
+        yield return ["SGVsbG8=", "Hello", Encodings.Base64Variant.Original];
+        yield return ["SGVsbA==", "Hell", Encodings.Base64Variant.Original];
+        yield return ["PDw/Pz8+Pg", "<<???>>", Encodings.Base64Variant.OriginalNoPadding];
+        yield return ["PDw_Pz8-Pg==", "<<???>>", Encodings.Base64Variant.Url];
+        yield return ["PDw_Pz8-Pg", "<<???>>", Encodings.Base64Variant.UrlNoPadding];
     }
 
     [TestMethod]

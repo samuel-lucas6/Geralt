@@ -5,19 +5,19 @@ public class ConstantTimeTests
 {
     public static IEnumerable<object[]> AddSubtractInvalidParameterSizes()
     {
-        yield return new object[] { 0, 1, 1 };
-        yield return new object[] { 1, 0, 1 };
-        yield return new object[] { 1, 1, 0 };
-        yield return new object[] { 1, 1, 2 };
-        yield return new object[] { 1, 2, 1 };
-        yield return new object[] { 2, 1, 1 };
+        yield return [0, 1, 1];
+        yield return [1, 0, 1];
+        yield return [1, 1, 0];
+        yield return [1, 1, 2];
+        yield return [1, 2, 1];
+        yield return [2, 1, 1];
     }
 
     public static IEnumerable<object[]> GreaterLessInvalidParameterSizes()
     {
-        yield return new object[] { 0, 1 };
-        yield return new object[] { 1, 0 };
-        yield return new object[] { 4, 2 };
+        yield return [0, 1];
+        yield return [1, 0];
+        yield return [4, 2];
     }
 
     [TestMethod]

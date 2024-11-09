@@ -6,55 +6,55 @@ public class AEGIS128LTests
     // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-aegis-aead#appendix-A.2
     public static IEnumerable<object[]> InternetDraftTestVectors()
     {
-        yield return new object[]
-        {
+        yield return
+        [
             "c1c0e58bd913006feba00f4b3cc3594e25835bfbb21632176cf03840687cb968cace4617af1bd0f7d064c639a5c79ee4",
             "00000000000000000000000000000000",
             "10000200000000000000000000000000",
             "10010000000000000000000000000000",
             ""
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             "1360dc9db8ae42455f6e5b6a9d488ea4f2184c4e12120249335c4ee84bafe25d",
             "",
             "10000200000000000000000000000000",
             "10010000000000000000000000000000",
             ""
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             "79d94593d8c2119d7e8fd9b8fc77845c5c077a05b2528b6ac54b563aed8efe84022cb796fe7e0ae1197525ff67e309484cfbab6528ddef89f17d74ef8ecd82b3",
             "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
             "10000200000000000000000000000000",
             "10010000000000000000000000000000",
             "0001020304050607"
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             "79d94593d8c2119d7e8fd9b8fc7786f1b80bfb463aba711d15405d094baf4a55a15dbfec81a76f35ed0b9c8b04ac",
             "000102030405060708090a0b0c0d",
             "10000200000000000000000000000000",
             "10010000000000000000000000000000",
             "0001020304050607"
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             "b31052ad1cca4e291abcf2df3502e6bdb1bfd6db36798be3607b1f94d34478aa7ede7f7a990fec10b91e2947a33da8bee89b6794e647baf0fc835ff574aca3fc27c33be0db2aff98",
             "101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031323334353637",
             "10000200000000000000000000000000",
             "10010000000000000000000000000000",
             "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20212223242526272829"
-        };
+        ];
     }
 
     public static IEnumerable<object[]> InvalidParameterSizes()
     {
-        yield return new object[] { AEGIS128L.TagSize, 1, AEGIS128L.NonceSize, AEGIS128L.KeySize, AEGIS128L.TagSize };
-        yield return new object[] { AEGIS128L.TagSize, 0, AEGIS128L.NonceSize + 1, AEGIS128L.KeySize, AEGIS128L.TagSize };
-        yield return new object[] { AEGIS128L.TagSize, 0, AEGIS128L.NonceSize - 1, AEGIS128L.KeySize, AEGIS128L.TagSize };
-        yield return new object[] { AEGIS128L.TagSize, 0, AEGIS128L.NonceSize, AEGIS128L.KeySize + 1, AEGIS128L.TagSize };
-        yield return new object[] { AEGIS128L.TagSize, 0, AEGIS128L.NonceSize, AEGIS128L.KeySize - 1, AEGIS128L.TagSize };
+        yield return [AEGIS128L.TagSize, 1, AEGIS128L.NonceSize, AEGIS128L.KeySize, AEGIS128L.TagSize];
+        yield return [AEGIS128L.TagSize, 0, AEGIS128L.NonceSize + 1, AEGIS128L.KeySize, AEGIS128L.TagSize];
+        yield return [AEGIS128L.TagSize, 0, AEGIS128L.NonceSize - 1, AEGIS128L.KeySize, AEGIS128L.TagSize];
+        yield return [AEGIS128L.TagSize, 0, AEGIS128L.NonceSize, AEGIS128L.KeySize + 1, AEGIS128L.TagSize];
+        yield return [AEGIS128L.TagSize, 0, AEGIS128L.NonceSize, AEGIS128L.KeySize - 1, AEGIS128L.TagSize];
     }
 
     [TestMethod]

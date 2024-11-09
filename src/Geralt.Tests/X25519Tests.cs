@@ -6,107 +6,107 @@ public class X25519Tests
     // https://datatracker.ietf.org/doc/html/rfc7748#section-6.1
     public static IEnumerable<object[]> Rfc7748TestVectors()
     {
-        yield return new object[]
-        {
+        yield return
+        [
             "4a5d9d5ba4ce2de1728e3bf480350f25e07e21c947d19e3376f09b3c1e161742",
             "77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a",
             "de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f"
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             "4a5d9d5ba4ce2de1728e3bf480350f25e07e21c947d19e3376f09b3c1e161742",
             "5dab087e624a8a4b79e17f8b83800ee66f3bb1292618b6fd1c2f8b27ff88e0eb",
             "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a"
-        };
+        ];
     }
 
     // https://github.com/google/wycheproof/blob/master/testvectors_v1/x25519_test.json
     public static IEnumerable<object[]> WycheproofTestVectors()
     {
-        yield return new object[]
-        {
+        yield return
+        [
             "0000000000000000000000000000000000000000000000000000000000000000",
             "88227494038f2bb811d47805bcdf04a2ac585ada7f2f23389bfd4658f9ddd45e",
             "0000000000000000000000000000000000000000000000000000000000000000"
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             "0000000000000000000000000000000000000000000000000000000000000000",
             "48232e8972b61c7e61930eb9450b5070eae1c670475685541f0476217e48184f",
             "0100000000000000000000000000000000000000000000000000000000000000"
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             "0000000000000000000000000000000000000000000000000000000000000000",
             "e0f978dfcd3a8f1a5093418de54136a584c20b7b349afdf6c0520886f95b1272",
             "e0eb7a7c3b41b8ae1656e3faf19fc46ada098deb9c32b1fd866205165f49b800"
-        };
+        ];
     }
 
     // https://datatracker.ietf.org/doc/html/rfc7748#section-6.1
     public static IEnumerable<object[]> PublicKeyTestVectors()
     {
-        yield return new object[]
-        {
+        yield return
+        [
             "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a",
             "77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a"
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             "de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f",
             "5dab087e624a8a4b79e17f8b83800ee66f3bb1292618b6fd1c2f8b27ff88e0eb"
-        };
+        ];
     }
 
     public static IEnumerable<object[]> DeriveSharedKeyTestVectors()
     {
-        yield return new object[]
-        {
+        yield return
+        [
             "519fb3af2f3f9e310718cf1f8bdec6e26ab64affe730f0f8b43c43b0e8ee52be",
             "77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a",
             "de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f",
             "5dab087e624a8a4b79e17f8b83800ee66f3bb1292618b6fd1c2f8b27ff88e0eb",
             "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a",
             ""
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             "a91209efc719601f61c54f74d369fe14f997a29a91b174d5771614b6c9407ad1",
             "77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a",
             "de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f",
             "5dab087e624a8a4b79e17f8b83800ee66f3bb1292618b6fd1c2f8b27ff88e0eb",
             "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a",
             "5dbbfd1c5549181aa9319cd71b946757e1f4769aee9568bd360b651a86ea29a2"
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             "354447b415885c25326201b17a365be2d597ef75a95b6991d52d2e864c06a0ba",
             "77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a",
             "de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f",
             "5dab087e624a8a4b79e17f8b83800ee66f3bb1292618b6fd1c2f8b27ff88e0eb",
             "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a",
             "871f4dcab454942a480381f59e34d3ed3cb0db4a70c575a984554c2af75b022aa02040644460daef8e64fe442e374be9b861ae142244412f76dbbb523f714eed"
-        };
+        ];
     }
 
     public static IEnumerable<object[]> KeyPairInvalidParameterSizes()
     {
-        yield return new object[] { X25519.PublicKeySize + 1, X25519.PrivateKeySize };
-        yield return new object[] { X25519.PublicKeySize - 1, X25519.PrivateKeySize };
-        yield return new object[] { X25519.PublicKeySize, X25519.PrivateKeySize + 1 };
-        yield return new object[] { X25519.PublicKeySize, X25519.PrivateKeySize - 1 };
+        yield return [X25519.PublicKeySize + 1, X25519.PrivateKeySize];
+        yield return [X25519.PublicKeySize - 1, X25519.PrivateKeySize];
+        yield return [X25519.PublicKeySize, X25519.PrivateKeySize + 1];
+        yield return [X25519.PublicKeySize, X25519.PrivateKeySize - 1];
     }
 
     public static IEnumerable<object[]> SharedKeyInvalidParameterSizes()
     {
-        yield return new object[] { X25519.SharedKeySize + 1, X25519.PrivateKeySize, X25519.PublicKeySize, X25519.PreSharedKeySize };
-        yield return new object[] { X25519.SharedKeySize - 1, X25519.PrivateKeySize, X25519.PublicKeySize, X25519.PreSharedKeySize };
-        yield return new object[] { X25519.SharedKeySize, X25519.PrivateKeySize + 1, X25519.PublicKeySize, X25519.PreSharedKeySize };
-        yield return new object[] { X25519.SharedKeySize, X25519.PrivateKeySize - 1, X25519.PublicKeySize, X25519.PreSharedKeySize };
-        yield return new object[] { X25519.SharedKeySize, X25519.PrivateKeySize, X25519.PublicKeySize + 1, X25519.PreSharedKeySize };
-        yield return new object[] { X25519.SharedKeySize, X25519.PrivateKeySize, X25519.PublicKeySize - 1, X25519.PreSharedKeySize };
-        yield return new object[] { X25519.SharedKeySize, X25519.PrivateKeySize, X25519.PublicKeySize, X25519.MaxPreSharedKeySize + 1 };
-        yield return new object[] { X25519.SharedKeySize, X25519.PrivateKeySize, X25519.PublicKeySize, X25519.MinPreSharedKeySize - 1 };
+        yield return [X25519.SharedKeySize + 1, X25519.PrivateKeySize, X25519.PublicKeySize, X25519.PreSharedKeySize];
+        yield return [X25519.SharedKeySize - 1, X25519.PrivateKeySize, X25519.PublicKeySize, X25519.PreSharedKeySize];
+        yield return [X25519.SharedKeySize, X25519.PrivateKeySize + 1, X25519.PublicKeySize, X25519.PreSharedKeySize];
+        yield return [X25519.SharedKeySize, X25519.PrivateKeySize - 1, X25519.PublicKeySize, X25519.PreSharedKeySize];
+        yield return [X25519.SharedKeySize, X25519.PrivateKeySize, X25519.PublicKeySize + 1, X25519.PreSharedKeySize];
+        yield return [X25519.SharedKeySize, X25519.PrivateKeySize, X25519.PublicKeySize - 1, X25519.PreSharedKeySize];
+        yield return [X25519.SharedKeySize, X25519.PrivateKeySize, X25519.PublicKeySize, X25519.MaxPreSharedKeySize + 1];
+        yield return [X25519.SharedKeySize, X25519.PrivateKeySize, X25519.PublicKeySize, X25519.MinPreSharedKeySize - 1];
     }
 
     [TestMethod]

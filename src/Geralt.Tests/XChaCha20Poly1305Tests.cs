@@ -6,54 +6,54 @@ public class XChaCha20Poly1305Tests
     // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-xchacha#appendix-A.3.1
     public static IEnumerable<object[]> InternetDraftTestVectors()
     {
-        yield return new object[]
-        {
+        yield return
+        [
             "bd6d179d3e83d43b9576579493c0e939572a1700252bfaccbed2902c21396cbb731c7f1b0b4aa6440bf3a82f4eda7e39ae64c6708c54c216cb96b72e1213b4522f8c9ba40db5d945b11b69b982c1bb9e3f3fac2bc369488f76b2383565d3fff921f9664c97637da9768812f615c68b13b52ec0875924c1c7987947deafd8780acf49",
             "4c616469657320616e642047656e746c656d656e206f662074686520636c617373206f66202739393a204966204920636f756c64206f6666657220796f75206f6e6c79206f6e652074697020666f7220746865206675747572652c2073756e73637265656e20776f756c642062652069742e",
             "404142434445464748494a4b4c4d4e4f5051525354555657",
             "808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f",
             "50515253c0c1c2c3c4c5c6c7"
-        };
+        ];
     }
 
     public static IEnumerable<object[]> IncrementalEncryptParameters()
     {
-        yield return new object[]
-        {
+        yield return
+        [
             "808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f",
             "0421d1d53971008907219aa2e371102a1f722a42b761a7eaf1d48a972f680bd27ea5c45efb51b91a7a7a4cd0de23b32d70ea706fee3d2ef6a64d8f44d996e164",
             "50515253c0c1c2c3c4c5c6c7"
-        };
+        ];
     }
 
     public static IEnumerable<object[]> IncrementalDecryptTestVectors()
     {
-        yield return new object[]
-        {
+        yield return
+        [
             "d08a6b1c74e2ffbf158eef1ba3fb42b48a9a2c49bbc6255b",
             "808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f",
             "4c616469657320616e642047656e746c656d656e206f662074686520636c617373206f66202739393a204966204920636f756c64206f6666657220796f75206f6e6c79206f6e652074697020666f7220746865206675747572652c2073756e73637265656e20776f756c642062652069742e",
             "23eb1e60c81fcc46aaf0f5321786a970473801a348a673a18928378c324254a075f201efb219c134c17daca9769a6fdee4dc72da0107f35a3ced05f7cad103d79a06d26cf29c457b72cd0fa79ed39ce381d14c2dcc5b56e45a1f626eb68f2eae8dcf08eee8c24049bea3822cb835f30e929310bb33ba6eb383bdd8e12ebba1074ea52a",
             "50515253c0c1c2c3c4c5c6c7"
-        };
+        ];
     }
 
     public static IEnumerable<object[]> InvalidParameterSizes()
     {
-        yield return new object[] { XChaCha20Poly1305.TagSize, 1, XChaCha20Poly1305.NonceSize, XChaCha20Poly1305.KeySize, XChaCha20Poly1305.TagSize };
-        yield return new object[] { XChaCha20Poly1305.TagSize, 0, XChaCha20Poly1305.NonceSize + 1, XChaCha20Poly1305.KeySize, XChaCha20Poly1305.TagSize };
-        yield return new object[] { XChaCha20Poly1305.TagSize, 0, XChaCha20Poly1305.NonceSize - 1, XChaCha20Poly1305.KeySize, XChaCha20Poly1305.TagSize };
-        yield return new object[] { XChaCha20Poly1305.TagSize, 0, XChaCha20Poly1305.NonceSize, XChaCha20Poly1305.KeySize + 1, XChaCha20Poly1305.TagSize };
-        yield return new object[] { XChaCha20Poly1305.TagSize, 0, XChaCha20Poly1305.NonceSize, XChaCha20Poly1305.KeySize - 1, XChaCha20Poly1305.TagSize };
+        yield return [XChaCha20Poly1305.TagSize, 1, XChaCha20Poly1305.NonceSize, XChaCha20Poly1305.KeySize, XChaCha20Poly1305.TagSize];
+        yield return [XChaCha20Poly1305.TagSize, 0, XChaCha20Poly1305.NonceSize + 1, XChaCha20Poly1305.KeySize, XChaCha20Poly1305.TagSize];
+        yield return [XChaCha20Poly1305.TagSize, 0, XChaCha20Poly1305.NonceSize - 1, XChaCha20Poly1305.KeySize, XChaCha20Poly1305.TagSize];
+        yield return [XChaCha20Poly1305.TagSize, 0, XChaCha20Poly1305.NonceSize, XChaCha20Poly1305.KeySize + 1, XChaCha20Poly1305.TagSize];
+        yield return [XChaCha20Poly1305.TagSize, 0, XChaCha20Poly1305.NonceSize, XChaCha20Poly1305.KeySize - 1, XChaCha20Poly1305.TagSize];
     }
 
     public static IEnumerable<object[]> IncrementalInvalidParameterSizes()
     {
-        yield return new object[] { IncrementalXChaCha20Poly1305.HeaderSize + 1, IncrementalXChaCha20Poly1305.KeySize, IncrementalXChaCha20Poly1305.TagSize, 0 };
-        yield return new object[] { IncrementalXChaCha20Poly1305.HeaderSize - 1, IncrementalXChaCha20Poly1305.KeySize, IncrementalXChaCha20Poly1305.TagSize, 0 };
-        yield return new object[] { IncrementalXChaCha20Poly1305.HeaderSize, IncrementalXChaCha20Poly1305.KeySize + 1, IncrementalXChaCha20Poly1305.TagSize, 0 };
-        yield return new object[] { IncrementalXChaCha20Poly1305.HeaderSize, IncrementalXChaCha20Poly1305.KeySize - 1, IncrementalXChaCha20Poly1305.TagSize, 0 };
-        yield return new object[] { IncrementalXChaCha20Poly1305.HeaderSize, IncrementalXChaCha20Poly1305.KeySize, IncrementalXChaCha20Poly1305.TagSize, 1 };
+        yield return [IncrementalXChaCha20Poly1305.HeaderSize + 1, IncrementalXChaCha20Poly1305.KeySize, IncrementalXChaCha20Poly1305.TagSize, 0];
+        yield return [IncrementalXChaCha20Poly1305.HeaderSize - 1, IncrementalXChaCha20Poly1305.KeySize, IncrementalXChaCha20Poly1305.TagSize, 0];
+        yield return [IncrementalXChaCha20Poly1305.HeaderSize, IncrementalXChaCha20Poly1305.KeySize + 1, IncrementalXChaCha20Poly1305.TagSize, 0];
+        yield return [IncrementalXChaCha20Poly1305.HeaderSize, IncrementalXChaCha20Poly1305.KeySize - 1, IncrementalXChaCha20Poly1305.TagSize, 0];
+        yield return [IncrementalXChaCha20Poly1305.HeaderSize, IncrementalXChaCha20Poly1305.KeySize, IncrementalXChaCha20Poly1305.TagSize, 1];
     }
 
     [TestMethod]

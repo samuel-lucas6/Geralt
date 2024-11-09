@@ -6,42 +6,42 @@ public class Argon2idTests
     // https://github.com/jedisct1/libsodium/blob/master/test/default/pwhash_argon2id.c
     public static IEnumerable<object[]> StringTestVectors()
     {
-        yield return new object[]
-        {
+        yield return
+        [
             true,
             "$argon2id$v=19$m=4882,t=2,p=1$bA81arsiXysd3WbTRzmEOw$Nm8QBM+7RH1DXo9rvp5cwKEOOOfD2g6JuxlXihoNcpE",
             ""
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             true,
             "$argon2id$v=19$m=4096,t=19,p=1$PkEgMTYtYnl0ZXMgc2FsdA$ltB/ue1kPtBMBGfsysMpPigE6hiNEKZ9vs8vLNVDQGA",
             "^T5H$JYt39n%K*j:W]!1s?vg!:jGi]Ax?..l7[p0v:1jHTpla9;]bUN;?bWyCbtqg "
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             true,
             "$argon2id$v=19$m=4096,t=1,p=3$PkEgcHJldHR5IGxvbmcgc2FsdA$HUqx5Z1b/ZypnUrvvJ5UC2Q+T6Q1WwASK/Kr9dRbGA0",
             "K3S=KyH#)36_?]LxeR8QNKw6X=gFbxai$C%29V*"
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             false,
             "$argon2id$v=19$m=4096,t=0,p=1$X1NhbHQAAAAAAAAAAAAAAA$bWh++MKN1OiFHKgIWTLvIi1iHicmHH7+Fv3K88ifFfI",
             ""
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             false,
             "$argon2id$v=19$m=2048,t=4,p=1$SWkxaUhpY21ISDcrRnYzSw$Mbg/Eck1kpZir5T9io7C64cpffdTBaORgyriLQFgQj8",
             ""
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             false,
             "$argon2id$v=19$m=4096,t=0,p=1$PkEgMTYtYnl0ZXMgc2FsdA$ltB/ue1kPtBMBGfsysMpPigE6hiNEKZ9vs8vLNVDQGA",
             "^T5H$JYt39n%K*j:W]!1s?vg!:jGi]Ax?..l7[p0v:1jHTpla9;]bUN;?bWyCbtqg "
-        };
+        ];
     }
 
     [TestMethod]

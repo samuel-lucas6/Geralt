@@ -6,20 +6,20 @@ public class Poly1305Tests
     // https://datatracker.ietf.org/doc/html/rfc8439#section-2.5.2
     public static IEnumerable<object[]> Rfc8439TestVectors()
     {
-        yield return new object[]
-        {
+        yield return
+        [
             "a8061dc1305136c6c22b8baf0c0127a9",
             "43727970746f6772617068696320466f72756d2052657365617263682047726f7570",
             "85d6be7857556d337f4452fe42d506a80103808afb0db2fd4abff6af4149f51b"
-        };
+        ];
     }
 
     public static IEnumerable<object[]> InvalidParameterSizes()
     {
-        yield return new object[] { Poly1305.TagSize + 1, 34, Poly1305.KeySize };
-        yield return new object[] { Poly1305.TagSize - 1, 34, Poly1305.KeySize };
-        yield return new object[] { Poly1305.TagSize, 34, Poly1305.KeySize + 1 };
-        yield return new object[] { Poly1305.TagSize, 34, Poly1305.KeySize - 1 };
+        yield return [Poly1305.TagSize + 1, 34, Poly1305.KeySize];
+        yield return [Poly1305.TagSize - 1, 34, Poly1305.KeySize];
+        yield return [Poly1305.TagSize, 34, Poly1305.KeySize + 1];
+        yield return [Poly1305.TagSize, 34, Poly1305.KeySize - 1];
     }
 
     [TestMethod]
