@@ -43,7 +43,7 @@ internal static class Sodium
         Interlocked.Exchange(ref _initialized, value: 1);
     }
 
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
     private static void MisuseHandlerError()
     {
         throw new InvalidOperationException("libsodium misuse error.");
