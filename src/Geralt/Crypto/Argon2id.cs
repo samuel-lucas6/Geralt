@@ -56,7 +56,8 @@ public static class Argon2id
 
     private static void ThrowIfInvalidHashPrefix(ReadOnlySpan<byte> hash)
     {
-        if (!ConstantTime.Equals(hash[..HashPrefix.Length], Encoding.UTF8.GetBytes(HashPrefix)))
+        if (!ConstantTime.Equals(hash[..HashPrefix.Length], Encoding.UTF8.GetBytes(HashPrefix))) {
             throw new FormatException("Invalid encoded password hash prefix.");
+        }
     }
 }
