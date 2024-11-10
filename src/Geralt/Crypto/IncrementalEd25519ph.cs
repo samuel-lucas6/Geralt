@@ -25,39 +25,30 @@ public sealed class IncrementalEd25519ph : IDisposable
         if (ret != 0) { throw new CryptographicException("Error initializing signature scheme state."); }
     }
 
-    public unsafe void Update(ReadOnlySpan<byte> message)
+    public void Update(ReadOnlySpan<byte> message)
     {
         if (_finalized) { throw new InvalidOperationException("Cannot update after finalizing without reinitializing."); }
-        fixed (byte* m = message)
-        {
-            int ret = crypto_sign_update(ref _state, m, (ulong)message.Length);
-            if (ret != 0) { throw new CryptographicException("Error updating signature scheme state."); }
-        }
+        int ret = crypto_sign_update(ref _state, message, (ulong)message.Length);
+        if (ret != 0) { throw new CryptographicException("Error updating signature scheme state."); }
     }
 
-    public unsafe void Finalize(Span<byte> signature, ReadOnlySpan<byte> privateKey)
+    public void Finalize(Span<byte> signature, ReadOnlySpan<byte> privateKey)
     {
         if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
         Validation.EqualToSize(nameof(signature), signature.Length, SignatureSize);
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
         _finalized = true;
-        fixed (byte* s = signature, sk = privateKey)
-        {
-            int ret = crypto_sign_final_create(ref _state, s, signatureLength: out _, sk);
-            if (ret != 0) { throw new CryptographicException("Error finalizing signature."); }
-        }
+        int ret = crypto_sign_final_create(ref _state, signature, signatureLength: out _, privateKey);
+        if (ret != 0) { throw new CryptographicException("Error finalizing signature."); }
     }
 
-    public unsafe bool FinalizeAndVerify(ReadOnlySpan<byte> signature, ReadOnlySpan<byte> publicKey)
+    public bool FinalizeAndVerify(ReadOnlySpan<byte> signature, ReadOnlySpan<byte> publicKey)
     {
         if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
         Validation.EqualToSize(nameof(signature), signature.Length, SignatureSize);
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
         _finalized = true;
-        fixed (byte* s = signature, pk = publicKey)
-        {
-            return crypto_sign_final_verify(ref _state, s, pk) == 0;
-        }
+        return crypto_sign_final_verify(ref _state, signature, publicKey) == 0;
     }
 
     public void Dispose()

@@ -8,24 +8,20 @@ public static class Poly1305
     public const int KeySize = crypto_onetimeauth_KEYBYTES;
     public const int TagSize = crypto_onetimeauth_BYTES;
 
-    public static unsafe void ComputeTag(Span<byte> tag, ReadOnlySpan<byte> message, ReadOnlySpan<byte> oneTimeKey)
+    public static void ComputeTag(Span<byte> tag, ReadOnlySpan<byte> message, ReadOnlySpan<byte> oneTimeKey)
     {
         Validation.EqualToSize(nameof(tag), tag.Length, TagSize);
         Validation.EqualToSize(nameof(oneTimeKey), oneTimeKey.Length, KeySize);
         Sodium.Initialize();
-        fixed (byte* t = tag, m = message, k = oneTimeKey)
-        {
-            int ret = crypto_onetimeauth(t, m, (ulong)message.Length, k);
-            if (ret != 0) { throw new CryptographicException("Error computing tag."); }
-        }
+        int ret = crypto_onetimeauth(tag, message, (ulong)message.Length, oneTimeKey);
+        if (ret != 0) { throw new CryptographicException("Error computing tag."); }
     }
 
-    public static unsafe bool VerifyTag(ReadOnlySpan<byte> tag, ReadOnlySpan<byte> message, ReadOnlySpan<byte> oneTimeKey)
+    public static bool VerifyTag(ReadOnlySpan<byte> tag, ReadOnlySpan<byte> message, ReadOnlySpan<byte> oneTimeKey)
     {
         Validation.EqualToSize(nameof(tag), tag.Length, TagSize);
         Validation.EqualToSize(nameof(oneTimeKey), oneTimeKey.Length, KeySize);
         Sodium.Initialize();
-        fixed (byte* t = tag, m = message, k = oneTimeKey)
-            return crypto_onetimeauth_verify(t, m, (ulong)message.Length, k) == 0;
+        return crypto_onetimeauth_verify(tag, message, (ulong)message.Length, oneTimeKey) == 0;
     }
 }

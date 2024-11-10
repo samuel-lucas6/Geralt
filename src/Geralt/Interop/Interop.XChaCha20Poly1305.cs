@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 internal static partial class Interop
 {
@@ -17,30 +18,35 @@ internal static partial class Interop
         internal const byte crypto_secretstream_xchacha20poly1305_TAG_REKEY = 0x02;
         internal const byte crypto_secretstream_xchacha20poly1305_TAG_FINAL = 0x03;
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_aead_xchacha20poly1305_ietf_encrypt(byte* ciphertext, out ulong ciphertextLength, byte* plaintext, ulong plaintextLength, byte* associatedData, ulong associatedDataLength, byte* nsec, byte* nonce, byte* key);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int crypto_aead_xchacha20poly1305_ietf_encrypt(Span<byte> ciphertext, out ulong ciphertextLength, ReadOnlySpan<byte> plaintext, ulong plaintextLength, ReadOnlySpan<byte> associatedData, ulong associatedDataLength, ReadOnlySpan<byte> nsec, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> key);
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_aead_xchacha20poly1305_ietf_decrypt(byte* plaintext, out ulong plaintextLength, byte* nsec, byte* ciphertext, ulong ciphertextLength, byte* associatedData, ulong associatedDataLength, byte* nonce, byte* key);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int crypto_aead_xchacha20poly1305_ietf_decrypt(Span<byte> plaintext, out ulong plaintextLength, ReadOnlySpan<byte> nsec, ReadOnlySpan<byte> ciphertext, ulong ciphertextLength, ReadOnlySpan<byte> associatedData, ulong associatedDataLength, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> key);
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_secretstream_xchacha20poly1305_init_push(ref crypto_secretstream_xchacha20poly1305_state state, byte* header, byte* key);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int crypto_secretstream_xchacha20poly1305_init_push(ref crypto_secretstream_xchacha20poly1305_state state, Span<byte> header, ReadOnlySpan<byte> key);
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_secretstream_xchacha20poly1305_init_pull(ref crypto_secretstream_xchacha20poly1305_state state, byte* header, byte* key);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int crypto_secretstream_xchacha20poly1305_init_pull(ref crypto_secretstream_xchacha20poly1305_state state, ReadOnlySpan<byte> header, ReadOnlySpan<byte> key);
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_secretstream_xchacha20poly1305_push(ref crypto_secretstream_xchacha20poly1305_state state, byte* ciphertextChunk, out ulong ciphertextChunkLength, byte* plaintextChunk, ulong plaintextChunkLength, byte* associatedData, ulong associatedDataLength, byte chunkFlag);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int crypto_secretstream_xchacha20poly1305_push(ref crypto_secretstream_xchacha20poly1305_state state, Span<byte> ciphertextChunk, out ulong ciphertextChunkLength, ReadOnlySpan<byte> plaintextChunk, ulong plaintextChunkLength, ReadOnlySpan<byte> associatedData, ulong associatedDataLength, byte chunkFlag);
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_secretstream_xchacha20poly1305_pull(ref crypto_secretstream_xchacha20poly1305_state state, byte* plaintext, out ulong plaintextLength, out byte chunkFlag, byte* ciphertextChunk, ulong ciphertextChunkLength, byte* associatedData, ulong associatedDataLength);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int crypto_secretstream_xchacha20poly1305_pull(ref crypto_secretstream_xchacha20poly1305_state state, Span<byte> plaintext, out ulong plaintextLength, out byte chunkFlag, ReadOnlySpan<byte> ciphertextChunk, ulong ciphertextChunkLength, ReadOnlySpan<byte> associatedData, ulong associatedDataLength);
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern void crypto_secretstream_xchacha20poly1305_rekey(ref crypto_secretstream_xchacha20poly1305_state state);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial void crypto_secretstream_xchacha20poly1305_rekey(ref crypto_secretstream_xchacha20poly1305_state state);
 
         [StructLayout(LayoutKind.Explicit, Size = 52)]
-        internal struct crypto_secretstream_xchacha20poly1305_state
-        {
-        }
+        internal struct crypto_secretstream_xchacha20poly1305_state;
     }
 }

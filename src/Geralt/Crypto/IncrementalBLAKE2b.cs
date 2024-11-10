@@ -27,39 +27,30 @@ public sealed class IncrementalBLAKE2b : IDisposable
         Reinitialize(hashSize, key);
     }
 
-    public unsafe void Reinitialize(int hashSize, ReadOnlySpan<byte> key = default)
+    public void Reinitialize(int hashSize, ReadOnlySpan<byte> key = default)
     {
         Validation.SizeBetween(nameof(hashSize), hashSize, MinHashSize, MaxHashSize);
         if (key.Length != 0) { Validation.SizeBetween(nameof(key), key.Length, MinKeySize, MaxKeySize); }
         _hashSize = hashSize;
         _finalized = false;
-        fixed (byte* k = key)
-        {
-            int ret = crypto_generichash_init(ref _state, k, (nuint)key.Length, (nuint)hashSize);
-            if (ret != 0) { throw new CryptographicException("Error initializing hash function state."); }
-        }
+        int ret = crypto_generichash_init(ref _state, key, (nuint)key.Length, (nuint)hashSize);
+        if (ret != 0) { throw new CryptographicException("Error initializing hash function state."); }
     }
 
-    public unsafe void Update(ReadOnlySpan<byte> message)
+    public void Update(ReadOnlySpan<byte> message)
     {
         if (_finalized) { throw new InvalidOperationException("Cannot update after finalizing without reinitializing or restoring a cached state."); }
-        fixed (byte* m = message)
-        {
-            int ret = crypto_generichash_update(ref _state, m, (ulong)message.Length);
-            if (ret != 0) { throw new CryptographicException("Error updating hash function state."); }
-        }
+        int ret = crypto_generichash_update(ref _state, message, (ulong)message.Length);
+        if (ret != 0) { throw new CryptographicException("Error updating hash function state."); }
     }
 
-    public unsafe void Finalize(Span<byte> hash)
+    public void Finalize(Span<byte> hash)
     {
         if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing or restoring a cached state."); }
         Validation.EqualToSize(nameof(hash), hash.Length, _hashSize);
         _finalized = true;
-        fixed (byte* h = hash)
-        {
-            int ret = crypto_generichash_final(ref _state, h, (nuint)hash.Length);
-            if (ret != 0) { throw new CryptographicException("Error finalizing hash."); }
-        }
+        int ret = crypto_generichash_final(ref _state, hash, (nuint)hash.Length);
+        if (ret != 0) { throw new CryptographicException("Error finalizing hash."); }
     }
 
     public bool FinalizeAndVerify(ReadOnlySpan<byte> hash)

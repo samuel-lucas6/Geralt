@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 internal static partial class Interop
 {
@@ -12,16 +13,20 @@ internal static partial class Interop
         internal const int crypto_pwhash_argon2id_OPSLIMIT_MIN = 1;
         internal const string crypto_pwhash_argon2id_STRPREFIX = "$argon2id$";
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_pwhash(byte* hash, ulong hashLength, byte* password, ulong passwordLength, byte* salt, ulong iterations, nuint memorySize, int algorithm);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int crypto_pwhash(Span<byte> hash, ulong hashLength, ReadOnlySpan<byte> password, ulong passwordLength, ReadOnlySpan<byte> salt, ulong iterations, nuint memorySize, int algorithm);
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_pwhash_str_alg(byte* hash, byte* password, ulong passwordLength, ulong iterations, nuint memorySize, int algorithm);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int crypto_pwhash_str_alg(Span<byte> hash, ReadOnlySpan<byte> password, ulong passwordLength, ulong iterations, nuint memorySize, int algorithm);
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_pwhash_str_verify(byte* hash, byte* password, ulong passwordLength);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int crypto_pwhash_str_verify(ReadOnlySpan<byte> hash, ReadOnlySpan<byte> password, ulong passwordLength);
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_pwhash_str_needs_rehash(byte* hash, ulong iterations, nuint memorySize);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int crypto_pwhash_str_needs_rehash(ReadOnlySpan<byte> hash, ulong iterations, nuint memorySize);
     }
 }

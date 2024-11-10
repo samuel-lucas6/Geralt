@@ -18,21 +18,19 @@ public static class SecureRandom
     public const int MinWordCount = 4;
     public const int MaxWordCount = 20;
 
-    public static unsafe void Fill(Span<byte> buffer)
+    public static void Fill(Span<byte> buffer)
     {
         Validation.NotEmpty(nameof(buffer), buffer.Length);
         Sodium.Initialize();
-        fixed (byte* b = buffer)
-            randombytes_buf(b, (nuint)buffer.Length);
+        randombytes_buf(buffer, (nuint)buffer.Length);
     }
 
-    public static unsafe void FillDeterministic(Span<byte> buffer, ReadOnlySpan<byte> seed)
+    public static void FillDeterministic(Span<byte> buffer, ReadOnlySpan<byte> seed)
     {
         Validation.NotEmpty(nameof(buffer), buffer.Length);
         Validation.EqualToSize(nameof(seed), seed.Length, SeedSize);
         Sodium.Initialize();
-        fixed (byte* b = buffer, s = seed)
-            randombytes_buf_deterministic(b, (nuint)buffer.Length, s);
+        randombytes_buf_deterministic(buffer, (nuint)buffer.Length, seed);
     }
 
     public static int GetInt32(int upperBound)

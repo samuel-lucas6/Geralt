@@ -17,37 +17,28 @@ public sealed class IncrementalPoly1305 : IDisposable
         Reinitialize(oneTimeKey);
     }
 
-    public unsafe void Reinitialize(ReadOnlySpan<byte> oneTimeKey)
+    public void Reinitialize(ReadOnlySpan<byte> oneTimeKey)
     {
         Validation.EqualToSize(nameof(oneTimeKey), oneTimeKey.Length, KeySize);
         _finalized = false;
-        fixed (byte* k = oneTimeKey)
-        {
-            int ret = crypto_onetimeauth_init(ref _state, k);
-            if (ret != 0) { throw new CryptographicException("Error initializing message authentication code state."); }
-        }
+        int ret = crypto_onetimeauth_init(ref _state, oneTimeKey);
+        if (ret != 0) { throw new CryptographicException("Error initializing message authentication code state."); }
     }
 
-    public unsafe void Update(ReadOnlySpan<byte> message)
+    public void Update(ReadOnlySpan<byte> message)
     {
         if (_finalized) { throw new InvalidOperationException("Cannot update after finalizing without reinitializing."); }
-        fixed (byte* m = message)
-        {
-            int ret = crypto_onetimeauth_update(ref _state, m, (ulong)message.Length);
-            if (ret != 0) { throw new CryptographicException("Error updating message authentication code state."); }
-        }
+        int ret = crypto_onetimeauth_update(ref _state, message, (ulong)message.Length);
+        if (ret != 0) { throw new CryptographicException("Error updating message authentication code state."); }
     }
 
-    public unsafe void Finalize(Span<byte> tag)
+    public void Finalize(Span<byte> tag)
     {
         if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
         Validation.EqualToSize(nameof(tag), tag.Length, TagSize);
         _finalized = true;
-        fixed (byte* t = tag)
-        {
-            int ret = crypto_onetimeauth_final(ref _state, t);
-            if (ret != 0) { throw new CryptographicException("Error finalizing message authentication code."); }
-        }
+        int ret = crypto_onetimeauth_final(ref _state, tag);
+        if (ret != 0) { throw new CryptographicException("Error finalizing message authentication code."); }
     }
 
     public bool FinalizeAndVerify(ReadOnlySpan<byte> tag)

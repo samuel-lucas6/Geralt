@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 internal static partial class Interop
 {
@@ -7,10 +8,12 @@ internal static partial class Interop
         internal const int crypto_stream_xchacha20_KEYBYTES = 32;
         internal const int crypto_stream_xchacha20_NONCEBYTES = 24;
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_stream_xchacha20(byte* ciphertext, ulong ciphertextLength, byte* nonce, byte* key);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int crypto_stream_xchacha20(Span<byte> ciphertext, ulong ciphertextLength, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> key);
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_stream_xchacha20_xor_ic(byte* ciphertext, byte* plaintext, ulong plaintextLength, byte* nonce, ulong counter, byte* key);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int crypto_stream_xchacha20_xor_ic(Span<byte> ciphertext, ReadOnlySpan<byte> plaintext, ulong plaintextLength, ReadOnlySpan<byte> nonce, ulong counter, ReadOnlySpan<byte> key);
     }
 }

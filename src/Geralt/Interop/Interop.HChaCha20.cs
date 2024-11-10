@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 internal static partial class Interop
 {
@@ -9,7 +10,8 @@ internal static partial class Interop
         internal const int crypto_core_hchacha20_CONSTBYTES = 16;
         internal const int crypto_core_hchacha20_OUTPUTBYTES = 32;
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_core_hchacha20(byte* output, byte* nonce, byte* key, byte* constant);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int crypto_core_hchacha20(Span<byte> output, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> key, ReadOnlySpan<byte> constant);
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 internal static partial class Interop
 {
@@ -13,24 +14,27 @@ internal static partial class Interop
         internal const int crypto_generichash_blake2b_SALTBYTES = 16;
         internal const int crypto_generichash_blake2b_PERSONALBYTES = 16;
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_generichash_blake2b(byte* hash, nuint hashLength, byte* message, ulong messageLength, byte* key, nuint keyLength);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int crypto_generichash_blake2b(Span<byte> hash, nuint hashLength, ReadOnlySpan<byte> message, ulong messageLength, ReadOnlySpan<byte> key, nuint keyLength);
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_generichash_blake2b_salt_personal(byte* hash, nuint hashLength, byte* message, ulong messageLength, byte* key, nuint keyLength, byte* salt, byte* personal);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int crypto_generichash_blake2b_salt_personal(Span<byte> hash, nuint hashLength, ReadOnlySpan<byte> message, ulong messageLength, ReadOnlySpan<byte> key, nuint keyLength, ReadOnlySpan<byte> salt, ReadOnlySpan<byte> personalization);
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_generichash_init(ref crypto_generichash_blake2b_state state, byte* key, nuint keyLength, nuint hashLength);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int crypto_generichash_init(ref crypto_generichash_blake2b_state state, ReadOnlySpan<byte> key, nuint keyLength, nuint hashLength);
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_generichash_update(ref crypto_generichash_blake2b_state state, byte* message, ulong messageLength);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int crypto_generichash_update(ref crypto_generichash_blake2b_state state, ReadOnlySpan<byte> message, ulong messageLength);
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int crypto_generichash_final(ref crypto_generichash_blake2b_state state, byte* hash, nuint hashLength);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int crypto_generichash_final(ref crypto_generichash_blake2b_state state, Span<byte> hash, nuint hashLength);
 
         [StructLayout(LayoutKind.Explicit, Size = 384)]
-        internal struct crypto_generichash_blake2b_state
-        {
-        }
+        internal struct crypto_generichash_blake2b_state;
     }
 }

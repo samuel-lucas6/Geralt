@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-
-internal static partial class Interop
+﻿internal static partial class Interop
 {
     internal static partial class Libsodium
     {
@@ -11,6 +9,5 @@ internal static partial class Interop
 #else
         private const string DllName = "libsodium";
 #endif
-        private const CallingConvention Convention = CallingConvention.Cdecl;
     }
 }

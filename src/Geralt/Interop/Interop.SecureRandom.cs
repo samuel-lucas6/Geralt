@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 internal static partial class Interop
 {
@@ -6,13 +7,16 @@ internal static partial class Interop
     {
         internal const int randombytes_SEEDBYTES = 32;
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe void randombytes_buf(byte* buffer, nuint size);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial void randombytes_buf(Span<byte> buffer, nuint size);
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe void randombytes_buf_deterministic(byte* buffer, nuint size, byte* seed);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial void randombytes_buf_deterministic(Span<byte> buffer, nuint size, ReadOnlySpan<byte> seed);
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern int randombytes_uniform(uint upperBound);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int randombytes_uniform(uint upperBound);
     }
 }

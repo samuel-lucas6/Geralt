@@ -16,16 +16,13 @@ public static class Encodings
         UrlNoPadding = 7
     }
 
-    public static unsafe string ToHex(ReadOnlySpan<byte> data)
+    public static string ToHex(ReadOnlySpan<byte> data)
     {
         Validation.NotEmpty(nameof(data), data.Length);
         Sodium.Initialize();
-        ReadOnlySpan<byte> hex = stackalloc byte[data.Length * 2 + 1];
-        fixed (byte* h = hex, d = data)
-        {
-            IntPtr ret = sodium_bin2hex(h, (nuint)hex.Length, d, (nuint)data.Length);
-            return Marshal.PtrToStringAnsi(ret) ?? throw new FormatException("Error converting bytes to hex.");
-        }
+        Span<byte> hex = stackalloc byte[data.Length * 2 + 1];
+        IntPtr ret = sodium_bin2hex(hex, (nuint)hex.Length, data, (nuint)data.Length);
+        return Marshal.PtrToStringAnsi(ret) ?? throw new FormatException("Error converting bytes to hex.");
     }
 
     public static byte[] FromHex(string hex, string ignoreChars = HexIgnoreChars)
@@ -39,17 +36,14 @@ public static class Encodings
         return binary;
     }
 
-    public static unsafe string ToBase64(ReadOnlySpan<byte> data, Base64Variant variant = Base64Variant.Original)
+    public static string ToBase64(ReadOnlySpan<byte> data, Base64Variant variant = Base64Variant.Original)
     {
         Validation.NotEmpty(nameof(data), data.Length);
         Sodium.Initialize();
         int base64MaxLength = sodium_base64_encoded_len((nuint)data.Length, (int)variant);
         Span<byte> base64 = stackalloc byte[base64MaxLength];
-        fixed (byte* b = base64, d = data)
-        {
-            IntPtr ret = sodium_bin2base64(b, (nuint)base64MaxLength, d, (nuint)data.Length, (int)variant);
-            return Marshal.PtrToStringAnsi(ret) ?? throw new FormatException("Error converting bytes to Base64.");
-        }
+        IntPtr ret = sodium_bin2base64(base64, (nuint)base64MaxLength, data, (nuint)data.Length, (int)variant);
+        return Marshal.PtrToStringAnsi(ret) ?? throw new FormatException("Error converting bytes to Base64.");
     }
 
     public static byte[] FromBase64(string base64, Base64Variant variant = Base64Variant.Original, string ignoreChars = Base64IgnoreChars)

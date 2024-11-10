@@ -4,26 +4,24 @@ namespace Geralt;
 
 public static class ConstantTime
 {
-    public static unsafe bool Equals(ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
+    public static bool Equals(ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
     {
         Validation.NotEmpty(nameof(a), a.Length);
         Validation.NotEmpty(nameof(b), b.Length);
         Sodium.Initialize();
         // It's impossible to prevent the lengths being leaked
         if (a.Length != b.Length) { return false; }
-        fixed (byte* aa = a, bb = b)
-            return sodium_memcmp(aa, bb, (nuint)a.Length) == 0;
+        return sodium_memcmp(a, b, (nuint)a.Length) == 0;
     }
 
-    public static unsafe void Increment(Span<byte> buffer)
+    public static void Increment(Span<byte> buffer)
     {
         Validation.NotEmpty(nameof(buffer), buffer.Length);
         Sodium.Initialize();
-        fixed (byte* b = buffer)
-            sodium_increment(b, (nuint)buffer.Length);
+        sodium_increment(buffer, (nuint)buffer.Length);
     }
 
-    public static unsafe void Add(Span<byte> buffer, ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
+    public static void Add(Span<byte> buffer, ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
     {
         Validation.NotEmpty(nameof(buffer), buffer.Length);
         Validation.NotEmpty(nameof(a), a.Length);
@@ -32,11 +30,10 @@ public static class ConstantTime
         Validation.EqualToSize(nameof(a), a.Length, b.Length);
         Sodium.Initialize();
         a.CopyTo(buffer);
-        fixed (byte* aa = buffer, bb = b)
-            sodium_add(aa, bb, (nuint)buffer.Length);
+        sodium_add(buffer, b, (nuint)buffer.Length);
     }
 
-    public static unsafe void Subtract(Span<byte> buffer, ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
+    public static void Subtract(Span<byte> buffer, ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
     {
         Validation.NotEmpty(nameof(buffer), buffer.Length);
         Validation.NotEmpty(nameof(a), a.Length);
@@ -45,34 +42,30 @@ public static class ConstantTime
         Validation.EqualToSize(nameof(a), a.Length, b.Length);
         Sodium.Initialize();
         a.CopyTo(buffer);
-        fixed (byte* aa = buffer, bb = b)
-            sodium_sub(aa, bb, (nuint)buffer.Length);
+        sodium_sub(buffer, b, (nuint)buffer.Length);
     }
 
-    public static unsafe bool IsLessThan(ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
+    public static bool IsLessThan(ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
     {
         Validation.NotEmpty(nameof(a), a.Length);
         Validation.NotEmpty(nameof(b), b.Length);
         Validation.EqualToSize(nameof(a), a.Length, b.Length);
         Sodium.Initialize();
-        fixed (byte* aa = a, bb = b)
-            return sodium_compare(aa, bb, (nuint)a.Length) == -1;
+        return sodium_compare(a, b, (nuint)a.Length) == -1;
     }
 
-    public static unsafe bool IsGreaterThan(ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
+    public static bool IsGreaterThan(ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
     {
         Validation.NotEmpty(nameof(a), a.Length);
         Validation.NotEmpty(nameof(b), b.Length);
         Validation.EqualToSize(nameof(a), a.Length, b.Length);
         Sodium.Initialize();
-        fixed (byte* aa = a, bb = b)
-            return sodium_compare(aa, bb, (nuint)a.Length) == 1;
+        return sodium_compare(a, b, (nuint)a.Length) == 1;
     }
 
-    public static unsafe bool IsAllZeros(ReadOnlySpan<byte> buffer)
+    public static bool IsAllZeros(ReadOnlySpan<byte> buffer)
     {
         Sodium.Initialize();
-        fixed (byte* b = buffer)
-            return sodium_is_zero(b, (nuint)buffer.Length) == 1;
+        return sodium_is_zero(buffer, (nuint)buffer.Length) == 1;
     }
 }

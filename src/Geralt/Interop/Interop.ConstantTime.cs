@@ -1,25 +1,32 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 internal static partial class Interop
 {
     internal static partial class Libsodium
     {
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int sodium_memcmp(byte* a, byte* b, nuint length);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int sodium_memcmp(ReadOnlySpan<byte> a, ReadOnlySpan<byte> b, nuint length);
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe void sodium_increment(byte* buffer, nuint bufferLength);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial void sodium_increment(Span<byte> buffer, nuint bufferLength);
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe void sodium_add(byte* a, byte* b, nuint length);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial void sodium_add(Span<byte> a, ReadOnlySpan<byte> b, nuint length);
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe void sodium_sub(byte* a, byte* b, nuint length);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial void sodium_sub(Span<byte> a, ReadOnlySpan<byte> b, nuint length);
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int sodium_compare(byte* a, byte* b, nuint length);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int sodium_compare(ReadOnlySpan<byte> a, ReadOnlySpan<byte> b, nuint length);
 
-        [DllImport(DllName, CallingConvention = Convention)]
-        internal static extern unsafe int sodium_is_zero(byte* buffer, nuint bufferLength);
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int sodium_is_zero(ReadOnlySpan<byte> buffer, nuint bufferLength);
     }
 }
