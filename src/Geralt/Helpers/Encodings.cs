@@ -20,7 +20,7 @@ public static class Encodings
     {
         Validation.NotEmpty(nameof(data), data.Length);
         Sodium.Initialize();
-        Span<byte> hex = stackalloc byte[data.Length * 2 + 1];
+        Span<byte> hex = new byte[data.Length * 2 + 1];
         IntPtr ret = sodium_bin2hex(hex, (nuint)hex.Length, data, (nuint)data.Length);
         return Marshal.PtrToStringAnsi(ret) ?? throw new FormatException("Error converting bytes to hex.");
     }
@@ -41,7 +41,7 @@ public static class Encodings
         Validation.NotEmpty(nameof(data), data.Length);
         Sodium.Initialize();
         int base64MaxLength = sodium_base64_encoded_len((nuint)data.Length, (int)variant);
-        Span<byte> base64 = stackalloc byte[base64MaxLength];
+        Span<byte> base64 = new byte[base64MaxLength];
         IntPtr ret = sodium_bin2base64(base64, (nuint)base64MaxLength, data, (nuint)data.Length, (int)variant);
         return Marshal.PtrToStringAnsi(ret) ?? throw new FormatException("Error converting bytes to Base64.");
     }
