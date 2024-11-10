@@ -15,7 +15,7 @@ public static class AEGIS128L
         Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
         Validation.EqualToSize(nameof(key), key.Length, KeySize);
         Sodium.Initialize();
-        int ret = crypto_aead_aegis128l_encrypt(ciphertext, ciphertextLength: out _, plaintext, (ulong)plaintext.Length, associatedData, (ulong)associatedData.Length, nsec: null, nonce, key);
+        int ret = crypto_aead_aegis128l_encrypt(ciphertext, ciphertextLength: out _, plaintext, (ulong)plaintext.Length, associatedData, (ulong)associatedData.Length, nsec: ReadOnlySpan<byte>.Empty, nonce, key);
         if (ret != 0) { throw new CryptographicException("Error encrypting plaintext."); }
     }
 
@@ -26,7 +26,7 @@ public static class AEGIS128L
         Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
         Validation.EqualToSize(nameof(key), key.Length, KeySize);
         Sodium.Initialize();
-        int ret = crypto_aead_aegis128l_decrypt(plaintext, plaintextLength: out _, nsec: null, ciphertext, (ulong)ciphertext.Length, associatedData, (ulong)associatedData.Length, nonce, key);
+        int ret = crypto_aead_aegis128l_decrypt(plaintext, plaintextLength: out _, nsec: ReadOnlySpan<byte>.Empty, ciphertext, (ulong)ciphertext.Length, associatedData, (ulong)associatedData.Length, nonce, key);
         if (ret != 0) { throw new CryptographicException("Invalid authentication tag for the given inputs."); }
     }
 }

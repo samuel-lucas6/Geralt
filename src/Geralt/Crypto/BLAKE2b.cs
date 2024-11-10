@@ -22,7 +22,7 @@ public static class BLAKE2b
     {
         Validation.SizeBetween(nameof(hash), hash.Length, MinHashSize, MaxHashSize);
         Sodium.Initialize();
-        int ret = crypto_generichash_blake2b(hash, (nuint)hash.Length, message, (ulong)message.Length, key: null, keyLength: 0);
+        int ret = crypto_generichash_blake2b(hash, (nuint)hash.Length, message, (ulong)message.Length, key: ReadOnlySpan<byte>.Empty, keyLength: 0);
         if (ret != 0) { throw new CryptographicException("Error computing hash."); }
     }
 
