@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using static Interop.Libsodium;
 
 namespace Geralt;
@@ -78,6 +79,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
         _finalized = false;
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
     public void Dispose()
     {
         _state = default;

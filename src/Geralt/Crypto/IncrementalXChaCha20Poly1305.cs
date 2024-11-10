@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using static Interop.Libsodium;
 
 namespace Geralt;
@@ -72,7 +73,9 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
         crypto_secretstream_xchacha20poly1305_rekey(ref _state);
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
     public void Dispose()
     {
+        _state = default;
     }
 }

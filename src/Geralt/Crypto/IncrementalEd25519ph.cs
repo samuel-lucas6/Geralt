@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using static Interop.Libsodium;
 
 namespace Geralt;
@@ -51,7 +52,9 @@ public sealed class IncrementalEd25519ph : IDisposable
         return crypto_sign_final_verify(ref _state, signature, publicKey) == 0;
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
     public void Dispose()
     {
+        _state = default;
     }
 }
