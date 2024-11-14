@@ -19,8 +19,8 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: |
-          6.0.x
           8.0.x
+          9.0.x
     - name: Install workloads
       run: dotnet workload install ios tvos maccatalyst
     - run: dotnet --info
@@ -28,6 +28,10 @@ jobs:
       run: dotnet test -f net8.0 -c Debug
     - name: Test (.NET 8.0/Release)
       run: dotnet test -f net8.0 -c Release
+    - name: Test (.NET 9.0/Debug)
+      run: dotnet test -f net9.0 -c Debug
+    - name: Test (.NET 9.0/Release)
+      run: dotnet test -f net9.0 -c Release
     - name: Pack
       run: dotnet pack -c Release
     - name: Upload artifacts
@@ -47,13 +51,17 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: |
-          6.0.x
           8.0.x
+          9.0.x
     - run: dotnet --info
     - name: Test (.NET 8.0/Debug)
       run: dotnet test -f net8.0 -c Debug
     - name: Test (.NET 8.0/Release)
       run: dotnet test -f net8.0 -c Release
+    - name: Test (.NET 9.0/Debug)
+      run: dotnet test -f net9.0 -c Debug
+    - name: Test (.NET 9.0/Release)
+      run: dotnet test -f net9.0 -c Release
 
   test-macos-x64:
     needs: test-linux-x64
@@ -67,26 +75,30 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: |
-          6.0.x
           8.0.x
+          9.0.x
     - run: dotnet --info
     - name: Test (.NET 8.0/Debug)
       run: dotnet test -f net8.0 -c Debug
     - name: Test (.NET 8.0/Release)
       run: dotnet test -f net8.0 -c Release
+    - name: Test (.NET 9.0/Debug)
+      run: dotnet test -f net9.0 -c Debug
+    - name: Test (.NET 9.0/Release)
+      run: dotnet test -f net9.0 -c Release
 
   test-linux-musl-x64:
     needs: test-macos-x64
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/dotnet/sdk:8.0-alpine
+      image: mcr.microsoft.com/dotnet/sdk:9.0-alpine
       env:
         DOTNET_CLI_TELEMETRY_OPTOUT: 1
         DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
     steps:
     - uses: actions/checkout@v4
     - run: dotnet --info
-    - name: Test (.NET 8.0/Debug)
-      run: dotnet test -f net8.0 -c Debug
-    - name: Test (.NET 8.0/Release)
-      run: dotnet test -f net8.0 -c Release
+    - name: Test (.NET 9.0/Debug)
+      run: dotnet test -f net9.0 -c Debug
+    - name: Test (.NET 9.0/Release)
+      run: dotnet test -f net9.0 -c Release
