@@ -30,6 +30,7 @@ public static class BLAKE2b
     {
         Validation.SizeBetween(nameof(hash), hash.Length, MinHashSize, MaxHashSize);
         Validation.NotNull(nameof(message), message);
+        if (!message.CanRead) { throw new InvalidOperationException("The stream cannot be read."); }
         int bytesRead;
         Span<byte> buffer = new byte[StreamBufferSize];
         using var blake2b = new IncrementalBLAKE2b(hash.Length);

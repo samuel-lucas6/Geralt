@@ -189,6 +189,10 @@ public class BLAKE2bTests
         if (messageSize > 0) {
             using var m = new MemoryStream(new byte[messageSize], writable: false);
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => BLAKE2b.ComputeHash(h, m));
+
+            h = new byte[BLAKE2b.HashSize];
+            m.Close();
+            Assert.ThrowsException<InvalidOperationException>(() => BLAKE2b.ComputeHash(h, m));
         }
         else {
             using MemoryStream? m = null;
