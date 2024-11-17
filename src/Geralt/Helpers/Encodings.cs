@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using static Interop.Libsodium;
 
 namespace Geralt;
@@ -20,9 +21,14 @@ public static class Encodings
     {
         Validation.NotEmpty(nameof(data), data.Length);
         Sodium.Initialize();
-        Span<byte> hex = new byte[data.Length * 2 + 1];
-        IntPtr ret = sodium_bin2hex(hex, (nuint)hex.Length, data, (nuint)data.Length);
-        return Marshal.PtrToStringAnsi(ret) ?? throw new FormatException("Error converting bytes to hex.");
+        Span<byte> hex = GC.AllocateArray<byte>(data.Length * 2 + 1, pinned: true);
+        try {
+            IntPtr ret = sodium_bin2hex(hex, (nuint)hex.Length, data, (nuint)data.Length);
+            return Marshal.PtrToStringAnsi(ret) ?? throw new FormatException("Error converting bytes to hex.");
+        }
+        finally {
+            CryptographicOperations.ZeroMemory(hex);
+        }
     }
 
     public static byte[] FromHex(string hex, string ignoreChars = HexIgnoreChars)
@@ -41,9 +47,14 @@ public static class Encodings
         Validation.NotEmpty(nameof(data), data.Length);
         Sodium.Initialize();
         int base64MaxLength = sodium_base64_encoded_len((nuint)data.Length, (int)variant);
-        Span<byte> base64 = new byte[base64MaxLength];
-        IntPtr ret = sodium_bin2base64(base64, (nuint)base64MaxLength, data, (nuint)data.Length, (int)variant);
-        return Marshal.PtrToStringAnsi(ret) ?? throw new FormatException("Error converting bytes to Base64.");
+        Span<byte> base64 = GC.AllocateArray<byte>(base64MaxLength, pinned: true);
+        try {
+            IntPtr ret = sodium_bin2base64(base64, (nuint)base64MaxLength, data, (nuint)data.Length, (int)variant);
+            return Marshal.PtrToStringAnsi(ret) ?? throw new FormatException("Error converting bytes to Base64.");
+        }
+        finally {
+            CryptographicOperations.ZeroMemory(base64);
+        }
     }
 
     public static byte[] FromBase64(string base64, Base64Variant variant = Base64Variant.Original, string ignoreChars = Base64IgnoreChars)
