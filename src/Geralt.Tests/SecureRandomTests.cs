@@ -92,6 +92,7 @@ public class SecureRandomTests
         Assert.AreEqual(capitalize ? wordCount : 0, passphrase.Count(char.IsUpper));
         Assert.AreEqual(capitalize, char.IsUpper(passphrase[0]));
         Assert.AreEqual(includeNumber, passphrase.Any(char.IsDigit));
+        Assert.IsFalse(passphrase.Any(c => c is '\n' or '\r'));
     }
 
     [TestMethod]
