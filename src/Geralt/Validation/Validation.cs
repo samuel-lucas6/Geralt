@@ -37,6 +37,13 @@ public static class Validation
         }
     }
 
+    public static void MultipleOfSize(string paramName, int size, int multipleOf)
+    {
+        if (size <= 0 || size % multipleOf != 0) {
+            throw new ArgumentOutOfRangeException(paramName, size, $"{paramName} must be a multiple of {multipleOf}.");
+        }
+    }
+
     public static void NotEmpty(string paramName, int size)
     {
         if (size == 0) {
