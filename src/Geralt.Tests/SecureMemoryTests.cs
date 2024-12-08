@@ -7,6 +7,7 @@ public class SecureMemoryTests
     public void Constants_Valid()
     {
         Assert.AreEqual(Environment.SystemPageSize, SecureMemory.PageSize);
+        Assert.AreEqual(Environment.SystemPageSize - 16, GuardedHeapAllocation.MaxSize);
     }
 
     [TestMethod]
@@ -109,5 +110,72 @@ public class SecureMemoryTests
         if (OperatingSystem.IsWindows()) {
             Assert.ThrowsException<InvalidOperationException>(() => SecureMemory.UnlockAndZeroMemory(b));
         }
+    }
+
+    [TestMethod]
+    public void GuardedHeapAllocation_Valid()
+    {
+        int size = ChaCha20.KeySize;
+        Span<byte> garbage = Enumerable.Repeat((byte)0xdb, size).ToArray();
+        Span<byte> copy = stackalloc byte[size];
+
+        using var secret = new GuardedHeapAllocation(size);
+        Span<byte> key = secret.AsSpan();
+        Assert.IsTrue(key.SequenceEqual(garbage));
+
+        RandomNumberGenerator.Fill(key);
+        Assert.IsFalse(key.SequenceEqual(garbage));
+
+        key.CopyTo(copy);
+        secret.ReadOnly();
+        Assert.IsTrue(key.SequenceEqual(copy));
+
+        secret.NoAccess();
+        // Can't check the value
+
+        secret.ReadWrite();
+        RandomNumberGenerator.Fill(key);
+        Assert.IsFalse(key.SequenceEqual(copy));
+    }
+
+    // This test has to be run manually, commenting out parts because there's no way to catch the access violation
+    /*[TestMethod]
+    public void GuardedHeapAllocation_Tampered()
+    {
+        var secret = new GuardedHeapAllocation(ChaCha20.KeySize);
+        Span<byte> key = secret.AsSpan();
+
+        secret.ReadOnly();
+        RandomNumberGenerator.Fill(key);
+
+        secret.NoAccess();
+        RandomNumberGenerator.Fill(key);
+
+        secret.Dispose();
+        RandomNumberGenerator.Fill(key);
+    }*/
+
+    [TestMethod]
+    [DataRow(0)]
+    [DataRow(4096)]
+    [DataRow(4096 - 15)]
+    public void GuardedHeapAllocation_Invalid(int size)
+    {
+        // This is the only exception that can be tested
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new GuardedHeapAllocation(size));
+    }
+
+    [TestMethod]
+    public void GuardedHeapAllocation_Disposed()
+    {
+        var secret = new GuardedHeapAllocation(ChaCha20.KeySize);
+
+        secret.Dispose();
+
+        Assert.ThrowsException<ObjectDisposedException>(() => secret.AsSpan());
+        Assert.ThrowsException<ObjectDisposedException>(() => secret.NoAccess());
+        Assert.ThrowsException<ObjectDisposedException>(() => secret.ReadOnly());
+        Assert.ThrowsException<ObjectDisposedException>(() => secret.ReadWrite());
+        Assert.ThrowsException<ObjectDisposedException>(() => secret.Dispose());
     }
 }
