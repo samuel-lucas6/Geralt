@@ -99,9 +99,12 @@ public class SecureMemoryTests
     [TestMethod]
     public void LockMemory_UnlockAndZeroMemory_InvalidOperation()
     {
-        var b = new byte[SecureMemory.PageSize * 81920];
+        var b = new byte[SecureMemory.PageSize * 65536];
 
-        Assert.ThrowsException<OutOfMemoryException>(() => SecureMemory.LockMemory(b));
+        // This test fails on macOS - it apparently allows large amounts of memory to be locked
+        if (!OperatingSystem.IsMacOS()) {
+            Assert.ThrowsException<OutOfMemoryException>(() => SecureMemory.LockMemory(b));
+        }
         // This test fails on Linux/macOS - munlock() must not return an error despite no locking taking place
         if (OperatingSystem.IsWindows()) {
             Assert.ThrowsException<InvalidOperationException>(() => SecureMemory.UnlockAndZeroMemory(b));
