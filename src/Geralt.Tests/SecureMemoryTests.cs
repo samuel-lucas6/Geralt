@@ -3,6 +3,14 @@
 [TestClass]
 public class SecureMemoryTests
 {
+    // With DataRow(), the associated test fails on macOS
+    public static IEnumerable<object[]> InvalidGuardedHeapAllocationSizes()
+    {
+        yield return [0];
+        yield return [SecureMemory.PageSize];
+        yield return [GuardedHeapAllocation.MaxSize + 1];
+    }
+
     [TestMethod]
     public void Constants_Valid()
     {
@@ -156,9 +164,7 @@ public class SecureMemoryTests
     }*/
 
     [TestMethod]
-    [DataRow(0)]
-    [DataRow(4096)]
-    [DataRow(4096 - 15)]
+    [DynamicData(nameof(InvalidGuardedHeapAllocationSizes), DynamicDataSourceType.Method)]
     public void GuardedHeapAllocation_Invalid(int size)
     {
         // This is the only exception that can be tested
