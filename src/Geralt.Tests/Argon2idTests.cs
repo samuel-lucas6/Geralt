@@ -186,4 +186,59 @@ public class Argon2idTests
 
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.NeedsRehash(h, iterations, memorySize));
     }
+
+    [TestMethod]
+    [DataRow("correct horse battery staple", Argon2id.MinIterations, Argon2id.MinMemorySize)]
+    public void ComputeHash_Valid_String(string password, int iterations, int memorySize)
+    {
+        Span<byte> p = Encoding.UTF8.GetBytes(password);
+
+        string h = Argon2id.ComputeHash(p, iterations, memorySize);
+
+        Assert.IsNotNull(h);
+
+        bool valid = Argon2id.VerifyHash(h, p);
+        Assert.IsTrue(valid);
+
+        bool rehash = Argon2id.NeedsRehash(h, iterations, memorySize);
+        Assert.IsFalse(rehash);
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(StringTestVectors), DynamicDataSourceType.Method)]
+    public void VerifyHash_Valid_String(bool expected, string hash, string password)
+    {
+        Span<byte> p = Encoding.UTF8.GetBytes(password);
+
+        bool valid = Argon2id.VerifyHash(hash, p);
+
+        Assert.AreEqual(expected, valid);
+    }
+
+    [TestMethod]
+    [DataRow("$argon2i$v=19$m=4096,t=3,p=1$eXNtbzQwOTFzajAwMDAwMA$Bb7qAql9aguCTBpLP4PVnlBd+ehJ5rX0R7smB/FggOM", "password")]
+    [DataRow("$argon2d$v=19$m=4096,t=3,p=1$YTBxd2k1bXBhZHIwMDAwMA$3MM5BChSl8q+MQED0fql0nwP5ykjHdBrGE0mVJHFEUE", "password")]
+    public void VerifyHash_Tampered_String(string hash, string password)
+    {
+        var p = Encoding.UTF8.GetBytes(password);
+
+        Assert.ThrowsException<FormatException>(() => Argon2id.VerifyHash(hash, p));
+    }
+
+    [TestMethod]
+    [DataRow("$argon2id$", "")]
+    [DataRow("$argon2id$v=1", "")]
+    [DataRow("$argon2id$v=19", "")]
+    [DataRow("$argon2id$v=19$", "")]
+    [DataRow("$argon2id$v=19$m=4882,t=", "")]
+    [DataRow("$argon2id$v=19$m=4882,t=2,p=1$", "")]
+    [DataRow("$argon2id$v=19$m=4882,t=2,p=1$bA81arsiX", "")]
+    [DataRow("$argon2id$v=19$m=4882,t=2,p=1$bA81arsiXysd3WbTRzmEOw$Nm8QBM+7", "")]
+    [DataRow("$argon2id$v=19$m=4882,t=2,p=1$bA81arsiXysd3WbTRzmEOw$Nm8QBM+7RH1DXo9rvp5cwKEOOOfD2g6JuxlXihoNcp", "")]
+    public void VerifyHash_Invalid_String(string hash, string password)
+    {
+        var p = Encoding.UTF8.GetBytes(password);
+
+        Assert.IsFalse(Argon2id.VerifyHash(hash, p));
+    }
 }

@@ -23,10 +23,22 @@ internal static partial class Interop
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static unsafe partial int crypto_pwhash_str_alg(sbyte* hash, ReadOnlySpan<byte> password, ulong passwordLength, ulong iterations, nuint memorySize, int algorithm);
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         internal static partial int crypto_pwhash_str_verify(ReadOnlySpan<byte> hash, ReadOnlySpan<byte> password, ulong passwordLength);
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int crypto_pwhash_str_verify([MarshalAs(UnmanagedType.LPStr)] string hash, ReadOnlySpan<byte> password, ulong passwordLength);
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         internal static partial int crypto_pwhash_str_needs_rehash(ReadOnlySpan<byte> hash, ulong iterations, nuint memorySize);
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int crypto_pwhash_str_needs_rehash([MarshalAs(UnmanagedType.LPStr)] string hash, ulong iterations, nuint memorySize);
     }
 }
