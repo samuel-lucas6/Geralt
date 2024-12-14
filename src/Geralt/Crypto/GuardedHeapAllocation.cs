@@ -6,8 +6,8 @@ public sealed class GuardedHeapAllocation : IDisposable
 {
     // A canary is placed before the data. However, this max size is artificial to limit memory usage
     public static readonly int MaxSize = SecureMemory.PageSize - CANARY_SIZE;
-    private readonly IntPtr _pointer;
-    private readonly int _size;
+    private IntPtr _pointer;
+    private int _size;
     private bool _disposed;
 
     public GuardedHeapAllocation(int size)
@@ -52,6 +52,8 @@ public sealed class GuardedHeapAllocation : IDisposable
         if (_disposed) { throw new ObjectDisposedException(nameof(GuardedHeapAllocation)); }
         // This calls sodium_mprotect_readwrite internally
         sodium_free(_pointer);
+        _pointer = IntPtr.Zero;
+        _size = 0;
         _disposed = true;
     }
 }
