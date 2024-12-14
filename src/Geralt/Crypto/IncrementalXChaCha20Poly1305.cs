@@ -13,6 +13,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
     private crypto_secretstream_xchacha20poly1305_state _state;
     private bool _decryption;
     private bool _finalized;
+    private bool _disposed;
 
     public enum ChunkFlag
     {
@@ -30,6 +31,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
 
     public void Reinitialize(bool decryption, Span<byte> header, ReadOnlySpan<byte> key)
     {
+        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalXChaCha20Poly1305)); }
         Validation.EqualToSize(nameof(header), header.Length, HeaderSize);
         Validation.EqualToSize(nameof(key), key.Length, KeySize);
         _decryption = decryption;
@@ -47,6 +49,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
 
     public void Push(Span<byte> ciphertextChunk, ReadOnlySpan<byte> plaintextChunk, ReadOnlySpan<byte> associatedData, ChunkFlag chunkFlag = ChunkFlag.Message)
     {
+        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalXChaCha20Poly1305)); }
         if (_decryption) { throw new InvalidOperationException("Cannot push into a decryption stream."); }
         if (_finalized) { throw new InvalidOperationException("Cannot push after the final chunk without reinitializing."); }
         Validation.EqualToSize(nameof(ciphertextChunk), ciphertextChunk.Length, plaintextChunk.Length + TagSize);
@@ -57,6 +60,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
 
     public ChunkFlag Pull(Span<byte> plaintextChunk, ReadOnlySpan<byte> ciphertextChunk, ReadOnlySpan<byte> associatedData = default)
     {
+        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalXChaCha20Poly1305)); }
         if (!_decryption) { throw new InvalidOperationException("Cannot pull from an encryption stream."); }
         if (_finalized) { throw new InvalidOperationException("Cannot pull after the final chunk without reinitializing."); }
         Validation.NotLessThanMin(nameof(ciphertextChunk), ciphertextChunk.Length, TagSize);
@@ -69,6 +73,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
 
     public void Rekey()
     {
+        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalXChaCha20Poly1305)); }
         if (_finalized) { throw new InvalidOperationException("Cannot rekey after the final chunk without reinitializing."); }
         crypto_secretstream_xchacha20poly1305_rekey(ref _state);
     }
@@ -76,6 +81,8 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
     public void Dispose()
     {
+        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalXChaCha20Poly1305)); }
         _state = default;
+        _disposed = true;
     }
 }

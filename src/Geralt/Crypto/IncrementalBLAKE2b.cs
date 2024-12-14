@@ -21,6 +21,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
     private int _hashSize;
     private bool _finalized;
     private bool _cached;
+    private bool _disposed;
 
     public IncrementalBLAKE2b(int hashSize, ReadOnlySpan<byte> key = default)
     {
@@ -30,6 +31,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
 
     public void Reinitialize(int hashSize, ReadOnlySpan<byte> key = default)
     {
+        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
         Validation.SizeBetween(nameof(hashSize), hashSize, MinHashSize, MaxHashSize);
         if (key.Length != 0) { Validation.SizeBetween(nameof(key), key.Length, MinKeySize, MaxKeySize); }
         _hashSize = hashSize;
@@ -40,6 +42,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
 
     public void Update(ReadOnlySpan<byte> message)
     {
+        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
         if (_finalized) { throw new InvalidOperationException("Cannot update after finalizing without reinitializing or restoring a cached state."); }
         int ret = crypto_generichash_update(ref _state, message, (ulong)message.Length);
         if (ret != 0) { throw new CryptographicException("Error updating hash function state."); }
@@ -47,6 +50,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
 
     public void Finalize(Span<byte> hash)
     {
+        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
         if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing or restoring a cached state."); }
         Validation.EqualToSize(nameof(hash), hash.Length, _hashSize);
         _finalized = true;
@@ -56,6 +60,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
 
     public bool FinalizeAndVerify(ReadOnlySpan<byte> hash)
     {
+        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
         if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing or restoring a cached state."); }
         Validation.EqualToSize(nameof(hash), hash.Length, _hashSize);
         Span<byte> computedHash = stackalloc byte[_hashSize];
@@ -67,6 +72,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
 
     public void CacheState()
     {
+        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
         if (_finalized) { throw new InvalidOperationException("Cannot cache the state after finalizing without reinitializing."); }
         _cachedState = _state;
         _cached = true;
@@ -74,6 +80,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
 
     public void RestoreCachedState()
     {
+        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
         if (!_cached) { throw new InvalidOperationException("Cannot restore the state when it has not been cached."); }
         _state = _cachedState;
         _finalized = false;
@@ -82,7 +89,9 @@ public sealed class IncrementalBLAKE2b : IDisposable
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
     public void Dispose()
     {
+        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
         _state = default;
         _cachedState = default;
+        _disposed = true;
     }
 }

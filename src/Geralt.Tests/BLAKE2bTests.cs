@@ -505,4 +505,26 @@ public class BLAKE2bTests
         Assert.ThrowsException<InvalidOperationException>(() => blake2b.CacheState());
         Assert.ThrowsException<InvalidOperationException>(() => blake2b.RestoreCachedState());
     }
+
+    [TestMethod]
+    [DynamicData(nameof(UnkeyedTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(KeyedTestVectors), DynamicDataSourceType.Method)]
+    public void Incremental_Disposed(string hash, string message, string? key = null)
+    {
+        var h = new byte[hash.Length / 2];
+        var m = Convert.FromHexString(message);
+        var k = key != null ? Convert.FromHexString(key) : Array.Empty<byte>();
+
+        var blake2b = new IncrementalBLAKE2b(h.Length, k);
+
+        blake2b.Dispose();
+
+        Assert.ThrowsException<ObjectDisposedException>(() => blake2b.Reinitialize(h.Length, k));
+        Assert.ThrowsException<ObjectDisposedException>(() => blake2b.Update(m));
+        Assert.ThrowsException<ObjectDisposedException>(() => blake2b.Finalize(h));
+        Assert.ThrowsException<ObjectDisposedException>(() => blake2b.FinalizeAndVerify(h));
+        Assert.ThrowsException<ObjectDisposedException>(() => blake2b.CacheState());
+        Assert.ThrowsException<ObjectDisposedException>(() => blake2b.RestoreCachedState());
+        Assert.ThrowsException<ObjectDisposedException>(() => blake2b.Dispose());
+    }
 }

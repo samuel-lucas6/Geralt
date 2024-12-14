@@ -11,6 +11,7 @@ public sealed class IncrementalPoly1305 : IDisposable
 
     private crypto_onetimeauth_state _state;
     private bool _finalized;
+    private bool _disposed;
 
     public IncrementalPoly1305(ReadOnlySpan<byte> oneTimeKey)
     {
@@ -20,6 +21,7 @@ public sealed class IncrementalPoly1305 : IDisposable
 
     public void Reinitialize(ReadOnlySpan<byte> oneTimeKey)
     {
+        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalPoly1305)); }
         Validation.EqualToSize(nameof(oneTimeKey), oneTimeKey.Length, KeySize);
         _finalized = false;
         int ret = crypto_onetimeauth_init(ref _state, oneTimeKey);
@@ -28,6 +30,7 @@ public sealed class IncrementalPoly1305 : IDisposable
 
     public void Update(ReadOnlySpan<byte> message)
     {
+        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalPoly1305)); }
         if (_finalized) { throw new InvalidOperationException("Cannot update after finalizing without reinitializing."); }
         int ret = crypto_onetimeauth_update(ref _state, message, (ulong)message.Length);
         if (ret != 0) { throw new CryptographicException("Error updating message authentication code state."); }
@@ -35,6 +38,7 @@ public sealed class IncrementalPoly1305 : IDisposable
 
     public void Finalize(Span<byte> tag)
     {
+        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalPoly1305)); }
         if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
         Validation.EqualToSize(nameof(tag), tag.Length, TagSize);
         _finalized = true;
@@ -44,6 +48,7 @@ public sealed class IncrementalPoly1305 : IDisposable
 
     public bool FinalizeAndVerify(ReadOnlySpan<byte> tag)
     {
+        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalPoly1305)); }
         if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
         Validation.EqualToSize(nameof(tag), tag.Length, TagSize);
         Span<byte> computedTag = stackalloc byte[TagSize];
@@ -56,6 +61,8 @@ public sealed class IncrementalPoly1305 : IDisposable
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
     public void Dispose()
     {
+        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalPoly1305)); }
         _state = default;
+        _disposed = true;
     }
 }

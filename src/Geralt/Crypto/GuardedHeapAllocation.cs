@@ -17,7 +17,6 @@ public sealed class GuardedHeapAllocation : IDisposable
         _pointer = sodium_malloc((nuint)size);
         if (_pointer == IntPtr.Zero) { throw new OutOfMemoryException("Unable to allocate memory."); }
         _size = size;
-        _disposed = false;
     }
 
     public unsafe Span<byte> AsSpan()

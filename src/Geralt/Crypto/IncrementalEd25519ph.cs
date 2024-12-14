@@ -12,6 +12,7 @@ public sealed class IncrementalEd25519ph : IDisposable
 
     private crypto_sign_state _state;
     private bool _finalized;
+    private bool _disposed;
 
     public IncrementalEd25519ph()
     {
@@ -21,6 +22,7 @@ public sealed class IncrementalEd25519ph : IDisposable
 
     public void Reinitialize()
     {
+        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalEd25519ph)); }
         _finalized = false;
         int ret = crypto_sign_init(ref _state);
         if (ret != 0) { throw new CryptographicException("Error initializing signature scheme state."); }
@@ -28,6 +30,7 @@ public sealed class IncrementalEd25519ph : IDisposable
 
     public void Update(ReadOnlySpan<byte> message)
     {
+        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalEd25519ph)); }
         if (_finalized) { throw new InvalidOperationException("Cannot update after finalizing without reinitializing."); }
         int ret = crypto_sign_update(ref _state, message, (ulong)message.Length);
         if (ret != 0) { throw new CryptographicException("Error updating signature scheme state."); }
@@ -35,6 +38,7 @@ public sealed class IncrementalEd25519ph : IDisposable
 
     public void Finalize(Span<byte> signature, ReadOnlySpan<byte> privateKey)
     {
+        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalEd25519ph)); }
         if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
         Validation.EqualToSize(nameof(signature), signature.Length, SignatureSize);
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
@@ -45,6 +49,7 @@ public sealed class IncrementalEd25519ph : IDisposable
 
     public bool FinalizeAndVerify(ReadOnlySpan<byte> signature, ReadOnlySpan<byte> publicKey)
     {
+        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalEd25519ph)); }
         if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
         Validation.EqualToSize(nameof(signature), signature.Length, SignatureSize);
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
@@ -55,6 +60,8 @@ public sealed class IncrementalEd25519ph : IDisposable
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
     public void Dispose()
     {
+        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalEd25519ph)); }
         _state = default;
+        _disposed = true;
     }
 }

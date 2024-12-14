@@ -257,4 +257,23 @@ public class Poly1305Tests
         Assert.ThrowsException<InvalidOperationException>(() => poly1305.Finalize(t));
         Assert.ThrowsException<InvalidOperationException>(() => poly1305.FinalizeAndVerify(t));
     }
+
+    [TestMethod]
+    [DynamicData(nameof(Rfc8439TestVectors), DynamicDataSourceType.Method)]
+    public void Incremental_Disposed(string tag, string message, string oneTimeKey)
+    {
+        var t = Convert.FromHexString(tag);
+        var m = Convert.FromHexString(message);
+        var k = Convert.FromHexString(oneTimeKey);
+
+        var poly1305 = new IncrementalPoly1305(k);
+
+        poly1305.Dispose();
+
+        Assert.ThrowsException<ObjectDisposedException>(() => poly1305.Reinitialize(k));
+        Assert.ThrowsException<ObjectDisposedException>(() => poly1305.Update(m));
+        Assert.ThrowsException<ObjectDisposedException>(() => poly1305.Finalize(t));
+        Assert.ThrowsException<ObjectDisposedException>(() => poly1305.FinalizeAndVerify(t));
+        Assert.ThrowsException<ObjectDisposedException>(() => poly1305.Dispose());
+    }
 }

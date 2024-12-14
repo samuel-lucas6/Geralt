@@ -458,4 +458,24 @@ public class Ed25519Tests
         Assert.ThrowsException<InvalidOperationException>(() => ed25519ph.Finalize(s, sk));
         Assert.ThrowsException<InvalidOperationException>(() => ed25519ph.FinalizeAndVerify(s, pk));
     }
+
+    [TestMethod]
+    [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
+    public void Incremental_Disposed(string signature, string message, string privateKey)
+    {
+        var s = Convert.FromHexString(signature);
+        var m = Convert.FromHexString(message);
+        var sk = Convert.FromHexString(privateKey);
+        var pk = sk[^Ed25519.PublicKeySize..];
+
+        var ed25519ph = new IncrementalEd25519ph();
+
+        ed25519ph.Dispose();
+
+        Assert.ThrowsException<ObjectDisposedException>(() => ed25519ph.Reinitialize());
+        Assert.ThrowsException<ObjectDisposedException>(() => ed25519ph.Update(m));
+        Assert.ThrowsException<ObjectDisposedException>(() => ed25519ph.Finalize(s, sk));
+        Assert.ThrowsException<ObjectDisposedException>(() => ed25519ph.FinalizeAndVerify(s, pk));
+        Assert.ThrowsException<ObjectDisposedException>(() => ed25519ph.Dispose());
+    }
 }
