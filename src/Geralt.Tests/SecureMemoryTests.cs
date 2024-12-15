@@ -3,6 +3,15 @@
 [TestClass]
 public class SecureMemoryTests
 {
+    public static IEnumerable<object[]> InvalidLockMemorySizes()
+    {
+        yield return [0];
+        yield return [SecureMemory.PageSize + 1];
+        yield return [SecureMemory.PageSize - 1];
+        yield return [SecureMemory.PageSize * 2 + 1];
+        yield return [SecureMemory.PageSize * 2 - 1];
+    }
+
     // With DataRow(), the associated test fails on macOS
     public static IEnumerable<object[]> InvalidGuardedHeapAllocationSizes()
     {
@@ -92,11 +101,7 @@ public class SecureMemoryTests
     }
 
     [TestMethod]
-    [DataRow(0)]
-    [DataRow(4096 + 1)]
-    [DataRow(4096 - 1)]
-    [DataRow(8192 + 1)]
-    [DataRow(8192 - 1)]
+    [DynamicData(nameof(InvalidLockMemorySizes), DynamicDataSourceType.Method)]
     public void LockMemory_UnlockAndZeroMemory_Invalid(int bufferSize)
     {
         var b = new byte[bufferSize];
