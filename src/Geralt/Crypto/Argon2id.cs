@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Runtime.InteropServices;
+using System.Text;
 using static Interop.Libsodium;
 
 namespace Geralt;
@@ -40,13 +41,15 @@ public static class Argon2id
         Validation.NotLessThanMin(nameof(iterations), iterations, MinIterations);
         Validation.NotLessThanMin(nameof(memorySize), memorySize, MinMemorySize);
         Sodium.Initialize();
-        unsafe
-        {
-            sbyte* hash = stackalloc sbyte[crypto_pwhash_STRBYTES];
+        nint hash = Marshal.AllocHGlobal(MaxHashSize);
+        try {
             int ret = crypto_pwhash_str_alg(hash, password, (ulong)password.Length, (ulong)iterations, (nuint)memorySize, crypto_pwhash_argon2id_ALG_ARGON2ID13);
             if (ret != 0) { throw new InsufficientMemoryException("Insufficient memory to perform password hashing."); }
-            return new string(hash);
+            return Marshal.PtrToStringAnsi(hash)!;
         }
+        finally { 
+            Marshal.FreeHGlobal(hash); 
+        }  
     }
 
     public static bool VerifyHash(ReadOnlySpan<byte> hash, ReadOnlySpan<byte> password)
@@ -96,8 +99,7 @@ public static class Argon2id
 
     private static void ThrowIfInvalidHashPrefix(string hash)
     {
-        if (!hash.StartsWith(HashPrefix))
-        {
+        if (!hash.StartsWith(HashPrefix)) {
             throw new FormatException("Invalid encoded password hash prefix.");
         }
     }

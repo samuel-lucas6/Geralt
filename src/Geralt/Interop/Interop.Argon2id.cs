@@ -23,7 +23,7 @@ internal static partial class Interop
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static unsafe partial int crypto_pwhash_str_alg(sbyte* hash, ReadOnlySpan<byte> password, ulong passwordLength, ulong iterations, nuint memorySize, int algorithm);
+        internal static partial int crypto_pwhash_str_alg(nint hash, ReadOnlySpan<byte> password, ulong passwordLength, ulong iterations, nuint memorySize, int algorithm);
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
