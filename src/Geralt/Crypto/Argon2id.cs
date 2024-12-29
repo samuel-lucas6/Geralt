@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Runtime.InteropServices;
+using System.Text;
 using static Interop.Libsodium;
 
 namespace Geralt;
@@ -35,9 +36,33 @@ public static class Argon2id
         if (ret != 0) { throw new InsufficientMemoryException("Insufficient memory to perform password hashing."); }
     }
 
+    public static string ComputeHash(ReadOnlySpan<byte> password, int iterations, int memorySize)
+    {
+        Validation.NotLessThanMin(nameof(iterations), iterations, MinIterations);
+        Validation.NotLessThanMin(nameof(memorySize), memorySize, MinMemorySize);
+        Sodium.Initialize();
+        nint hash = Marshal.AllocHGlobal(MaxHashSize);
+        try {
+            int ret = crypto_pwhash_str_alg(hash, password, (ulong)password.Length, (ulong)iterations, (nuint)memorySize, crypto_pwhash_argon2id_ALG_ARGON2ID13);
+            if (ret != 0) { throw new InsufficientMemoryException("Insufficient memory to perform password hashing."); }
+            return Marshal.PtrToStringAnsi(hash)!;
+        }
+        finally { 
+            Marshal.FreeHGlobal(hash); 
+        }  
+    }
+
     public static bool VerifyHash(ReadOnlySpan<byte> hash, ReadOnlySpan<byte> password)
     {
         Validation.SizeBetween(nameof(hash), hash.Length, MinHashSize, MaxHashSize);
+        ThrowIfInvalidHashPrefix(hash);
+        Sodium.Initialize();
+        return crypto_pwhash_str_verify(hash, password, (ulong)password.Length) == 0;
+    }
+
+    public static bool VerifyHash(string hash, ReadOnlySpan<byte> password)
+    {
+        Validation.NotNull(nameof(hash), hash);
         ThrowIfInvalidHashPrefix(hash);
         Sodium.Initialize();
         return crypto_pwhash_str_verify(hash, password, (ulong)password.Length) == 0;
@@ -54,9 +79,27 @@ public static class Argon2id
         return ret == -1 ? throw new FormatException("Invalid encoded password hash.") : ret == 1;
     }
 
+    public static bool NeedsRehash(string hash, int iterations, int memorySize)
+    {
+        Validation.NotNull(nameof(hash), hash);
+        Validation.NotLessThanMin(nameof(iterations), iterations, MinIterations);
+        Validation.NotLessThanMin(nameof(memorySize), memorySize, MinMemorySize);
+        ThrowIfInvalidHashPrefix(hash);
+        Sodium.Initialize();
+        int ret = crypto_pwhash_str_needs_rehash(hash, (ulong)iterations, (nuint)memorySize);
+        return ret == -1 ? throw new FormatException("Invalid encoded password hash.") : ret == 1;
+    }
+
     private static void ThrowIfInvalidHashPrefix(ReadOnlySpan<byte> hash)
     {
         if (!ConstantTime.Equals(hash[..HashPrefix.Length], Encoding.UTF8.GetBytes(HashPrefix))) {
+            throw new FormatException("Invalid encoded password hash prefix.");
+        }
+    }
+
+    private static void ThrowIfInvalidHashPrefix(string hash)
+    {
+        if (!hash.StartsWith(HashPrefix)) {
             throw new FormatException("Invalid encoded password hash prefix.");
         }
     }
