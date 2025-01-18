@@ -11,7 +11,7 @@ public static class Argon2id
     public const int MinKeySize = crypto_pwhash_BYTES_MIN;
     public const int MinIterations = crypto_pwhash_argon2id_OPSLIMIT_MIN;
     public const int MinMemorySize = crypto_pwhash_MEMLIMIT_MIN;
-    public const int MinHashSize = 93;
+    public const int MinHashSize = 93; // Smallest possible Argon2id string that libsodium can generate
     public const int MaxHashSize = crypto_pwhash_STRBYTES;
     private const string HashPrefix = crypto_pwhash_argon2id_STRPREFIX;
 
@@ -47,9 +47,9 @@ public static class Argon2id
             if (ret != 0) { throw new InsufficientMemoryException("Insufficient memory to perform password hashing."); }
             return Marshal.PtrToStringAnsi(hash)!;
         }
-        finally { 
-            Marshal.FreeHGlobal(hash); 
-        }  
+        finally {
+            Marshal.FreeHGlobal(hash);
+        }
     }
 
     public static bool VerifyHash(ReadOnlySpan<byte> hash, ReadOnlySpan<byte> password)
@@ -63,6 +63,7 @@ public static class Argon2id
     public static bool VerifyHash(string hash, ReadOnlySpan<byte> password)
     {
         Validation.NotNull(nameof(hash), hash);
+        Validation.SizeBetween(nameof(hash), hash.Length, MinHashSize, MaxHashSize);
         ThrowIfInvalidHashPrefix(hash);
         Sodium.Initialize();
         return crypto_pwhash_str_verify(hash, password, (ulong)password.Length) == 0;
@@ -82,6 +83,7 @@ public static class Argon2id
     public static bool NeedsRehash(string hash, int iterations, int memorySize)
     {
         Validation.NotNull(nameof(hash), hash);
+        Validation.SizeBetween(nameof(hash), hash.Length, MinHashSize, MaxHashSize);
         Validation.NotLessThanMin(nameof(iterations), iterations, MinIterations);
         Validation.NotLessThanMin(nameof(memorySize), memorySize, MinMemorySize);
         ThrowIfInvalidHashPrefix(hash);
