@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Geralt/Geralt.csproj" />
+  <Project Path="Geralt.Tests/Geralt.Tests.csproj" />
+</Solution>
