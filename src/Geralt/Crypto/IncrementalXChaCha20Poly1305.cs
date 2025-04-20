@@ -42,12 +42,12 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
         if (ret != 0) { throw new CryptographicException(_decryption ? "Error initializing stream decryption." : "Error initializing stream encryption."); }
     }
 
-    public void Push(Span<byte> ciphertextChunk, ReadOnlySpan<byte> plaintextChunk, ChunkFlag chunkFlag = ChunkFlag.Message)
+    public void EncryptChunk(Span<byte> ciphertextChunk, ReadOnlySpan<byte> plaintextChunk, ChunkFlag chunkFlag = ChunkFlag.Message)
     {
-        Push(ciphertextChunk, plaintextChunk, associatedData: default, chunkFlag);
+        EncryptChunk(ciphertextChunk, plaintextChunk, associatedData: default, chunkFlag);
     }
 
-    public void Push(Span<byte> ciphertextChunk, ReadOnlySpan<byte> plaintextChunk, ReadOnlySpan<byte> associatedData, ChunkFlag chunkFlag = ChunkFlag.Message)
+    public void EncryptChunk(Span<byte> ciphertextChunk, ReadOnlySpan<byte> plaintextChunk, ReadOnlySpan<byte> associatedData, ChunkFlag chunkFlag = ChunkFlag.Message)
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalXChaCha20Poly1305)); }
         if (_decryption) { throw new InvalidOperationException("Cannot push into a decryption stream."); }
@@ -58,7 +58,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
         if (ret != 0) { throw new CryptographicException("Error encrypting plaintext chunk."); }
     }
 
-    public ChunkFlag Pull(Span<byte> plaintextChunk, ReadOnlySpan<byte> ciphertextChunk, ReadOnlySpan<byte> associatedData = default)
+    public ChunkFlag DecryptChunk(Span<byte> plaintextChunk, ReadOnlySpan<byte> ciphertextChunk, ReadOnlySpan<byte> associatedData = default)
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalXChaCha20Poly1305)); }
         if (!_decryption) { throw new InvalidOperationException("Cannot pull from an encryption stream."); }
