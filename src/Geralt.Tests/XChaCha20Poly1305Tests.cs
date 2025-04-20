@@ -158,11 +158,11 @@ public class XChaCha20Poly1305Tests
         Span<byte> p = Convert.FromHexString(plaintext);
         Span<byte> c = stackalloc byte[p.Length + IncrementalXChaCha20Poly1305.TagSize];
 
-        using var encryptor = new IncrementalXChaCha20Poly1305(encryption: true, h, k);
+        using var encryptor = new IncrementalXChaCha20Poly1305(h, k, encryption: true);
         encryptor.EncryptChunk(c, p, IncrementalXChaCha20Poly1305.ChunkFlag.Final);
         p.Clear();
 
-        using var decryptor = new IncrementalXChaCha20Poly1305(encryption: false, h, k);
+        using var decryptor = new IncrementalXChaCha20Poly1305(h, k, encryption: false);
         var chunkFlag = decryptor.DecryptChunk(p, c);
 
         Assert.AreEqual(IncrementalXChaCha20Poly1305.ChunkFlag.Final, chunkFlag);
@@ -179,11 +179,11 @@ public class XChaCha20Poly1305Tests
         Span<byte> ad = Convert.FromHexString(associatedData);
         Span<byte> c = stackalloc byte[p.Length + IncrementalXChaCha20Poly1305.TagSize];
 
-        using var encryptor = new IncrementalXChaCha20Poly1305(encryption: true, h, k);
+        using var encryptor = new IncrementalXChaCha20Poly1305(h, k, encryption: true);
         encryptor.EncryptChunk(c, p, ad, IncrementalXChaCha20Poly1305.ChunkFlag.Final);
         p.Clear();
 
-        using var decryptor = new IncrementalXChaCha20Poly1305(encryption: false, h, k);
+        using var decryptor = new IncrementalXChaCha20Poly1305(h, k, encryption: false);
         var chunkFlag = decryptor.DecryptChunk(p, c, ad);
 
         Assert.AreEqual(IncrementalXChaCha20Poly1305.ChunkFlag.Final, chunkFlag);
@@ -203,7 +203,7 @@ public class XChaCha20Poly1305Tests
         Span<byte> c = stackalloc byte[p.Length + IncrementalXChaCha20Poly1305.TagSize * 4];
         Span<byte> c1 = c[..33], c2 = c[33..66], c3 = c[66..99], c4 = c[99..];
 
-        using var encryptor = new IncrementalXChaCha20Poly1305(encryption: true, h, k);
+        using var encryptor = new IncrementalXChaCha20Poly1305(h, k, encryption: true);
         encryptor.EncryptChunk(c1, p1, IncrementalXChaCha20Poly1305.ChunkFlag.Message);
         encryptor.Rekey();
         encryptor.EncryptChunk(c2, p2, IncrementalXChaCha20Poly1305.ChunkFlag.Boundary);
@@ -211,7 +211,7 @@ public class XChaCha20Poly1305Tests
         encryptor.EncryptChunk(c4, p4, IncrementalXChaCha20Poly1305.ChunkFlag.Final);
         p1.Clear(); p2.Clear(); p3.Clear(); p4.Clear();
 
-        using var decryptor = new IncrementalXChaCha20Poly1305(encryption: false, h, k);
+        using var decryptor = new IncrementalXChaCha20Poly1305(h, k, encryption: false);
         var chunkFlag = decryptor.DecryptChunk(p1, c1);
         Assert.AreEqual(IncrementalXChaCha20Poly1305.ChunkFlag.Message, chunkFlag);
 
@@ -238,14 +238,14 @@ public class XChaCha20Poly1305Tests
         Span<byte> p = Convert.FromHexString(plaintext);
         Span<byte> c = stackalloc byte[p.Length + IncrementalXChaCha20Poly1305.TagSize];
 
-        using var secretstream = new IncrementalXChaCha20Poly1305(encryption: true, h, k);
+        using var secretstream = new IncrementalXChaCha20Poly1305(h, k, encryption: true);
         secretstream.EncryptChunk(c, p, IncrementalXChaCha20Poly1305.ChunkFlag.Final);
 
-        secretstream.Reinitialize(encryption: true, h, k);
+        secretstream.Reinitialize(h, k, encryption: true);
         secretstream.EncryptChunk(c, p, IncrementalXChaCha20Poly1305.ChunkFlag.Final);
         p.Clear();
 
-        secretstream.Reinitialize(encryption: false, h, k);
+        secretstream.Reinitialize(h, k, encryption: false);
         var chunkFlag = secretstream.DecryptChunk(p, c);
 
         Assert.AreEqual(IncrementalXChaCha20Poly1305.ChunkFlag.Final, chunkFlag);
@@ -267,7 +267,7 @@ public class XChaCha20Poly1305Tests
 
         foreach (var param in parameters) {
             param[0]++;
-            using var decryptor = new IncrementalXChaCha20Poly1305(encryption: false, parameters[0], parameters[1]);
+            using var decryptor = new IncrementalXChaCha20Poly1305(parameters[0], parameters[1], encryption: false);
             Assert.ThrowsException<CryptographicException>(() => decryptor.DecryptChunk(p, parameters[2], parameters[3]));
             param[0]--;
         }
@@ -283,7 +283,7 @@ public class XChaCha20Poly1305Tests
         var p = new byte[plaintext.Length / 2];
         var c = Convert.FromHexString(ciphertext);
 
-        using var decryptor = new IncrementalXChaCha20Poly1305(encryption: false, h, k);
+        using var decryptor = new IncrementalXChaCha20Poly1305(h, k, encryption: false);
         // Should rekey here
         Assert.ThrowsException<CryptographicException>(() => decryptor.DecryptChunk(p, c));
     }
@@ -298,14 +298,14 @@ public class XChaCha20Poly1305Tests
         var p = new byte[plaintextSize];
 
         if (headerSize != IncrementalXChaCha20Poly1305.HeaderSize || keySize != IncrementalXChaCha20Poly1305.KeySize) {
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => new IncrementalXChaCha20Poly1305(encryption: true, h, k));
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => new IncrementalXChaCha20Poly1305(encryption: false, h, k));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => new IncrementalXChaCha20Poly1305(h, k, encryption: true));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => new IncrementalXChaCha20Poly1305(h, k, encryption: false));
         }
         else {
-            using var encryptor = new IncrementalXChaCha20Poly1305(encryption: true, h, k);
+            using var encryptor = new IncrementalXChaCha20Poly1305(h, k, encryption: true);
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => encryptor.EncryptChunk(c, p));
 
-            using var decryptor = new IncrementalXChaCha20Poly1305(encryption: false, h, k);
+            using var decryptor = new IncrementalXChaCha20Poly1305(h, k, encryption: false);
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => decryptor.DecryptChunk(p, c));
         }
     }
@@ -318,12 +318,12 @@ public class XChaCha20Poly1305Tests
         var p = new byte[h.Length];
         var c = new byte[p.Length + IncrementalXChaCha20Poly1305.TagSize];
 
-        using var encryptor = new IncrementalXChaCha20Poly1305(encryption: true, h, k);
+        using var encryptor = new IncrementalXChaCha20Poly1305(h, k, encryption: true);
         Assert.ThrowsException<InvalidOperationException>(() => encryptor.DecryptChunk(p, c));
         encryptor.EncryptChunk(c, p, IncrementalXChaCha20Poly1305.ChunkFlag.Final);
         Assert.ThrowsException<InvalidOperationException>(() => encryptor.EncryptChunk(c, p));
 
-        using var decryptor = new IncrementalXChaCha20Poly1305(encryption: false, h, k);
+        using var decryptor = new IncrementalXChaCha20Poly1305(h, k, encryption: false);
         Assert.ThrowsException<InvalidOperationException>(() => decryptor.EncryptChunk(c, p));
         decryptor.DecryptChunk(p, c);
         Assert.ThrowsException<InvalidOperationException>(() => decryptor.DecryptChunk(p, c));
@@ -337,11 +337,11 @@ public class XChaCha20Poly1305Tests
         var p = new byte[h.Length];
         var c = new byte[p.Length + IncrementalXChaCha20Poly1305.TagSize];
 
-        var encryptor = new IncrementalXChaCha20Poly1305(encryption: true, h, k);
+        var encryptor = new IncrementalXChaCha20Poly1305(h, k, encryption: true);
 
         encryptor.Dispose();
 
-        Assert.ThrowsException<ObjectDisposedException>(() => encryptor.Reinitialize(encryption: false, h, k));
+        Assert.ThrowsException<ObjectDisposedException>(() => encryptor.Reinitialize(h, k, encryption: false));
         Assert.ThrowsException<ObjectDisposedException>(() => encryptor.EncryptChunk(c, p, IncrementalXChaCha20Poly1305.ChunkFlag.Final));
         Assert.ThrowsException<ObjectDisposedException>(() => encryptor.DecryptChunk(p, c));
         Assert.ThrowsException<ObjectDisposedException>(() => encryptor.Rekey());

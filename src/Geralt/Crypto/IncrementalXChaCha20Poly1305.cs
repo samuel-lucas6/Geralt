@@ -23,13 +23,13 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
         Final = crypto_secretstream_xchacha20poly1305_TAG_FINAL
     }
 
-    public IncrementalXChaCha20Poly1305(bool encryption, Span<byte> header, ReadOnlySpan<byte> key)
+    public IncrementalXChaCha20Poly1305(Span<byte> header, ReadOnlySpan<byte> key, bool encryption)
     {
         Sodium.Initialize();
-        Reinitialize(encryption, header, key);
+        Reinitialize(header, key, encryption);
     }
 
-    public void Reinitialize(bool encryption, Span<byte> header, ReadOnlySpan<byte> key)
+    public void Reinitialize(Span<byte> header, ReadOnlySpan<byte> key, bool encryption)
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalXChaCha20Poly1305)); }
         Validation.EqualToSize(nameof(header), header.Length, HeaderSize);
