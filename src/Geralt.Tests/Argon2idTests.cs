@@ -88,24 +88,6 @@ public class Argon2idTests
     [DataRow("correct horse battery staple", Argon2id.MinIterations, Argon2id.MinMemorySize)]
     public void ComputeHash_Valid(string password, int iterations, int memorySize)
     {
-        Span<byte> h = stackalloc byte[Argon2id.MaxHashSize];
-        Span<byte> p = Encoding.UTF8.GetBytes(password);
-
-        Argon2id.ComputeHash(h, p, iterations, memorySize);
-
-        Assert.IsFalse(h.SequenceEqual(new byte[h.Length]));
-
-        bool valid = Argon2id.VerifyHash(h, p);
-        Assert.IsTrue(valid);
-
-        bool rehash = Argon2id.NeedsRehash(h, iterations, memorySize);
-        Assert.IsFalse(rehash);
-    }
-
-    [TestMethod]
-    [DataRow("correct horse battery staple", Argon2id.MinIterations, Argon2id.MinMemorySize)]
-    public void ComputeHash_String_Valid(string password, int iterations, int memorySize)
-    {
         Span<byte> p = Encoding.UTF8.GetBytes(password);
 
         string h = Argon2id.ComputeHash(p, iterations, memorySize);
@@ -120,22 +102,9 @@ public class Argon2idTests
     }
 
     [TestMethod]
-    [DataRow(Argon2id.MaxHashSize + 1, Argon2id.KeySize, Argon2id.MinIterations, Argon2id.MinMemorySize)]
-    [DataRow(Argon2id.MaxHashSize - 1, Argon2id.KeySize, Argon2id.MinIterations, Argon2id.MinMemorySize)]
-    [DataRow(Argon2id.MaxHashSize, Argon2id.KeySize, Argon2id.MinIterations - 1, Argon2id.MinMemorySize)]
-    [DataRow(Argon2id.MaxHashSize, Argon2id.KeySize, Argon2id.MinIterations, Argon2id.MinMemorySize - 1)]
-    public void ComputeHash_Invalid(int hashSize, int passwordSize, int iterations, int memorySize)
-    {
-        var h = new byte[hashSize];
-        var p = new byte[passwordSize];
-
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.ComputeHash(h, p, iterations, memorySize));
-    }
-
-    [TestMethod]
     [DataRow(Argon2id.KeySize, Argon2id.MinIterations - 1, Argon2id.MinMemorySize)]
     [DataRow(Argon2id.KeySize, Argon2id.MinIterations, Argon2id.MinMemorySize - 1)]
-    public void ComputeHash_String_Invalid(int passwordSize, int iterations, int memorySize)
+    public void ComputeHash_Invalid(int passwordSize, int iterations, int memorySize)
     {
         var p = new byte[passwordSize];
 
@@ -146,18 +115,6 @@ public class Argon2idTests
     [DynamicData(nameof(StringTestVectors), DynamicDataSourceType.Method)]
     public void VerifyHash_Valid(bool expected, string hash, string password)
     {
-        Span<byte> h = Encoding.UTF8.GetBytes(hash);
-        Span<byte> p = Encoding.UTF8.GetBytes(password);
-
-        bool valid = Argon2id.VerifyHash(h, p);
-
-        Assert.AreEqual(expected, valid);
-    }
-
-    [TestMethod]
-    [DynamicData(nameof(StringTestVectors), DynamicDataSourceType.Method)]
-    public void VerifyHash_String_Valid(bool expected, string hash, string password)
-    {
         Span<byte> p = Encoding.UTF8.GetBytes(password);
 
         bool valid = Argon2id.VerifyHash(hash, p);
@@ -166,21 +123,10 @@ public class Argon2idTests
     }
 
     [TestMethod]
-    [DataRow(Argon2id.MaxHashSize + 1, Argon2id.KeySize)]
-    [DataRow(Argon2id.MinHashSize - 1, Argon2id.KeySize)]
-    public void VerifyHash_Invalid(int hashSize, int passwordSize)
-    {
-        var h = new byte[hashSize];
-        var p = new byte[passwordSize];
-
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.VerifyHash(h, p));
-    }
-
-    [TestMethod]
     [DataRow(null, "")]
     [DataRow("$argon2id$v=19$m=4882,t=2,p=1$bA81arsiXysd3WbTRzmEOw$Nm8QBM+7RH1DXo9rvp5cwKEOOOfD2g6JuxlXiho", "")]
     [DataRow("$argon2id$v=19$m=4882,t=2,p=1$bA81arsiXysd3WbTRzmEOw$Nm8QBM+7RH1DXo9rvp5cwKEOOOfD2g6JuxlXihoNcpEltB/ue1kPtBMBGfsysMpPigE6hiNEKZ9v", "")]
-    public void VerifyHash_String_Invalid(string? hash, string password)
+    public void VerifyHash_Invalid(string? hash, string password)
     {
         var p = Encoding.UTF8.GetBytes(password);
 
@@ -197,17 +143,6 @@ public class Argon2idTests
     [DataRow("$argon2d$v=19$m=4096,t=3,p=1$YTBxd2k1bXBhZHIwMDAwMA$3MM5BChSl8q+MQED0fql0nwP5ykjHdBrGE0mVJHFEUE", "password")]
     public void VerifyHash_WrongPrefix(string hash, string password)
     {
-        var h = Encoding.UTF8.GetBytes(hash);
-        var p = Encoding.UTF8.GetBytes(password);
-
-        Assert.ThrowsException<FormatException>(() => Argon2id.VerifyHash(h, p));
-    }
-
-    [TestMethod]
-    [DataRow("$argon2i$v=19$m=4096,t=3,p=1$eXNtbzQwOTFzajAwMDAwMA$Bb7qAql9aguCTBpLP4PVnlBd+ehJ5rX0R7smB/FggOM", "password")]
-    [DataRow("$argon2d$v=19$m=4096,t=3,p=1$YTBxd2k1bXBhZHIwMDAwMA$3MM5BChSl8q+MQED0fql0nwP5ykjHdBrGE0mVJHFEUE", "password")]
-    public void VerifyHash_String_WrongPrefix(string hash, string password)
-    {
         var p = Encoding.UTF8.GetBytes(password);
 
         Assert.ThrowsException<FormatException>(() => Argon2id.VerifyHash(hash, p));
@@ -218,19 +153,6 @@ public class Argon2idTests
     [DataRow(true, "$argon2id$v=19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 4, 16777216)]
     [DataRow(true, "$argon2id$v=19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 3, 26777216)]
     public void NeedsRehash_Valid(bool expected, string hash, int iterations, int memorySize)
-    {
-        Span<byte> h = Encoding.UTF8.GetBytes(hash);
-
-        bool rehash = Argon2id.NeedsRehash(h, iterations, memorySize);
-
-        Assert.AreEqual(expected, rehash);
-    }
-
-    [TestMethod]
-    [DataRow(false, "$argon2id$v=19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 3, 16777216)]
-    [DataRow(true, "$argon2id$v=19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 4, 16777216)]
-    [DataRow(true, "$argon2id$v=19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 3, 26777216)]
-    public void NeedsRehash_String_Valid(bool expected, string hash, int iterations, int memorySize)
     {
         bool rehash = Argon2id.NeedsRehash(hash, iterations, memorySize);
 
@@ -245,32 +167,7 @@ public class Argon2idTests
     [DataRow("$argon2d$v=19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 3, 16777216)]
     public void NeedsRehash_Tampered(string hash, int iterations, int memorySize)
     {
-        var h = Encoding.UTF8.GetBytes(hash);
-
-        Assert.ThrowsException<FormatException>(() => Argon2id.NeedsRehash(h, iterations, memorySize));
-    }
-
-    [TestMethod]
-    [DataRow("argon2id$v=19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 3, 16777216)]
-    [DataRow("$argon2id$v19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 3, 16777216)]
-    [DataRow("$argon2id$v=19$m=16384t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 3, 16777216)]
-    [DataRow("$argon2i$v=19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 3, 16777216)]
-    [DataRow("$argon2d$v=19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 3, 16777216)]
-    public void NeedsRehash_String_Tampered(string hash, int iterations, int memorySize)
-    {
         Assert.ThrowsException<FormatException>(() => Argon2id.NeedsRehash(hash, iterations, memorySize));
-    }
-
-    [TestMethod]
-    [DataRow(Argon2id.MaxHashSize + 1, Argon2id.MinIterations, Argon2id.MinMemorySize)]
-    [DataRow(Argon2id.MinHashSize - 1, Argon2id.MinIterations, Argon2id.MinMemorySize)]
-    [DataRow(Argon2id.MinHashSize, Argon2id.MinIterations - 1, Argon2id.MinMemorySize)]
-    [DataRow(Argon2id.MinHashSize, Argon2id.MinIterations, Argon2id.MinMemorySize - 1)]
-    public void NeedsRehash_Invalid(int hashSize, int iterations, int memorySize)
-    {
-        var h = new byte[hashSize];
-
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.NeedsRehash(h, iterations, memorySize));
     }
 
     [TestMethod]
@@ -279,7 +176,7 @@ public class Argon2idTests
     [DataRow("$argon2id$v=19$m=4882,t=2,p=1$bA81arsiXysd3WbTRzmEOw$Nm8QBM+7RH1DXo9rvp5cwKEOOOfD2g6JuxlXihoNcpEltB/ue1kPtBMBGfsysMpPigE6hiNEKZ9v", Argon2id.MinIterations, Argon2id.MinMemorySize)]
     [DataRow("$argon2id$v=19$m=4882,t=2,p=1$bA81arsiXysd3WbTRzmEOw$Nm8QBM+7RH1DXo9rvp5cwKEOOOfD2g6JuxlXihoNcpE", Argon2id.MinIterations - 1, Argon2id.MinMemorySize)]
     [DataRow("$argon2id$v=19$m=4882,t=2,p=1$bA81arsiXysd3WbTRzmEOw$Nm8QBM+7RH1DXo9rvp5cwKEOOOfD2g6JuxlXihoNcpE", Argon2id.MinIterations, Argon2id.MinMemorySize - 1)]
-    public void NeedsRehash_String_Invalid(string? hash, int iterations, int memorySize)
+    public void NeedsRehash_Invalid(string? hash, int iterations, int memorySize)
     {
         if (hash == null) {
             Assert.ThrowsException<ArgumentNullException>(() => Argon2id.NeedsRehash(hash!, iterations, memorySize));
