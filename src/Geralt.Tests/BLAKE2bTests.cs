@@ -525,6 +525,5 @@ public class BLAKE2bTests
         Assert.ThrowsException<ObjectDisposedException>(() => blake2b.FinalizeAndVerify(h));
         Assert.ThrowsException<ObjectDisposedException>(() => blake2b.CacheState());
         Assert.ThrowsException<ObjectDisposedException>(() => blake2b.RestoreCachedState());
-        Assert.ThrowsException<ObjectDisposedException>(() => blake2b.Dispose());
     }
 }

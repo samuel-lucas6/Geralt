@@ -135,6 +135,5 @@ public class SecureMemoryTests
         Assert.ThrowsException<ObjectDisposedException>(() => secret.NoAccess());
         Assert.ThrowsException<ObjectDisposedException>(() => secret.ReadOnly());
         Assert.ThrowsException<ObjectDisposedException>(() => secret.ReadWrite());
-        Assert.ThrowsException<ObjectDisposedException>(() => secret.Dispose());
     }
 }

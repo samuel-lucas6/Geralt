@@ -476,6 +476,5 @@ public class Ed25519Tests
         Assert.ThrowsException<ObjectDisposedException>(() => ed25519ph.Update(m));
         Assert.ThrowsException<ObjectDisposedException>(() => ed25519ph.Finalize(s, sk));
         Assert.ThrowsException<ObjectDisposedException>(() => ed25519ph.FinalizeAndVerify(s, pk));
-        Assert.ThrowsException<ObjectDisposedException>(() => ed25519ph.Dispose());
     }
 }

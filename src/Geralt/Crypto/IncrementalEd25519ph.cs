@@ -60,7 +60,7 @@ public sealed class IncrementalEd25519ph : IDisposable
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
     public void Dispose()
     {
-        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalEd25519ph)); }
+        if (_disposed) { return; }
         _state = default;
         _disposed = true;
     }

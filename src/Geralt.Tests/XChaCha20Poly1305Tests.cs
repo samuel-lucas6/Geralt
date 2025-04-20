@@ -345,6 +345,5 @@ public class XChaCha20Poly1305Tests
         Assert.ThrowsException<ObjectDisposedException>(() => encryptor.Push(c, p, IncrementalXChaCha20Poly1305.ChunkFlag.Final));
         Assert.ThrowsException<ObjectDisposedException>(() => encryptor.Pull(p, c));
         Assert.ThrowsException<ObjectDisposedException>(() => encryptor.Rekey());
-        Assert.ThrowsException<ObjectDisposedException>(() => encryptor.Dispose());
     }
 }

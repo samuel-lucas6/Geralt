@@ -89,7 +89,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
     public void Dispose()
     {
-        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
+        if (_disposed) { return; }
         _state = default;
         _cachedState = default;
         _disposed = true;

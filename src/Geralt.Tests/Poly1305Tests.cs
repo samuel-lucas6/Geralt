@@ -274,6 +274,5 @@ public class Poly1305Tests
         Assert.ThrowsException<ObjectDisposedException>(() => poly1305.Update(m));
         Assert.ThrowsException<ObjectDisposedException>(() => poly1305.Finalize(t));
         Assert.ThrowsException<ObjectDisposedException>(() => poly1305.FinalizeAndVerify(t));
-        Assert.ThrowsException<ObjectDisposedException>(() => poly1305.Dispose());
     }
 }

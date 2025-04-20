@@ -5,7 +5,7 @@ namespace Geralt;
 public sealed class GuardedHeapAllocation : IDisposable
 {
     // A canary is placed before the data. However, this max size is artificial to limit memory usage
-    public static readonly int MaxSize = SecureMemory.PageSize - CANARY_SIZE;
+    public static readonly int MaxSize = Environment.SystemPageSize - CANARY_SIZE;
     private IntPtr _pointer;
     private int _size;
     private bool _disposed;
@@ -48,7 +48,7 @@ public sealed class GuardedHeapAllocation : IDisposable
 
     public void Dispose()
     {
-        if (_disposed) { throw new ObjectDisposedException(nameof(GuardedHeapAllocation)); }
+        if (_disposed) { return; }
         // This calls sodium_mprotect_readwrite internally
         sodium_free(_pointer);
         _pointer = IntPtr.Zero;

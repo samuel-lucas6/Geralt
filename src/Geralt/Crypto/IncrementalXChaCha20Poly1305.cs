@@ -81,7 +81,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
     public void Dispose()
     {
-        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalXChaCha20Poly1305)); }
+        if (_disposed) { return; }
         _state = default;
         _disposed = true;
     }
