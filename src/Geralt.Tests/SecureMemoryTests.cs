@@ -18,9 +18,11 @@ public class SecureMemoryTests
     }
 
     [TestMethod]
-    public void ZeroMemory_Bytes_Valid()
+    [DataRow(0)]
+    [DataRow(ChaCha20.KeySize)]
+    public void ZeroMemory_Bytes_Valid(int bufferSize)
     {
-        Span<byte> b = stackalloc byte[ChaCha20.KeySize];
+        Span<byte> b = stackalloc byte[bufferSize];
         RandomNumberGenerator.Fill(b);
 
         SecureMemory.ZeroMemory(b);
@@ -29,30 +31,16 @@ public class SecureMemoryTests
     }
 
     [TestMethod]
-    public void ZeroMemory_Bytes_Invalid()
+    [DataRow(0)]
+    [DataRow(SecureRandom.MinStringLength)]
+    public void ZeroMemory_Chars_Valid(int bufferSize)
     {
-        var b = Array.Empty<byte>();
-
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureMemory.ZeroMemory(b));
-    }
-
-    [TestMethod]
-    public void ZeroMemory_Chars_Valid()
-    {
-        Span<char> b = stackalloc char[SecureRandom.MinStringLength];
+        Span<char> b = stackalloc char[bufferSize];
         b.Fill('a');
 
         SecureMemory.ZeroMemory(b);
 
         Assert.IsTrue(b.SequenceEqual(new char[b.Length]));
-    }
-
-    [TestMethod]
-    public void ZeroMemory_Chars_Invalid()
-    {
-        var b = Array.Empty<char>();
-
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureMemory.ZeroMemory(b));
     }
 
     [TestMethod]
@@ -65,12 +53,6 @@ public class SecureMemoryTests
         Assert.IsTrue(s.SequenceEqual(new char[s.Length]));
         // Not the same as null or string.Empty
         Assert.IsTrue(s.ToString().All(c => c == '\0'));
-    }
-
-    [TestMethod]
-    public void ZeroMemory_String_Invalid()
-    {
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureMemory.ZeroMemory(string.Empty.AsSpan()));
     }
 
     [TestMethod]

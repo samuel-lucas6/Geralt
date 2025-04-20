@@ -6,7 +6,6 @@ public static class SecureMemory
 {
     public static unsafe void ZeroMemory(Span<byte> buffer)
     {
-        Validation.NotEmpty(nameof(buffer), buffer.Length);
         Sodium.Initialize();
         fixed (byte* b = buffer) {
             sodium_memzero(new IntPtr(b), (nuint)buffer.Length);
@@ -15,7 +14,6 @@ public static class SecureMemory
 
     public static unsafe void ZeroMemory(ReadOnlySpan<char> buffer)
     {
-        Validation.NotEmpty(nameof(buffer), buffer.Length);
         Sodium.Initialize();
         fixed (char* b = buffer) {
             // sizeof(char) because .NET uses UTF-16
