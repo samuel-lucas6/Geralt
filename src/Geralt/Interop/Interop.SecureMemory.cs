@@ -13,14 +13,6 @@ internal static partial class Interop
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial int sodium_mlock(IntPtr pointer, nuint length);
-
-        [LibraryImport(DllName)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial int sodium_munlock(IntPtr pointer, nuint length);
-
-        [LibraryImport(DllName)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         internal static partial IntPtr sodium_malloc(nuint size);
 
         [LibraryImport(DllName)]

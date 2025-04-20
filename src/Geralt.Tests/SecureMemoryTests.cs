@@ -3,27 +3,17 @@
 [TestClass]
 public class SecureMemoryTests
 {
-    public static IEnumerable<object[]> InvalidLockMemorySizes()
-    {
-        yield return [0];
-        yield return [SecureMemory.PageSize + 1];
-        yield return [SecureMemory.PageSize - 1];
-        yield return [SecureMemory.PageSize * 2 + 1];
-        yield return [SecureMemory.PageSize * 2 - 1];
-    }
-
     // With DataRow(), the associated test fails on macOS
     public static IEnumerable<object[]> InvalidGuardedHeapAllocationSizes()
     {
         yield return [0];
-        yield return [SecureMemory.PageSize];
+        yield return [Environment.SystemPageSize];
         yield return [GuardedHeapAllocation.MaxSize + 1];
     }
 
     [TestMethod]
     public void Constants_Valid()
     {
-        Assert.AreEqual(Environment.SystemPageSize, SecureMemory.PageSize);
         Assert.AreEqual(Environment.SystemPageSize - 16, GuardedHeapAllocation.MaxSize);
     }
 
@@ -81,48 +71,6 @@ public class SecureMemoryTests
     public void ZeroMemory_String_Invalid()
     {
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureMemory.ZeroMemory(string.Empty.AsSpan()));
-    }
-
-    [TestMethod]
-    public void LockMemory_UnlockAndZeroMemory_Valid()
-    {
-        Span<byte> b = stackalloc byte[SecureMemory.PageSize];
-        Span<byte> c = stackalloc byte[b.Length];
-        RandomNumberGenerator.Fill(b);
-        b.CopyTo(c);
-
-        SecureMemory.LockMemory(b);
-
-        Assert.IsTrue(b.SequenceEqual(c));
-
-        SecureMemory.UnlockAndZeroMemory(b);
-
-        Assert.IsTrue(b.SequenceEqual(new byte[b.Length]));
-    }
-
-    [TestMethod]
-    [DynamicData(nameof(InvalidLockMemorySizes), DynamicDataSourceType.Method)]
-    public void LockMemory_UnlockAndZeroMemory_Invalid(int bufferSize)
-    {
-        var b = new byte[bufferSize];
-
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureMemory.LockMemory(b));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureMemory.UnlockAndZeroMemory(b));
-    }
-
-    [TestMethod]
-    public void LockMemory_UnlockAndZeroMemory_InvalidOperation()
-    {
-        var b = new byte[SecureMemory.PageSize * 65536];
-
-        // This test fails on macOS - it apparently allows large amounts of memory to be locked
-        if (!OperatingSystem.IsMacOS()) {
-            Assert.ThrowsException<OutOfMemoryException>(() => SecureMemory.LockMemory(b));
-        }
-        // This test fails on Linux/macOS - munlock() must not return an error despite no locking taking place
-        if (OperatingSystem.IsWindows()) {
-            Assert.ThrowsException<InvalidOperationException>(() => SecureMemory.UnlockAndZeroMemory(b));
-        }
     }
 
     [TestMethod]
