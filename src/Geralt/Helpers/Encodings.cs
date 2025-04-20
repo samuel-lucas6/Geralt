@@ -1,5 +1,4 @@
 ﻿using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using static Interop.Libsodium;
 
 namespace Geralt;
@@ -27,7 +26,7 @@ public static class Encodings
             return Marshal.PtrToStringAnsi(ret) ?? throw new FormatException("Error converting bytes to hex.");
         }
         finally {
-            CryptographicOperations.ZeroMemory(hex);
+            SecureMemory.ZeroMemory(hex);
         }
     }
 
@@ -53,7 +52,7 @@ public static class Encodings
             return Marshal.PtrToStringAnsi(ret) ?? throw new FormatException("Error converting bytes to Base64.");
         }
         finally {
-            CryptographicOperations.ZeroMemory(base64);
+            SecureMemory.ZeroMemory(base64);
         }
     }
 

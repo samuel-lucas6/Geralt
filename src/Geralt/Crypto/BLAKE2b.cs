@@ -37,7 +37,7 @@ public static class BLAKE2b
         while ((bytesRead = message.Read(buffer)) > 0) {
             blake2b.Update(buffer[..bytesRead]);
         }
-        CryptographicOperations.ZeroMemory(buffer);
+        SecureMemory.ZeroMemory(buffer);
         blake2b.Finalize(hash);
     }
 
@@ -57,7 +57,7 @@ public static class BLAKE2b
         Span<byte> computedTag = stackalloc byte[tag.Length];
         ComputeTag(computedTag, message, key);
         bool equal = ConstantTime.Equals(tag, computedTag);
-        CryptographicOperations.ZeroMemory(computedTag);
+        SecureMemory.ZeroMemory(computedTag);
         return equal;
     }
 

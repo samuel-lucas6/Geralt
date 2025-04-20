@@ -66,7 +66,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
         Span<byte> computedHash = stackalloc byte[_hashSize];
         Finalize(computedHash);
         bool equal = ConstantTime.Equals(hash, computedHash);
-        CryptographicOperations.ZeroMemory(computedHash);
+        SecureMemory.ZeroMemory(computedHash);
         return equal;
     }
 

@@ -57,7 +57,7 @@ public static class X25519
         blake2b.Update(senderPublicKey);
         blake2b.Update(recipientPublicKey);
         blake2b.Finalize(sharedKey);
-        CryptographicOperations.ZeroMemory(sharedSecret);
+        SecureMemory.ZeroMemory(sharedSecret);
     }
 
     public static void DeriveRecipientSharedKey(Span<byte> sharedKey, ReadOnlySpan<byte> recipientPrivateKey, ReadOnlySpan<byte> senderPublicKey, ReadOnlySpan<byte> preSharedKey = default)
@@ -75,7 +75,7 @@ public static class X25519
         blake2b.Update(senderPublicKey);
         blake2b.Update(recipientPublicKey);
         blake2b.Finalize(sharedKey);
-        CryptographicOperations.ZeroMemory(sharedSecret);
+        SecureMemory.ZeroMemory(sharedSecret);
     }
 
     public static void ComputeSharedSecret(Span<byte> sharedSecret, ReadOnlySpan<byte> senderPrivateKey, ReadOnlySpan<byte> recipientPublicKey)

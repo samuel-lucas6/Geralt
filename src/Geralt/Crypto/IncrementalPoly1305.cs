@@ -54,7 +54,7 @@ public sealed class IncrementalPoly1305 : IDisposable
         Span<byte> computedTag = stackalloc byte[TagSize];
         Finalize(computedTag);
         bool equal = ConstantTime.Equals(tag, computedTag);
-        CryptographicOperations.ZeroMemory(computedTag);
+        SecureMemory.ZeroMemory(computedTag);
         return equal;
     }
 
