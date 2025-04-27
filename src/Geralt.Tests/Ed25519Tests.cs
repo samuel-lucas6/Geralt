@@ -410,18 +410,18 @@ public class Ed25519Tests
     [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
     public void Incremental_Verify_Tampered(string signature, string message, string privateKey)
     {
-        var parameters = new List<byte[]>
+        var parameters = new Dictionary<string, byte[]>
         {
-            Convert.FromHexString(signature),
-            Convert.FromHexString(message),
-            Convert.FromHexString(privateKey)[^Ed25519.PublicKeySize..]
+            { "s", Convert.FromHexString(signature) },
+            { "m", Convert.FromHexString(message) },
+            { "pk", Convert.FromHexString(privateKey)[^Ed25519.PublicKeySize..] }
         };
 
-        foreach (var param in parameters.Where(param => param.Length != 0)) {
+        foreach (var param in parameters.Values.Where(param => param.Length > 0)) {
             param[0]++;
             using var ed25519ph = new IncrementalEd25519ph();
-            ed25519ph.Update(parameters[1]);
-            bool valid = ed25519ph.FinalizeAndVerify(parameters[0], parameters[2]);
+            ed25519ph.Update(parameters["m"]);
+            bool valid = ed25519ph.FinalizeAndVerify(parameters["s"], parameters["pk"]);
             param[0]--;
             Assert.IsFalse(valid);
         }

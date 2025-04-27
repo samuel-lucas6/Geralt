@@ -241,16 +241,16 @@ public class BLAKE2bTests
     [DynamicData(nameof(KeyedTestVectors), DynamicDataSourceType.Method)]
     public void VerifyTag_Tampered(string tag, string message, string key)
     {
-        var parameters = new List<byte[]>
+        var parameters = new Dictionary<string, byte[]>
         {
-            Convert.FromHexString(tag),
-            Convert.FromHexString(message),
-            Convert.FromHexString(key)
+            { "t", Convert.FromHexString(tag) },
+            { "m", Convert.FromHexString(message) },
+            { "k", Convert.FromHexString(key) }
         };
 
-        foreach (var param in parameters.Where(param => param.Length != 0)) {
+        foreach (var param in parameters.Values.Where(param => param.Length > 0)) {
             param[0]++;
-            bool valid = BLAKE2b.VerifyTag(parameters[0], parameters[1], parameters[2]);
+            bool valid = BLAKE2b.VerifyTag(parameters["t"], parameters["m"], parameters["k"]);
             param[0]--;
             Assert.IsFalse(valid);
         }
@@ -430,18 +430,18 @@ public class BLAKE2bTests
     [DynamicData(nameof(KeyedTestVectors), DynamicDataSourceType.Method)]
     public void Incremental_Verify_Tampered(string hash, string message, string key)
     {
-        var parameters = new List<byte[]>
+        var parameters = new Dictionary<string, byte[]>
         {
-            Convert.FromHexString(hash),
-            Convert.FromHexString(message),
-            Convert.FromHexString(key)
+            { "h", Convert.FromHexString(hash) },
+            { "m", Convert.FromHexString(message) },
+            { "k", Convert.FromHexString(key) }
         };
 
-        foreach (var param in parameters.Where(param => param.Length > 0)) {
+        foreach (var param in parameters.Values.Where(param => param.Length > 0)) {
             param[0]++;
-            using var blake2b = new IncrementalBLAKE2b(parameters[0].Length, parameters[2]);
-            blake2b.Update(parameters[1]);
-            bool valid = blake2b.FinalizeAndVerify(parameters[0]);
+            using var blake2b = new IncrementalBLAKE2b(parameters["h"].Length, parameters["k"]);
+            blake2b.Update(parameters["m"]);
+            bool valid = blake2b.FinalizeAndVerify(parameters["h"]);
             param[0]--;
             Assert.IsFalse(valid);
         }

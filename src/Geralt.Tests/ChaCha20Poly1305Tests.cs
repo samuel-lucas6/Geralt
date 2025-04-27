@@ -90,17 +90,17 @@ public class ChaCha20Poly1305Tests
     public void Decrypt_Tampered(string ciphertext, string plaintext, string nonce, string key, string associatedData)
     {
         var p = new byte[plaintext.Length / 2];
-        var parameters = new List<byte[]>
+        var parameters = new Dictionary<string, byte[]>
         {
-            Convert.FromHexString(ciphertext),
-            Convert.FromHexString(nonce),
-            Convert.FromHexString(key),
-            Convert.FromHexString(associatedData)
+            { "c", Convert.FromHexString(ciphertext) },
+            { "n", Convert.FromHexString(nonce) },
+            { "k", Convert.FromHexString(key) },
+            { "ad", Convert.FromHexString(associatedData) }
         };
 
-        foreach (var param in parameters) {
+        foreach (var param in parameters.Values.Where(param => param.Length > 0)) {
             param[0]++;
-            Assert.ThrowsException<CryptographicException>(() => ChaCha20Poly1305.Decrypt(p, parameters[0], parameters[1], parameters[2], parameters[3]));
+            Assert.ThrowsException<CryptographicException>(() => ChaCha20Poly1305.Decrypt(p, parameters["c"], parameters["n"], parameters["k"], parameters["ad"]));
             param[0]--;
         }
         Assert.IsTrue(p.SequenceEqual(new byte[p.Length]));

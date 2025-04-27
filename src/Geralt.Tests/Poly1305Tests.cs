@@ -77,16 +77,16 @@ public class Poly1305Tests
     [DynamicData(nameof(Rfc8439TestVectors), DynamicDataSourceType.Method)]
     public void VerifyTag_Tampered(string tag, string message, string oneTimeKey)
     {
-        var parameters = new List<byte[]>
+        var parameters = new Dictionary<string, byte[]>
         {
-            Convert.FromHexString(tag),
-            Convert.FromHexString(message),
-            Convert.FromHexString(oneTimeKey)
+            { "t", Convert.FromHexString(tag) },
+            { "m", Convert.FromHexString(message) },
+            { "k", Convert.FromHexString(oneTimeKey) }
         };
 
-        foreach (var param in parameters) {
+        foreach (var param in parameters.Values.Where(param => param.Length > 0)) {
             param[0]++;
-            bool valid = Poly1305.VerifyTag(parameters[0], parameters[1], parameters[2]);
+            bool valid = Poly1305.VerifyTag(parameters["t"], parameters["m"], parameters["k"]);
             param[0]--;
             Assert.IsFalse(valid);
         }
@@ -188,18 +188,18 @@ public class Poly1305Tests
     [DynamicData(nameof(Rfc8439TestVectors), DynamicDataSourceType.Method)]
     public void Incremental_Verify_Tampered(string tag, string message, string oneTimeKey)
     {
-        var parameters = new List<byte[]>
+        var parameters = new Dictionary<string, byte[]>
         {
-            Convert.FromHexString(tag),
-            Convert.FromHexString(message),
-            Convert.FromHexString(oneTimeKey)
+            { "t", Convert.FromHexString(tag) },
+            { "m", Convert.FromHexString(message) },
+            { "k", Convert.FromHexString(oneTimeKey) }
         };
 
-        foreach (var param in parameters.Where(param => param.Length > 0)) {
+        foreach (var param in parameters.Values.Where(param => param.Length > 0)) {
             param[0]++;
-            using var poly1305 = new IncrementalPoly1305(parameters[2]);
-            poly1305.Update(parameters[1]);
-            bool valid = poly1305.FinalizeAndVerify(parameters[0]);
+            using var poly1305 = new IncrementalPoly1305(parameters["k"]);
+            poly1305.Update(parameters["m"]);
+            bool valid = poly1305.FinalizeAndVerify(parameters["t"]);
             param[0]--;
             Assert.IsFalse(valid);
         }
