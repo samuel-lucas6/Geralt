@@ -48,11 +48,22 @@ public sealed class GuardedHeapAllocation : IDisposable
 
     public void Dispose()
     {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool disposing)
+    {
         if (_disposed) { return; }
         // This calls sodium_mprotect_readwrite internally
         sodium_free(_pointer);
         _pointer = IntPtr.Zero;
         _size = 0;
         _disposed = true;
+    }
+
+    ~GuardedHeapAllocation()
+    {
+        Dispose(false);
     }
 }
