@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFrameworks>net8.0</TargetFrameworks>
-        <TargetFrameworks Condition="'$(RUNNER_OS)'=='Windows'">net8.0;net8.0-ios;net8.0-tvos;net8.0-maccatalyst</TargetFrameworks>
+        <TargetFrameworks Condition="'$(RUNNER_OS)'=='Windows'">net8.0;net9.0-ios;net9.0-tvos;net9.0-maccatalyst</TargetFrameworks>
         <Version>3.3.0</Version>
         <Authors>Samuel Lucas</Authors>
         <Description>A modern cryptographic library for .NET 8+ based on libsodium and inspired by Monocypher.</Description>
