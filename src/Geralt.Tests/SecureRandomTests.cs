@@ -103,6 +103,7 @@ public class SecureRandomTests
     public void GetPassphrase_Invalid(int wordCount)
     {
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.GetPassphrase(wordCount));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.GetPassphrase(ReadOnlySpan<string>.Empty, SecureRandom.MinWordCount));
     }
 
     [TestMethod]

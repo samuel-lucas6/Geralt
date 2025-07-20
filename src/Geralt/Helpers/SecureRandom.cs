@@ -51,10 +51,10 @@ public static class SecureRandom
         return stringBuilder.ToString();
     }
 
-    public static char[] GetPassphrase(int wordCount, char separatorChar = '-', bool capitalize = false, bool includeNumber = false)
+    public static char[] GetPassphrase(ReadOnlySpan<string> wordlist, int wordCount, char separatorChar = '-', bool capitalize = false, bool includeNumber = false)
     {
+        Validation.NotEmpty(nameof(wordlist), wordlist.Length);
         Validation.SizeBetween(nameof(wordCount), wordCount, MinWordCount, MaxWordCount);
-        Span<string> wordlist = GetWordlist();
         int numberIndex = 0;
         if (includeNumber) { numberIndex = GetInt32(wordCount); }
         var passphrase = new List<char>();
@@ -65,6 +65,12 @@ public static class SecureRandom
             if (i != wordCount - 1) { passphrase.Add(separatorChar); }
         }
         return passphrase.ToArray();
+    }
+
+    public static char[] GetPassphrase(int wordCount, char separatorChar = '-', bool capitalize = false, bool includeNumber = false)
+    {
+        ReadOnlySpan<string> wordlist = GetWordlist();
+        return GetPassphrase(wordlist, wordCount, separatorChar, capitalize, includeNumber);
     }
 
     public static Span<string> GetWordlist()
