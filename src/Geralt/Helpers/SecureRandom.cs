@@ -9,7 +9,7 @@ public static class SecureRandom
     public const int SeedSize = randombytes_SEEDBYTES;
     public const string AlphabeticChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     public const string NumericChars = "0123456789";
-    public const string SymbolChars = "!#$%&'()*+,-./:;<=>?@[]^_`{}~";
+    public const string SymbolChars = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
     public const string AlphanumericChars = AlphabeticChars + NumericChars;
     public const string AlphanumericSymbolChars = AlphanumericChars + SymbolChars;
     public const int MinUpperBound = 2;

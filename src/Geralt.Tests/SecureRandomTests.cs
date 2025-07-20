@@ -9,7 +9,7 @@ public class SecureRandomTests
         Assert.AreEqual(32, SecureRandom.SeedSize);
         Assert.AreEqual("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", SecureRandom.AlphabeticChars);
         Assert.AreEqual("0123456789", SecureRandom.NumericChars);
-        Assert.AreEqual("!#$%&'()*+,-./:;<=>?@[]^_`{}~", SecureRandom.SymbolChars);
+        Assert.AreEqual("!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~", SecureRandom.SymbolChars);
         Assert.AreEqual(SecureRandom.AlphabeticChars + SecureRandom.NumericChars, SecureRandom.AlphanumericChars);
         Assert.AreEqual(SecureRandom.AlphanumericChars + SecureRandom.SymbolChars, SecureRandom.AlphanumericSymbolChars);
         Assert.AreEqual(2, SecureRandom.MinUpperBound);
