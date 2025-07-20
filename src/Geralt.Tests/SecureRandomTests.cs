@@ -1,3 +1,5 @@
+using System.Buffers;
+
 namespace Geralt.Tests;
 
 [TestClass]
@@ -119,5 +121,23 @@ public class SecureRandomTests
     public void GetString_Invalid(int length)
     {
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.GetString(length));
+    }
+
+    [TestMethod]
+    public void GetWordlist_Valid()
+    {
+        SearchValues<char> invalidChars = SearchValues.Create([' ', '\n', '\r']);
+        SearchValues<char> symbolChars = SearchValues.Create(SecureRandom.SymbolChars);
+
+        Span<string> wordlist = SecureRandom.GetWordlist();
+
+        Assert.AreEqual(7772, wordlist.Length);
+        Assert.AreEqual("abacus", wordlist[0]);
+        Assert.AreEqual("zoom", wordlist[^1]);
+        foreach (ReadOnlySpan<char> word in wordlist) {
+            Assert.IsFalse(word.IsEmpty);
+            Assert.AreEqual(-1, word.IndexOfAny(invalidChars));
+            Assert.AreEqual(-1, word.IndexOfAny(symbolChars));
+        }
     }
 }
