@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-using System.Text;
-using static Interop.Libsodium;
+﻿using static Interop.Libsodium;
 
 namespace Geralt;
 
@@ -13,8 +11,11 @@ public static class SecureRandom
     public const string AlphanumericChars = AlphabeticChars + NumericChars;
     public const string AlphanumericSymbolChars = AlphanumericChars + SymbolChars;
     public const int MinUpperBound = 2;
-    public const int MinStringLength = 8;
-    public const int MaxStringLength = 128;
+    public const int MinStringSize = 8;
+    public const int MaxStringSize = 128;
+    public const int MinCharacterSetSize = MinUpperBound;
+    public const int LongestWordSize = 9;
+    public const int MinWordlistSize = MinUpperBound;
     public const int MinWordCount = 4;
     public const int MaxWordCount = 20;
 
@@ -40,40 +41,70 @@ public static class SecureRandom
         return randombytes_uniform((uint)upperBound);
     }
 
-    public static string GetString(int length, string characterSet = AlphanumericChars)
+    public static void GenerateString(Span<char> buffer, ReadOnlySpan<char> characterSet)
     {
-        Validation.SizeBetween(nameof(length), length, MinStringLength, MaxStringLength);
-        Validation.NotNullOrEmpty(nameof(characterSet), characterSet);
-        var stringBuilder = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            stringBuilder.Append(characterSet[GetInt32(characterSet.Length)]);
+        Validation.SizeBetween(nameof(buffer), buffer.Length, MinStringSize, MaxStringSize);
+        Validation.NotLessThanMin(nameof(characterSet), characterSet.Length, MinCharacterSetSize);
+        for (int i = 0; i < buffer.Length; i++) {
+            buffer[i] = characterSet[GetInt32(characterSet.Length)];
         }
-        return stringBuilder.ToString();
     }
 
-    public static char[] GetPassphrase(ReadOnlySpan<string> wordlist, int wordCount, char separatorChar = '-', bool capitalize = false, bool includeNumber = false)
+    public static int GeneratePassphrase(Span<char> buffer, ReadOnlySpan<string> wordlist, int wordCount, char separatorChar = '-', bool capitalize = false, bool includeNumber = false)
     {
-        Validation.NotEmpty(nameof(wordlist), wordlist.Length);
+        Validation.NotLessThanMin(nameof(wordlist), wordlist.Length, MinWordlistSize);
         Validation.SizeBetween(nameof(wordCount), wordCount, MinWordCount, MaxWordCount);
+        if (char.IsControl(separatorChar)) {
+            throw new ArgumentOutOfRangeException(nameof(separatorChar), separatorChar, $"{nameof(separatorChar)} must not be a control character.");
+        }
+        int longestWord = 0;
+        ReadOnlySpan<char> invalidChars = [' ', '\0', '\r', '\n'];
+        foreach (ReadOnlySpan<char> word in wordlist) {
+            Validation.NotEmpty(nameof(word), word.Length);
+            if (word.ContainsAny(invalidChars)) {
+                throw new FormatException($"{nameof(wordlist)} must not contain whitespace, null, or newline characters.");
+            }
+            if (word.Length > longestWord) {
+                longestWord = word.Length;
+            }
+        }
+        Validation.EqualToSize(nameof(buffer), buffer.Length, GetPassphraseBufferSize(longestWord, wordCount, includeNumber));
         int numberIndex = 0;
         if (includeNumber) { numberIndex = GetInt32(wordCount); }
-        var passphrase = new List<char>();
+        int bufferIndex = 0;
         for (int i = 0; i < wordCount; i++) {
+            int wordIndex = bufferIndex;
             int randomIndex = GetInt32(wordlist.Length);
-            passphrase.AddRange(capitalize ? CultureInfo.InvariantCulture.TextInfo.ToTitleCase(wordlist[randomIndex]) : wordlist[randomIndex]);
-            if (includeNumber && i == numberIndex) { passphrase.Add(char.Parse(GetInt32(NumericChars.Length).ToString())); }
-            if (i != wordCount - 1) { passphrase.Add(separatorChar); }
+            foreach (char c in wordlist[randomIndex]) {
+                if (capitalize && bufferIndex == wordIndex) {
+                    buffer[bufferIndex++] = char.ToUpperInvariant(c);
+                    continue;
+                }
+                buffer[bufferIndex++] = c;
+            }
+            if (includeNumber && i == numberIndex) {
+                buffer[bufferIndex++] = (char)('0' + GetInt32(NumericChars.Length));
+            }
+            if (i != wordCount - 1) {
+                buffer[bufferIndex++] = separatorChar;
+            }
         }
-        return passphrase.ToArray();
+        return bufferIndex;
     }
 
-    public static char[] GetPassphrase(int wordCount, char separatorChar = '-', bool capitalize = false, bool includeNumber = false)
+    public static int GeneratePassphrase(Span<char> buffer, int wordCount, char separatorChar = '-', bool capitalize = false, bool includeNumber = false)
     {
         ReadOnlySpan<string> wordlist = GetWordlist();
-        return GetPassphrase(wordlist, wordCount, separatorChar, capitalize, includeNumber);
+        return GeneratePassphrase(buffer, wordlist, wordCount, separatorChar, capitalize, includeNumber);
     }
 
-    public static Span<string> GetWordlist()
+    public static int GetPassphraseBufferSize(int longestWord, int wordCount, bool includeNumber)
+    {
+        // Need to account for the separator chars and number
+        return longestWord * wordCount + (includeNumber ? wordCount : wordCount - 1);
+    }
+
+    public static ReadOnlySpan<string> GetWordlist()
     {
         return Properties.Resources.wordlist.ReplaceLineEndings().Split(separator: Environment.NewLine, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
     }

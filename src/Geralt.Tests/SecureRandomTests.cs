@@ -15,8 +15,11 @@ public class SecureRandomTests
         Assert.AreEqual(SecureRandom.AlphabeticChars + SecureRandom.NumericChars, SecureRandom.AlphanumericChars);
         Assert.AreEqual(SecureRandom.AlphanumericChars + SecureRandom.SymbolChars, SecureRandom.AlphanumericSymbolChars);
         Assert.AreEqual(2, SecureRandom.MinUpperBound);
-        Assert.AreEqual(8, SecureRandom.MinStringLength);
-        Assert.AreEqual(128, SecureRandom.MaxStringLength);
+        Assert.AreEqual(8, SecureRandom.MinStringSize);
+        Assert.AreEqual(SecureRandom.MinUpperBound, SecureRandom.MinCharacterSetSize);
+        Assert.AreEqual(128, SecureRandom.MaxStringSize);
+        Assert.AreEqual(9, SecureRandom.LongestWordSize);
+        Assert.AreEqual(SecureRandom.MinUpperBound, SecureRandom.MinWordlistSize);
         Assert.AreEqual(4, SecureRandom.MinWordCount);
         Assert.AreEqual(20, SecureRandom.MaxWordCount);
     }
@@ -79,66 +82,98 @@ public class SecureRandomTests
     }
 
     [TestMethod]
+    public void GenerateString_Valid()
+    {
+        Span<char> buffer = stackalloc char[SecureRandom.MinStringSize];
+        ReadOnlySpan<char> characterSet = SecureRandom.AlphabeticChars;
+
+        SecureRandom.GenerateString(buffer, characterSet);
+
+        foreach (char c in buffer) {
+            Assert.IsTrue(characterSet.Contains(c));
+        }
+    }
+
+    [TestMethod]
+    [DataRow(SecureRandom.MaxStringSize + 1, SecureRandom.MinCharacterSetSize)]
+    [DataRow(SecureRandom.MinStringSize - 1, SecureRandom.MinCharacterSetSize)]
+    [DataRow(SecureRandom.MinStringSize, SecureRandom.MinCharacterSetSize - 1)]
+    [DataRow(SecureRandom.MinStringSize, 0)]
+    public void GenerateString_Invalid(int bufferSize, int characterSetSize)
+    {
+        var buffer = new char[bufferSize];
+        var characterSet = new char[characterSetSize];
+
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.GenerateString(buffer, characterSet));
+    }
+
+    [TestMethod]
     [DataRow(SecureRandom.MinWordCount, ' ', false, false)]
     [DataRow(SecureRandom.MaxWordCount, ' ', false, false)]
     [DataRow(SecureRandom.MinWordCount, '_', false, false)]
     [DataRow(SecureRandom.MinWordCount, ' ', true, false)]
     [DataRow(SecureRandom.MinWordCount, ' ', false, true)]
     [DataRow(SecureRandom.MinWordCount, ' ', true, true)]
-    public void GetPassphrase_Valid(int wordCount, char separatorChar, bool capitalize, bool includeNumber)
+    public void GeneratePassphrase_Valid(int wordCount, char separatorChar, bool capitalize, bool includeNumber)
     {
-        char[] passphrase = SecureRandom.GetPassphrase(wordCount, separatorChar, capitalize, includeNumber);
+        Span<char> buffer = stackalloc char[SecureRandom.GetPassphraseBufferSize(SecureRandom.LongestWordSize, wordCount, includeNumber)];
+        buffer.Clear();
+
+        int passphraseSize = SecureRandom.GeneratePassphrase(buffer, wordCount, separatorChar, capitalize, includeNumber);
+        var passphrase = buffer[..passphraseSize].ToArray();
 
         Assert.AreEqual(wordCount - 1, passphrase.Count(c => c == separatorChar));
         Assert.AreNotEqual(separatorChar, passphrase[^1]);
-        Assert.AreEqual(capitalize ? wordCount : 0, passphrase.Count(char.IsUpper));
         Assert.AreEqual(capitalize, char.IsUpper(passphrase[0]));
-        Assert.AreEqual(includeNumber, passphrase.Any(char.IsDigit));
-        Assert.IsFalse(passphrase.Any(c => c is '\n' or '\r'));
+        Assert.AreEqual(capitalize ? wordCount : 0, passphrase.Count(char.IsUpper));
+        Assert.AreEqual(includeNumber ? 1 : 0, passphrase.Count(char.IsDigit));
+        Assert.IsFalse(passphrase.Any(c => c is '\0' or '\r' or '\n'));
+        Assert.IsTrue(buffer[passphraseSize..].SequenceEqual(new char[buffer.Length - passphraseSize]));
     }
 
     [TestMethod]
-    [DataRow(SecureRandom.MaxWordCount + 1)]
-    [DataRow(SecureRandom.MinWordCount - 1)]
-    public void GetPassphrase_Invalid(int wordCount)
+    [DataRow(1, SecureRandom.MinWordlistSize, SecureRandom.MaxWordCount, '-')]
+    [DataRow(-1, SecureRandom.MinWordlistSize, SecureRandom.MaxWordCount, '-')]
+    [DataRow(0, SecureRandom.MinWordlistSize - 1, SecureRandom.MaxWordCount, '-')]
+    [DataRow(0, 0, SecureRandom.MaxWordCount, '-')]
+    [DataRow(0, null, SecureRandom.MaxWordCount, '-')]
+    [DataRow(0, SecureRandom.MinWordlistSize, SecureRandom.MaxWordCount + 1, '-')]
+    [DataRow(0, SecureRandom.MinWordlistSize, SecureRandom.MinWordCount - 1, '-')]
+    [DataRow(0, SecureRandom.MinWordlistSize, SecureRandom.MinWordCount, '\0')]
+    [DataRow(0, SecureRandom.MinWordlistSize, SecureRandom.MinWordCount, '\r')]
+    [DataRow(0, SecureRandom.MinWordlistSize, SecureRandom.MinWordCount, '\n')]
+    public void GeneratePassphrase_Invalid(int bufferSizeAdjustment, int? wordlistSize, int wordCount, char separatorChar)
     {
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.GetPassphrase(wordCount));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.GetPassphrase(ReadOnlySpan<string>.Empty, SecureRandom.MinWordCount));
-    }
+        var buffer = new char[SecureRandom.GetPassphraseBufferSize(SecureRandom.LongestWordSize, wordCount, includeNumber: false) + bufferSizeAdjustment];
+        string[] wordlist = wordlistSize switch {
+            null => [null!, null!],
+            SecureRandom.MinWordlistSize => ["test1", "test2"],
+            _ => ["test1"]
+        };
 
-    [TestMethod]
-    public void GetString_Valid()
-    {
-        int length = SecureRandom.MaxStringLength;
-        string random = SecureRandom.GetString(length, SecureRandom.AlphabeticChars);
-
-        Assert.AreEqual(length, random.Length);
-        Assert.IsTrue(random.All(char.IsLetter));
-    }
-
-    [TestMethod]
-    [DataRow(SecureRandom.MaxStringLength + 1)]
-    [DataRow(SecureRandom.MinStringLength - 1)]
-    public void GetString_Invalid(int length)
-    {
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.GetString(length));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.GeneratePassphrase(buffer, wordlist, wordCount, separatorChar));
+        if (separatorChar is '\0' or '\r' or '\n') {
+            string invalidChar = separatorChar.ToString();
+            Assert.ThrowsException<FormatException>(() => SecureRandom.GeneratePassphrase(buffer, new[] {invalidChar, invalidChar}, wordCount));
+        }
     }
 
     [TestMethod]
     public void GetWordlist_Valid()
     {
-        SearchValues<char> invalidChars = SearchValues.Create([' ', '\n', '\r']);
-        SearchValues<char> symbolChars = SearchValues.Create(SecureRandom.SymbolChars);
+        var invalidChars = SearchValues.Create([' ', '\0', '\r', '\n']);
+        var symbolChars = SearchValues.Create(SecureRandom.SymbolChars);
 
-        Span<string> wordlist = SecureRandom.GetWordlist();
+        ReadOnlySpan<string> wordlist = SecureRandom.GetWordlist();
 
+        // EFF's long wordlist is 7776, but I've removed hyphenated words
         Assert.AreEqual(7772, wordlist.Length);
         Assert.AreEqual("abacus", wordlist[0]);
         Assert.AreEqual("zoom", wordlist[^1]);
         foreach (ReadOnlySpan<char> word in wordlist) {
             Assert.IsFalse(word.IsEmpty);
-            Assert.AreEqual(-1, word.IndexOfAny(invalidChars));
-            Assert.AreEqual(-1, word.IndexOfAny(symbolChars));
+            Assert.IsFalse(word.ContainsAny(invalidChars));
+            Assert.IsFalse(word.ContainsAny(symbolChars));
         }
     }
 }
