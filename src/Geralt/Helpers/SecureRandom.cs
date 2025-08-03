@@ -14,6 +14,8 @@ public static class SecureRandom
     public const int MinStringSize = 8;
     public const int MaxStringSize = 128;
     public const int MinCharacterSetSize = MinUpperBound;
+    public const int MinLongestWordSize = 1;
+    public const int MaxLongestWordSize = 45; // Longest word in the English dictionary
     public const int LongestWordSize = 9;
     public const int MinWordlistSize = MinUpperBound;
     public const int MinWordCount = 4;
@@ -53,7 +55,6 @@ public static class SecureRandom
     public static int GeneratePassphrase(Span<char> buffer, ReadOnlySpan<string> wordlist, int wordCount, char separatorChar = '-', bool capitalize = false, bool includeNumber = false)
     {
         Validation.NotLessThanMin(nameof(wordlist), wordlist.Length, MinWordlistSize);
-        Validation.SizeBetween(nameof(wordCount), wordCount, MinWordCount, MaxWordCount);
         if (char.IsControl(separatorChar)) {
             throw new ArgumentOutOfRangeException(nameof(separatorChar), separatorChar, $"{nameof(separatorChar)} must not be a control character.");
         }
@@ -100,6 +101,8 @@ public static class SecureRandom
 
     public static int GetPassphraseBufferSize(int longestWord, int wordCount, bool includeNumber)
     {
+        Validation.SizeBetween(nameof(longestWord), longestWord, MinLongestWordSize, MaxLongestWordSize);
+        Validation.SizeBetween(nameof(wordCount), wordCount, MinWordCount, MaxWordCount);
         // Need to account for the separator chars and number
         return longestWord * wordCount + (includeNumber ? wordCount : wordCount - 1);
     }
