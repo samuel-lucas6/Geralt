@@ -32,7 +32,7 @@ public class SecureMemoryTests
 
     [TestMethod]
     [DataRow(0)]
-    [DataRow(SecureRandom.MinStringLength)]
+    [DataRow(SecureRandom.MinStringSize)]
     public void ZeroMemory_Chars_Valid(int bufferSize)
     {
         Span<char> b = stackalloc char[bufferSize];
@@ -46,7 +46,7 @@ public class SecureMemoryTests
     [TestMethod]
     public void ZeroMemory_String_Valid()
     {
-        ReadOnlySpan<char> s = RandomNumberGenerator.GetString(SecureRandom.AlphanumericSymbolChars, SecureRandom.MinStringLength).AsSpan();
+        ReadOnlySpan<char> s = RandomNumberGenerator.GetString(SecureRandom.AlphanumericSymbolChars, SecureRandom.MinStringSize).AsSpan();
 
         SecureMemory.ZeroMemory(s);
 
