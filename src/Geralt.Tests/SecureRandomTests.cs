@@ -118,7 +118,7 @@ public class SecureRandomTests
     [DataRow(SecureRandom.MinWordCount, ' ', true, true)]
     public void GeneratePassphrase_Valid(int wordCount, char separatorChar, bool capitalize, bool includeNumber)
     {
-        Span<char> buffer = stackalloc char[SecureRandom.GetPassphraseBufferSize(SecureRandom.LongestWordSize, wordCount, includeNumber)];
+        Span<char> buffer = stackalloc char[SecureRandom.GetPassphraseBufferSize(SecureRandom.LongestWordSize, wordCount)];
         buffer.Clear();
 
         int passphraseSize = SecureRandom.GeneratePassphrase(buffer, wordCount, separatorChar, capitalize, includeNumber);
@@ -162,29 +162,25 @@ public class SecureRandomTests
     }
 
     [TestMethod]
-    [DataRow(8, 1, SecureRandom.MinWordCount, true)]
-    [DataRow(7, 1, SecureRandom.MinWordCount, false)]
-    [DataRow(184, 45, SecureRandom.MinWordCount, true)]
-    [DataRow(183, 45, SecureRandom.MinWordCount, false)]
-    [DataRow(40, 1, SecureRandom.MaxWordCount, true)]
-    [DataRow(39, 1, SecureRandom.MaxWordCount, false)]
-    [DataRow(920, 45, SecureRandom.MaxWordCount, true)]
-    [DataRow(919, 45, SecureRandom.MaxWordCount, false)]
-    public void GetPassphraseBufferSize_Valid(int bufferSize, int longestWord, int wordCount, bool includeNumber)
+    [DataRow(8, 1, SecureRandom.MinWordCount)]
+    [DataRow(184, 45, SecureRandom.MinWordCount)]
+    [DataRow(40, 1, SecureRandom.MaxWordCount)]
+    [DataRow(920, 45, SecureRandom.MaxWordCount)]
+    public void GetPassphraseBufferSize_Valid(int bufferSize, int longestWord, int wordCount)
     {
-        int size = SecureRandom.GetPassphraseBufferSize(longestWord, wordCount, includeNumber);
+        int size = SecureRandom.GetPassphraseBufferSize(longestWord, wordCount);
 
         Assert.AreEqual(bufferSize, size);
     }
 
     [TestMethod]
-    [DataRow(SecureRandom.MaxLongestWordSize + 1, SecureRandom.MinWordCount, true)]
-    [DataRow(SecureRandom.MinLongestWordSize - 1, SecureRandom.MinWordCount, true)]
-    [DataRow(SecureRandom.LongestWordSize, SecureRandom.MaxWordCount + 1, true)]
-    [DataRow(SecureRandom.LongestWordSize, SecureRandom.MinWordCount - 1, true)]
-    public void GetPassphraseBufferSize_Invalid(int longestWord, int wordCount, bool includeNumber)
+    [DataRow(SecureRandom.MaxLongestWordSize + 1, SecureRandom.MinWordCount)]
+    [DataRow(SecureRandom.MinLongestWordSize - 1, SecureRandom.MinWordCount)]
+    [DataRow(SecureRandom.LongestWordSize, SecureRandom.MaxWordCount + 1)]
+    [DataRow(SecureRandom.LongestWordSize, SecureRandom.MinWordCount - 1)]
+    public void GetPassphraseBufferSize_Invalid(int longestWord, int wordCount)
     {
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.GetPassphraseBufferSize(longestWord, wordCount, includeNumber));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.GetPassphraseBufferSize(longestWord, wordCount));
     }
 
     [TestMethod]

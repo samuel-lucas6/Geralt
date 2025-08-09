@@ -69,7 +69,7 @@ public static class SecureRandom
                 longestWord = word.Length;
             }
         }
-        Validation.EqualToSize(nameof(buffer), buffer.Length, GetPassphraseBufferSize(longestWord, wordCount, includeNumber));
+        Validation.EqualToSize(nameof(buffer), buffer.Length, GetPassphraseBufferSize(longestWord, wordCount));
         int numberIndex = 0;
         if (includeNumber) { numberIndex = GetInt32(wordCount); }
         int bufferIndex = 0;
@@ -99,12 +99,12 @@ public static class SecureRandom
         return GeneratePassphrase(buffer, wordlist, wordCount, separatorChar, capitalize, includeNumber);
     }
 
-    public static int GetPassphraseBufferSize(int longestWord, int wordCount, bool includeNumber)
+    public static int GetPassphraseBufferSize(int longestWord, int wordCount)
     {
         Validation.SizeBetween(nameof(longestWord), longestWord, MinLongestWordSize, MaxLongestWordSize);
         Validation.SizeBetween(nameof(wordCount), wordCount, MinWordCount, MaxWordCount);
-        // Need to account for the separator chars and number
-        return longestWord * wordCount + (includeNumber ? wordCount : wordCount - 1);
+        // Need to account for the separator chars and a number
+        return (longestWord * wordCount) + wordCount;
     }
 
     public static ReadOnlySpan<string> GetWordlist()
