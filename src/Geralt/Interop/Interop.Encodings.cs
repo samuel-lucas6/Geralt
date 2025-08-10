@@ -11,7 +11,7 @@ internal static partial class Interop
 
         [LibraryImport(DllName, StringMarshalling = StringMarshalling.Utf8)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial int sodium_hex2bin(Span<byte> binary, nuint binaryMaxLength, string hex, nuint hexLength, string ignoreChars, out nuint binaryLength, string? hexEnd);
+        internal static partial int sodium_hex2bin(Span<byte> binary, nuint binaryMaxLength, ReadOnlySpan<byte> hex, nuint hexLength, string ignoreChars, out nuint binaryLength, string? hexEnd);
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -23,6 +23,6 @@ internal static partial class Interop
 
         [LibraryImport(DllName, StringMarshalling = StringMarshalling.Utf8)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial int sodium_base642bin(Span<byte> binary, nuint binaryMaxLength, string base64, nuint base64Length, string ignoreChars, out nuint binaryLength, string? base64End, int variant);
+        internal static partial int sodium_base642bin(Span<byte> binary, nuint binaryMaxLength, ReadOnlySpan<byte> base64, nuint base64Length, string ignoreChars, out nuint binaryLength, string? base64End, int variant);
     }
 }
