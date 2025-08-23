@@ -175,7 +175,7 @@ public class BLAKE2bTests
         var h = new byte[hashSize];
         var m = new byte[messageSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => BLAKE2b.ComputeHash(h, m));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => BLAKE2b.ComputeHash(h, m));
     }
 
     [TestMethod]
@@ -188,15 +188,15 @@ public class BLAKE2bTests
 
         if (messageSize > 0) {
             using var m = new MemoryStream(new byte[messageSize], writable: false);
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => BLAKE2b.ComputeHash(h, m));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => BLAKE2b.ComputeHash(h, m));
 
             h = new byte[BLAKE2b.HashSize];
             m.Close();
-            Assert.ThrowsException<InvalidOperationException>(() => BLAKE2b.ComputeHash(h, m));
+            Assert.ThrowsExactly<InvalidOperationException>(() => BLAKE2b.ComputeHash(h, m));
         }
         else {
             using MemoryStream? m = null;
-            Assert.ThrowsException<ArgumentNullException>(() => BLAKE2b.ComputeHash(h, m));
+            Assert.ThrowsExactly<ArgumentNullException>(() => BLAKE2b.ComputeHash(h, m));
         }
     }
 
@@ -221,7 +221,7 @@ public class BLAKE2bTests
         var m = new byte[messageSize];
         var k = new byte[keySize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => BLAKE2b.ComputeTag(t, m, k));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => BLAKE2b.ComputeTag(t, m, k));
     }
 
     [TestMethod]
@@ -264,7 +264,7 @@ public class BLAKE2bTests
         var m = new byte[messageSize];
         var k = new byte[keySize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => BLAKE2b.VerifyTag(t, m, k));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => BLAKE2b.VerifyTag(t, m, k));
     }
 
     [TestMethod]
@@ -299,7 +299,7 @@ public class BLAKE2bTests
         var s = new byte[saltSize];
         var i = new byte[infoSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => BLAKE2b.DeriveKey(okm, ikm, p, s, i));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => BLAKE2b.DeriveKey(okm, ikm, p, s, i));
     }
 
     [TestMethod]
@@ -456,14 +456,14 @@ public class BLAKE2bTests
         var k = new byte[keySize];
 
         if (keySize is < IncrementalBLAKE2b.MinKeySize or > IncrementalBLAKE2b.MaxKeySize) {
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => new IncrementalBLAKE2b(hashSize, k));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new IncrementalBLAKE2b(hashSize, k));
         }
         else if (hashSize is < IncrementalBLAKE2b.MinHashSize or > IncrementalBLAKE2b.MaxHashSize) {
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => new IncrementalBLAKE2b(hashSize));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new IncrementalBLAKE2b(hashSize));
             using var blake2b = new IncrementalBLAKE2b(IncrementalBLAKE2b.MaxHashSize);
             blake2b.Update(m);
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => blake2b.Finalize(h));
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => blake2b.FinalizeAndVerify(h));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => blake2b.Finalize(h));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => blake2b.FinalizeAndVerify(h));
         }
     }
 
@@ -480,11 +480,11 @@ public class BLAKE2bTests
         blake2b.Update(m);
         blake2b.Finalize(h);
 
-        Assert.ThrowsException<InvalidOperationException>(() => blake2b.Update(m));
-        Assert.ThrowsException<InvalidOperationException>(() => blake2b.Finalize(h));
-        Assert.ThrowsException<InvalidOperationException>(() => blake2b.FinalizeAndVerify(h));
-        Assert.ThrowsException<InvalidOperationException>(() => blake2b.CacheState());
-        Assert.ThrowsException<InvalidOperationException>(() => blake2b.RestoreCachedState());
+        Assert.ThrowsExactly<InvalidOperationException>(() => blake2b.Update(m));
+        Assert.ThrowsExactly<InvalidOperationException>(() => blake2b.Finalize(h));
+        Assert.ThrowsExactly<InvalidOperationException>(() => blake2b.FinalizeAndVerify(h));
+        Assert.ThrowsExactly<InvalidOperationException>(() => blake2b.CacheState());
+        Assert.ThrowsExactly<InvalidOperationException>(() => blake2b.RestoreCachedState());
     }
 
     [TestMethod]
@@ -499,11 +499,11 @@ public class BLAKE2bTests
         blake2b.Update(m);
         blake2b.FinalizeAndVerify(h);
 
-        Assert.ThrowsException<InvalidOperationException>(() => blake2b.Update(m));
-        Assert.ThrowsException<InvalidOperationException>(() => blake2b.Finalize(h));
-        Assert.ThrowsException<InvalidOperationException>(() => blake2b.FinalizeAndVerify(h));
-        Assert.ThrowsException<InvalidOperationException>(() => blake2b.CacheState());
-        Assert.ThrowsException<InvalidOperationException>(() => blake2b.RestoreCachedState());
+        Assert.ThrowsExactly<InvalidOperationException>(() => blake2b.Update(m));
+        Assert.ThrowsExactly<InvalidOperationException>(() => blake2b.Finalize(h));
+        Assert.ThrowsExactly<InvalidOperationException>(() => blake2b.FinalizeAndVerify(h));
+        Assert.ThrowsExactly<InvalidOperationException>(() => blake2b.CacheState());
+        Assert.ThrowsExactly<InvalidOperationException>(() => blake2b.RestoreCachedState());
     }
 
     [TestMethod]
@@ -519,11 +519,11 @@ public class BLAKE2bTests
 
         blake2b.Dispose();
 
-        Assert.ThrowsException<ObjectDisposedException>(() => blake2b.Reinitialize(h.Length, k));
-        Assert.ThrowsException<ObjectDisposedException>(() => blake2b.Update(m));
-        Assert.ThrowsException<ObjectDisposedException>(() => blake2b.Finalize(h));
-        Assert.ThrowsException<ObjectDisposedException>(() => blake2b.FinalizeAndVerify(h));
-        Assert.ThrowsException<ObjectDisposedException>(() => blake2b.CacheState());
-        Assert.ThrowsException<ObjectDisposedException>(() => blake2b.RestoreCachedState());
+        Assert.ThrowsExactly<ObjectDisposedException>(() => blake2b.Reinitialize(h.Length, k));
+        Assert.ThrowsExactly<ObjectDisposedException>(() => blake2b.Update(m));
+        Assert.ThrowsExactly<ObjectDisposedException>(() => blake2b.Finalize(h));
+        Assert.ThrowsExactly<ObjectDisposedException>(() => blake2b.FinalizeAndVerify(h));
+        Assert.ThrowsExactly<ObjectDisposedException>(() => blake2b.CacheState());
+        Assert.ThrowsExactly<ObjectDisposedException>(() => blake2b.RestoreCachedState());
     }
 }

@@ -41,7 +41,7 @@ public class SecureRandomTests
     {
         var buffer = Array.Empty<byte>();
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.Fill(buffer));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => SecureRandom.Fill(buffer));
     }
 
     [TestMethod]
@@ -64,7 +64,7 @@ public class SecureRandomTests
         var buffer = new byte[bufferSize];
         var seed = new byte[seedSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.FillDeterministic(buffer, seed));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => SecureRandom.FillDeterministic(buffer, seed));
     }
 
     [TestMethod]
@@ -80,7 +80,7 @@ public class SecureRandomTests
     {
         int upperBound = SecureRandom.MinUpperBound - 1;
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.GetInt32(upperBound));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => SecureRandom.GetInt32(upperBound));
     }
 
     [TestMethod]
@@ -106,7 +106,7 @@ public class SecureRandomTests
         var buffer = new char[bufferSize];
         var characterSet = new char[characterSetSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.GenerateString(buffer, characterSet));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => SecureRandom.GenerateString(buffer, characterSet));
     }
 
     [TestMethod]
@@ -154,10 +154,10 @@ public class SecureRandomTests
             _ => ["test1"]
         };
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.GeneratePassphrase(buffer, wordlist, wordCount, separatorChar));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => SecureRandom.GeneratePassphrase(buffer, wordlist, wordCount, separatorChar));
         if (separatorChar is '\0' or '\r' or '\n') {
             string invalidChar = separatorChar.ToString();
-            Assert.ThrowsException<FormatException>(() => SecureRandom.GeneratePassphrase(buffer, new[] {invalidChar, invalidChar}, wordCount));
+            Assert.ThrowsExactly<FormatException>(() => SecureRandom.GeneratePassphrase(buffer, new[] {invalidChar, invalidChar}, wordCount));
         }
     }
 
@@ -180,7 +180,7 @@ public class SecureRandomTests
     [DataRow(SecureRandom.LongestWordSize, SecureRandom.MinWordCount - 1)]
     public void GetPassphraseBufferSize_Invalid(int longestWord, int wordCount)
     {
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => SecureRandom.GetPassphraseBufferSize(longestWord, wordCount));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => SecureRandom.GetPassphraseBufferSize(longestWord, wordCount));
     }
 
     [TestMethod]

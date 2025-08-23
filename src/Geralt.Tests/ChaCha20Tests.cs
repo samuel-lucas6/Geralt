@@ -120,7 +120,7 @@ public class ChaCha20Tests
         var n = new byte[nonceSize];
         var k = new byte[keySize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ChaCha20.Fill(b, n, k));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => ChaCha20.Fill(b, n, k));
     }
 
     [TestMethod]
@@ -147,10 +147,10 @@ public class ChaCha20Tests
         var k = new byte[keySize];
 
         if (counter < uint.MaxValue) {
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => ChaCha20.Encrypt(c, p, n, k, counter));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => ChaCha20.Encrypt(c, p, n, k, counter));
         }
         else {
-            Assert.ThrowsException<CryptographicException>(() => ChaCha20.Encrypt(c, p, n, k, counter));
+            Assert.ThrowsExactly<CryptographicException>(() => ChaCha20.Encrypt(c, p, n, k, counter));
         }
     }
 
@@ -178,10 +178,10 @@ public class ChaCha20Tests
         var k = new byte[keySize];
 
         if (counter < uint.MaxValue) {
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => ChaCha20.Decrypt(p, c, n, k, counter));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => ChaCha20.Decrypt(p, c, n, k, counter));
         }
         else {
-            Assert.ThrowsException<CryptographicException>(() => ChaCha20.Decrypt(p, c, n, k, counter));
+            Assert.ThrowsExactly<CryptographicException>(() => ChaCha20.Decrypt(p, c, n, k, counter));
         }
     }
 }

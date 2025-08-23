@@ -90,7 +90,7 @@ public class AEGIS128LTests
         var k = new byte[keySize];
         var ad = new byte[associatedDataSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => AEGIS128L.Encrypt(c, p, n, k, ad));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => AEGIS128L.Encrypt(c, p, n, k, ad));
     }
 
     [TestMethod]
@@ -123,7 +123,7 @@ public class AEGIS128LTests
 
         foreach (var param in parameters.Values.Where(param => param.Length > 0)) {
             param[0]++;
-            Assert.ThrowsException<CryptographicException>(() => AEGIS128L.Decrypt(p, parameters["c"], parameters["n"], parameters["k"], parameters["ad"]));
+            Assert.ThrowsExactly<CryptographicException>(() => AEGIS128L.Decrypt(p, parameters["c"], parameters["n"], parameters["k"], parameters["ad"]));
             param[0]--;
         }
         Assert.IsTrue(p.SequenceEqual(new byte[p.Length]));
@@ -139,6 +139,6 @@ public class AEGIS128LTests
         var k = new byte[keySize];
         var ad = new byte[associatedDataSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => AEGIS128L.Decrypt(p, c, n, k, ad));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => AEGIS128L.Decrypt(p, c, n, k, ad));
     }
 }

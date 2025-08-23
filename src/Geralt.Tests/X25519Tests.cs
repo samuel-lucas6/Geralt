@@ -141,7 +141,7 @@ public class X25519Tests
         var pk = new byte[publicKeySize];
         var sk = new byte[privateKeySize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.GenerateKeyPair(pk, sk));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => X25519.GenerateKeyPair(pk, sk));
     }
 
     [TestMethod]
@@ -168,7 +168,7 @@ public class X25519Tests
         var sk = new byte[privateKeySize];
         var s = new byte[seedSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.GenerateKeyPair(pk, sk, s));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => X25519.GenerateKeyPair(pk, sk, s));
     }
 
     [TestMethod]
@@ -190,7 +190,7 @@ public class X25519Tests
         var pk = new byte[publicKeySize];
         var sk = new byte[privateKeySize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.ComputePublicKey(pk, sk));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => X25519.ComputePublicKey(pk, sk));
     }
 
     [TestMethod]
@@ -214,7 +214,7 @@ public class X25519Tests
         var sk = Convert.FromHexString(senderPrivateKey);
         var pk = Convert.FromHexString(recipientPublicKey);
 
-        Assert.ThrowsException<CryptographicException>(() => X25519.ComputeSharedSecret(s, sk, pk));
+        Assert.ThrowsExactly<CryptographicException>(() => X25519.ComputeSharedSecret(s, sk, pk));
     }
 
     [TestMethod]
@@ -230,7 +230,7 @@ public class X25519Tests
         var sk = new byte[senderPrivateKeySize];
         var pk = new byte[recipientPublicKeySize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.ComputeSharedSecret(s, sk, pk));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => X25519.ComputeSharedSecret(s, sk, pk));
     }
 
     [TestMethod]
@@ -261,7 +261,7 @@ public class X25519Tests
         var pk = new byte[publicKeySize];
         var psk = new byte[preSharedKeySize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedKey(s, sk, pk, psk));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedKey(s, sk, pk, psk));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedKey(s, sk, pk, psk));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedKey(s, sk, pk, psk));
     }
 }

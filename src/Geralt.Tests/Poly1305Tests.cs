@@ -57,7 +57,7 @@ public class Poly1305Tests
         var m = new byte[messageSize];
         var k = new byte[keySize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Poly1305.ComputeTag(t, m, k));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Poly1305.ComputeTag(t, m, k));
     }
 
     [TestMethod]
@@ -100,7 +100,7 @@ public class Poly1305Tests
         var m = new byte[messageSize];
         var k = new byte[keySize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Poly1305.VerifyTag(t, m, k));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Poly1305.VerifyTag(t, m, k));
     }
 
     [TestMethod]
@@ -214,13 +214,13 @@ public class Poly1305Tests
         var k = new byte[keySize];
 
         if (keySize != IncrementalPoly1305.KeySize) {
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => new IncrementalPoly1305(k));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new IncrementalPoly1305(k));
         }
         else if (tagSize != IncrementalPoly1305.TagSize) {
             using var poly1305 = new IncrementalPoly1305(k);
             poly1305.Update(m);
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => poly1305.Finalize(t));
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => poly1305.FinalizeAndVerify(t));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => poly1305.Finalize(t));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => poly1305.FinalizeAndVerify(t));
         }
     }
 
@@ -236,9 +236,9 @@ public class Poly1305Tests
         poly1305.Update(m);
         poly1305.Finalize(t);
 
-        Assert.ThrowsException<InvalidOperationException>(() => poly1305.Update(m));
-        Assert.ThrowsException<InvalidOperationException>(() => poly1305.Finalize(t));
-        Assert.ThrowsException<InvalidOperationException>(() => poly1305.FinalizeAndVerify(t));
+        Assert.ThrowsExactly<InvalidOperationException>(() => poly1305.Update(m));
+        Assert.ThrowsExactly<InvalidOperationException>(() => poly1305.Finalize(t));
+        Assert.ThrowsExactly<InvalidOperationException>(() => poly1305.FinalizeAndVerify(t));
     }
 
     [TestMethod]
@@ -253,9 +253,9 @@ public class Poly1305Tests
         poly1305.Update(m);
         poly1305.FinalizeAndVerify(t);
 
-        Assert.ThrowsException<InvalidOperationException>(() => poly1305.Update(m));
-        Assert.ThrowsException<InvalidOperationException>(() => poly1305.Finalize(t));
-        Assert.ThrowsException<InvalidOperationException>(() => poly1305.FinalizeAndVerify(t));
+        Assert.ThrowsExactly<InvalidOperationException>(() => poly1305.Update(m));
+        Assert.ThrowsExactly<InvalidOperationException>(() => poly1305.Finalize(t));
+        Assert.ThrowsExactly<InvalidOperationException>(() => poly1305.FinalizeAndVerify(t));
     }
 
     [TestMethod]
@@ -270,9 +270,9 @@ public class Poly1305Tests
 
         poly1305.Dispose();
 
-        Assert.ThrowsException<ObjectDisposedException>(() => poly1305.Reinitialize(k));
-        Assert.ThrowsException<ObjectDisposedException>(() => poly1305.Update(m));
-        Assert.ThrowsException<ObjectDisposedException>(() => poly1305.Finalize(t));
-        Assert.ThrowsException<ObjectDisposedException>(() => poly1305.FinalizeAndVerify(t));
+        Assert.ThrowsExactly<ObjectDisposedException>(() => poly1305.Reinitialize(k));
+        Assert.ThrowsExactly<ObjectDisposedException>(() => poly1305.Update(m));
+        Assert.ThrowsExactly<ObjectDisposedException>(() => poly1305.Finalize(t));
+        Assert.ThrowsExactly<ObjectDisposedException>(() => poly1305.FinalizeAndVerify(t));
     }
 }

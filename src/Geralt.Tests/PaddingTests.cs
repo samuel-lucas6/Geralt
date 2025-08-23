@@ -44,7 +44,7 @@ public class PaddingTests
         var b = new byte[bufferSize];
         var d = new byte[dataSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Padding.Pad(b, d, blockSize));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Padding.Pad(b, d, blockSize));
     }
 
     [TestMethod]
@@ -52,7 +52,7 @@ public class PaddingTests
     [DataRow(1, 0)]
     public void GetPaddedLength_Invalid(int unpaddedLength, int blockSize)
     {
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Padding.GetPaddedLength(unpaddedLength, blockSize));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Padding.GetPaddedLength(unpaddedLength, blockSize));
     }
 
     [TestMethod]
@@ -71,7 +71,7 @@ public class PaddingTests
     {
         var b = Array.Empty<byte>();
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Padding.Fill(b));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Padding.Fill(b));
     }
 
     [TestMethod]
@@ -91,7 +91,7 @@ public class PaddingTests
     {
         var p = Convert.FromHexString(paddedData.Replace("80", "00"));
 
-        Assert.ThrowsException<FormatException>(() => Padding.GetUnpaddedLength(p, blockSize));
+        Assert.ThrowsExactly<FormatException>(() => Padding.GetUnpaddedLength(p, blockSize));
     }
 
     [TestMethod]
@@ -101,6 +101,6 @@ public class PaddingTests
     {
         var p = new byte[paddedDataSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Padding.GetUnpaddedLength(p, blockSize));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Padding.GetUnpaddedLength(p, blockSize));
     }
 }

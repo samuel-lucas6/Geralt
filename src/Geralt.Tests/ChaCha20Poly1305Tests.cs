@@ -67,7 +67,7 @@ public class ChaCha20Poly1305Tests
         var k = new byte[keySize];
         var ad = new byte[associatedDataSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ChaCha20Poly1305.Encrypt(c, p, n, k, ad));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => ChaCha20Poly1305.Encrypt(c, p, n, k, ad));
     }
 
     [TestMethod]
@@ -100,7 +100,7 @@ public class ChaCha20Poly1305Tests
 
         foreach (var param in parameters.Values.Where(param => param.Length > 0)) {
             param[0]++;
-            Assert.ThrowsException<CryptographicException>(() => ChaCha20Poly1305.Decrypt(p, parameters["c"], parameters["n"], parameters["k"], parameters["ad"]));
+            Assert.ThrowsExactly<CryptographicException>(() => ChaCha20Poly1305.Decrypt(p, parameters["c"], parameters["n"], parameters["k"], parameters["ad"]));
             param[0]--;
         }
         Assert.IsTrue(p.SequenceEqual(new byte[p.Length]));
@@ -116,6 +116,6 @@ public class ChaCha20Poly1305Tests
         var k = new byte[keySize];
         var ad = new byte[associatedDataSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ChaCha20Poly1305.Decrypt(p, c, n, k, ad));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => ChaCha20Poly1305.Decrypt(p, c, n, k, ad));
     }
 }

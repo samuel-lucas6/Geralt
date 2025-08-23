@@ -69,7 +69,7 @@ public class EncodingsTests
         var h = new char[hexSize];
         var d = new byte[dataSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Encodings.ToHex(h, d));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Encodings.ToHex(h, d));
     }
 
     [TestMethod]
@@ -98,7 +98,7 @@ public class EncodingsTests
     {
         var d = new byte[dataSize];
 
-        Assert.ThrowsException<FormatException>(() => Encodings.FromHex(d, hex, ignoreChars));
+        Assert.ThrowsExactly<FormatException>(() => Encodings.FromHex(d, hex, ignoreChars));
     }
 
     [TestMethod]
@@ -120,7 +120,7 @@ public class EncodingsTests
     {
         var d = new byte[dataSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Encodings.FromHex(d, hex, ignoreChars));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Encodings.FromHex(d, hex, ignoreChars));
     }
 
     [TestMethod]
@@ -146,7 +146,7 @@ public class EncodingsTests
         var b = new char[base64Size];
         var d = new byte[dataSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Encodings.ToBase64(b, d));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Encodings.ToBase64(b, d));
     }
 
     [TestMethod]
@@ -199,7 +199,7 @@ public class EncodingsTests
     {
         var d = new byte[Encodings.GetFromBase64BufferSize(base64, variant)];
 
-        Assert.ThrowsException<FormatException>(() => Encodings.FromBase64(d, base64, variant));
+        Assert.ThrowsExactly<FormatException>(() => Encodings.FromBase64(d, base64, variant));
     }
 
     [TestMethod]
@@ -217,6 +217,6 @@ public class EncodingsTests
     {
         var d = new byte[dataSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Encodings.FromBase64(d, base64, variant, ignoreChars));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Encodings.FromBase64(d, base64, variant, ignoreChars));
     }
 }

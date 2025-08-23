@@ -103,7 +103,7 @@ public class SecureMemoryTests
     public void GuardedHeapAllocation_Invalid(int size)
     {
         // This is the only exception that can be tested
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new GuardedHeapAllocation(size));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new GuardedHeapAllocation(size));
     }
 
     [TestMethod]
@@ -113,9 +113,9 @@ public class SecureMemoryTests
 
         secret.Dispose();
 
-        Assert.ThrowsException<ObjectDisposedException>(() => secret.AsSpan());
-        Assert.ThrowsException<ObjectDisposedException>(() => secret.NoAccess());
-        Assert.ThrowsException<ObjectDisposedException>(() => secret.ReadOnly());
-        Assert.ThrowsException<ObjectDisposedException>(() => secret.ReadWrite());
+        Assert.ThrowsExactly<ObjectDisposedException>(() => secret.AsSpan());
+        Assert.ThrowsExactly<ObjectDisposedException>(() => secret.NoAccess());
+        Assert.ThrowsExactly<ObjectDisposedException>(() => secret.ReadOnly());
+        Assert.ThrowsExactly<ObjectDisposedException>(() => secret.ReadWrite());
     }
 }

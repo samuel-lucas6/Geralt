@@ -42,6 +42,6 @@ public class HChaCha20Tests
         var n = new byte[nonceSize];
         var p = new byte[personalizationSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => HChaCha20.DeriveKey(okm, ikm, n, p));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => HChaCha20.DeriveKey(okm, ikm, n, p));
     }
 }

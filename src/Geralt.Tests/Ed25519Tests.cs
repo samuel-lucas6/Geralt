@@ -132,7 +132,7 @@ public class Ed25519Tests
         var pk = new byte[publicKeySize];
         var sk = new byte[privateKeySize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Ed25519.GenerateKeyPair(pk, sk));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Ed25519.GenerateKeyPair(pk, sk));
     }
 
     [TestMethod]
@@ -159,7 +159,7 @@ public class Ed25519Tests
         var sk = new byte[privateKeySize];
         var s = new byte[seedSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Ed25519.GenerateKeyPair(pk, sk, s));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Ed25519.GenerateKeyPair(pk, sk, s));
     }
 
     [TestMethod]
@@ -181,7 +181,7 @@ public class Ed25519Tests
         var pk = new byte[publicKeySize];
         var sk = new byte[privateKeySize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Ed25519.ComputePublicKey(pk, sk));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Ed25519.ComputePublicKey(pk, sk));
     }
 
     [TestMethod]
@@ -206,7 +206,7 @@ public class Ed25519Tests
         var x = new byte[x25519PublicKeySize];
         var e = new byte[ed25519PublicKeySize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Ed25519.GetX25519PublicKey(x, e));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Ed25519.GetX25519PublicKey(x, e));
     }
 
     [TestMethod]
@@ -231,7 +231,7 @@ public class Ed25519Tests
         var x = new byte[x25519PrivateKeySize];
         var e = new byte[ed25519PrivateKeySize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Ed25519.GetX25519PrivateKey(x, e));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Ed25519.GetX25519PrivateKey(x, e));
     }
 
     [TestMethod]
@@ -255,7 +255,7 @@ public class Ed25519Tests
         var m = new byte[messageSize];
         var sk = new byte[privateKeySize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Ed25519.Sign(s, m, sk));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Ed25519.Sign(s, m, sk));
     }
 
     [TestMethod]
@@ -292,7 +292,7 @@ public class Ed25519Tests
         var m = new byte[messageSize];
         var pk = new byte[publicKeySize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Ed25519.Verify(s, m, pk));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Ed25519.Verify(s, m, pk));
     }
 
     [TestMethod]
@@ -346,7 +346,7 @@ public class Ed25519Tests
         using var ed25519ph = new IncrementalEd25519ph();
         ed25519ph.Update(m);
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ed25519ph.Finalize(s, sk));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => ed25519ph.Finalize(s, sk));
     }
 
     [TestMethod]
@@ -362,9 +362,9 @@ public class Ed25519Tests
         ed25519ph.Update(m);
         ed25519ph.Finalize(s, sk);
 
-        Assert.ThrowsException<InvalidOperationException>(() => ed25519ph.Update(m));
-        Assert.ThrowsException<InvalidOperationException>(() => ed25519ph.Finalize(s, sk));
-        Assert.ThrowsException<InvalidOperationException>(() => ed25519ph.FinalizeAndVerify(s, pk));
+        Assert.ThrowsExactly<InvalidOperationException>(() => ed25519ph.Update(m));
+        Assert.ThrowsExactly<InvalidOperationException>(() => ed25519ph.Finalize(s, sk));
+        Assert.ThrowsExactly<InvalidOperationException>(() => ed25519ph.FinalizeAndVerify(s, pk));
     }
 
     [TestMethod]
@@ -438,7 +438,7 @@ public class Ed25519Tests
         using var ed25519ph = new IncrementalEd25519ph();
         ed25519ph.Update(m);
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ed25519ph.FinalizeAndVerify(s, pk));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => ed25519ph.FinalizeAndVerify(s, pk));
     }
 
     [TestMethod]
@@ -454,9 +454,9 @@ public class Ed25519Tests
         ed25519ph.Update(m);
         ed25519ph.FinalizeAndVerify(s, pk);
 
-        Assert.ThrowsException<InvalidOperationException>(() => ed25519ph.Update(m));
-        Assert.ThrowsException<InvalidOperationException>(() => ed25519ph.Finalize(s, sk));
-        Assert.ThrowsException<InvalidOperationException>(() => ed25519ph.FinalizeAndVerify(s, pk));
+        Assert.ThrowsExactly<InvalidOperationException>(() => ed25519ph.Update(m));
+        Assert.ThrowsExactly<InvalidOperationException>(() => ed25519ph.Finalize(s, sk));
+        Assert.ThrowsExactly<InvalidOperationException>(() => ed25519ph.FinalizeAndVerify(s, pk));
     }
 
     [TestMethod]
@@ -472,9 +472,9 @@ public class Ed25519Tests
 
         ed25519ph.Dispose();
 
-        Assert.ThrowsException<ObjectDisposedException>(() => ed25519ph.Reinitialize());
-        Assert.ThrowsException<ObjectDisposedException>(() => ed25519ph.Update(m));
-        Assert.ThrowsException<ObjectDisposedException>(() => ed25519ph.Finalize(s, sk));
-        Assert.ThrowsException<ObjectDisposedException>(() => ed25519ph.FinalizeAndVerify(s, pk));
+        Assert.ThrowsExactly<ObjectDisposedException>(() => ed25519ph.Reinitialize());
+        Assert.ThrowsExactly<ObjectDisposedException>(() => ed25519ph.Update(m));
+        Assert.ThrowsExactly<ObjectDisposedException>(() => ed25519ph.Finalize(s, sk));
+        Assert.ThrowsExactly<ObjectDisposedException>(() => ed25519ph.FinalizeAndVerify(s, pk));
     }
 }

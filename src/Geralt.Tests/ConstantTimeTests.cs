@@ -42,7 +42,7 @@ public class ConstantTimeTests
         var a = new byte[aSize];
         var b = new byte[bSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ConstantTime.Equals(a, b));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => ConstantTime.Equals(a, b));
     }
 
     [TestMethod]
@@ -61,7 +61,7 @@ public class ConstantTimeTests
     {
         var b = Array.Empty<byte>();
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ConstantTime.Increment(b));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => ConstantTime.Increment(b));
     }
 
     [TestMethod]
@@ -99,7 +99,7 @@ public class ConstantTimeTests
         var a = new byte[aSize];
         var b = new byte[bSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ConstantTime.Add(buf, a, b));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => ConstantTime.Add(buf, a, b));
     }
 
     [TestMethod]
@@ -124,7 +124,7 @@ public class ConstantTimeTests
         var a = new byte[aSize];
         var b = new byte[bSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ConstantTime.Subtract(buf, a, b));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => ConstantTime.Subtract(buf, a, b));
     }
 
     [TestMethod]
@@ -147,7 +147,7 @@ public class ConstantTimeTests
         var a = new byte[aSize];
         var b = new byte[bSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ConstantTime.IsLessThan(a, b));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => ConstantTime.IsLessThan(a, b));
     }
 
     [TestMethod]
@@ -170,6 +170,6 @@ public class ConstantTimeTests
         var a = new byte[aSize];
         var b = new byte[bSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => ConstantTime.IsGreaterThan(a, b));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => ConstantTime.IsGreaterThan(a, b));
     }
 }

@@ -81,7 +81,7 @@ public class Argon2idTests
         var p = new byte[passwordSize];
         var s = new byte[saltSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.DeriveKey(okm, p, s, iterations, memorySize));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Argon2id.DeriveKey(okm, p, s, iterations, memorySize));
     }
 
     [TestMethod]
@@ -108,7 +108,7 @@ public class Argon2idTests
     {
         var p = new byte[passwordSize];
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.ComputeHash(p, iterations, memorySize));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Argon2id.ComputeHash(p, iterations, memorySize));
     }
 
     [TestMethod]
@@ -131,10 +131,10 @@ public class Argon2idTests
         var p = Encoding.UTF8.GetBytes(password);
 
         if (hash == null) {
-            Assert.ThrowsException<ArgumentNullException>(() => Argon2id.VerifyHash(hash!, p));
+            Assert.ThrowsExactly<ArgumentNullException>(() => Argon2id.VerifyHash(hash!, p));
         }
         else {
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.VerifyHash(hash, p));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Argon2id.VerifyHash(hash, p));
         }
     }
 
@@ -145,7 +145,7 @@ public class Argon2idTests
     {
         var p = Encoding.UTF8.GetBytes(password);
 
-        Assert.ThrowsException<FormatException>(() => Argon2id.VerifyHash(hash, p));
+        Assert.ThrowsExactly<FormatException>(() => Argon2id.VerifyHash(hash, p));
     }
 
     [TestMethod]
@@ -167,7 +167,7 @@ public class Argon2idTests
     [DataRow("$argon2d$v=19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 3, 16777216)]
     public void NeedsRehash_Tampered(string hash, int iterations, int memorySize)
     {
-        Assert.ThrowsException<FormatException>(() => Argon2id.NeedsRehash(hash, iterations, memorySize));
+        Assert.ThrowsExactly<FormatException>(() => Argon2id.NeedsRehash(hash, iterations, memorySize));
     }
 
     [TestMethod]
@@ -179,10 +179,10 @@ public class Argon2idTests
     public void NeedsRehash_Invalid(string? hash, int iterations, int memorySize)
     {
         if (hash == null) {
-            Assert.ThrowsException<ArgumentNullException>(() => Argon2id.NeedsRehash(hash!, iterations, memorySize));
+            Assert.ThrowsExactly<ArgumentNullException>(() => Argon2id.NeedsRehash(hash!, iterations, memorySize));
         }
         else {
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => Argon2id.NeedsRehash(hash, iterations, memorySize));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Argon2id.NeedsRehash(hash, iterations, memorySize));
         }
     }
 }
