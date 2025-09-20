@@ -50,6 +50,7 @@ public class AEGIS256Tests
 
     public static IEnumerable<object[]> InvalidParameterSizes()
     {
+        yield return [AEGIS256.TagSize - 1, 0, AEGIS256.NonceSize, AEGIS256.KeySize, AEGIS256.TagSize];
         yield return [AEGIS256.TagSize, 1, AEGIS256.NonceSize, AEGIS256.KeySize, AEGIS256.TagSize];
         yield return [AEGIS256.TagSize, 0, AEGIS256.NonceSize + 1, AEGIS256.KeySize, AEGIS256.TagSize];
         yield return [AEGIS256.TagSize, 0, AEGIS256.NonceSize - 1, AEGIS256.KeySize, AEGIS256.TagSize];
