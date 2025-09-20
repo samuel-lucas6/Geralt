@@ -50,6 +50,7 @@ public class AEGIS128LTests
 
     public static IEnumerable<object[]> InvalidParameterSizes()
     {
+        yield return [AEGIS128L.TagSize - 1, 0, AEGIS128L.NonceSize, AEGIS128L.KeySize, AEGIS128L.TagSize];
         yield return [AEGIS128L.TagSize, 1, AEGIS128L.NonceSize, AEGIS128L.KeySize, AEGIS128L.TagSize];
         yield return [AEGIS128L.TagSize, 0, AEGIS128L.NonceSize + 1, AEGIS128L.KeySize, AEGIS128L.TagSize];
         yield return [AEGIS128L.TagSize, 0, AEGIS128L.NonceSize - 1, AEGIS128L.KeySize, AEGIS128L.TagSize];
