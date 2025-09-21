@@ -53,9 +53,9 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
         if (!_encryption) { throw new InvalidOperationException("Cannot encrypt on a decryption stream."); }
         if (_finalized) { throw new InvalidOperationException("Cannot encrypt after the final chunk without reinitializing."); }
         Validation.EqualToSize(nameof(ciphertextChunk), ciphertextChunk.Length, plaintextChunk.Length + TagSize);
-        if (chunkFlag == ChunkFlag.Final) { _finalized = true; }
-        int ret = crypto_secretstream_xchacha20poly1305_push(ref _state, ciphertextChunk, out _, plaintextChunk, (ulong)plaintextChunk.Length, associatedData, (ulong)associatedData.Length, (byte)chunkFlag);
+        int ret = crypto_secretstream_xchacha20poly1305_push(ref _state, ciphertextChunk, ciphertextChunkLength: out _, plaintextChunk, (ulong)plaintextChunk.Length, associatedData, (ulong)associatedData.Length, (byte)chunkFlag);
         if (ret != 0) { throw new CryptographicException("Error encrypting plaintext chunk."); }
+        if (chunkFlag == ChunkFlag.Final) { _finalized = true; }
     }
 
     public ChunkFlag DecryptChunk(Span<byte> plaintextChunk, ReadOnlySpan<byte> ciphertextChunk, ReadOnlySpan<byte> associatedData = default)
@@ -65,8 +65,8 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
         if (_finalized) { throw new InvalidOperationException("Cannot decrypt after the final chunk without reinitializing."); }
         Validation.NotLessThanMin(nameof(ciphertextChunk), ciphertextChunk.Length, TagSize);
         Validation.EqualToSize(nameof(plaintextChunk), plaintextChunk.Length, ciphertextChunk.Length - TagSize);
-        int ret = crypto_secretstream_xchacha20poly1305_pull(ref _state, plaintextChunk, out _, out byte chunkFlag, ciphertextChunk, (ulong)ciphertextChunk.Length, associatedData, (ulong)associatedData.Length);
-        if (ret != 0) { throw new CryptographicException("Error decrypting ciphertext chunk."); }
+        int ret = crypto_secretstream_xchacha20poly1305_pull(ref _state, plaintextChunk, plaintextChunkLength: out _, out byte chunkFlag, ciphertextChunk, (ulong)ciphertextChunk.Length, associatedData, (ulong)associatedData.Length);
+        if (ret != 0) { throw new CryptographicException("Invalid chunk authentication tag for the given inputs."); }
         if (chunkFlag == (byte)ChunkFlag.Final) { _finalized = true; }
         return (ChunkFlag)chunkFlag;
     }
