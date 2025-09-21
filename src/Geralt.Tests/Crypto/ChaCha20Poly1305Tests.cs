@@ -27,6 +27,7 @@ public class ChaCha20Poly1305Tests
 
     public static IEnumerable<object[]> InvalidParameterSizes()
     {
+        yield return [ChaCha20Poly1305.TagSize - 1, 0, ChaCha20Poly1305.NonceSize, ChaCha20Poly1305.KeySize, ChaCha20Poly1305.TagSize];
         yield return [ChaCha20Poly1305.TagSize, 1, ChaCha20Poly1305.NonceSize, ChaCha20Poly1305.KeySize, ChaCha20Poly1305.TagSize];
         yield return [ChaCha20Poly1305.TagSize, 0, ChaCha20Poly1305.NonceSize + 1, ChaCha20Poly1305.KeySize, ChaCha20Poly1305.TagSize];
         yield return [ChaCha20Poly1305.TagSize, 0, ChaCha20Poly1305.NonceSize - 1, ChaCha20Poly1305.KeySize, ChaCha20Poly1305.TagSize];
