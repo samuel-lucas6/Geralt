@@ -89,6 +89,7 @@ public class ChaCha20Tests
         yield return [ChaCha20.BlockSize, ChaCha20.BlockSize, ChaCha20.NonceSize, ChaCha20.KeySize + 1, (uint)0];
         yield return [ChaCha20.BlockSize, ChaCha20.BlockSize, ChaCha20.NonceSize, ChaCha20.KeySize - 1, (uint)0];
         yield return [ChaCha20.BlockSize, ChaCha20.BlockSize, ChaCha20.NonceSize, ChaCha20.KeySize, uint.MaxValue];
+        yield return [ChaCha20.BlockSize * 2, ChaCha20.BlockSize * 2, ChaCha20.NonceSize, ChaCha20.KeySize, uint.MaxValue - 1];
     }
 
     [TestMethod]
@@ -146,7 +147,7 @@ public class ChaCha20Tests
         var n = new byte[nonceSize];
         var k = new byte[keySize];
 
-        if (counter < uint.MaxValue) {
+        if (counter == 0) {
             Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => ChaCha20.Encrypt(c, p, n, k, counter));
         }
         else {
@@ -177,7 +178,7 @@ public class ChaCha20Tests
         var n = new byte[nonceSize];
         var k = new byte[keySize];
 
-        if (counter < uint.MaxValue) {
+        if (counter == 0) {
             Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => ChaCha20.Decrypt(p, c, n, k, counter));
         }
         else {
