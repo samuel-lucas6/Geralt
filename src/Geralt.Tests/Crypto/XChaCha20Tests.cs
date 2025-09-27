@@ -53,6 +53,7 @@ public class XChaCha20Tests
         yield return [XChaCha20.BlockSize, XChaCha20.BlockSize, XChaCha20.NonceSize, XChaCha20.KeySize + 1, (ulong)0];
         yield return [XChaCha20.BlockSize, XChaCha20.BlockSize, XChaCha20.NonceSize, XChaCha20.KeySize - 1, (ulong)0];
         yield return [XChaCha20.BlockSize, XChaCha20.BlockSize, XChaCha20.NonceSize, XChaCha20.KeySize, ulong.MaxValue];
+        yield return [XChaCha20.BlockSize * 2, XChaCha20.BlockSize * 2, XChaCha20.NonceSize, XChaCha20.KeySize, ulong.MaxValue - 1];
     }
 
     [TestMethod]
@@ -110,7 +111,7 @@ public class XChaCha20Tests
         var n = new byte[nonceSize];
         var k = new byte[keySize];
 
-        if (counter < ulong.MaxValue) {
+        if (counter == 0) {
             Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => XChaCha20.Encrypt(c, p, n, k, counter));
         }
         else {
@@ -141,7 +142,7 @@ public class XChaCha20Tests
         var n = new byte[nonceSize];
         var k = new byte[keySize];
 
-        if (counter < ulong.MaxValue) {
+        if (counter == 0) {
             Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => XChaCha20.Decrypt(p, c, n, k, counter));
         }
         else {
