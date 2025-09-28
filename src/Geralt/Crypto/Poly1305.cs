@@ -7,6 +7,7 @@ public static class Poly1305
 {
     public const int KeySize = crypto_onetimeauth_KEYBYTES;
     public const int TagSize = crypto_onetimeauth_BYTES;
+    public const int BlockSize = 16;
 
     public static void ComputeTag(Span<byte> tag, ReadOnlySpan<byte> message, ReadOnlySpan<byte> oneTimeKey)
     {
