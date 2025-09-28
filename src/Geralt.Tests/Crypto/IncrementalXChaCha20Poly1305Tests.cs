@@ -225,7 +225,6 @@ public class IncrementalXChaCha20Poly1305Tests
         var c = new byte[p.Length + IncrementalXChaCha20Poly1305.TagSize];
 
         var secretstream = new IncrementalXChaCha20Poly1305(h, k, encryption: true);
-
         secretstream.Dispose();
 
         Assert.ThrowsExactly<ObjectDisposedException>(() => secretstream.Reinitialize(h, k, encryption: false));
