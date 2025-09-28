@@ -164,6 +164,28 @@ public class Ed25519Tests
 
     [TestMethod]
     [DynamicData(nameof(Rfc8032Ed25519TestVectors), DynamicDataSourceType.Method)]
+    public void GetSeed_Valid(string signature, string message, string privateKey)
+    {
+        Span<byte> s = stackalloc byte[Ed25519.SeedSize];
+        Span<byte> sk = Convert.FromHexString(privateKey);
+
+        Ed25519.GetSeed(s, sk);
+
+        Assert.AreEqual(privateKey[..(privateKey.Length / 2)], Convert.ToHexString(s).ToLower());
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(KeyPairInvalidParameterSizes), DynamicDataSourceType.Method)]
+    public void GetSeed_Invalid(int seedSize, int privateKeySize)
+    {
+        var s = new byte[seedSize];
+        var sk = new byte[privateKeySize];
+
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Ed25519.GetSeed(s, sk));
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(Rfc8032Ed25519TestVectors), DynamicDataSourceType.Method)]
     public void GetPublicKey_Valid(string signature, string message, string privateKey)
     {
         Span<byte> pk = stackalloc byte[Ed25519.PublicKeySize];

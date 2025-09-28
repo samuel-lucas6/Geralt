@@ -29,6 +29,15 @@ public static class Ed25519
         if (ret != 0) { throw new CryptographicException("Unable to generate key pair from seed."); }
     }
 
+    public static void GetSeed(Span<byte> seed, ReadOnlySpan<byte> privateKey)
+    {
+        Validation.EqualToSize(nameof(seed), seed.Length, SeedSize);
+        Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
+        Sodium.Initialize();
+        int ret = crypto_sign_ed25519_sk_to_seed(seed, privateKey);
+        if (ret != 0) { throw new CryptographicException("Unable to retrieve seed from private key."); }
+    }
+
     public static void GetPublicKey(Span<byte> publicKey, ReadOnlySpan<byte> privateKey)
     {
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);

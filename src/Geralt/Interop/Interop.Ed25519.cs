@@ -20,6 +20,10 @@ internal static partial class Interop
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int crypto_sign_ed25519_sk_to_seed(Span<byte> seed, ReadOnlySpan<byte> privateKey);
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         internal static partial int crypto_sign_ed25519_sk_to_pk(Span<byte> publicKey, ReadOnlySpan<byte> privateKey);
 
         [LibraryImport(DllName)]
