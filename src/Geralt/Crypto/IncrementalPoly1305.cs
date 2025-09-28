@@ -8,6 +8,7 @@ public sealed class IncrementalPoly1305 : IDisposable
 {
     public const int KeySize = Poly1305.KeySize;
     public const int TagSize = Poly1305.TagSize;
+    public const int BlockSize = Poly1305.BlockSize;
 
     private crypto_onetimeauth_state _state;
     private bool _finalized;
@@ -23,9 +24,9 @@ public sealed class IncrementalPoly1305 : IDisposable
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalPoly1305)); }
         Validation.EqualToSize(nameof(oneTimeKey), oneTimeKey.Length, KeySize);
-        _finalized = false;
         int ret = crypto_onetimeauth_init(ref _state, oneTimeKey);
         if (ret != 0) { throw new CryptographicException("Error initializing message authentication code state."); }
+        _finalized = false;
     }
 
     public void Update(ReadOnlySpan<byte> message)
@@ -41,9 +42,9 @@ public sealed class IncrementalPoly1305 : IDisposable
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalPoly1305)); }
         if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
         Validation.EqualToSize(nameof(tag), tag.Length, TagSize);
-        _finalized = true;
         int ret = crypto_onetimeauth_final(ref _state, tag);
         if (ret != 0) { throw new CryptographicException("Error finalizing message authentication code."); }
+        _finalized = true;
     }
 
     public bool FinalizeAndVerify(ReadOnlySpan<byte> tag)
