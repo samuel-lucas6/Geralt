@@ -164,34 +164,34 @@ public class Ed25519Tests
 
     [TestMethod]
     [DynamicData(nameof(Rfc8032Ed25519TestVectors), DynamicDataSourceType.Method)]
-    public void ComputePublicKey_Valid(string signature, string message, string privateKey)
+    public void GetPublicKey_Valid(string signature, string message, string privateKey)
     {
         Span<byte> pk = stackalloc byte[Ed25519.PublicKeySize];
         Span<byte> sk = Convert.FromHexString(privateKey);
 
-        Ed25519.ComputePublicKey(pk, sk);
+        Ed25519.GetPublicKey(pk, sk);
 
         Assert.AreEqual(privateKey[(privateKey.Length / 2)..], Convert.ToHexString(pk).ToLower());
     }
 
     [TestMethod]
     [DynamicData(nameof(KeyPairInvalidParameterSizes), DynamicDataSourceType.Method)]
-    public void ComputePublicKey_Invalid(int publicKeySize, int privateKeySize)
+    public void GetPublicKey_Invalid(int publicKeySize, int privateKeySize)
     {
         var pk = new byte[publicKeySize];
         var sk = new byte[privateKeySize];
 
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Ed25519.ComputePublicKey(pk, sk));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Ed25519.GetPublicKey(pk, sk));
     }
 
     [TestMethod]
     [DataRow("25c704c594b88afc00a76b69d1ed2b984d7e22550f3ed0802d04fbcd07d38d47", "3d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c")]
-    public void GetX25519PublicKey_Valid(string x25519PublicKey, string ed25519PublicKey)
+    public void ComputeX25519PublicKey_Valid(string x25519PublicKey, string ed25519PublicKey)
     {
         Span<byte> x = stackalloc byte[X25519.PublicKeySize];
         Span<byte> e = Convert.FromHexString(ed25519PublicKey);
 
-        Ed25519.GetX25519PublicKey(x, e);
+        Ed25519.ComputeX25519PublicKey(x, e);
 
         Assert.AreEqual(x25519PublicKey, Convert.ToHexString(x).ToLower());
     }
@@ -201,22 +201,22 @@ public class Ed25519Tests
     [DataRow(X25519.PublicKeySize - 1, Ed25519.PublicKeySize)]
     [DataRow(X25519.PublicKeySize, Ed25519.PublicKeySize + 1)]
     [DataRow(X25519.PublicKeySize, Ed25519.PublicKeySize - 1)]
-    public void GetX25519PublicKey_Invalid(int x25519PublicKeySize, int ed25519PublicKeySize)
+    public void ComputeX25519PublicKey_Invalid(int x25519PublicKeySize, int ed25519PublicKeySize)
     {
         var x = new byte[x25519PublicKeySize];
         var e = new byte[ed25519PublicKeySize];
 
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Ed25519.GetX25519PublicKey(x, e));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Ed25519.ComputeX25519PublicKey(x, e));
     }
 
     [TestMethod]
     [DataRow("68bd9ed75882d52815a97585caf4790a7f6c6b3b7f821c5e259a24b02e502e51", "4ccd089b28ff96da9db6c346ec114e0f5b8a319f35aba624da8cf6ed4fb8a6fb3d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c")]
-    public void GetX25519PrivateKey_Valid(string x25519PrivateKey, string ed25519PrivateKey)
+    public void ComputeX25519PrivateKey_Valid(string x25519PrivateKey, string ed25519PrivateKey)
     {
         Span<byte> x = stackalloc byte[X25519.PrivateKeySize];
         Span<byte> e = Convert.FromHexString(ed25519PrivateKey);
 
-        Ed25519.GetX25519PrivateKey(x, e);
+        Ed25519.ComputeX25519PrivateKey(x, e);
 
         Assert.AreEqual(x25519PrivateKey, Convert.ToHexString(x).ToLower());
     }
@@ -226,12 +226,12 @@ public class Ed25519Tests
     [DataRow(X25519.PrivateKeySize - 1, Ed25519.PrivateKeySize)]
     [DataRow(X25519.PrivateKeySize, Ed25519.PrivateKeySize + 1)]
     [DataRow(X25519.PrivateKeySize, Ed25519.PrivateKeySize - 1)]
-    public void GetX25519PrivateKey_Invalid(int x25519PrivateKeySize, int ed25519PrivateKeySize)
+    public void ComputeX25519PrivateKey_Invalid(int x25519PrivateKeySize, int ed25519PrivateKeySize)
     {
         var x = new byte[x25519PrivateKeySize];
         var e = new byte[ed25519PrivateKeySize];
 
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Ed25519.GetX25519PrivateKey(x, e));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Ed25519.ComputeX25519PrivateKey(x, e));
     }
 
     [TestMethod]

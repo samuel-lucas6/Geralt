@@ -29,16 +29,16 @@ public static class Ed25519
         if (ret != 0) { throw new CryptographicException("Unable to generate key pair from seed."); }
     }
 
-    public static void ComputePublicKey(Span<byte> publicKey, ReadOnlySpan<byte> privateKey)
+    public static void GetPublicKey(Span<byte> publicKey, ReadOnlySpan<byte> privateKey)
     {
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
         Sodium.Initialize();
         int ret = crypto_sign_ed25519_sk_to_pk(publicKey, privateKey);
-        if (ret != 0) { throw new CryptographicException("Unable to compute public key from private key."); }
+        if (ret != 0) { throw new CryptographicException("Unable to retrieve public key from private key."); }
     }
 
-    public static void GetX25519PublicKey(Span<byte> x25519PublicKey, ReadOnlySpan<byte> ed25519PublicKey)
+    public static void ComputeX25519PublicKey(Span<byte> x25519PublicKey, ReadOnlySpan<byte> ed25519PublicKey)
     {
         Validation.EqualToSize(nameof(x25519PublicKey), x25519PublicKey.Length, X25519.PublicKeySize);
         Validation.EqualToSize(nameof(ed25519PublicKey), ed25519PublicKey.Length, PublicKeySize);
@@ -47,7 +47,7 @@ public static class Ed25519
         if (ret != 0) { throw new CryptographicException("Unable to compute X25519 public key."); }
     }
 
-    public static void GetX25519PrivateKey(Span<byte> x25519PrivateKey, ReadOnlySpan<byte> ed25519PrivateKey)
+    public static void ComputeX25519PrivateKey(Span<byte> x25519PrivateKey, ReadOnlySpan<byte> ed25519PrivateKey)
     {
         Validation.EqualToSize(nameof(x25519PrivateKey), x25519PrivateKey.Length, X25519.PrivateKeySize);
         Validation.EqualToSize(nameof(ed25519PrivateKey), ed25519PrivateKey.Length, PrivateKeySize);
