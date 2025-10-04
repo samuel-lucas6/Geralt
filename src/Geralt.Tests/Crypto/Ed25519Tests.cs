@@ -74,12 +74,10 @@ public class Ed25519Tests
 
     public static IEnumerable<object[]> KeyPairInvalidParameterSizes()
     {
-        yield return [Ed25519.PublicKeySize + 1, Ed25519.PrivateKeySize, Ed25519.SeedSize];
-        yield return [Ed25519.PublicKeySize - 1, Ed25519.PrivateKeySize, Ed25519.SeedSize];
-        yield return [Ed25519.PublicKeySize, Ed25519.PrivateKeySize + 1, Ed25519.SeedSize];
-        yield return [Ed25519.PublicKeySize, Ed25519.PrivateKeySize - 1, Ed25519.SeedSize];
-        yield return [Ed25519.PublicKeySize, Ed25519.PrivateKeySize, Ed25519.SeedSize + 1];
-        yield return [Ed25519.PublicKeySize, Ed25519.PrivateKeySize, Ed25519.SeedSize - 1];
+        yield return [Ed25519.PublicKeySize + 1, Ed25519.PrivateKeySize];
+        yield return [Ed25519.PublicKeySize - 1, Ed25519.PrivateKeySize];
+        yield return [Ed25519.PublicKeySize, Ed25519.PrivateKeySize + 1];
+        yield return [Ed25519.PublicKeySize, Ed25519.PrivateKeySize - 1];
     }
 
     public static IEnumerable<object[]> SignInvalidParameterSizes()
@@ -121,7 +119,7 @@ public class Ed25519Tests
 
     [TestMethod]
     [DynamicData(nameof(KeyPairInvalidParameterSizes), DynamicDataSourceType.Method)]
-    public void GenerateKeyPair_Invalid(int publicKeySize, int privateKeySize, int _)
+    public void GenerateKeyPair_Invalid(int publicKeySize, int privateKeySize)
     {
         var pk = new byte[publicKeySize];
         var sk = new byte[privateKeySize];
@@ -145,7 +143,9 @@ public class Ed25519Tests
 
     [TestMethod]
     [DynamicData(nameof(KeyPairInvalidParameterSizes), DynamicDataSourceType.Method)]
-    public void GenerateKeyPair_Seed_Invalid(int publicKeySize, int privateKeySize, int seedSize)
+    [DataRow(Ed25519.PublicKeySize, Ed25519.PrivateKeySize, Ed25519.SeedSize + 1)]
+    [DataRow(Ed25519.PublicKeySize, Ed25519.PrivateKeySize, Ed25519.SeedSize - 1)]
+    public void GenerateKeyPair_Seed_Invalid(int publicKeySize, int privateKeySize, int seedSize = Ed25519.SeedSize)
     {
         var pk = new byte[publicKeySize];
         var sk = new byte[privateKeySize];
@@ -168,7 +168,7 @@ public class Ed25519Tests
 
     [TestMethod]
     [DynamicData(nameof(KeyPairInvalidParameterSizes), DynamicDataSourceType.Method)]
-    public void GetSeed_Invalid(int seedSize, int privateKeySize, int _)
+    public void GetSeed_Invalid(int seedSize, int privateKeySize)
     {
         var s = new byte[seedSize];
         var sk = new byte[privateKeySize];
@@ -190,7 +190,7 @@ public class Ed25519Tests
 
     [TestMethod]
     [DynamicData(nameof(KeyPairInvalidParameterSizes), DynamicDataSourceType.Method)]
-    public void GetPublicKey_Invalid(int publicKeySize, int privateKeySize, int _)
+    public void GetPublicKey_Invalid(int publicKeySize, int privateKeySize)
     {
         var pk = new byte[publicKeySize];
         var sk = new byte[privateKeySize];
