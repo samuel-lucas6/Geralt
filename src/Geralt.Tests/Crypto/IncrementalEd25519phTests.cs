@@ -15,7 +15,7 @@ public class IncrementalEd25519phTests
     }
 
     [TestMethod]
-    public void Incremental_Constants_Valid()
+    public void Constants_Valid()
     {
         Assert.AreEqual(32, IncrementalEd25519ph.PublicKeySize);
         Assert.AreEqual(64, IncrementalEd25519ph.PrivateKeySize);
@@ -24,7 +24,7 @@ public class IncrementalEd25519phTests
 
     [TestMethod]
     [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
-    public void Incremental_Sign_Valid(string signature, string message, string privateKey)
+    public void Sign_Valid(string signature, string message, string privateKey)
     {
         Span<byte> s = stackalloc byte[IncrementalEd25519ph.SignatureSize];
         Span<byte> m = Convert.FromHexString(message);
@@ -45,58 +45,26 @@ public class IncrementalEd25519phTests
 
     [TestMethod]
     [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
-    public void Incremental_Sign_Reinitialize_Valid(string signature, string message, string privateKey)
+    public void Reinitialize_Valid(string signature, string message, string privateKey)
     {
         Span<byte> s = stackalloc byte[IncrementalEd25519ph.SignatureSize];
         Span<byte> m = Convert.FromHexString(message);
         Span<byte> sk = Convert.FromHexString(privateKey);
+        Span<byte> pk = sk[^Ed25519.PublicKeySize..];
 
         using var ed25519ph = new IncrementalEd25519ph();
         ed25519ph.Update(m);
         ed25519ph.Finalize(s, sk);
-        s.Clear();
         ed25519ph.Reinitialize();
         ed25519ph.Update(m);
-        ed25519ph.Finalize(s, sk);
+        bool valid = ed25519ph.FinalizeAndVerify(s, pk);
 
-        Assert.AreEqual(signature, Convert.ToHexString(s).ToLower());
-    }
-
-    [TestMethod]
-    [DynamicData(nameof(Ed25519Tests.SignInvalidParameterSizes), typeof(Ed25519Tests))]
-    public void Incremental_Sign_Invalid(int signatureSize, int messageSize, int privateKeySize)
-    {
-        var s = new byte[signatureSize];
-        var m = new byte[messageSize];
-        var sk = new byte[privateKeySize];
-
-        using var ed25519ph = new IncrementalEd25519ph();
-        ed25519ph.Update(m);
-
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => ed25519ph.Finalize(s, sk));
+        Assert.IsTrue(valid);
     }
 
     [TestMethod]
     [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
-    public void Incremental_Sign_InvalidOperation(string signature, string message, string privateKey)
-    {
-        var s = new byte[IncrementalEd25519ph.SignatureSize];
-        var m = Convert.FromHexString(message);
-        var sk = Convert.FromHexString(privateKey);
-        var pk = sk[^Ed25519.PublicKeySize..];
-
-        using var ed25519ph = new IncrementalEd25519ph();
-        ed25519ph.Update(m);
-        ed25519ph.Finalize(s, sk);
-
-        Assert.ThrowsExactly<InvalidOperationException>(() => ed25519ph.Update(m));
-        Assert.ThrowsExactly<InvalidOperationException>(() => ed25519ph.Finalize(s, sk));
-        Assert.ThrowsExactly<InvalidOperationException>(() => ed25519ph.FinalizeAndVerify(s, pk));
-    }
-
-    [TestMethod]
-    [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
-    public void Incremental_Verify_Valid(string signature, string message, string privateKey)
+    public void Verify_Valid(string signature, string message, string privateKey)
     {
         Span<byte> s = Convert.FromHexString(signature);
         Span<byte> m = Convert.FromHexString(message);
@@ -117,25 +85,7 @@ public class IncrementalEd25519phTests
 
     [TestMethod]
     [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
-    public void Incremental_Verify_Reinitialize_Valid(string signature, string message, string privateKey)
-    {
-        Span<byte> s = Convert.FromHexString(signature);
-        Span<byte> m = Convert.FromHexString(message);
-        Span<byte> pk = Convert.FromHexString(privateKey)[^Ed25519.PublicKeySize..];
-
-        using var ed25519ph = new IncrementalEd25519ph();
-        ed25519ph.Update(m);
-        ed25519ph.FinalizeAndVerify(s, pk);
-        ed25519ph.Reinitialize();
-        ed25519ph.Update(m);
-        bool valid = ed25519ph.FinalizeAndVerify(s, pk);
-
-        Assert.IsTrue(valid);
-    }
-
-    [TestMethod]
-    [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
-    public void Incremental_Verify_Tampered(string signature, string message, string privateKey)
+    public void Verify_Tampered(string signature, string message, string privateKey)
     {
         var parameters = new Dictionary<string, byte[]>
         {
@@ -149,35 +99,45 @@ public class IncrementalEd25519phTests
             using var ed25519ph = new IncrementalEd25519ph();
             ed25519ph.Update(parameters["m"]);
             bool valid = ed25519ph.FinalizeAndVerify(parameters["s"], parameters["pk"]);
-            param[0]--;
             Assert.IsFalse(valid);
+            param[0]--;
         }
     }
 
     [TestMethod]
-    [DynamicData(nameof(Ed25519Tests.VerifyInvalidParameterSizes), typeof(Ed25519Tests))]
-    public void Incremental_Verify_Invalid(int signatureSize, int messageSize, int publicKeySize)
+    [DynamicData(nameof(Ed25519Tests.SignInvalidParameterSizes), typeof(Ed25519Tests))]
+    public void Incremental_Invalid(int signatureSize, int messageSize, int privateKeySize)
     {
         var s = new byte[signatureSize];
         var m = new byte[messageSize];
-        var pk = new byte[publicKeySize];
+        var sk = new byte[privateKeySize];
+        var pk = new byte[privateKeySize - Ed25519.PublicKeySize];
 
         using var ed25519ph = new IncrementalEd25519ph();
         ed25519ph.Update(m);
 
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => ed25519ph.Finalize(s, sk));
         Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => ed25519ph.FinalizeAndVerify(s, pk));
     }
 
     [TestMethod]
     [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
-    public void Incremental_Verify_InvalidOperation(string signature, string message, string privateKey)
+    public void Incremental_InvalidOperation(string signature, string message, string privateKey)
     {
-        var s = Convert.FromHexString(signature);
+        var s = new byte[IncrementalEd25519ph.SignatureSize];
         var m = Convert.FromHexString(message);
         var sk = Convert.FromHexString(privateKey);
         var pk = sk[^Ed25519.PublicKeySize..];
 
         using var ed25519ph = new IncrementalEd25519ph();
+        ed25519ph.Update(m);
+        ed25519ph.Finalize(s, sk);
+
+        Assert.ThrowsExactly<InvalidOperationException>(() => ed25519ph.Update(m));
+        Assert.ThrowsExactly<InvalidOperationException>(() => ed25519ph.Finalize(s, sk));
+        Assert.ThrowsExactly<InvalidOperationException>(() => ed25519ph.FinalizeAndVerify(s, pk));
+
+        ed25519ph.Reinitialize();
         ed25519ph.Update(m);
         ed25519ph.FinalizeAndVerify(s, pk);
 
@@ -196,12 +156,12 @@ public class IncrementalEd25519phTests
         var pk = sk[^Ed25519.PublicKeySize..];
 
         var ed25519ph = new IncrementalEd25519ph();
-
         ed25519ph.Dispose();
 
         Assert.ThrowsExactly<ObjectDisposedException>(() => ed25519ph.Reinitialize());
         Assert.ThrowsExactly<ObjectDisposedException>(() => ed25519ph.Update(m));
         Assert.ThrowsExactly<ObjectDisposedException>(() => ed25519ph.Finalize(s, sk));
         Assert.ThrowsExactly<ObjectDisposedException>(() => ed25519ph.FinalizeAndVerify(s, pk));
+        ed25519ph.Dispose();
     }
 }
