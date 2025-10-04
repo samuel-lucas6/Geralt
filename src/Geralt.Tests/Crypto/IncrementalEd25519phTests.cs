@@ -4,7 +4,7 @@
 public class IncrementalEd25519phTests
 {
     // https://www.rfc-editor.org/rfc/rfc8032.html#section-7.3
-    public static IEnumerable<object[]> Rfc8032Ed25519phTestVectors()
+    public static IEnumerable<object[]> Rfc8032TestVectors()
     {
         yield return
         [
@@ -23,7 +23,7 @@ public class IncrementalEd25519phTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc8032TestVectors), DynamicDataSourceType.Method)]
     public void Sign_Valid(string signature, string message, string privateKey)
     {
         Span<byte> s = stackalloc byte[IncrementalEd25519ph.SignatureSize];
@@ -44,7 +44,7 @@ public class IncrementalEd25519phTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc8032TestVectors), DynamicDataSourceType.Method)]
     public void Reinitialize_Valid(string signature, string message, string privateKey)
     {
         Span<byte> s = stackalloc byte[IncrementalEd25519ph.SignatureSize];
@@ -63,7 +63,7 @@ public class IncrementalEd25519phTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc8032TestVectors), DynamicDataSourceType.Method)]
     public void Verify_Valid(string signature, string message, string privateKey)
     {
         Span<byte> s = Convert.FromHexString(signature);
@@ -84,7 +84,7 @@ public class IncrementalEd25519phTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc8032TestVectors), DynamicDataSourceType.Method)]
     public void Verify_Tampered(string signature, string message, string privateKey)
     {
         var parameters = new Dictionary<string, byte[]>
@@ -121,7 +121,7 @@ public class IncrementalEd25519phTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc8032TestVectors), DynamicDataSourceType.Method)]
     public void Incremental_InvalidOperation(string signature, string message, string privateKey)
     {
         var s = new byte[IncrementalEd25519ph.SignatureSize];
@@ -147,7 +147,7 @@ public class IncrementalEd25519phTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc8032Ed25519phTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc8032TestVectors), DynamicDataSourceType.Method)]
     public void Incremental_Disposed(string signature, string message, string privateKey)
     {
         var s = Convert.FromHexString(signature);
