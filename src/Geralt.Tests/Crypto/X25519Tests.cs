@@ -3,9 +3,22 @@ namespace Geralt.Tests;
 [TestClass]
 public class X25519Tests
 {
+    // https://datatracker.ietf.org/doc/html/rfc7748#section-5.2
     // https://datatracker.ietf.org/doc/html/rfc7748#section-6.1
     public static IEnumerable<object[]> Rfc7748TestVectors()
     {
+        yield return
+        [
+            "c3da55379de9c6908e94ea4df28d084f32eccf03491c71f754b4075577a28552",
+            "a546e36bf0527c9d3b16154b82465edd62144c0ac1fc5a18506a2244ba449ac4",
+            "e6db6867583030db3594c1a424b15f7c726624ec26b3353b10a903a6d0ab1c4c"
+        ];
+        yield return
+        [
+            "95cbde9476e8907d7aade45cb4b873f88b595a68799fa152e6f8f7647aac7957",
+            "4b66e9d4d1b4673c5ad22691957d6af5c11b6421e0ea01d42ca4169e7918ba0d",
+            "e5210f12786811d3f4b7959d0538ae2c31dbe7106fc03c3efc4cd549c715a493"
+        ];
         yield return
         [
             "4a5d9d5ba4ce2de1728e3bf480350f25e07e21c947d19e3376f09b3c1e161742",
@@ -20,9 +33,10 @@ public class X25519Tests
         ];
     }
 
-    // https://github.com/google/wycheproof/blob/master/testvectors_v1/x25519_test.json
+    // https://github.com/C2SP/wycheproof/blob/main/testvectors_v1/x25519_test.json
     public static IEnumerable<object[]> WycheproofTestVectors()
     {
+        // SmallPublicKey/LowOrderPublic/ZeroSharedSecret
         yield return
         [
             "0000000000000000000000000000000000000000000000000000000000000000",
@@ -40,6 +54,12 @@ public class X25519Tests
             "0000000000000000000000000000000000000000000000000000000000000000",
             "e0f978dfcd3a8f1a5093418de54136a584c20b7b349afdf6c0520886f95b1272",
             "e0eb7a7c3b41b8ae1656e3faf19fc46ada098deb9c32b1fd866205165f49b800"
+        ];
+        yield return
+        [
+            "0000000000000000000000000000000000000000000000000000000000000000",
+            "c8fe0df92ae68a03023fc0c9adb9557d31be7feed0d3ab36c558143daf4dbb40",
+            "ecffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f"
         ];
     }
 
@@ -68,6 +88,15 @@ public class X25519Tests
             "5dab087e624a8a4b79e17f8b83800ee66f3bb1292618b6fd1c2f8b27ff88e0eb",
             "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a",
             ""
+        ];
+        yield return
+        [
+            "9d86883c0f58a9cfc12fad7209a228c5eea452a710602e404fbc9189562ca307",
+            "77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a",
+            "de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f",
+            "5dab087e624a8a4b79e17f8b83800ee66f3bb1292618b6fd1c2f8b27ff88e0eb",
+            "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a",
+            "1f21c2a65b744b2cbe0d72270a708b8c"
         ];
         yield return
         [
@@ -146,7 +175,7 @@ public class X25519Tests
 
     [TestMethod]
     [DataRow("10c84ef255d4682177b9d0b43d753552fbc6b0f2cf735e6b45cba18fa1f05444", "471cfd04edcbcb7f4174a88e9c9569b9aa9464254c3d5373ff6775cb22e7483f", "b589764bb6395e13788436f93f4eaa4c858900b6a12328e8626ded5b39d2c7e9")]
-    public void GenerateKeyPair_Seeded_Valid(string publicKey, string privateKey, string seed)
+    public void GenerateKeyPair_Seed_Valid(string publicKey, string privateKey, string seed)
     {
         Span<byte> pk = stackalloc byte[X25519.PublicKeySize];
         Span<byte> sk = stackalloc byte[X25519.PrivateKeySize];
@@ -162,7 +191,7 @@ public class X25519Tests
     [DynamicData(nameof(KeyPairInvalidParameterSizes), DynamicDataSourceType.Method)]
     [DataRow(X25519.PublicKeySize, X25519.PrivateKeySize, X25519.SeedSize + 1)]
     [DataRow(X25519.PublicKeySize, X25519.PrivateKeySize, X25519.SeedSize - 1)]
-    public void GenerateKeyPair_Seeded_Invalid(int publicKeySize, int privateKeySize, int seedSize = X25519.SeedSize)
+    public void GenerateKeyPair_Seed_Invalid(int publicKeySize, int privateKeySize, int seedSize = X25519.SeedSize)
     {
         var pk = new byte[publicKeySize];
         var sk = new byte[privateKeySize];
@@ -197,24 +226,24 @@ public class X25519Tests
     [DynamicData(nameof(Rfc7748TestVectors), DynamicDataSourceType.Method)]
     public void ComputeSharedSecret_Valid(string sharedSecret, string senderPrivateKey, string recipientPublicKey)
     {
-        Span<byte> s = stackalloc byte[X25519.SharedSecretSize];
+        Span<byte> ss = stackalloc byte[X25519.SharedSecretSize];
         Span<byte> sk = Convert.FromHexString(senderPrivateKey);
         Span<byte> pk = Convert.FromHexString(recipientPublicKey);
 
-        X25519.ComputeSharedSecret(s, sk, pk);
+        X25519.ComputeSharedSecret(ss, sk, pk);
 
-        Assert.AreEqual(sharedSecret, Convert.ToHexString(s).ToLower());
+        Assert.AreEqual(sharedSecret, Convert.ToHexString(ss).ToLower());
     }
 
     [TestMethod]
     [DynamicData(nameof(WycheproofTestVectors), DynamicDataSourceType.Method)]
     public void ComputeSharedSecret_Tampered(string sharedSecret, string senderPrivateKey, string recipientPublicKey)
     {
-        var s = new byte[X25519.SharedSecretSize];
+        var ss = new byte[X25519.SharedSecretSize];
         var sk = Convert.FromHexString(senderPrivateKey);
         var pk = Convert.FromHexString(recipientPublicKey);
 
-        Assert.ThrowsExactly<CryptographicException>(() => X25519.ComputeSharedSecret(s, sk, pk));
+        Assert.ThrowsExactly<CryptographicException>(() => X25519.ComputeSharedSecret(ss, sk, pk));
     }
 
     [TestMethod]
@@ -226,42 +255,42 @@ public class X25519Tests
     [DataRow(X25519.SharedSecretSize, X25519.PrivateKeySize, X25519.PublicKeySize - 1)]
     public void ComputeSharedSecret_Invalid(int sharedSecretSize, int senderPrivateKeySize, int recipientPublicKeySize)
     {
-        var s = new byte[sharedSecretSize];
+        var ss = new byte[sharedSecretSize];
         var sk = new byte[senderPrivateKeySize];
         var pk = new byte[recipientPublicKeySize];
 
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => X25519.ComputeSharedSecret(s, sk, pk));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => X25519.ComputeSharedSecret(ss, sk, pk));
     }
 
     [TestMethod]
     [DynamicData(nameof(DeriveSharedKeyTestVectors), DynamicDataSourceType.Method)]
     public void DeriveSharedKey_Valid(string sharedKey, string senderPrivateKey, string recipientPublicKey, string recipientPrivateKey, string senderPublicKey, string preSharedKey)
     {
-        Span<byte> ss = stackalloc byte[X25519.SharedKeySize];
+        Span<byte> sss = stackalloc byte[X25519.SharedKeySize];
         Span<byte> ssk = Convert.FromHexString(senderPrivateKey);
         Span<byte> rpk = Convert.FromHexString(recipientPublicKey);
-        Span<byte> rs = stackalloc byte[X25519.SharedKeySize];
+        Span<byte> rss = stackalloc byte[X25519.SharedKeySize];
         Span<byte> rsk = Convert.FromHexString(recipientPrivateKey);
         Span<byte> spk = Convert.FromHexString(senderPublicKey);
         Span<byte> psk = Convert.FromHexString(preSharedKey);
 
-        X25519.DeriveSenderSharedKey(ss, ssk, rpk, psk);
-        X25519.DeriveRecipientSharedKey(rs, rsk, spk, psk);
+        X25519.DeriveSenderSharedKey(sss, ssk, rpk, psk);
+        X25519.DeriveRecipientSharedKey(rss, rsk, spk, psk);
 
-        Assert.AreEqual(sharedKey, Convert.ToHexString(ss).ToLower());
-        Assert.AreEqual(sharedKey, Convert.ToHexString(rs).ToLower());
+        Assert.AreEqual(sharedKey, Convert.ToHexString(sss).ToLower());
+        Assert.AreEqual(sharedKey, Convert.ToHexString(rss).ToLower());
     }
 
     [TestMethod]
     [DynamicData(nameof(SharedKeyInvalidParameterSizes), DynamicDataSourceType.Method)]
     public void DeriveSharedKey_Invalid(int sharedKeySize, int privateKeySize, int publicKeySize, int preSharedKeySize)
     {
-        var s = new byte[sharedKeySize];
+        var ss = new byte[sharedKeySize];
         var sk = new byte[privateKeySize];
         var pk = new byte[publicKeySize];
         var psk = new byte[preSharedKeySize];
 
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedKey(s, sk, pk, psk));
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedKey(s, sk, pk, psk));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedKey(ss, sk, pk, psk));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedKey(ss, sk, pk, psk));
     }
 }
