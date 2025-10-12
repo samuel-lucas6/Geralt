@@ -42,42 +42,6 @@ public static class X25519
         if (ret != 0) { throw new CryptographicException("Unable to compute public key from private key."); }
     }
 
-    public static void DeriveSenderSharedKey(Span<byte> sharedKey, ReadOnlySpan<byte> senderPrivateKey, ReadOnlySpan<byte> recipientPublicKey, ReadOnlySpan<byte> preSharedKey = default)
-    {
-        Validation.EqualToSize(nameof(sharedKey), sharedKey.Length, SharedKeySize);
-        Validation.EqualToSize(nameof(senderPrivateKey), senderPrivateKey.Length, PrivateKeySize);
-        Validation.EqualToSize(nameof(recipientPublicKey), recipientPublicKey.Length, PublicKeySize);
-        if (preSharedKey.Length != 0) { Validation.SizeBetween(nameof(preSharedKey), preSharedKey.Length, MinPreSharedKeySize, MaxPreSharedKeySize); }
-        Span<byte> sharedSecret = stackalloc byte[SharedSecretSize];
-        ComputeSharedSecret(sharedSecret, senderPrivateKey, recipientPublicKey);
-        Span<byte> senderPublicKey = stackalloc byte[PublicKeySize];
-        ComputePublicKey(senderPublicKey, senderPrivateKey);
-        using var blake2b = new IncrementalBLAKE2b(sharedKey.Length, preSharedKey);
-        blake2b.Update(sharedSecret);
-        blake2b.Update(senderPublicKey);
-        blake2b.Update(recipientPublicKey);
-        blake2b.Finalize(sharedKey);
-        SecureMemory.ZeroMemory(sharedSecret);
-    }
-
-    public static void DeriveRecipientSharedKey(Span<byte> sharedKey, ReadOnlySpan<byte> recipientPrivateKey, ReadOnlySpan<byte> senderPublicKey, ReadOnlySpan<byte> preSharedKey = default)
-    {
-        Validation.EqualToSize(nameof(sharedKey), sharedKey.Length, SharedKeySize);
-        Validation.EqualToSize(nameof(recipientPrivateKey), recipientPrivateKey.Length, PrivateKeySize);
-        Validation.EqualToSize(nameof(senderPublicKey), senderPublicKey.Length, PublicKeySize);
-        if (preSharedKey.Length != 0) { Validation.SizeBetween(nameof(preSharedKey), preSharedKey.Length, MinPreSharedKeySize, MaxPreSharedKeySize); }
-        Span<byte> sharedSecret = stackalloc byte[SharedSecretSize];
-        ComputeSharedSecret(sharedSecret, recipientPrivateKey, senderPublicKey);
-        Span<byte> recipientPublicKey = stackalloc byte[PublicKeySize];
-        ComputePublicKey(recipientPublicKey, recipientPrivateKey);
-        using var blake2b = new IncrementalBLAKE2b(sharedKey.Length, preSharedKey);
-        blake2b.Update(sharedSecret);
-        blake2b.Update(senderPublicKey);
-        blake2b.Update(recipientPublicKey);
-        blake2b.Finalize(sharedKey);
-        SecureMemory.ZeroMemory(sharedSecret);
-    }
-
     public static void ComputeSharedSecret(Span<byte> sharedSecret, ReadOnlySpan<byte> senderPrivateKey, ReadOnlySpan<byte> recipientPublicKey)
     {
         Validation.EqualToSize(nameof(sharedSecret), sharedSecret.Length, SharedSecretSize);
@@ -86,5 +50,38 @@ public static class X25519
         Sodium.Initialize();
         int ret = crypto_scalarmult(sharedSecret, senderPrivateKey, recipientPublicKey);
         if (ret != 0) { throw new CryptographicException("Invalid public key."); }
+    }
+
+    public static void DeriveSenderSharedKey(Span<byte> sharedKey, ReadOnlySpan<byte> senderPrivateKey, ReadOnlySpan<byte> recipientPublicKey, ReadOnlySpan<byte> preSharedKey = default)
+    {
+        Validation.EqualToSize(nameof(sharedKey), sharedKey.Length, SharedKeySize);
+        Validation.EqualToSize(nameof(senderPrivateKey), senderPrivateKey.Length, PrivateKeySize);
+        Validation.EqualToSize(nameof(recipientPublicKey), recipientPublicKey.Length, PublicKeySize);
+        if (preSharedKey.Length != 0) { Validation.SizeBetween(nameof(preSharedKey), preSharedKey.Length, MinPreSharedKeySize, MaxPreSharedKeySize); }
+        DeriveSharedKey(sharedKey, senderPrivateKey, recipientPublicKey, preSharedKey, isSender: true);
+    }
+
+    public static void DeriveRecipientSharedKey(Span<byte> sharedKey, ReadOnlySpan<byte> recipientPrivateKey, ReadOnlySpan<byte> senderPublicKey, ReadOnlySpan<byte> preSharedKey = default)
+    {
+        Validation.EqualToSize(nameof(sharedKey), sharedKey.Length, SharedKeySize);
+        Validation.EqualToSize(nameof(recipientPrivateKey), recipientPrivateKey.Length, PrivateKeySize);
+        Validation.EqualToSize(nameof(senderPublicKey), senderPublicKey.Length, PublicKeySize);
+        if (preSharedKey.Length != 0) { Validation.SizeBetween(nameof(preSharedKey), preSharedKey.Length, MinPreSharedKeySize, MaxPreSharedKeySize); }
+        DeriveSharedKey(sharedKey, recipientPrivateKey, senderPublicKey, preSharedKey, isSender: false);
+    }
+
+    private static void DeriveSharedKey(Span<byte> sharedKey, ReadOnlySpan<byte> yourPrivateKey, ReadOnlySpan<byte> othersPublicKey, ReadOnlySpan<byte> preSharedKey, bool isSender)
+    {
+        Span<byte> sharedSecret = stackalloc byte[SharedSecretSize];
+        ComputeSharedSecret(sharedSecret, yourPrivateKey, othersPublicKey);
+        Span<byte> yourPublicKey = stackalloc byte[PublicKeySize];
+        ComputePublicKey(yourPublicKey, yourPrivateKey);
+        using var blake2b = new IncrementalBLAKE2b(sharedKey.Length, preSharedKey);
+        blake2b.Update(sharedSecret);
+        blake2b.Update(isSender ? yourPublicKey : othersPublicKey);
+        blake2b.Update(isSender ? othersPublicKey : yourPublicKey);
+        blake2b.Finalize(sharedKey);
+        SecureMemory.ZeroMemory(sharedSecret);
+        SecureMemory.ZeroMemory(yourPublicKey);
     }
 }
