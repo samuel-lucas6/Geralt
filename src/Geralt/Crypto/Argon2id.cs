@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Text;
 using static Interop.Libsodium;
 
 namespace Geralt;
@@ -6,12 +6,13 @@ namespace Geralt;
 public static class Argon2id
 {
     public const int KeySize = 32;
-    public const int SaltSize = crypto_pwhash_SALTBYTES;
-    public const int MinKeySize = crypto_pwhash_BYTES_MIN;
+    public const int SaltSize = crypto_pwhash_argon2id_SALTBYTES;
+    public const int HashSize = MaxHashSize;
+    public const int MinKeySize = crypto_pwhash_argon2id_BYTES_MIN;
     public const int MinIterations = crypto_pwhash_argon2id_OPSLIMIT_MIN;
-    public const int MinMemorySize = crypto_pwhash_MEMLIMIT_MIN;
-    public const int MinHashSize = 93; // Smallest possible Argon2id string that libsodium can generate
-    public const int MaxHashSize = crypto_pwhash_STRBYTES;
+    public const int MinMemorySize = crypto_pwhash_argon2id_MEMLIMIT_MIN;
+    private const int MinHashSize = 45; // With Argon2id, 45 characters according to CyberChef (e.g., $argon2id$v=19$m=8,t=1,p=1$c29tZXNhbHQ$AKal+Q), 55 characters according to the PHC string format spec, and 93 when generated with libsodium
+    private const int MaxHashSize = crypto_pwhash_argon2id_STRBYTES; // With Argon2id and no keyid/data, 198 characters according to the PHC string format spec (e.g., $argon2id$v=19$m=0000000000,t=0000000000,p=000$1111111111111111111111111111111111111111111111111111111111111111$22222222222222222222222222222222222222222222222222222222222222222222222222222222222222)
     private const string HashPrefix = crypto_pwhash_argon2id_STRPREFIX;
 
     public static void DeriveKey(Span<byte> outputKeyingMaterial, ReadOnlySpan<byte> password, ReadOnlySpan<byte> salt, int iterations, int memorySize)
@@ -22,50 +23,69 @@ public static class Argon2id
         Validation.NotLessThanMin(nameof(memorySize), memorySize, MinMemorySize);
         Sodium.Initialize();
         int ret = crypto_pwhash(outputKeyingMaterial, (ulong)outputKeyingMaterial.Length, password, (ulong)password.Length, salt, (ulong)iterations, (nuint)memorySize, crypto_pwhash_argon2id_ALG_ARGON2ID13);
-        if (ret != 0) { throw new InsufficientMemoryException("Insufficient memory to perform key derivation."); }
+        if (ret != 0) { throw new InsufficientMemoryException("Insufficient memory to perform password-based key derivation."); }
     }
 
-    public static string ComputeHash(ReadOnlySpan<byte> password, int iterations, int memorySize)
+    public static void ComputeHash(Span<char> hash, ReadOnlySpan<byte> password, int iterations, int memorySize)
     {
+        Validation.EqualToSize(nameof(hash), hash.Length, HashSize);
         Validation.NotLessThanMin(nameof(iterations), iterations, MinIterations);
         Validation.NotLessThanMin(nameof(memorySize), memorySize, MinMemorySize);
         Sodium.Initialize();
-        nint hash = Marshal.AllocHGlobal(MaxHashSize);
+        Span<byte> hashBytes = stackalloc byte[HashSize];
         try {
-            int ret = crypto_pwhash_str_alg(hash, password, (ulong)password.Length, (ulong)iterations, (nuint)memorySize, crypto_pwhash_argon2id_ALG_ARGON2ID13);
+            int ret = crypto_pwhash_str_alg(hashBytes, password, (ulong)password.Length, (ulong)iterations, (nuint)memorySize, crypto_pwhash_argon2id_ALG_ARGON2ID13);
             if (ret != 0) { throw new InsufficientMemoryException("Insufficient memory to perform password hashing."); }
-            return Marshal.PtrToStringAnsi(hash)!;
+            for (int i = 0; i < hashBytes.Length; i++) {
+                hash[i] = (char)hashBytes[i];
+            }
         }
         finally {
-            Marshal.FreeHGlobal(hash);
+            SecureMemory.ZeroMemory(hashBytes);
         }
     }
 
-    public static bool VerifyHash(string hash, ReadOnlySpan<byte> password)
+    public static bool VerifyHash(ReadOnlySpan<char> hash, ReadOnlySpan<byte> password)
     {
-        Validation.NotNull(nameof(hash), hash);
         Validation.SizeBetween(nameof(hash), hash.Length, MinHashSize, MaxHashSize);
-        ThrowIfInvalidHashPrefix(hash);
-        Sodium.Initialize();
-        return crypto_pwhash_str_verify(hash, password, (ulong)password.Length) == 0;
+        Span<byte> hashBytes = stackalloc byte[HashSize]; hashBytes.Clear();
+        try {
+            for (int i = 0; i < hash.Length; i++) {
+                hashBytes[i] = (byte)hash[i];
+            }
+            ThrowIfInvalidHashPrefix(hashBytes);
+            Sodium.Initialize();
+            return crypto_pwhash_str_verify(hashBytes, password, (ulong)password.Length) == 0;
+        }
+        finally {
+            SecureMemory.ZeroMemory(hashBytes);
+        }
     }
 
-    public static bool NeedsRehash(string hash, int iterations, int memorySize)
+    public static bool NeedsRehash(ReadOnlySpan<char> hash, int iterations, int memorySize)
     {
-        Validation.NotNull(nameof(hash), hash);
         Validation.SizeBetween(nameof(hash), hash.Length, MinHashSize, MaxHashSize);
         Validation.NotLessThanMin(nameof(iterations), iterations, MinIterations);
         Validation.NotLessThanMin(nameof(memorySize), memorySize, MinMemorySize);
-        ThrowIfInvalidHashPrefix(hash);
-        Sodium.Initialize();
-        int ret = crypto_pwhash_str_needs_rehash(hash, (ulong)iterations, (nuint)memorySize);
-        return ret == -1 ? throw new FormatException("Invalid encoded password hash.") : ret == 1;
+        Span<byte> hashBytes = stackalloc byte[HashSize]; hashBytes.Clear();
+        try {
+            for (int i = 0; i < hash.Length; i++) {
+                hashBytes[i] = (byte)hash[i];
+            }
+            ThrowIfInvalidHashPrefix(hashBytes);
+            Sodium.Initialize();
+            int ret = crypto_pwhash_str_needs_rehash(hashBytes, (ulong)iterations, (nuint)memorySize);
+            return ret == -1 ? throw new FormatException("Invalid password hash string.") : ret == 1;
+        }
+        finally {
+            SecureMemory.ZeroMemory(hashBytes);
+        }
     }
 
-    private static void ThrowIfInvalidHashPrefix(string hash)
+    private static void ThrowIfInvalidHashPrefix(ReadOnlySpan<byte> hashBytes)
     {
-        if (!hash.StartsWith(HashPrefix)) {
-            throw new FormatException("Invalid encoded password hash prefix.");
+        if (!ConstantTime.Equals(hashBytes[..HashPrefix.Length], Encoding.ASCII.GetBytes(HashPrefix))) {
+            throw new FormatException("Invalid password hash string prefix.");
         }
     }
 }
