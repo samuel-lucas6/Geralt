@@ -36,7 +36,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
         if (key.Length != 0) { Validation.SizeBetween(nameof(key), key.Length, MinKeySize, MaxKeySize); }
         _hashSize = hashSize;
         _finalized = false;
-        int ret = crypto_generichash_init(ref _state, key, (nuint)key.Length, (nuint)hashSize);
+        int ret = crypto_generichash_blake2b_init(ref _state, key, (nuint)key.Length, (nuint)hashSize);
         if (ret != 0) { throw new CryptographicException("Error initializing hash function state."); }
     }
 
@@ -44,7 +44,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
         if (_finalized) { throw new InvalidOperationException("Cannot update after finalizing without reinitializing or restoring a cached state."); }
-        int ret = crypto_generichash_update(ref _state, message, (ulong)message.Length);
+        int ret = crypto_generichash_blake2b_update(ref _state, message, (ulong)message.Length);
         if (ret != 0) { throw new CryptographicException("Error updating hash function state."); }
     }
 
@@ -54,7 +54,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
         if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing or restoring a cached state."); }
         Validation.EqualToSize(nameof(hash), hash.Length, _hashSize);
         _finalized = true;
-        int ret = crypto_generichash_final(ref _state, hash, (nuint)hash.Length);
+        int ret = crypto_generichash_blake2b_final(ref _state, hash, (nuint)hash.Length);
         if (ret != 0) { throw new CryptographicException("Error finalizing hash."); }
     }
 

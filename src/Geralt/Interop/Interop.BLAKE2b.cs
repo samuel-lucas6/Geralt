@@ -21,20 +21,5 @@ internal static partial class Interop
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         internal static partial int crypto_generichash_blake2b_salt_personal(Span<byte> hash, nuint hashLength, ReadOnlySpan<byte> message, ulong messageLength, ReadOnlySpan<byte> key, nuint keyLength, ReadOnlySpan<byte> salt, ReadOnlySpan<byte> personalization);
-
-        [LibraryImport(DllName)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial int crypto_generichash_init(ref crypto_generichash_blake2b_state state, ReadOnlySpan<byte> key, nuint keyLength, nuint hashLength);
-
-        [LibraryImport(DllName)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial int crypto_generichash_update(ref crypto_generichash_blake2b_state state, ReadOnlySpan<byte> message, ulong messageLength);
-
-        [LibraryImport(DllName)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial int crypto_generichash_final(ref crypto_generichash_blake2b_state state, Span<byte> hash, nuint hashLength);
-
-        [StructLayout(LayoutKind.Explicit, Size = 384)]
-        internal struct crypto_generichash_blake2b_state;
     }
 }
