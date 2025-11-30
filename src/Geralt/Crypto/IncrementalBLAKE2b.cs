@@ -11,8 +11,8 @@ public sealed class IncrementalBLAKE2b : IDisposable
     public const int TagSize = BLAKE2b.TagSize;
     public const int MinHashSize = BLAKE2b.MinHashSize;
     public const int MaxHashSize = BLAKE2b.MaxHashSize;
-    public const int MinTagSize = MinHashSize;
-    public const int MaxTagSize = MaxHashSize;
+    public const int MinTagSize = BLAKE2b.MinTagSize;
+    public const int MaxTagSize = BLAKE2b.MaxTagSize;
     public const int MinKeySize = BLAKE2b.MinKeySize;
     public const int MaxKeySize = BLAKE2b.MaxKeySize;
 
@@ -34,10 +34,10 @@ public sealed class IncrementalBLAKE2b : IDisposable
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
         Validation.SizeBetween(nameof(hashSize), hashSize, MinHashSize, MaxHashSize);
         if (key.Length != 0) { Validation.SizeBetween(nameof(key), key.Length, MinKeySize, MaxKeySize); }
-        _hashSize = hashSize;
-        _finalized = false;
         int ret = crypto_generichash_blake2b_init(ref _state, key, (nuint)key.Length, (nuint)hashSize);
         if (ret != 0) { throw new CryptographicException("Error initializing hash function state."); }
+        _hashSize = hashSize;
+        _finalized = false;
     }
 
     public void Update(ReadOnlySpan<byte> message)
@@ -53,9 +53,9 @@ public sealed class IncrementalBLAKE2b : IDisposable
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
         if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing or restoring a cached state."); }
         Validation.EqualToSize(nameof(hash), hash.Length, _hashSize);
-        _finalized = true;
         int ret = crypto_generichash_blake2b_final(ref _state, hash, (nuint)hash.Length);
         if (ret != 0) { throw new CryptographicException("Error finalizing hash."); }
+        _finalized = true;
     }
 
     public bool FinalizeAndVerify(ReadOnlySpan<byte> hash)
