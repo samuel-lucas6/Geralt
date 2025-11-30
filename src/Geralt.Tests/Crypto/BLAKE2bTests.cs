@@ -120,7 +120,7 @@ public class BLAKE2bTests
         Assert.AreEqual(32, BLAKE2b.KeySize);
         Assert.AreEqual(32, BLAKE2b.TagSize);
         Assert.AreEqual(16, BLAKE2b.SaltSize);
-        Assert.AreEqual(16, BLAKE2b.PersonalSize);
+        Assert.AreEqual(16, BLAKE2b.PersonalizationSize);
         Assert.AreEqual(16, BLAKE2b.MinHashSize);
         Assert.AreEqual(64, BLAKE2b.MaxHashSize);
         Assert.AreEqual(16, BLAKE2b.MinTagSize);
@@ -156,18 +156,6 @@ public class BLAKE2bTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(UnkeyedTestVectors), DynamicDataSourceType.Method)]
-    public void ComputeHash_Stream_Valid(string hash, string message)
-    {
-        Span<byte> h = stackalloc byte[hash.Length / 2];
-        using var m = new MemoryStream(Convert.FromHexString(message), writable: false);
-
-        BLAKE2b.ComputeHash(h, m);
-
-        Assert.AreEqual(hash, Convert.ToHexString(h).ToLower());
-    }
-
-    [TestMethod]
     [DataRow(BLAKE2b.MaxHashSize + 1, 1)]
     [DataRow(BLAKE2b.MinHashSize - 1, 1)]
     public void ComputeHash_Invalid(int hashSize, int messageSize)
@@ -176,28 +164,6 @@ public class BLAKE2bTests
         var m = new byte[messageSize];
 
         Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => BLAKE2b.ComputeHash(h, m));
-    }
-
-    [TestMethod]
-    [DataRow(BLAKE2b.MaxHashSize + 1, 1)]
-    [DataRow(BLAKE2b.MinHashSize - 1, 1)]
-    [DataRow(BLAKE2b.MaxHashSize, 0)]
-    public void ComputeHash_Stream_Invalid(int hashSize, int messageSize)
-    {
-        var h = new byte[hashSize];
-
-        if (messageSize > 0) {
-            using var m = new MemoryStream(new byte[messageSize], writable: false);
-            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => BLAKE2b.ComputeHash(h, m));
-
-            h = new byte[BLAKE2b.HashSize];
-            m.Close();
-            Assert.ThrowsExactly<InvalidOperationException>(() => BLAKE2b.ComputeHash(h, m));
-        }
-        else {
-            using MemoryStream? m = null;
-            Assert.ThrowsExactly<ArgumentNullException>(() => BLAKE2b.ComputeHash(h, m));
-        }
     }
 
     [TestMethod]
@@ -283,14 +249,14 @@ public class BLAKE2bTests
     }
 
     [TestMethod]
-    [DataRow(BLAKE2b.MaxKeySize + 1, BLAKE2b.KeySize, BLAKE2b.PersonalSize, BLAKE2b.SaltSize, 1)]
-    [DataRow(BLAKE2b.MinKeySize - 1, BLAKE2b.KeySize, BLAKE2b.PersonalSize, BLAKE2b.SaltSize, 1)]
-    [DataRow(BLAKE2b.KeySize, BLAKE2b.MaxKeySize + 1, BLAKE2b.PersonalSize, BLAKE2b.SaltSize, 1)]
-    [DataRow(BLAKE2b.KeySize, BLAKE2b.MinKeySize - 1, BLAKE2b.PersonalSize, BLAKE2b.SaltSize, 1)]
-    [DataRow(BLAKE2b.KeySize, BLAKE2b.KeySize, BLAKE2b.PersonalSize + 1, BLAKE2b.SaltSize, 1)]
-    [DataRow(BLAKE2b.KeySize, BLAKE2b.KeySize, BLAKE2b.PersonalSize - 1, BLAKE2b.SaltSize, 1)]
-    [DataRow(BLAKE2b.KeySize, BLAKE2b.KeySize, BLAKE2b.PersonalSize, BLAKE2b.SaltSize + 1, 1)]
-    [DataRow(BLAKE2b.KeySize, BLAKE2b.KeySize, BLAKE2b.PersonalSize, BLAKE2b.SaltSize - 1, 1)]
+    [DataRow(BLAKE2b.MaxKeySize + 1, BLAKE2b.KeySize, BLAKE2b.PersonalizationSize, BLAKE2b.SaltSize, 1)]
+    [DataRow(BLAKE2b.MinKeySize - 1, BLAKE2b.KeySize, BLAKE2b.PersonalizationSize, BLAKE2b.SaltSize, 1)]
+    [DataRow(BLAKE2b.KeySize, BLAKE2b.MaxKeySize + 1, BLAKE2b.PersonalizationSize, BLAKE2b.SaltSize, 1)]
+    [DataRow(BLAKE2b.KeySize, BLAKE2b.MinKeySize - 1, BLAKE2b.PersonalizationSize, BLAKE2b.SaltSize, 1)]
+    [DataRow(BLAKE2b.KeySize, BLAKE2b.KeySize, BLAKE2b.PersonalizationSize + 1, BLAKE2b.SaltSize, 1)]
+    [DataRow(BLAKE2b.KeySize, BLAKE2b.KeySize, BLAKE2b.PersonalizationSize - 1, BLAKE2b.SaltSize, 1)]
+    [DataRow(BLAKE2b.KeySize, BLAKE2b.KeySize, BLAKE2b.PersonalizationSize, BLAKE2b.SaltSize + 1, 1)]
+    [DataRow(BLAKE2b.KeySize, BLAKE2b.KeySize, BLAKE2b.PersonalizationSize, BLAKE2b.SaltSize - 1, 1)]
     public void DeriveKey_Invalid(int outputKeyingMaterialSize, int inputKeyingMaterialSize, int personalizationSize, int saltSize, int infoSize)
     {
         var okm = new byte[outputKeyingMaterialSize];

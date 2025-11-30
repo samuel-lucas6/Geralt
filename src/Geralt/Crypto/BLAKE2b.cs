@@ -5,18 +5,17 @@ namespace Geralt;
 
 public static class BLAKE2b
 {
-    public const int HashSize = crypto_generichash_BYTES;
-    public const int KeySize = crypto_generichash_KEYBYTES;
-    public const int TagSize = crypto_generichash_BYTES;
+    public const int HashSize = crypto_generichash_blake2b_BYTES;
+    public const int KeySize = crypto_generichash_blake2b_KEYBYTES;
+    public const int TagSize = crypto_generichash_blake2b_BYTES;
     public const int SaltSize = crypto_generichash_blake2b_SALTBYTES;
-    public const int PersonalSize = crypto_generichash_blake2b_PERSONALBYTES;
-    public const int MinHashSize = crypto_generichash_BYTES_MIN;
-    public const int MaxHashSize = crypto_generichash_BYTES_MAX;
+    public const int PersonalizationSize = crypto_generichash_blake2b_PERSONALBYTES;
+    public const int MinHashSize = crypto_generichash_blake2b_BYTES_MIN;
+    public const int MaxHashSize = crypto_generichash_blake2b_BYTES_MAX;
     public const int MinTagSize = MinHashSize;
     public const int MaxTagSize = MaxHashSize;
-    public const int MinKeySize = crypto_generichash_KEYBYTES_MIN;
-    public const int MaxKeySize = crypto_generichash_KEYBYTES_MAX;
-    private const int StreamBufferSize = 4096;
+    public const int MinKeySize = crypto_generichash_blake2b_KEYBYTES_MIN;
+    public const int MaxKeySize = crypto_generichash_blake2b_KEYBYTES_MAX;
 
     public static void ComputeHash(Span<byte> hash, ReadOnlySpan<byte> message)
     {
@@ -24,21 +23,6 @@ public static class BLAKE2b
         Sodium.Initialize();
         int ret = crypto_generichash_blake2b(hash, (nuint)hash.Length, message, (ulong)message.Length, key: ReadOnlySpan<byte>.Empty, keyLength: 0);
         if (ret != 0) { throw new CryptographicException("Error computing hash."); }
-    }
-
-    public static void ComputeHash(Span<byte> hash, Stream message)
-    {
-        Validation.SizeBetween(nameof(hash), hash.Length, MinHashSize, MaxHashSize);
-        Validation.NotNull(nameof(message), message);
-        if (!message.CanRead) { throw new InvalidOperationException("The stream cannot be read."); }
-        int bytesRead;
-        Span<byte> buffer = new byte[StreamBufferSize];
-        using var blake2b = new IncrementalBLAKE2b(hash.Length);
-        while ((bytesRead = message.Read(buffer)) > 0) {
-            blake2b.Update(buffer[..bytesRead]);
-        }
-        SecureMemory.ZeroMemory(buffer);
-        blake2b.Finalize(hash);
     }
 
     public static void ComputeTag(Span<byte> tag, ReadOnlySpan<byte> message, ReadOnlySpan<byte> key)
@@ -65,7 +49,7 @@ public static class BLAKE2b
     {
         Validation.SizeBetween(nameof(outputKeyingMaterial), outputKeyingMaterial.Length, MinKeySize, MaxKeySize);
         Validation.SizeBetween(nameof(inputKeyingMaterial), inputKeyingMaterial.Length, MinKeySize, MaxKeySize);
-        Validation.EqualToSize(nameof(personalization), personalization.Length, PersonalSize);
+        Validation.EqualToSize(nameof(personalization), personalization.Length, PersonalizationSize);
         if (salt.Length != 0) { Validation.EqualToSize(nameof(salt), salt.Length, SaltSize); }
         Sodium.Initialize();
         int ret = crypto_generichash_blake2b_salt_personal(outputKeyingMaterial, (nuint)outputKeyingMaterial.Length, info, (ulong)info.Length, inputKeyingMaterial, (nuint)inputKeyingMaterial.Length, salt.Length != 0 ? salt : new byte[SaltSize], personalization);
