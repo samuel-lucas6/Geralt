@@ -31,13 +31,8 @@ public class IncrementalEd25519phTests
         Span<byte> sk = Convert.FromHexString(privateKey);
 
         using var ed25519ph = new IncrementalEd25519ph();
-        if (m.Length > 1) {
-            ed25519ph.Update(m[..(m.Length / 2)]);
-            ed25519ph.Update(m[(m.Length / 2)..]);
-        }
-        else {
-            ed25519ph.Update(m);
-        }
+        ed25519ph.Update(m[..(m.Length / 2)]);
+        ed25519ph.Update(m[(m.Length / 2)..]);
         ed25519ph.Finalize(s, sk);
 
         Assert.AreEqual(signature, Convert.ToHexString(s).ToLower());
@@ -71,13 +66,8 @@ public class IncrementalEd25519phTests
         Span<byte> pk = Convert.FromHexString(privateKey)[^Ed25519.PublicKeySize..];
 
         using var ed25519ph = new IncrementalEd25519ph();
-        if (m.Length > 1) {
-            ed25519ph.Update(m[..(m.Length / 2)]);
-            ed25519ph.Update(m[(m.Length / 2)..]);
-        }
-        else {
-            ed25519ph.Update(m);
-        }
+        ed25519ph.Update(m[..(m.Length / 2)]);
+        ed25519ph.Update(m[(m.Length / 2)..]);
         bool valid = ed25519ph.FinalizeAndVerify(s, pk);
 
         Assert.IsTrue(valid);

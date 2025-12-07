@@ -28,13 +28,8 @@ public class IncrementalBLAKE2bTests
         Span<byte> k = key != null ? Convert.FromHexString(key) : Span<byte>.Empty;
 
         using var blake2b = new IncrementalBLAKE2b(h.Length, k);
-        if (m.Length > 1) {
-            blake2b.Update(m[..(m.Length / 2)]);
-            blake2b.Update(m[(m.Length / 2)..]);
-        }
-        else {
-            blake2b.Update(m);
-        }
+        blake2b.Update(m[..(m.Length / 2)]);
+        blake2b.Update(m[(m.Length / 2)..]);
         blake2b.Finalize(h);
 
         Assert.AreEqual(hash, Convert.ToHexString(h).ToLower());
@@ -93,13 +88,8 @@ public class IncrementalBLAKE2bTests
         Span<byte> k = Convert.FromHexString(key);
 
         using var blake2b = new IncrementalBLAKE2b(h.Length, k);
-        if (m.Length > 1) {
-            blake2b.Update(m[..(m.Length / 2)]);
-            blake2b.Update(m[(m.Length / 2)..]);
-        }
-        else {
-            blake2b.Update(m);
-        }
+        blake2b.Update(m[..(m.Length / 2)]);
+        blake2b.Update(m[(m.Length / 2)..]);
         bool valid = blake2b.FinalizeAndVerify(h);
 
         Assert.IsTrue(valid);

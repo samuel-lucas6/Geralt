@@ -20,13 +20,8 @@ public class IncrementalPoly1305Tests
         Span<byte> k = Convert.FromHexString(oneTimeKey);
 
         using var poly1305 = new IncrementalPoly1305(k);
-        if (m.Length > Poly1305.BlockSize && m.Length % 2 == 0) {
-            poly1305.Update(m[..(m.Length / 2)]);
-            poly1305.Update(m[(m.Length / 2)..]);
-        }
-        else {
-            poly1305.Update(m);
-        }
+        poly1305.Update(m[..(m.Length / 2)]);
+        poly1305.Update(m[(m.Length / 2)..]);
         poly1305.Finalize(t);
 
         Assert.AreEqual(tag, Convert.ToHexString(t).ToLower());
@@ -59,13 +54,8 @@ public class IncrementalPoly1305Tests
         Span<byte> k = Convert.FromHexString(oneTimeKey);
 
         using var poly1305 = new IncrementalPoly1305(k);
-        if (m.Length > Poly1305.BlockSize && m.Length % 2 == 0) {
-            poly1305.Update(m[..(m.Length / 2)]);
-            poly1305.Update(m[(m.Length / 2)..]);
-        }
-        else {
-            poly1305.Update(m);
-        }
+        poly1305.Update(m[..(m.Length / 2)]);
+        poly1305.Update(m[(m.Length / 2)..]);
         bool valid = poly1305.FinalizeAndVerify(t);
 
         Assert.IsTrue(valid);
