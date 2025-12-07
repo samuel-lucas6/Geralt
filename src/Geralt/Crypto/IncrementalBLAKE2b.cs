@@ -9,6 +9,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
     public const int HashSize = BLAKE2b.HashSize;
     public const int KeySize = BLAKE2b.KeySize;
     public const int TagSize = BLAKE2b.TagSize;
+    public const int BlockSize = BLAKE2b.BlockSize;
     public const int MinHashSize = BLAKE2b.MinHashSize;
     public const int MaxHashSize = BLAKE2b.MaxHashSize;
     public const int MinTagSize = BLAKE2b.MinTagSize;

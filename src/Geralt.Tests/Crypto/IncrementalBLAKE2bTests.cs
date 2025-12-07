@@ -9,6 +9,7 @@ public class IncrementalBLAKE2bTests
         Assert.AreEqual(32, IncrementalBLAKE2b.HashSize);
         Assert.AreEqual(32, IncrementalBLAKE2b.KeySize);
         Assert.AreEqual(32, IncrementalBLAKE2b.TagSize);
+        Assert.AreEqual(128, IncrementalBLAKE2b.BlockSize);
         Assert.AreEqual(16, IncrementalBLAKE2b.MinHashSize);
         Assert.AreEqual(64, IncrementalBLAKE2b.MaxHashSize);
         Assert.AreEqual(16, IncrementalBLAKE2b.MinTagSize);

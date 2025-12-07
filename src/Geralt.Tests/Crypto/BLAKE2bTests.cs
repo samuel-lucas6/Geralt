@@ -173,6 +173,7 @@ public class BLAKE2bTests
         Assert.AreEqual(32, BLAKE2b.HashSize);
         Assert.AreEqual(32, BLAKE2b.KeySize);
         Assert.AreEqual(32, BLAKE2b.TagSize);
+        Assert.AreEqual(128, BLAKE2b.BlockSize);
         Assert.AreEqual(16, BLAKE2b.SaltSize);
         Assert.AreEqual(16, BLAKE2b.PersonalizationSize);
         Assert.AreEqual(16, BLAKE2b.MinHashSize);

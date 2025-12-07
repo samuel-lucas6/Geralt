@@ -8,6 +8,7 @@ public static class BLAKE2b
     public const int HashSize = crypto_generichash_blake2b_BYTES;
     public const int KeySize = crypto_generichash_blake2b_KEYBYTES;
     public const int TagSize = crypto_generichash_blake2b_BYTES;
+    public const int BlockSize = 128;
     public const int SaltSize = crypto_generichash_blake2b_SALTBYTES;
     public const int PersonalizationSize = crypto_generichash_blake2b_PERSONALBYTES;
     public const int MinHashSize = crypto_generichash_blake2b_BYTES_MIN;
