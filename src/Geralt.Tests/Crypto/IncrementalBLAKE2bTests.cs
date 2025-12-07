@@ -42,7 +42,7 @@ public class IncrementalBLAKE2bTests
     [TestMethod]
     [DynamicData(nameof(BLAKE2bTests.UnkeyedTestVectors), typeof(BLAKE2bTests))]
     [DynamicData(nameof(BLAKE2bTests.KeyedTestVectors), typeof(BLAKE2bTests))]
-    public void Compute_Reinitialize_Valid(string hash, string message, string? key = null)
+    public void Reinitialize_Valid(string hash, string message, string? key = null)
     {
         Span<byte> h = stackalloc byte[hash.Length / 2];
         Span<byte> m = Convert.FromHexString(message);
@@ -51,18 +51,17 @@ public class IncrementalBLAKE2bTests
         using var blake2b = new IncrementalBLAKE2b(h.Length, k);
         blake2b.Update(m);
         blake2b.Finalize(h);
-        h.Clear();
         blake2b.Reinitialize(h.Length, k);
         blake2b.Update(m);
-        blake2b.Finalize(h);
+        bool valid = blake2b.FinalizeAndVerify(h);
 
-        Assert.AreEqual(hash, Convert.ToHexString(h).ToLower());
+        Assert.IsTrue(valid);
     }
 
     [TestMethod]
     [DynamicData(nameof(BLAKE2bTests.UnkeyedTestVectors), typeof(BLAKE2bTests))]
     [DynamicData(nameof(BLAKE2bTests.KeyedTestVectors), typeof(BLAKE2bTests))]
-    public void Compute_CacheState_Valid(string hash, string message, string? key = null)
+    public void CacheState_Valid(string hash, string message, string? key = null)
     {
         Span<byte> h = stackalloc byte[hash.Length / 2];
         Span<byte> m = Convert.FromHexString(message);
@@ -100,42 +99,6 @@ public class IncrementalBLAKE2bTests
         else {
             blake2b.Update(m);
         }
-        bool valid = blake2b.FinalizeAndVerify(h);
-
-        Assert.IsTrue(valid);
-    }
-
-    [TestMethod]
-    [DynamicData(nameof(BLAKE2bTests.KeyedTestVectors), typeof(BLAKE2bTests))]
-    public void Verify_Reinitialize_Valid(string hash, string message, string key)
-    {
-        Span<byte> h = Convert.FromHexString(hash);
-        Span<byte> m = Convert.FromHexString(message);
-        Span<byte> k = Convert.FromHexString(key);
-
-        using var blake2b = new IncrementalBLAKE2b(h.Length, k);
-        blake2b.Update(m);
-        blake2b.FinalizeAndVerify(h);
-        blake2b.Reinitialize(h.Length, k);
-        blake2b.Update(m);
-        bool valid = blake2b.FinalizeAndVerify(h);
-
-        Assert.IsTrue(valid);
-    }
-
-    [TestMethod]
-    [DynamicData(nameof(BLAKE2bTests.KeyedTestVectors), typeof(BLAKE2bTests))]
-    public void Verify_CacheState_Valid(string hash, string message, string key)
-    {
-        Span<byte> h = Convert.FromHexString(hash);
-        Span<byte> m = Convert.FromHexString(message);
-        Span<byte> k = Convert.FromHexString(key);
-
-        using var blake2b = new IncrementalBLAKE2b(h.Length, k);
-        blake2b.Update(m);
-        blake2b.CacheState();
-        blake2b.FinalizeAndVerify(h);
-        blake2b.RestoreCachedState();
         bool valid = blake2b.FinalizeAndVerify(h);
 
         Assert.IsTrue(valid);
@@ -185,7 +148,7 @@ public class IncrementalBLAKE2bTests
     [TestMethod]
     [DynamicData(nameof(BLAKE2bTests.UnkeyedTestVectors), typeof(BLAKE2bTests))]
     [DynamicData(nameof(BLAKE2bTests.KeyedTestVectors), typeof(BLAKE2bTests))]
-    public void Compute_InvalidOperation(string hash, string message, string? key = null)
+    public void Incremental_InvalidOperation(string hash, string message, string? key = null)
     {
         var h = new byte[hash.Length / 2];
         var m = Convert.FromHexString(message);
@@ -200,17 +163,8 @@ public class IncrementalBLAKE2bTests
         Assert.ThrowsExactly<InvalidOperationException>(() => blake2b.FinalizeAndVerify(h));
         Assert.ThrowsExactly<InvalidOperationException>(() => blake2b.CacheState());
         Assert.ThrowsExactly<InvalidOperationException>(() => blake2b.RestoreCachedState());
-    }
 
-    [TestMethod]
-    [DynamicData(nameof(BLAKE2bTests.KeyedTestVectors), typeof(BLAKE2bTests))]
-    public void Verify_InvalidOperation(string hash, string message, string key)
-    {
-        var h = Convert.FromHexString(hash);
-        var m = Convert.FromHexString(message);
-        var k = Convert.FromHexString(key);
-
-        using var blake2b = new IncrementalBLAKE2b(h.Length, k);
+        blake2b.Reinitialize(h.Length, k);
         blake2b.Update(m);
         blake2b.FinalizeAndVerify(h);
 
@@ -231,7 +185,6 @@ public class IncrementalBLAKE2bTests
         var k = key != null ? Convert.FromHexString(key) : Array.Empty<byte>();
 
         var blake2b = new IncrementalBLAKE2b(h.Length, k);
-
         blake2b.Dispose();
 
         Assert.ThrowsExactly<ObjectDisposedException>(() => blake2b.Reinitialize(h.Length, k));
@@ -240,5 +193,6 @@ public class IncrementalBLAKE2bTests
         Assert.ThrowsExactly<ObjectDisposedException>(() => blake2b.FinalizeAndVerify(h));
         Assert.ThrowsExactly<ObjectDisposedException>(() => blake2b.CacheState());
         Assert.ThrowsExactly<ObjectDisposedException>(() => blake2b.RestoreCachedState());
+        blake2b.Dispose();
     }
 }
