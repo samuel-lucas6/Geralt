@@ -15,18 +15,18 @@ internal static partial class Interop
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial int crypto_pwhash(Span<byte> hash, ulong hashLength, ReadOnlySpan<byte> password, ulong passwordLength, ReadOnlySpan<byte> salt, ulong iterations, nuint memorySize, int algorithm);
+        internal static partial int crypto_pwhash_argon2id(Span<byte> hash, ulong hashLength, ReadOnlySpan<byte> password, ulong passwordLength, ReadOnlySpan<byte> salt, ulong iterations, nuint memorySize, int algorithm);
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial int crypto_pwhash_str_alg(Span<byte> hash, ReadOnlySpan<byte> password, ulong passwordLength, ulong iterations, nuint memorySize, int algorithm);
+        internal static partial int crypto_pwhash_argon2id_str(Span<byte> hash, ReadOnlySpan<byte> password, ulong passwordLength, ulong iterations, nuint memorySize);
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial int crypto_pwhash_str_verify(Span<byte> hash, ReadOnlySpan<byte> password, ulong passwordLength);
+        internal static partial int crypto_pwhash_argon2id_str_verify(Span<byte> hash, ReadOnlySpan<byte> password, ulong passwordLength);
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial int crypto_pwhash_str_needs_rehash(Span<byte> hash, ulong iterations, nuint memorySize);
+        internal static partial int crypto_pwhash_argon2id_str_needs_rehash(Span<byte> hash, ulong iterations, nuint memorySize);
     }
 }

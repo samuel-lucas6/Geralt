@@ -22,7 +22,7 @@ public static class Argon2id
         Validation.NotLessThanMin(nameof(iterations), iterations, MinIterations);
         Validation.NotLessThanMin(nameof(memorySize), memorySize, MinMemorySize);
         Sodium.Initialize();
-        int ret = crypto_pwhash(outputKeyingMaterial, (ulong)outputKeyingMaterial.Length, password, (ulong)password.Length, salt, (ulong)iterations, (nuint)memorySize, crypto_pwhash_argon2id_ALG_ARGON2ID13);
+        int ret = crypto_pwhash_argon2id(outputKeyingMaterial, (ulong)outputKeyingMaterial.Length, password, (ulong)password.Length, salt, (ulong)iterations, (nuint)memorySize, crypto_pwhash_argon2id_ALG_ARGON2ID13);
         if (ret != 0) { throw new InsufficientMemoryException("Insufficient memory to perform password-based key derivation."); }
     }
 
@@ -34,7 +34,7 @@ public static class Argon2id
         Sodium.Initialize();
         Span<byte> hashBytes = stackalloc byte[HashSize];
         try {
-            int ret = crypto_pwhash_str_alg(hashBytes, password, (ulong)password.Length, (ulong)iterations, (nuint)memorySize, crypto_pwhash_argon2id_ALG_ARGON2ID13);
+            int ret = crypto_pwhash_argon2id_str(hashBytes, password, (ulong)password.Length, (ulong)iterations, (nuint)memorySize);
             if (ret != 0) { throw new InsufficientMemoryException("Insufficient memory to perform password hashing."); }
             for (int i = 0; i < hashBytes.Length; i++) {
                 hash[i] = (char)hashBytes[i];
@@ -55,7 +55,7 @@ public static class Argon2id
             }
             ThrowIfInvalidHashPrefix(hashBytes);
             Sodium.Initialize();
-            return crypto_pwhash_str_verify(hashBytes, password, (ulong)password.Length) == 0;
+            return crypto_pwhash_argon2id_str_verify(hashBytes, password, (ulong)password.Length) == 0;
         }
         finally {
             SecureMemory.ZeroMemory(hashBytes);
@@ -74,7 +74,7 @@ public static class Argon2id
             }
             ThrowIfInvalidHashPrefix(hashBytes);
             Sodium.Initialize();
-            int ret = crypto_pwhash_str_needs_rehash(hashBytes, (ulong)iterations, (nuint)memorySize);
+            int ret = crypto_pwhash_argon2id_str_needs_rehash(hashBytes, (ulong)iterations, (nuint)memorySize);
             return ret == -1 ? throw new FormatException("Invalid password hash string.") : ret == 1;
         }
         finally {
