@@ -10,7 +10,7 @@ public sealed class IncrementalPoly1305 : IDisposable
     public const int TagSize = Poly1305.TagSize;
     public const int BlockSize = Poly1305.BlockSize;
 
-    private crypto_onetimeauth_state _state;
+    private crypto_onetimeauth_poly1305_state _state;
     private bool _finalized;
     private bool _disposed;
 
@@ -24,7 +24,7 @@ public sealed class IncrementalPoly1305 : IDisposable
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalPoly1305)); }
         Validation.EqualToSize(nameof(oneTimeKey), oneTimeKey.Length, KeySize);
-        int ret = crypto_onetimeauth_init(ref _state, oneTimeKey);
+        int ret = crypto_onetimeauth_poly1305_init(ref _state, oneTimeKey);
         if (ret != 0) { throw new CryptographicException("Error initializing message authentication code state."); }
         _finalized = false;
     }
@@ -33,7 +33,7 @@ public sealed class IncrementalPoly1305 : IDisposable
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalPoly1305)); }
         if (_finalized) { throw new InvalidOperationException("Cannot update after finalizing without reinitializing."); }
-        int ret = crypto_onetimeauth_update(ref _state, message, (ulong)message.Length);
+        int ret = crypto_onetimeauth_poly1305_update(ref _state, message, (ulong)message.Length);
         if (ret != 0) { throw new CryptographicException("Error updating message authentication code state."); }
     }
 
@@ -42,7 +42,7 @@ public sealed class IncrementalPoly1305 : IDisposable
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalPoly1305)); }
         if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
         Validation.EqualToSize(nameof(tag), tag.Length, TagSize);
-        int ret = crypto_onetimeauth_final(ref _state, tag);
+        int ret = crypto_onetimeauth_poly1305_final(ref _state, tag);
         if (ret != 0) { throw new CryptographicException("Error finalizing message authentication code."); }
         _finalized = true;
     }
