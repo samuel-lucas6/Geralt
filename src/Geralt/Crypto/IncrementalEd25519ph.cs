@@ -10,7 +10,7 @@ public sealed class IncrementalEd25519ph : IDisposable
     public const int PrivateKeySize = Ed25519.PrivateKeySize;
     public const int SignatureSize = Ed25519.SignatureSize;
 
-    private crypto_sign_state _state;
+    private crypto_sign_ed25519ph_state _state;
     private bool _finalized;
     private bool _disposed;
 
@@ -23,16 +23,16 @@ public sealed class IncrementalEd25519ph : IDisposable
     public void Reinitialize()
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalEd25519ph)); }
-        _finalized = false;
-        int ret = crypto_sign_init(ref _state);
+        int ret = crypto_sign_ed25519ph_init(ref _state);
         if (ret != 0) { throw new CryptographicException("Error initializing signature scheme state."); }
+        _finalized = false;
     }
 
     public void Update(ReadOnlySpan<byte> message)
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalEd25519ph)); }
         if (_finalized) { throw new InvalidOperationException("Cannot update after finalizing without reinitializing."); }
-        int ret = crypto_sign_update(ref _state, message, (ulong)message.Length);
+        int ret = crypto_sign_ed25519ph_update(ref _state, message, (ulong)message.Length);
         if (ret != 0) { throw new CryptographicException("Error updating signature scheme state."); }
     }
 
@@ -42,9 +42,9 @@ public sealed class IncrementalEd25519ph : IDisposable
         if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
         Validation.EqualToSize(nameof(signature), signature.Length, SignatureSize);
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
-        _finalized = true;
-        int ret = crypto_sign_final_create(ref _state, signature, signatureLength: out _, privateKey);
+        int ret = crypto_sign_ed25519ph_final_create(ref _state, signature, signatureLength: out _, privateKey);
         if (ret != 0) { throw new CryptographicException("Error finalizing signature."); }
+        _finalized = true;
     }
 
     public bool FinalizeAndVerify(ReadOnlySpan<byte> signature, ReadOnlySpan<byte> publicKey)
@@ -54,7 +54,7 @@ public sealed class IncrementalEd25519ph : IDisposable
         Validation.EqualToSize(nameof(signature), signature.Length, SignatureSize);
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
         _finalized = true;
-        return crypto_sign_final_verify(ref _state, signature, publicKey) == 0;
+        return crypto_sign_ed25519ph_final_verify(ref _state, signature, publicKey) == 0;
     }
 
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
