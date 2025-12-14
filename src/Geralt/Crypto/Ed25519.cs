@@ -5,17 +5,17 @@ namespace Geralt;
 
 public static class Ed25519
 {
-    public const int PublicKeySize = crypto_sign_PUBLICKEYBYTES;
-    public const int PrivateKeySize = crypto_sign_SECRETKEYBYTES;
-    public const int SignatureSize = crypto_sign_BYTES;
-    public const int SeedSize = crypto_sign_SEEDBYTES;
+    public const int PublicKeySize = crypto_sign_ed25519_PUBLICKEYBYTES;
+    public const int PrivateKeySize = crypto_sign_ed25519_SECRETKEYBYTES;
+    public const int SignatureSize = crypto_sign_ed25519_BYTES;
+    public const int SeedSize = crypto_sign_ed25519_SEEDBYTES;
 
     public static void GenerateKeyPair(Span<byte> publicKey, Span<byte> privateKey)
     {
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
         Sodium.Initialize();
-        int ret = crypto_sign_keypair(publicKey, privateKey);
+        int ret = crypto_sign_ed25519_keypair(publicKey, privateKey);
         if (ret != 0) { throw new CryptographicException("Unable to generate key pair."); }
     }
 
@@ -25,7 +25,7 @@ public static class Ed25519
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
         Validation.EqualToSize(nameof(seed), seed.Length, SeedSize);
         Sodium.Initialize();
-        int ret = crypto_sign_seed_keypair(publicKey, privateKey, seed);
+        int ret = crypto_sign_ed25519_seed_keypair(publicKey, privateKey, seed);
         if (ret != 0) { throw new CryptographicException("Unable to generate key pair from seed."); }
     }
 
@@ -70,7 +70,7 @@ public static class Ed25519
         Validation.EqualToSize(nameof(signature), signature.Length, SignatureSize);
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
         Sodium.Initialize();
-        int ret = crypto_sign_detached(signature, signatureLength: out _, message, (ulong)message.Length, privateKey);
+        int ret = crypto_sign_ed25519_detached(signature, signatureLength: out _, message, (ulong)message.Length, privateKey);
         if (ret != 0) { throw new CryptographicException("Unable to compute signature."); }
     }
 
@@ -79,6 +79,6 @@ public static class Ed25519
         Validation.EqualToSize(nameof(signature), signature.Length, SignatureSize);
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
         Sodium.Initialize();
-        return crypto_sign_verify_detached(signature, message, (ulong)message.Length, publicKey) == 0;
+        return crypto_sign_ed25519_verify_detached(signature, message, (ulong)message.Length, publicKey) == 0;
     }
 }

@@ -5,18 +5,18 @@ internal static partial class Interop
 {
     internal static partial class Libsodium
     {
-        internal const int crypto_sign_PUBLICKEYBYTES = 32;
-        internal const int crypto_sign_SECRETKEYBYTES = 64;
-        internal const int crypto_sign_SEEDBYTES = 32;
-        internal const int crypto_sign_BYTES = 64;
+        internal const int crypto_sign_ed25519_PUBLICKEYBYTES = 32;
+        internal const int crypto_sign_ed25519_SECRETKEYBYTES = 64;
+        internal const int crypto_sign_ed25519_SEEDBYTES = 32;
+        internal const int crypto_sign_ed25519_BYTES = 64;
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial int crypto_sign_keypair(Span<byte> publicKey, Span<byte> privateKey);
+        internal static partial int crypto_sign_ed25519_keypair(Span<byte> publicKey, Span<byte> privateKey);
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial int crypto_sign_seed_keypair(Span<byte> publicKey, Span<byte> privateKey, ReadOnlySpan<byte> seed);
+        internal static partial int crypto_sign_ed25519_seed_keypair(Span<byte> publicKey, Span<byte> privateKey, ReadOnlySpan<byte> seed);
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -36,10 +36,10 @@ internal static partial class Interop
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial int crypto_sign_detached(Span<byte> signature, out ulong signatureLength, ReadOnlySpan<byte> message, ulong messageLength, ReadOnlySpan<byte> privateKey);
+        internal static partial int crypto_sign_ed25519_detached(Span<byte> signature, out ulong signatureLength, ReadOnlySpan<byte> message, ulong messageLength, ReadOnlySpan<byte> privateKey);
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial int crypto_sign_verify_detached(ReadOnlySpan<byte> signature, ReadOnlySpan<byte> message, ulong messageLength, ReadOnlySpan<byte> publicKey);
+        internal static partial int crypto_sign_ed25519_verify_detached(ReadOnlySpan<byte> signature, ReadOnlySpan<byte> message, ulong messageLength, ReadOnlySpan<byte> publicKey);
     }
 }
