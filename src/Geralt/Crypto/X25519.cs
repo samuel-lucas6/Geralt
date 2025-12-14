@@ -8,7 +8,7 @@ public static class X25519
     public const int PublicKeySize = crypto_kx_PUBLICKEYBYTES;
     public const int PrivateKeySize = crypto_kx_SECRETKEYBYTES;
     public const int SeedSize = crypto_kx_SEEDBYTES;
-    public const int SharedSecretSize = crypto_scalarmult_BYTES;
+    public const int SharedSecretSize = crypto_scalarmult_curve25519_BYTES;
     public const int SharedKeySize = crypto_kx_SESSIONKEYBYTES;
     public const int PreSharedKeySize = BLAKE2b.KeySize;
     public const int MinPreSharedKeySize = BLAKE2b.MinKeySize;
@@ -38,7 +38,7 @@ public static class X25519
         Validation.EqualToSize(nameof(publicKey), publicKey.Length, PublicKeySize);
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
         Sodium.Initialize();
-        int ret = crypto_scalarmult_base(publicKey, privateKey);
+        int ret = crypto_scalarmult_curve25519_base(publicKey, privateKey);
         if (ret != 0) { throw new CryptographicException("Unable to compute public key from private key."); }
     }
 
@@ -48,7 +48,7 @@ public static class X25519
         Validation.EqualToSize(nameof(senderPrivateKey), senderPrivateKey.Length, PrivateKeySize);
         Validation.EqualToSize(nameof(recipientPublicKey), recipientPublicKey.Length, PublicKeySize);
         Sodium.Initialize();
-        int ret = crypto_scalarmult(sharedSecret, senderPrivateKey, recipientPublicKey);
+        int ret = crypto_scalarmult_curve25519(sharedSecret, senderPrivateKey, recipientPublicKey);
         if (ret != 0) { throw new CryptographicException("Invalid public key."); }
     }
 
