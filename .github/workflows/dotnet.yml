@@ -13,13 +13,14 @@ jobs:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up .NET
       uses: actions/setup-dotnet@v5
       with:
         dotnet-version: |
           8.0.x
           9.0.x
+          10.0.x
     - name: Install workloads
       run: dotnet workload install ios tvos maccatalyst
     - run: dotnet --info
@@ -31,10 +32,14 @@ jobs:
       run: dotnet test -f net9.0 -c Debug
     - name: Test (.NET 9.0/Release)
       run: dotnet test -f net9.0 -c Release
+    - name: Test (.NET 10.0/Debug)
+      run: dotnet test -f net10.0 -c Debug
+    - name: Test (.NET 10.0/Release)
+      run: dotnet test -f net10.0 -c Release
     - name: Pack
       run: dotnet pack -c Release
     - name: Upload artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         path: '**/*.nupkg'
 
@@ -45,13 +50,14 @@ jobs:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up .NET
       uses: actions/setup-dotnet@v5
       with:
         dotnet-version: |
           8.0.x
           9.0.x
+          10.0.x
     - run: dotnet --info
     - name: Test (.NET 8.0/Debug)
       run: dotnet test -f net8.0 -c Debug
@@ -61,6 +67,10 @@ jobs:
       run: dotnet test -f net9.0 -c Debug
     - name: Test (.NET 9.0/Release)
       run: dotnet test -f net9.0 -c Release
+    - name: Test (.NET 10.0/Debug)
+      run: dotnet test -f net10.0 -c Debug
+    - name: Test (.NET 10.0/Release)
+      run: dotnet test -f net10.0 -c Release
 
   test-linux-x64:
     needs: test-windows-arm64
@@ -69,13 +79,14 @@ jobs:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up .NET
       uses: actions/setup-dotnet@v5
       with:
         dotnet-version: |
           8.0.x
           9.0.x
+          10.0.x
     - run: dotnet --info
     - name: Test (.NET 8.0/Debug)
       run: dotnet test -f net8.0 -c Debug
@@ -85,6 +96,10 @@ jobs:
       run: dotnet test -f net9.0 -c Debug
     - name: Test (.NET 9.0/Release)
       run: dotnet test -f net9.0 -c Release
+    - name: Test (.NET 10.0/Debug)
+      run: dotnet test -f net10.0 -c Debug
+    - name: Test (.NET 10.0/Release)
+      run: dotnet test -f net10.0 -c Release
 
   test-linux-arm64:
     needs: test-linux-x64
@@ -93,13 +108,14 @@ jobs:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up .NET
       uses: actions/setup-dotnet@v5
       with:
         dotnet-version: |
           8.0.x
           9.0.x
+          10.0.x
     - run: dotnet --info
     - name: Test (.NET 8.0/Debug)
       run: dotnet test -f net8.0 -c Debug
@@ -109,6 +125,10 @@ jobs:
       run: dotnet test -f net9.0 -c Debug
     - name: Test (.NET 9.0/Release)
       run: dotnet test -f net9.0 -c Release
+    - name: Test (.NET 10.0/Debug)
+      run: dotnet test -f net10.0 -c Debug
+    - name: Test (.NET 10.0/Release)
+      run: dotnet test -f net10.0 -c Release
 
   test-macos-arm64:
     needs: test-linux-arm64
@@ -117,13 +137,14 @@ jobs:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up .NET
       uses: actions/setup-dotnet@v5
       with:
         dotnet-version: |
           8.0.x
           9.0.x
+          10.0.x
     - run: dotnet --info
     - name: Test (.NET 8.0/Debug)
       run: dotnet test -f net8.0 -c Debug
@@ -133,19 +154,23 @@ jobs:
       run: dotnet test -f net9.0 -c Debug
     - name: Test (.NET 9.0/Release)
       run: dotnet test -f net9.0 -c Release
+    - name: Test (.NET 10.0/Debug)
+      run: dotnet test -f net10.0 -c Debug
+    - name: Test (.NET 10.0/Release)
+      run: dotnet test -f net10.0 -c Release
 
   test-linux-musl-x64:
     needs: test-macos-arm64
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/dotnet/sdk:9.0-alpine
+      image: mcr.microsoft.com/dotnet/sdk:10.0-alpine
       env:
         DOTNET_CLI_TELEMETRY_OPTOUT: 1
         DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - run: dotnet --info
-    - name: Test (.NET 9.0/Debug)
-      run: dotnet test -f net9.0 -c Debug
-    - name: Test (.NET 9.0/Release)
-      run: dotnet test -f net9.0 -c Release
+    - name: Test (.NET 10.0/Debug)
+      run: dotnet test -f net10.0 -c Debug
+    - name: Test (.NET 10.0/Release)
+      run: dotnet test -f net10.0 -c Release
