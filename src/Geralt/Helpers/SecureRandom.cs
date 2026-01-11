@@ -1,4 +1,6 @@
-﻿using static Interop.Libsodium;
+﻿using System.Text;
+using System.Globalization;
+using static Interop.Libsodium;
 
 namespace Geralt;
 
@@ -14,12 +16,24 @@ public static class SecureRandom
     public const int MinStringSize = 8;
     public const int MaxStringSize = 128;
     public const int MinCharacterSetSize = MinUpperBound;
-    public const int MinLongestWordSize = 1;
+    public const int MinLongestWordSize = 1; // Shortest word in the English dictionary
     public const int MaxLongestWordSize = 45; // Longest word in the English dictionary
-    public const int LongestWordSize = 9;
     public const int MinWordlistSize = MinUpperBound;
     public const int MinWordCount = 4;
     public const int MaxWordCount = 20;
+
+    // https://www.browserling.com/tools/longest-line
+    public enum LongestWordSize
+    {
+        EffLong = 9, // https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt
+        EffShort1 = 5, // https://www.eff.org/files/2016/09/08/eff_short_wordlist_1.txt
+        EffShort2 = 10, // https://www.eff.org/files/2016/09/08/eff_short_wordlist_2_0.txt
+        Bip39 = 8, // https://github.com/bitcoin/bips/blob/master/bip-0039/english.txt
+        Slip39 = 8, // https://github.com/satoshilabs/slips/blob/master/slip-0039/wordlist.txt
+        Monero = 12, // https://github.com/monero-project/monero/blob/master/src/mnemonics/english.h
+        Diceware = 6 // https://theworld.com/~reinhold/diceware.html (both 7776 and 8192 words)
+        // Other wordlists: https://gist.github.com/atoponce/95c4f36f2bc12ec13242a3ccc55023af
+    }
 
     public static void Fill(Span<byte> buffer)
     {
@@ -52,18 +66,23 @@ public static class SecureRandom
         }
     }
 
-    public static int GeneratePassphrase(Span<char> buffer, ReadOnlySpan<string> wordlist, int wordCount, char separatorChar = '-', bool capitalize = false, bool includeNumber = false)
+    public static void GeneratePassphrase(Span<char> buffer, out int passphraseSize, ReadOnlySpan<string> wordlist, int wordCount, char separatorChar = '-', bool capitalize = false, bool includeNumber = false)
     {
         Validation.NotLessThanMin(nameof(wordlist), wordlist.Length, MinWordlistSize);
-        if (char.IsControl(separatorChar)) {
-            throw new ArgumentOutOfRangeException(nameof(separatorChar), separatorChar, $"{nameof(separatorChar)} must not be a control character.");
+        if (CharUnicodeInfo.GetUnicodeCategory(separatorChar) is UnicodeCategory.NonSpacingMark or UnicodeCategory.Control or UnicodeCategory.Format or UnicodeCategory.LineSeparator
+            or UnicodeCategory.ParagraphSeparator or UnicodeCategory.Surrogate or UnicodeCategory.PrivateUse or UnicodeCategory.OtherNotAssigned) {
+            throw new ArgumentOutOfRangeException(nameof(separatorChar), separatorChar, $"{nameof(separatorChar)} must be a printable character.");
         }
         int longestWord = 0;
-        ReadOnlySpan<char> invalidChars = [' ', '\0', '\r', '\n'];
         foreach (ReadOnlySpan<char> word in wordlist) {
-            Validation.NotEmpty(nameof(word), word.Length);
-            if (word.ContainsAny(invalidChars)) {
-                throw new FormatException($"{nameof(wordlist)} must not contain whitespace, null, or newline characters.");
+            if (word.IsEmpty) {
+                throw new ArgumentOutOfRangeException(nameof(wordlist), $"{nameof(wordlist)} must not contain empty words.");
+            }
+            foreach (var rune in word.EnumerateRunes()) {
+                if (rune == Rune.ReplacementChar || Rune.GetUnicodeCategory(rune) is UnicodeCategory.SpaceSeparator or UnicodeCategory.Control or UnicodeCategory.Format
+                    or UnicodeCategory.LineSeparator or UnicodeCategory.ParagraphSeparator or UnicodeCategory.PrivateUse or UnicodeCategory.OtherNotAssigned) {
+                    throw new FormatException($"{nameof(wordlist)} must only contain printable characters, excluding spaces.");
+                }
             }
             if (word.Length > longestWord) {
                 longestWord = word.Length;
@@ -90,13 +109,14 @@ public static class SecureRandom
                 buffer[bufferIndex++] = separatorChar;
             }
         }
-        return bufferIndex;
+        passphraseSize = bufferIndex;
     }
 
-    public static int GeneratePassphrase(Span<char> buffer, int wordCount, char separatorChar = '-', bool capitalize = false, bool includeNumber = false)
+    public static void GeneratePassphrase(Span<char> buffer, out int passphraseSize, int wordCount, char separatorChar = '-', bool capitalize = false, bool includeNumber = false)
     {
-        ReadOnlySpan<string> wordlist = GetWordlist();
-        return GeneratePassphrase(buffer, wordlist, wordCount, separatorChar, capitalize, includeNumber);
+        // The default wordlist is EFF's Long Wordlist with hyphenated words removed, leaving 7772 words
+        ReadOnlySpan<string> effLongWordlist = GetWordlist();
+        GeneratePassphrase(buffer, out passphraseSize, effLongWordlist, wordCount, separatorChar, capitalize, includeNumber);
     }
 
     public static int GetPassphraseBufferSize(int longestWord, int wordCount)

@@ -9,11 +9,11 @@ internal static partial class Interop
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial void randombytes_buf(Span<byte> buffer, nuint size);
+        internal static partial void randombytes_buf(Span<byte> buffer, nuint bufferSize);
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial void randombytes_buf_deterministic(Span<byte> buffer, nuint size, ReadOnlySpan<byte> seed);
+        internal static partial void randombytes_buf_deterministic(Span<byte> buffer, nuint bufferSize, ReadOnlySpan<byte> seed);
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
