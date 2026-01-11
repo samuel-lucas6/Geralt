@@ -20,7 +20,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="libsodium" Version="[1.0.20.2,1.0.21)" />
+        <PackageReference Include="libsodium" Version="[1.0.21,1.0.22)"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -31,11 +31,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="Resources\wordlist.txt" />
+        <None Remove="Resources\wordlist.txt"/>
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="Resources\wordlist.txt" />
+        <EmbeddedResource Include="Resources\wordlist.txt"/>
     </ItemGroup>
 
     <ItemGroup>
