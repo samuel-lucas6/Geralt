@@ -1,4 +1,5 @@
-﻿using static Interop.Libsodium;
+﻿using System.Buffers;
+using static Interop.Libsodium;
 
 namespace Geralt;
 
@@ -8,7 +9,7 @@ public static class Encodings
     public const string Base64CharacterSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
     public const string Base64UrlCharacterSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=";
     public const string Base64FullCharacterSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/-_=";
-    public const string HexIgnoreChars = ":- ./,";
+    public const string HexIgnoreChars = ":- _./,%;";
     public const string Base64IgnoreChars = " \r\n";
 
     public enum Base64Variant
@@ -52,7 +53,7 @@ public static class Encodings
             hexBuffer[i] = (byte)hex[i];
         }
         try {
-            int ret = sodium_hex2bin(data, (nuint)data.Length, hexBuffer, (nuint)hexBuffer.Length, ignoreChars.ToString(), binaryLength: out nuint _, hexEnd: null);
+            int ret = sodium_hex2bin(data, (nuint)data.Length, hexBuffer, (nuint)hexBuffer.Length, ignoreChars.ToString(), binaryLength: out _, hexEnd: null);
             if (ret != 0) { throw new FormatException("Unable to parse the hex string."); }
         }
         finally {
@@ -67,7 +68,7 @@ public static class Encodings
             return hex.Length / 2;
         }
         Validation.NotEmpty(nameof(hex), hex.Length);
-        if (ignoreChars.ContainsAny(HexCharacterSet)) {
+        if (ignoreChars.ContainsAny(SearchValues.Create(HexCharacterSet))) {
             throw new ArgumentOutOfRangeException(nameof(ignoreChars), $"{nameof(ignoreChars)} cannot contain hex characters.");
         }
         int ignoreCharsCount = 0;
@@ -114,7 +115,7 @@ public static class Encodings
             base64Buffer[i] = (byte)base64[i];
         }
         try {
-            int ret = sodium_base642bin(data, (nuint)data.Length, base64Buffer, (nuint)base64Buffer.Length, ignoreChars.ToString(), binaryLength: out nuint _, base64End: null, (int)variant);
+            int ret = sodium_base642bin(data, (nuint)data.Length, base64Buffer, (nuint)base64Buffer.Length, ignoreChars.ToString(), binaryLength: out _, base64End: null, (int)variant);
             if (ret != 0) { throw new FormatException("Unable to parse the Base64 string."); }
         }
         finally {
@@ -125,9 +126,19 @@ public static class Encodings
     public static int GetFromBase64BufferSize(ReadOnlySpan<char> base64, Base64Variant variant = Base64Variant.Original, ReadOnlySpan<char> ignoreChars = default)
     {
         Validation.NotEmpty(nameof(base64), base64.Length);
+        if (ignoreChars.IsEmpty) {
+            if (variant is Base64Variant.Original or Base64Variant.Url) {
+                Validation.MultipleOfSize(nameof(base64), base64.Length, 4);
+            }
+            else {
+                if (base64.Length % 4 == 1) {
+                    throw new ArgumentOutOfRangeException(nameof(base64), base64.Length, $"{nameof(base64)} without padding must be a valid length.");
+                }
+            }
+        }
         int ignoreCharsCount = 0;
         if (!ignoreChars.IsEmpty) {
-            if (ignoreChars.ContainsAny(Base64FullCharacterSet)) {
+            if (ignoreChars.ContainsAny(SearchValues.Create(Base64FullCharacterSet))) {
                 throw new ArgumentOutOfRangeException(nameof(ignoreChars), $"{nameof(ignoreChars)} cannot contain Base64 characters.");
             }
             foreach (char c in base64) {
@@ -136,7 +147,7 @@ public static class Encodings
                 }
             }
             if (base64.Length - ignoreCharsCount == 0) {
-                throw new ArgumentOutOfRangeException(nameof(base64), $"{nameof(base64)} must contain Base64 characters.");
+                throw new ArgumentOutOfRangeException(nameof(base64), $"{nameof(base64)} must contain characters that aren't ignored.");
             }
         }
         if (variant is Base64Variant.Original or Base64Variant.Url) {

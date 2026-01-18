@@ -43,7 +43,7 @@ public class EncodingsTests
         Assert.AreEqual("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", Encodings.Base64CharacterSet);
         Assert.AreEqual("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=", Encodings.Base64UrlCharacterSet);
         Assert.AreEqual("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/-_=", Encodings.Base64FullCharacterSet);
-        Assert.AreEqual(":- ./,", Encodings.HexIgnoreChars);
+        Assert.AreEqual(":- _./,%;", Encodings.HexIgnoreChars);
         Assert.AreEqual(" \r\n", Encodings.Base64IgnoreChars);
     }
 
@@ -89,14 +89,14 @@ public class EncodingsTests
     }
 
     [TestMethod]
-    [DataRow(1, "Zg", "")]
-    [DataRow(2, "Zg==", "")]
-    [DataRow(5, "PDw/Pz8+Pg", "")]
-    [DataRow(4, "66/6f/6f", "")]
-    [DataRow(4, "66/6f/6f", ":")]
-    public void FromHex_Tampered(int dataSize, string hex, string ignoreChars)
+    [DataRow("Zg", "")]
+    [DataRow("Zg==", "")]
+    [DataRow("PDw/Pz8+Pg", "")]
+    [DataRow("66/6f/6f", "")]
+    [DataRow("66/6f/6f", ":")]
+    public void FromHex_Tampered(string hex, string ignoreChars)
     {
-        var d = new byte[dataSize];
+        var d = new byte[Encodings.GetFromHexBufferSize(hex, ignoreChars)];
 
         Assert.ThrowsExactly<FormatException>(() => Encodings.FromHex(d, hex, ignoreChars));
     }
@@ -115,7 +115,8 @@ public class EncodingsTests
     [DataRow(2, "666f", "0")]
     [DataRow(2, "666f", "9")]
     [DataRow(2, "Zg==", "Zg=")]
-    [DataRow(4, "66/6f/6f", "/")]
+    [DataRow(3 + 1, "66/6f/6f", "/")]
+    [DataRow(3 - 1, "66/6f/6f", "/")]
     public void FromHex_Invalid(int dataSize, string? hex, string ignoreChars)
     {
         var d = new byte[dataSize];
@@ -152,8 +153,8 @@ public class EncodingsTests
     [TestMethod]
     [DynamicData(nameof(Rfc4648Base64TestVectors), DynamicDataSourceType.Method)]
     [DynamicData(nameof(Base64VariantTestVectors), DynamicDataSourceType.Method)]
+    [DataRow("Zg==", "f", Encodings.Base64Variant.Original, Encodings.Base64IgnoreChars)]
     [DataRow("Z g = =", "f", Encodings.Base64Variant.Original, " ")]
-    [DataRow("Zg= =\r", "f", Encodings.Base64Variant.Original, " \r")]
     [DataRow("Zg= =\n", "f", Encodings.Base64Variant.Original, " \n")]
     [DataRow("Zg= =\r\n", "f", Encodings.Base64Variant.Original, Encodings.Base64IgnoreChars)]
     public void FromBase64_Valid(string base64, string data, Encodings.Base64Variant variant, string? ignoreChars = null)
@@ -168,27 +169,13 @@ public class EncodingsTests
     [TestMethod]
     // https://eprint.iacr.org/2022/361
     [DataRow("SGVsbG9=", Encodings.Base64Variant.Original)]
-    [DataRow("SGVsbG9", Encodings.Base64Variant.Original)]
-    [DataRow("SGVsbA=", Encodings.Base64Variant.Original)]
-    [DataRow("SGVsbA", Encodings.Base64Variant.Original)]
-    [DataRow("SGVsbA====", Encodings.Base64Variant.Original)]
     // https://base64.guru/standards/base64url
-    [DataRow("PDw_Pz8-Pg", Encodings.Base64Variant.Original)]
-    [DataRow("PDw_Pz8-Pg=", Encodings.Base64Variant.Original)]
     [DataRow("PDw_Pz8-Pg==", Encodings.Base64Variant.Original)]
-    [DataRow("PDw/Pz8+Pg", Encodings.Base64Variant.Original)]
-    [DataRow("PDw/Pz8+Pg=", Encodings.Base64Variant.Original)]
-    [DataRow("PDw/Pz8+Pg===", Encodings.Base64Variant.Original)]
     [DataRow("PDw_Pz8-Pg", Encodings.Base64Variant.OriginalNoPadding)]
     [DataRow("PDw_Pz8-Pg=", Encodings.Base64Variant.OriginalNoPadding)]
     [DataRow("PDw_Pz8-Pg==", Encodings.Base64Variant.OriginalNoPadding)]
     [DataRow("PDw/Pz8+Pg=", Encodings.Base64Variant.OriginalNoPadding)]
     [DataRow("PDw/Pz8+Pg==", Encodings.Base64Variant.OriginalNoPadding)]
-    [DataRow("PDw_Pz8-Pg", Encodings.Base64Variant.Url)]
-    [DataRow("PDw_Pz8-Pg=", Encodings.Base64Variant.Url)]
-    [DataRow("PDw_Pz8-Pg===", Encodings.Base64Variant.Url)]
-    [DataRow("PDw/Pz8+Pg", Encodings.Base64Variant.Url)]
-    [DataRow("PDw/Pz8+Pg=", Encodings.Base64Variant.Url)]
     [DataRow("PDw/Pz8+Pg==", Encodings.Base64Variant.Url)]
     [DataRow("PDw_Pz8-Pg=", Encodings.Base64Variant.UrlNoPadding)]
     [DataRow("PDw_Pz8-Pg==", Encodings.Base64Variant.UrlNoPadding)]
@@ -203,15 +190,35 @@ public class EncodingsTests
     }
 
     [TestMethod]
-    [DataRow(1, null, Encodings.Base64Variant.Original, "")]
-    [DataRow(1, "", Encodings.Base64Variant.Original, "")]
     [DataRow(1 + 1, "Zg==", Encodings.Base64Variant.Original, "")]
     [DataRow(1 - 1, "Zg==", Encodings.Base64Variant.Original, "")]
+    [DataRow(1, null, Encodings.Base64Variant.Original, "")]
+    [DataRow(1, "", Encodings.Base64Variant.Original, "")]
+    // https://eprint.iacr.org/2022/361
+    [DataRow(5, "SGVsbG9", Encodings.Base64Variant.Original, "")]
+    [DataRow(4, "SGVsbA=", Encodings.Base64Variant.Original, "")]
+    [DataRow(4, "SGVsbA", Encodings.Base64Variant.Original, "")]
+    [DataRow(4, "SGVsbA====", Encodings.Base64Variant.Original, "")]
+    // https://base64.guru/standards/base64url
+    [DataRow(7, "PDw_Pz8-Pg", Encodings.Base64Variant.Original, "")]
+    [DataRow(7, "PDw_Pz8-Pg=", Encodings.Base64Variant.Original, "")]
+    [DataRow(7, "PDw/Pz8+Pg", Encodings.Base64Variant.Original, "")]
+    [DataRow(7, "PDw/Pz8+Pg=", Encodings.Base64Variant.Original, "")]
+    [DataRow(7, "PDw/Pz8+Pg===", Encodings.Base64Variant.Original, "")]
+    [DataRow(7, "PDw_Pz8-Pg", Encodings.Base64Variant.Url, "")]
+    [DataRow(7, "PDw_Pz8-Pg=", Encodings.Base64Variant.Url, "")]
+    [DataRow(7, "PDw_Pz8-Pg===", Encodings.Base64Variant.Url, "")]
+    [DataRow(7, "PDw/Pz8+Pg", Encodings.Base64Variant.Url, "")]
+    [DataRow(7, "PDw/Pz8+Pg=", Encodings.Base64Variant.Url, "")]
+    [DataRow(7, "PDw/Pz8+Pgggg", Encodings.Base64Variant.OriginalNoPadding, "")]
+    [DataRow(7, "PDw_Pz8-Pgggg", Encodings.Base64Variant.UrlNoPadding, "")]
     [DataRow(1, "Zg==", Encodings.Base64Variant.Original, "a")]
     [DataRow(1, "Zg==", Encodings.Base64Variant.Original, "Z")]
-    [DataRow(1, "Zg==", Encodings.Base64Variant.Original, "=")]
+    [DataRow(1, "Zg==", Encodings.Base64Variant.Original, "+")]
     [DataRow(1, "Zg==", Encodings.Base64Variant.Original, "/")]
+    [DataRow(1, "Zg==", Encodings.Base64Variant.Original, "-")]
     [DataRow(1, "Zg==", Encodings.Base64Variant.Original, "_")]
+    [DataRow(1, "Zg==", Encodings.Base64Variant.Original, "=")]
     [DataRow(1, "!", Encodings.Base64Variant.Original, "!")]
     public void FromBase64_Invalid(int dataSize, string? base64, Encodings.Base64Variant variant, string? ignoreChars)
     {
