@@ -25,7 +25,7 @@ public class Iso78164PaddingTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(NsecTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(NsecTestVectors))]
     public void Pad_Valid(string buffer, string data, int blockSize)
     {
         Span<byte> d = Convert.FromHexString(data);
@@ -93,7 +93,7 @@ public class Iso78164PaddingTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(NsecTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(NsecTestVectors))]
     public void GetUnpaddedBufferSize_Valid(string paddedData, string data, int blockSize)
     {
         Span<byte> pd = Convert.FromHexString(paddedData);

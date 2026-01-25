@@ -185,7 +185,7 @@ public class BLAKE2bTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(UnkeyedTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(UnkeyedTestVectors))]
     public void ComputeHash_Valid(string hash, string message)
     {
         Span<byte> h = stackalloc byte[hash.Length / 2];
@@ -208,7 +208,7 @@ public class BLAKE2bTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(KeyedTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(KeyedTestVectors))]
     public void ComputeTag_Valid(string tag, string message, string key)
     {
         Span<byte> t = stackalloc byte[tag.Length / 2];
@@ -221,7 +221,7 @@ public class BLAKE2bTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(TagInvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(TagInvalidParameterSizes))]
     public void ComputeTag_Invalid(int tagSize, int messageSize, int keySize)
     {
         var t = new byte[tagSize];
@@ -232,7 +232,7 @@ public class BLAKE2bTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(KeyedTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(KeyedTestVectors))]
     public void VerifyTag_Valid(string tag, string message, string key)
     {
         Span<byte> t = Convert.FromHexString(tag);
@@ -245,7 +245,7 @@ public class BLAKE2bTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(KeyedTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(KeyedTestVectors))]
     public void VerifyTag_Tampered(string tag, string message, string key)
     {
         var parameters = new Dictionary<string, byte[]>
@@ -264,7 +264,7 @@ public class BLAKE2bTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(TagInvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(TagInvalidParameterSizes))]
     public void VerifyTag_Invalid(int tagSize, int messageSize, int keySize)
     {
         var t = new byte[tagSize];
@@ -275,7 +275,7 @@ public class BLAKE2bTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(KeyDerivationTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(KeyDerivationTestVectors))]
     public void DeriveKey_Valid(string outputKeyingMaterial, string inputKeyingMaterial, string personalization, string salt, string info)
     {
         Span<byte> okm = stackalloc byte[outputKeyingMaterial.Length / 2];

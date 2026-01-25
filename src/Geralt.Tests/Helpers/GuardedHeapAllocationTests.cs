@@ -61,7 +61,7 @@ public class GuardedHeapAllocationTests
     }*/
 
     [TestMethod]
-    [DynamicData(nameof(InvalidGuardedHeapAllocationSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(InvalidGuardedHeapAllocationSizes))]
     public void GuardedHeapAllocation_Invalid(int size)
     {
         // This is the only exception that can be tested

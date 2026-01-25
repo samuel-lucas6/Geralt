@@ -86,7 +86,7 @@ public class Poly1305Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc8439TestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc8439TestVectors))]
     public void ComputeTag_Valid(string tag, string message, string oneTimeKey)
     {
         Span<byte> t = stackalloc byte[Poly1305.TagSize];
@@ -99,7 +99,7 @@ public class Poly1305Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(InvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(InvalidParameterSizes))]
     public void ComputeTag_Invalid(int tagSize, int messageSize, int keySize)
     {
         var t = new byte[tagSize];
@@ -110,7 +110,7 @@ public class Poly1305Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc8439TestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc8439TestVectors))]
     public void VerifyTag_Valid(string tag, string message, string oneTimeKey)
     {
         Span<byte> t = Convert.FromHexString(tag);
@@ -123,7 +123,7 @@ public class Poly1305Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc8439TestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc8439TestVectors))]
     public void VerifyTag_Tampered(string tag, string message, string oneTimeKey)
     {
         var parameters = new Dictionary<string, byte[]>
@@ -142,7 +142,7 @@ public class Poly1305Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(InvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(InvalidParameterSizes))]
     public void VerifyTag_Invalid(int tagSize, int messageSize, int keySize)
     {
         var t = new byte[tagSize];

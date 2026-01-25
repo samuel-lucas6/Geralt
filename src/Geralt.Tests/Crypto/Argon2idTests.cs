@@ -310,7 +310,7 @@ public class Argon2idTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(KeyDerivationTestVectors),  DynamicDataSourceType.Method)]
+    [DynamicData(nameof(KeyDerivationTestVectors))]
     public void DeriveKey_Valid(string outputKeyingMaterial, string password, string salt, int iterations, int memorySize)
     {
         Span<byte> okm = stackalloc byte[outputKeyingMaterial.Length / 2];
@@ -369,7 +369,7 @@ public class Argon2idTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(ValidStringTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(ValidStringTestVectors))]
     public void VerifyHash_Valid(string hash, string password)
     {
         Span<byte> p = Encoding.UTF8.GetBytes(password);
@@ -380,8 +380,8 @@ public class Argon2idTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(TamperedStringTestVectors), DynamicDataSourceType.Method)]
-    [DynamicData(nameof(InvalidPhcStringFormatTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(TamperedStringTestVectors))]
+    [DynamicData(nameof(InvalidPhcStringFormatTestVectors))]
     public void VerifyHash_Tampered(string hash, string password)
     {
         Span<byte> p = Encoding.UTF8.GetBytes(password);
@@ -392,7 +392,7 @@ public class Argon2idTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(InvalidStringTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(InvalidStringTestVectors))]
     public void VerifyHash_Invalid(string hash, string password)
     {
         var p = Encoding.UTF8.GetBytes(password);
@@ -419,14 +419,14 @@ public class Argon2idTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(InvalidPhcStringFormatTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(InvalidPhcStringFormatTestVectors))]
     public void NeedsRehash_Tampered(string hash, string password, int iterations = Argon2id.MinIterations, int memorySize = Argon2id.MinMemorySize)
     {
         Assert.ThrowsExactly<FormatException>(() => Argon2id.NeedsRehash(hash, iterations, memorySize));
     }
 
     [TestMethod]
-    [DynamicData(nameof(InvalidStringTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(InvalidStringTestVectors))]
     public void NeedsRehash_Invalid(string hash, string password, int iterations = Argon2id.MinIterations, int memorySize = Argon2id.MinMemorySize)
     {
         if (!hash.StartsWith("$argon2id$")) {

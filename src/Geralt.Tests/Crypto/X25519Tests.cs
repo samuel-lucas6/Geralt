@@ -164,7 +164,7 @@ public class X25519Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(KeyPairInvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(KeyPairInvalidParameterSizes))]
     public void GenerateKeyPair_Invalid(int publicKeySize, int privateKeySize)
     {
         var pk = new byte[publicKeySize];
@@ -188,7 +188,7 @@ public class X25519Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(KeyPairInvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(KeyPairInvalidParameterSizes))]
     [DataRow(X25519.PublicKeySize, X25519.PrivateKeySize, X25519.SeedSize + 1)]
     [DataRow(X25519.PublicKeySize, X25519.PrivateKeySize, X25519.SeedSize - 1)]
     public void GenerateKeyPair_Seed_Invalid(int publicKeySize, int privateKeySize, int seedSize = X25519.SeedSize)
@@ -201,7 +201,7 @@ public class X25519Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(PublicKeyTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(PublicKeyTestVectors))]
     public void ComputePublicKey_Valid(string publicKey, string privateKey)
     {
         Span<byte> pk = stackalloc byte[X25519.PublicKeySize];
@@ -213,7 +213,7 @@ public class X25519Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(KeyPairInvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(KeyPairInvalidParameterSizes))]
     public void ComputePublicKey_Invalid(int publicKeySize, int privateKeySize)
     {
         var pk = new byte[publicKeySize];
@@ -223,7 +223,7 @@ public class X25519Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc7748TestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc7748TestVectors))]
     public void ComputeSharedSecret_Valid(string sharedSecret, string senderPrivateKey, string recipientPublicKey)
     {
         Span<byte> ss = stackalloc byte[X25519.SharedSecretSize];
@@ -236,7 +236,7 @@ public class X25519Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(WycheproofTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(WycheproofTestVectors))]
     public void ComputeSharedSecret_Tampered(string sharedSecret, string senderPrivateKey, string recipientPublicKey)
     {
         var ss = new byte[X25519.SharedSecretSize];
@@ -263,7 +263,7 @@ public class X25519Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(DeriveSharedKeyTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(DeriveSharedKeyTestVectors))]
     public void DeriveSharedKey_Valid(string sharedKey, string senderPrivateKey, string recipientPublicKey, string recipientPrivateKey, string senderPublicKey, string preSharedKey)
     {
         Span<byte> sss = stackalloc byte[X25519.SharedKeySize];
@@ -282,7 +282,7 @@ public class X25519Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(SharedKeyInvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(SharedKeyInvalidParameterSizes))]
     public void DeriveSharedKey_Invalid(int sharedKeySize, int privateKeySize, int publicKeySize, int preSharedKeySize)
     {
         var ss = new byte[sharedKeySize];

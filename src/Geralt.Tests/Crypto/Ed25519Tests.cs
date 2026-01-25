@@ -118,7 +118,7 @@ public class Ed25519Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(KeyPairInvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(KeyPairInvalidParameterSizes))]
     public void GenerateKeyPair_Invalid(int publicKeySize, int privateKeySize)
     {
         var pk = new byte[publicKeySize];
@@ -142,7 +142,7 @@ public class Ed25519Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(KeyPairInvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(KeyPairInvalidParameterSizes))]
     [DataRow(Ed25519.PublicKeySize, Ed25519.PrivateKeySize, Ed25519.SeedSize + 1)]
     [DataRow(Ed25519.PublicKeySize, Ed25519.PrivateKeySize, Ed25519.SeedSize - 1)]
     public void GenerateKeyPair_Seed_Invalid(int publicKeySize, int privateKeySize, int seedSize = Ed25519.SeedSize)
@@ -155,7 +155,7 @@ public class Ed25519Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc8032TestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc8032TestVectors))]
     public void GetSeed_Valid(string signature, string message, string privateKey)
     {
         Span<byte> s = stackalloc byte[Ed25519.SeedSize];
@@ -167,7 +167,7 @@ public class Ed25519Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(KeyPairInvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(KeyPairInvalidParameterSizes))]
     public void GetSeed_Invalid(int seedSize, int privateKeySize)
     {
         var s = new byte[seedSize];
@@ -177,7 +177,7 @@ public class Ed25519Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc8032TestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc8032TestVectors))]
     public void GetPublicKey_Valid(string signature, string message, string privateKey)
     {
         Span<byte> pk = stackalloc byte[Ed25519.PublicKeySize];
@@ -189,7 +189,7 @@ public class Ed25519Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(KeyPairInvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(KeyPairInvalidParameterSizes))]
     public void GetPublicKey_Invalid(int publicKeySize, int privateKeySize)
     {
         var pk = new byte[publicKeySize];
@@ -249,7 +249,7 @@ public class Ed25519Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc8032TestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc8032TestVectors))]
     public void Sign_Valid(string signature, string message, string privateKey)
     {
         Span<byte> s = stackalloc byte[Ed25519.SignatureSize];
@@ -262,7 +262,7 @@ public class Ed25519Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(SignInvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(SignInvalidParameterSizes))]
     public void Sign_Invalid(int signatureSize, int messageSize, int privateKeySize)
     {
         var s = new byte[signatureSize];
@@ -273,7 +273,7 @@ public class Ed25519Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc8032TestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc8032TestVectors))]
     public void Verify_Valid(string signature, string message, string privateKey)
     {
         Span<byte> s = Convert.FromHexString(signature);
@@ -286,7 +286,7 @@ public class Ed25519Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(WycheproofTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(WycheproofTestVectors))]
     public void Verify_Tampered(string signature, string message, string publicKey)
     {
         Span<byte> s = Convert.FromHexString(signature);
@@ -299,7 +299,7 @@ public class Ed25519Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(VerifyInvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(VerifyInvalidParameterSizes))]
     public void Verify_Invalid(int signatureSize, int messageSize, int publicKeySize)
     {
         var s = new byte[signatureSize];

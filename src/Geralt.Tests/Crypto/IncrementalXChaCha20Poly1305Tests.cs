@@ -62,7 +62,7 @@ public class IncrementalXChaCha20Poly1305Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(EncryptParameters), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(EncryptParameters))]
     public void Encrypt_Decrypt_Valid(string key, string plaintext, string? associatedData = null)
     {
         Span<byte> h = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
@@ -88,7 +88,7 @@ public class IncrementalXChaCha20Poly1305Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(EncryptParameters), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(EncryptParameters))]
     public void Encrypt_Decrypt_Chunked_Valid(string key, string plaintext, string? associatedData = null)
     {
         Span<byte> h = stackalloc byte[IncrementalXChaCha20Poly1305.HeaderSize];
@@ -137,7 +137,7 @@ public class IncrementalXChaCha20Poly1305Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(DecryptTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(DecryptTestVectors))]
     public void Decrypt_Tampered(string header, string key, string plaintext, string ciphertext, string associatedData)
     {
         var p = new byte[plaintext.Length / 2];
@@ -159,7 +159,7 @@ public class IncrementalXChaCha20Poly1305Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(MissingRekeyTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(MissingRekeyTestVectors))]
     public void Decrypt_MissingRekey(string header, string key, string plaintext, string ciphertext, string? associatedData = null)
     {
         var h = Convert.FromHexString(header);
@@ -174,7 +174,7 @@ public class IncrementalXChaCha20Poly1305Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(InvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(InvalidParameterSizes))]
     public void Encrypt_Decrypt_Invalid(int headerSize, int keySize, int ciphertextSize, int plaintextSize)
     {
         var h = new byte[headerSize];

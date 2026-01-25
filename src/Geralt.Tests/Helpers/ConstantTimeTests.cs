@@ -92,7 +92,7 @@ public class ConstantTimeTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(AddSubtractInvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(AddSubtractInvalidParameterSizes))]
     public void Add_Invalid(int bufferSize, int aSize, int bSize)
     {
         var buf = new byte[bufferSize];
@@ -117,7 +117,7 @@ public class ConstantTimeTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(AddSubtractInvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(AddSubtractInvalidParameterSizes))]
     public void Subtract_Invalid(int bufferSize, int aSize, int bSize)
     {
         var buf = new byte[bufferSize];
@@ -141,7 +141,7 @@ public class ConstantTimeTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(GreaterLessInvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(GreaterLessInvalidParameterSizes))]
     public void IsLessThan_Invalid(int aSize, int bSize)
     {
         var a = new byte[aSize];
@@ -164,7 +164,7 @@ public class ConstantTimeTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(GreaterLessInvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(GreaterLessInvalidParameterSizes))]
     public void IsGreaterThan_Invalid(int aSize, int bSize)
     {
         var a = new byte[aSize];

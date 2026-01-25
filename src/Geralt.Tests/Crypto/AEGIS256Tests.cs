@@ -67,7 +67,7 @@ public class AEGIS256Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(InternetDraftTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(InternetDraftTestVectors))]
     public void Encrypt_Valid(string ciphertext, string plaintext, string nonce, string key, string associatedData)
     {
         Span<byte> c = stackalloc byte[ciphertext.Length / 2];
@@ -82,7 +82,7 @@ public class AEGIS256Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(InvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(InvalidParameterSizes))]
     public void Encrypt_Invalid(int ciphertextSize, int plaintextSize, int nonceSize, int keySize, int associatedDataSize)
     {
         var c = new byte[ciphertextSize];
@@ -95,7 +95,7 @@ public class AEGIS256Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(InternetDraftTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(InternetDraftTestVectors))]
     public void Decrypt_Valid(string ciphertext, string plaintext, string nonce, string key, string associatedData)
     {
         Span<byte> p = stackalloc byte[plaintext.Length / 2];
@@ -110,7 +110,7 @@ public class AEGIS256Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(InternetDraftTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(InternetDraftTestVectors))]
     public void Decrypt_Tampered(string ciphertext, string plaintext, string nonce, string key, string associatedData)
     {
         var p = new byte[plaintext.Length / 2];
@@ -131,7 +131,7 @@ public class AEGIS256Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(InvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(InvalidParameterSizes))]
     public void Decrypt_Invalid(int ciphertextSize, int plaintextSize, int nonceSize, int keySize, int associatedDataSize)
     {
         var p = new byte[plaintextSize];

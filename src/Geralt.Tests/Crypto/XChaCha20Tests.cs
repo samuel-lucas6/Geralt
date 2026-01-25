@@ -65,7 +65,7 @@ public class XChaCha20Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(InternetDraftFillTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(InternetDraftFillTestVectors))]
     public void Fill_Valid(string buffer, string nonce, string key)
     {
         Span<byte> b = stackalloc byte[buffer.Length / 2];
@@ -78,7 +78,7 @@ public class XChaCha20Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(FillInvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(FillInvalidParameterSizes))]
     public void Fill_Invalid(int bufferSize, int nonceSize, int keySize)
     {
         var b = new byte[bufferSize];
@@ -89,7 +89,7 @@ public class XChaCha20Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(InternetDraftEncryptTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(InternetDraftEncryptTestVectors))]
     public void Encrypt_Valid(string ciphertext, string plaintext, string nonce, string key, ulong counter)
     {
         Span<byte> c = stackalloc byte[ciphertext.Length / 2];
@@ -103,7 +103,7 @@ public class XChaCha20Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(EncryptInvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(EncryptInvalidParameterSizes))]
     public void Encrypt_Invalid(int ciphertextSize, int plaintextSize, int nonceSize, int keySize, ulong counter)
     {
         var c = new byte[ciphertextSize];
@@ -120,7 +120,7 @@ public class XChaCha20Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(InternetDraftEncryptTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(InternetDraftEncryptTestVectors))]
     public void Decrypt_Valid(string ciphertext, string plaintext, string nonce, string key, ulong counter)
     {
         Span<byte> p = stackalloc byte[plaintext.Length / 2];
@@ -134,7 +134,7 @@ public class XChaCha20Tests
     }
 
     [TestMethod]
-    [DynamicData(nameof(EncryptInvalidParameterSizes), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(EncryptInvalidParameterSizes))]
     public void Decrypt_Invalid(int ciphertextSize, int plaintextSize, int nonceSize, int keySize, ulong counter)
     {
         var p = new byte[plaintextSize];

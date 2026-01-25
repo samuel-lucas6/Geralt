@@ -48,7 +48,7 @@ public class EncodingsTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc4648HexTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc4648HexTestVectors))]
     public void ToHex_Valid(string hex, string data)
     {
         Span<byte> d = Encoding.UTF8.GetBytes(data);
@@ -73,7 +73,7 @@ public class EncodingsTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc4648HexTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc4648HexTestVectors))]
     [DataRow("66", "f", Encodings.HexIgnoreChars)]
     [DataRow("666F6F", "foo", "")]
     [DataRow("66 6f 6f 62", "foob", " ")]
@@ -125,8 +125,8 @@ public class EncodingsTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc4648Base64TestVectors), DynamicDataSourceType.Method)]
-    [DynamicData(nameof(Base64VariantTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc4648Base64TestVectors))]
+    [DynamicData(nameof(Base64VariantTestVectors))]
     public void ToBase64_Valid(string base64, string data, Encodings.Base64Variant variant)
     {
         Span<byte> d = Encoding.UTF8.GetBytes(data);
@@ -151,8 +151,8 @@ public class EncodingsTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc4648Base64TestVectors), DynamicDataSourceType.Method)]
-    [DynamicData(nameof(Base64VariantTestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc4648Base64TestVectors))]
+    [DynamicData(nameof(Base64VariantTestVectors))]
     [DataRow("Zg==", "f", Encodings.Base64Variant.Original, Encodings.Base64IgnoreChars)]
     [DataRow("Z g = =", "f", Encodings.Base64Variant.Original, " ")]
     [DataRow("Zg= =\n", "f", Encodings.Base64Variant.Original, " \n")]

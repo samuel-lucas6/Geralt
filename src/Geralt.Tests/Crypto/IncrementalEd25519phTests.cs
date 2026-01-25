@@ -23,7 +23,7 @@ public class IncrementalEd25519phTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc8032TestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc8032TestVectors))]
     public void Sign_Valid(string signature, string message, string privateKey)
     {
         Span<byte> s = stackalloc byte[IncrementalEd25519ph.SignatureSize];
@@ -39,7 +39,7 @@ public class IncrementalEd25519phTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc8032TestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc8032TestVectors))]
     public void Reinitialize_Valid(string signature, string message, string privateKey)
     {
         Span<byte> s = stackalloc byte[IncrementalEd25519ph.SignatureSize];
@@ -58,7 +58,7 @@ public class IncrementalEd25519phTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc8032TestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc8032TestVectors))]
     public void Verify_Valid(string signature, string message, string privateKey)
     {
         Span<byte> s = Convert.FromHexString(signature);
@@ -74,7 +74,7 @@ public class IncrementalEd25519phTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc8032TestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc8032TestVectors))]
     public void Verify_Tampered(string signature, string message, string privateKey)
     {
         var parameters = new Dictionary<string, byte[]>
@@ -111,7 +111,7 @@ public class IncrementalEd25519phTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc8032TestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc8032TestVectors))]
     public void Incremental_InvalidOperation(string signature, string message, string privateKey)
     {
         var s = new byte[IncrementalEd25519ph.SignatureSize];
@@ -137,7 +137,7 @@ public class IncrementalEd25519phTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(Rfc8032TestVectors), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(Rfc8032TestVectors))]
     public void Incremental_Disposed(string signature, string message, string privateKey)
     {
         var s = Convert.FromHexString(signature);
