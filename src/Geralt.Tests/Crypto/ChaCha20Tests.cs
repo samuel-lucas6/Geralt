@@ -151,7 +151,7 @@ public class ChaCha20Tests
             Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => ChaCha20.Encrypt(c, p, n, k, counter));
         }
         else {
-            Assert.ThrowsExactly<CryptographicException>(() => ChaCha20.Encrypt(c, p, n, k, counter));
+            Assert.ThrowsExactly<OverflowException>(() => ChaCha20.Encrypt(c, p, n, k, counter));
         }
     }
 
@@ -182,7 +182,7 @@ public class ChaCha20Tests
             Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => ChaCha20.Decrypt(p, c, n, k, counter));
         }
         else {
-            Assert.ThrowsExactly<CryptographicException>(() => ChaCha20.Decrypt(p, c, n, k, counter));
+            Assert.ThrowsExactly<OverflowException>(() => ChaCha20.Decrypt(p, c, n, k, counter));
         }
     }
 }
