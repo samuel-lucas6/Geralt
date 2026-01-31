@@ -15,7 +15,7 @@ public sealed class GuardedHeapAllocation : IDisposable
         Validation.SizeBetween(nameof(size), size, 1, MaxSize);
         Sodium.Initialize();
         _pointer = sodium_malloc((nuint)size);
-        if (_pointer == IntPtr.Zero) { throw new OutOfMemoryException("Unable to allocate memory."); }
+        if (_pointer == IntPtr.Zero) { throw new InsufficientMemoryException("Unable to allocate memory."); }
         _size = size;
     }
 
