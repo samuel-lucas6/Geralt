@@ -20,7 +20,7 @@ public static class X25519
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
         Sodium.Initialize();
         int ret = crypto_kx_keypair(publicKey, privateKey);
-        if (ret != 0) { throw new CryptographicException("Unable to generate key pair."); }
+        if (ret != 0) { throw new CryptographicException("Error generating key pair."); }
     }
 
     public static void GenerateKeyPair(Span<byte> publicKey, Span<byte> privateKey, ReadOnlySpan<byte> seed)
@@ -30,7 +30,7 @@ public static class X25519
         Validation.EqualToSize(nameof(seed), seed.Length, SeedSize);
         Sodium.Initialize();
         int ret = crypto_kx_seed_keypair(publicKey, privateKey, seed);
-        if (ret != 0) { throw new CryptographicException("Unable to generate key pair from seed."); }
+        if (ret != 0) { throw new CryptographicException("Error generating key pair from seed."); }
     }
 
     public static void ComputePublicKey(Span<byte> publicKey, ReadOnlySpan<byte> privateKey)
@@ -39,7 +39,7 @@ public static class X25519
         Validation.EqualToSize(nameof(privateKey), privateKey.Length, PrivateKeySize);
         Sodium.Initialize();
         int ret = crypto_scalarmult_curve25519_base(publicKey, privateKey);
-        if (ret != 0) { throw new CryptographicException("Unable to compute public key from private key."); }
+        if (ret != 0) { throw new CryptographicException("Error computing public key from private key."); }
     }
 
     public static void ComputeSharedSecret(Span<byte> sharedSecret, ReadOnlySpan<byte> senderPrivateKey, ReadOnlySpan<byte> recipientPublicKey)

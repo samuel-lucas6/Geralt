@@ -15,7 +15,7 @@ public sealed class GuardedHeapAllocation : IDisposable
         Validation.SizeBetween(nameof(size), size, 1, MaxSize);
         Sodium.Initialize();
         _pointer = sodium_malloc((nuint)size);
-        if (_pointer == IntPtr.Zero) { throw new InsufficientMemoryException("Unable to allocate memory."); }
+        if (_pointer == IntPtr.Zero) { throw new InsufficientMemoryException("Insufficient memory for guarded heap allocation."); }
         _size = size;
     }
 
@@ -29,21 +29,21 @@ public sealed class GuardedHeapAllocation : IDisposable
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(GuardedHeapAllocation)); }
         int ret = sodium_mprotect_noaccess(_pointer);
-        if (ret != 0) { throw new InvalidOperationException("Unable to make memory inaccessible."); }
+        if (ret != 0) { throw new InvalidOperationException("Error marking memory as inaccessible."); }
     }
 
     public void ReadOnly()
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(GuardedHeapAllocation)); }
         int ret = sodium_mprotect_readonly(_pointer);
-        if (ret != 0) { throw new InvalidOperationException("Unable to make memory read-only."); }
+        if (ret != 0) { throw new InvalidOperationException("Error marking memory as read-only."); }
     }
 
     public void ReadWrite()
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(GuardedHeapAllocation)); }
         int ret = sodium_mprotect_readwrite(_pointer);
-        if (ret != 0) { throw new InvalidOperationException("Unable to make memory readable and writable."); }
+        if (ret != 0) { throw new InvalidOperationException("Error marking memory as readable and writable."); }
     }
 
     public void Dispose()

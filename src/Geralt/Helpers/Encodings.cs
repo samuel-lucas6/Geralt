@@ -55,7 +55,7 @@ public static class Encodings
         }
         try {
             int ret = sodium_hex2bin(data, (nuint)data.Length, hexBuffer, (nuint)hexBuffer.Length, ignoreChars.ToString(), binaryLength: out _, hexEnd: null);
-            if (ret != 0) { throw new FormatException("Unable to parse the hex string."); }
+            if (ret != 0) { throw new FormatException("Invalid hex string."); }
         }
         finally {
             SecureMemory.ZeroMemory(hexBuffer);
@@ -120,7 +120,7 @@ public static class Encodings
         }
         try {
             int ret = sodium_base642bin(data, (nuint)data.Length, base64Buffer, (nuint)base64Buffer.Length, ignoreChars.ToString(), binaryLength: out _, base64End: null, (int)variant);
-            if (ret != 0) { throw new FormatException("Unable to parse the Base64 string."); }
+            if (ret != 0) { throw new FormatException("Invalid Base64 string."); }
         }
         finally {
             SecureMemory.ZeroMemory(base64Buffer);
