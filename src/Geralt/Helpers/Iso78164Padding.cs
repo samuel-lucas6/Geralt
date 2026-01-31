@@ -1,4 +1,5 @@
-﻿using static Interop.Libsodium;
+﻿using System.Security.Cryptography;
+using static Interop.Libsodium;
 
 namespace Geralt;
 
@@ -10,7 +11,7 @@ public static class Iso78164Padding
         Sodium.Initialize();
         data.CopyTo(buffer);
         int ret = sodium_pad(paddedBufferLength: out _, buffer, (nuint)data.Length, (nuint)blockSize, (nuint)buffer.Length);
-        if (ret != 0) { throw new ArgumentOutOfRangeException(nameof(buffer), $"{nameof(buffer)} is not large enough."); }
+        if (ret != 0) { throw new CryptographicException("Error padding data."); }
     }
 
     public static int GetPaddedBufferSize(ReadOnlySpan<byte> data, int blockSize)
