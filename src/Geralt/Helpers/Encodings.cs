@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.Security.Cryptography;
 using static Interop.Libsodium;
 
 namespace Geralt;
@@ -28,7 +29,7 @@ public static class Encodings
         Span<byte> hexBuffer = GC.AllocateArray<byte>(hex.Length + 1, pinned: true);
         try {
             IntPtr ret = sodium_bin2hex(hexBuffer, (nuint)hexBuffer.Length, data, (nuint)data.Length);
-            if (ret == IntPtr.Zero) { throw new FormatException("Error converting bytes to hex."); }
+            if (ret == IntPtr.Zero) { throw new CryptographicException("Error converting bytes to hex."); }
             for (int i = 0; i < hexBuffer.Length - 1; i++) {
                 hex[i] = (char)hexBuffer[i];
             }
@@ -92,7 +93,7 @@ public static class Encodings
         Span<byte> base64Buffer = GC.AllocateArray<byte>(base64.Length + 1, pinned: true);
         try {
             IntPtr ret = sodium_bin2base64(base64Buffer, (nuint)base64Buffer.Length, data, (nuint)data.Length, (int)variant);
-            if (ret == IntPtr.Zero) { throw new FormatException("Error converting bytes to Base64."); }
+            if (ret == IntPtr.Zero) { throw new CryptographicException("Error converting bytes to Base64."); }
             for (int i = 0; i < base64Buffer.Length - 1; i++) {
                 base64[i] = (char)base64Buffer[i];
             }
