@@ -69,13 +69,16 @@ public static class Encodings
         }
         Validation.NotEmpty(nameof(hex), hex.Length);
         if (ignoreChars.ContainsAny(SearchValues.Create(HexCharacterSet))) {
-            throw new ArgumentOutOfRangeException(nameof(ignoreChars), $"{nameof(ignoreChars)} cannot contain hex characters.");
+            throw new ArgumentException($"{nameof(ignoreChars)} cannot contain hex characters.", nameof(ignoreChars));
         }
         int ignoreCharsCount = 0;
         foreach (char c in hex) {
             if (ignoreChars.Contains(c)) {
                 ignoreCharsCount++;
             }
+        }
+        if (hex.Length - ignoreCharsCount == 0) {
+            throw new ArgumentException($"{nameof(hex)} must contain characters that aren't ignored.", nameof(hex));
         }
         Validation.MultipleOfSize(nameof(hex), hex.Length - ignoreCharsCount, 2);
         return (hex.Length - ignoreCharsCount) / 2;
@@ -139,7 +142,7 @@ public static class Encodings
         int ignoreCharsCount = 0;
         if (!ignoreChars.IsEmpty) {
             if (ignoreChars.ContainsAny(SearchValues.Create(Base64FullCharacterSet))) {
-                throw new ArgumentOutOfRangeException(nameof(ignoreChars), $"{nameof(ignoreChars)} cannot contain Base64 characters.");
+                throw new ArgumentException($"{nameof(ignoreChars)} cannot contain Base64 characters.", nameof(ignoreChars));
             }
             foreach (char c in base64) {
                 if (ignoreChars.Contains(c)) {
@@ -147,7 +150,7 @@ public static class Encodings
                 }
             }
             if (base64.Length - ignoreCharsCount == 0) {
-                throw new ArgumentOutOfRangeException(nameof(base64), $"{nameof(base64)} must contain characters that aren't ignored.");
+                throw new ArgumentException($"{nameof(base64)} must contain characters that aren't ignored.", nameof(base64));
             }
         }
         if (variant is Base64Variant.Original or Base64Variant.Url) {

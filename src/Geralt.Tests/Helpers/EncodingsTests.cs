@@ -114,14 +114,19 @@ public class EncodingsTests
     [DataRow(2, "666f", "F")]
     [DataRow(2, "666f", "0")]
     [DataRow(2, "666f", "9")]
-    [DataRow(2, "Zg==", "Zg=")]
+    [DataRow(2, "Zg==", "Zg==")]
     [DataRow(3 + 1, "66/6f/6f", "/")]
     [DataRow(3 - 1, "66/6f/6f", "/")]
     public void FromHex_Invalid(int dataSize, string? hex, string ignoreChars)
     {
         var d = new byte[dataSize];
 
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Encodings.FromHex(d, hex, ignoreChars));
+        if ((ignoreChars.Length > 0 && Encodings.HexCharacterSet.Contains(ignoreChars)) || (hex is { Length: > 0 } && hex == ignoreChars)) {
+            Assert.ThrowsExactly<ArgumentException>(() => Encodings.FromHex(d, hex, ignoreChars));
+        }
+        else {
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Encodings.FromHex(d, hex, ignoreChars));
+        }
     }
 
     [TestMethod]
@@ -220,10 +225,15 @@ public class EncodingsTests
     [DataRow(1, "Zg==", Encodings.Base64Variant.Original, "_")]
     [DataRow(1, "Zg==", Encodings.Base64Variant.Original, "=")]
     [DataRow(1, "!", Encodings.Base64Variant.Original, "!")]
-    public void FromBase64_Invalid(int dataSize, string? base64, Encodings.Base64Variant variant, string? ignoreChars)
+    public void FromBase64_Invalid(int dataSize, string? base64, Encodings.Base64Variant variant, string ignoreChars)
     {
         var d = new byte[dataSize];
 
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Encodings.FromBase64(d, base64, variant, ignoreChars));
+        if ((ignoreChars.Length > 0 && Encodings.Base64FullCharacterSet.Contains(ignoreChars)) || (base64 is { Length: > 0 } && base64 == ignoreChars)) {
+            Assert.ThrowsExactly<ArgumentException>(() => Encodings.FromBase64(d, base64, variant, ignoreChars));
+        }
+        else {
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Encodings.FromBase64(d, base64, variant, ignoreChars));
+        }
     }
 }
