@@ -45,7 +45,7 @@ public static class XChaCha20
     {
         long blockCount = (-1L + messageSize + BlockSize) / BlockSize;
         if (ulong.MaxValue - (ulong)blockCount < counter) {
-            throw new CryptographicException("Counter overflow prevented.");
+            throw new OverflowException("Counter overflow prevented.");
         }
     }
 }
