@@ -41,7 +41,7 @@ public class HChaCha20Tests
         var n = new byte[HChaCha20.NonceSize];
         var p = Convert.FromHexString(personalization);
 
-        Assert.ThrowsExactly<FormatException>(() => HChaCha20.DeriveKey(okm, ikm, n, p));
+        Assert.ThrowsExactly<ArgumentException>(() => HChaCha20.DeriveKey(okm, ikm, n, p));
     }
 
     [TestMethod]

@@ -18,8 +18,8 @@ public static class HChaCha20
         if (personalization.Length != 0) {
             Validation.EqualToSize(nameof(personalization), personalization.Length, PersonalizationSize);
             // https://link.springer.com/article/10.1007/s00145-018-9297-9
-            if (ConstantTime.IsAllZeros(personalization)) { throw new FormatException($"{nameof(personalization)} cannot be all-zero."); }
-            if (ConstantTime.Equals(personalization[..8], personalization[8..])) { throw new FormatException($"{nameof(personalization)} must have asymmetry."); }
+            if (ConstantTime.IsAllZeros(personalization)) { throw new ArgumentException($"{nameof(personalization)} cannot be all-zero.", nameof(personalization)); }
+            if (ConstantTime.Equals(personalization[..8], personalization[8..])) { throw new ArgumentException($"{nameof(personalization)} must have asymmetry.", nameof(personalization)); }
         }
         Sodium.Initialize();
         int ret = crypto_core_hchacha20(outputKeyingMaterial, nonce, inputKeyingMaterial, personalization);
