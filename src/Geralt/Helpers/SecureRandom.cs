@@ -71,12 +71,12 @@ public static class SecureRandom
         Validation.NotLessThanMin(nameof(wordlist), wordlist.Length, MinWordlistSize);
         if (CharUnicodeInfo.GetUnicodeCategory(separatorChar) is UnicodeCategory.NonSpacingMark or UnicodeCategory.Control or UnicodeCategory.Format or UnicodeCategory.LineSeparator
             or UnicodeCategory.ParagraphSeparator or UnicodeCategory.Surrogate or UnicodeCategory.PrivateUse or UnicodeCategory.OtherNotAssigned) {
-            throw new ArgumentOutOfRangeException(nameof(separatorChar), separatorChar, $"{nameof(separatorChar)} must be a printable character.");
+            throw new ArgumentException($"{nameof(separatorChar)} must be a printable character.", nameof(separatorChar));
         }
         int longestWord = 0;
         foreach (ReadOnlySpan<char> word in wordlist) {
             if (word.IsEmpty) {
-                throw new ArgumentOutOfRangeException(nameof(wordlist), $"{nameof(wordlist)} must not contain empty words.");
+                throw new FormatException($"{nameof(wordlist)} must not contain empty words.");
             }
             foreach (var rune in word.EnumerateRunes()) {
                 if (rune == Rune.ReplacementChar || Rune.GetUnicodeCategory(rune) is UnicodeCategory.SpaceSeparator or UnicodeCategory.Control or UnicodeCategory.Format

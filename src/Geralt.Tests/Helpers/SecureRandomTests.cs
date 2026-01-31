@@ -175,8 +175,11 @@ public class SecureRandomTests
         var word2 = wordlist.Length > 1 ? wordlist[1] : ReadOnlySpan<char>.Empty;
         var buffer = new char[bufferSize];
 
-        if (word1.ContainsAny(invalidChars) || word2.ContainsAny(invalidChars)) {
+        if ((wordlist.Length > 0 && word1.IsEmpty && word2.IsEmpty) || word1.ContainsAny(invalidChars) || word2.ContainsAny(invalidChars)) {
             Assert.ThrowsExactly<FormatException>(() => SecureRandom.GeneratePassphrase(buffer, passphraseSize: out _, wordlist, wordCount, separatorChar));
+        }
+        else if (!SecureRandom.AlphanumericSymbolChars.Contains(separatorChar)) {
+            Assert.ThrowsExactly<ArgumentException>(() => SecureRandom.GeneratePassphrase(buffer, passphraseSize: out _, wordlist, wordCount, separatorChar));
         }
         else {
             Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => SecureRandom.GeneratePassphrase(buffer, passphraseSize: out _, wordlist, wordCount, separatorChar));
