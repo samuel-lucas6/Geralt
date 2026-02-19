@@ -17,10 +17,10 @@ public static class Argon2id
 
     public static void DeriveKey(Span<byte> outputKeyingMaterial, ReadOnlySpan<byte> password, ReadOnlySpan<byte> salt, int iterations, int memorySize)
     {
-        Validation.NotLessThanMin(nameof(outputKeyingMaterial), outputKeyingMaterial.Length, MinKeySize);
-        Validation.EqualToSize(nameof(salt), salt.Length, SaltSize);
-        Validation.NotLessThanMin(nameof(iterations), iterations, MinIterations);
-        Validation.NotLessThanMin(nameof(memorySize), memorySize, MinMemorySize);
+        Validation.GreaterThanOrEqualTo(nameof(outputKeyingMaterial), outputKeyingMaterial.Length, MinKeySize);
+        Validation.EqualTo(nameof(salt), salt.Length, SaltSize);
+        Validation.GreaterThanOrEqualTo(nameof(iterations), iterations, MinIterations);
+        Validation.GreaterThanOrEqualTo(nameof(memorySize), memorySize, MinMemorySize);
         Sodium.Initialize();
         int ret = crypto_pwhash_argon2id(outputKeyingMaterial, (ulong)outputKeyingMaterial.Length, password, (ulong)password.Length, salt, (ulong)iterations, (nuint)memorySize, crypto_pwhash_argon2id_ALG_ARGON2ID13);
         if (ret != 0) { throw new InsufficientMemoryException("Insufficient memory to perform password-based key derivation."); }
@@ -28,9 +28,9 @@ public static class Argon2id
 
     public static void ComputeHash(Span<char> hash, ReadOnlySpan<byte> password, int iterations, int memorySize)
     {
-        Validation.EqualToSize(nameof(hash), hash.Length, HashSize);
-        Validation.NotLessThanMin(nameof(iterations), iterations, MinIterations);
-        Validation.NotLessThanMin(nameof(memorySize), memorySize, MinMemorySize);
+        Validation.EqualTo(nameof(hash), hash.Length, HashSize);
+        Validation.GreaterThanOrEqualTo(nameof(iterations), iterations, MinIterations);
+        Validation.GreaterThanOrEqualTo(nameof(memorySize), memorySize, MinMemorySize);
         Sodium.Initialize();
         Span<byte> hashBytes = stackalloc byte[HashSize];
         try {
@@ -47,7 +47,7 @@ public static class Argon2id
 
     public static bool VerifyHash(ReadOnlySpan<char> hash, ReadOnlySpan<byte> password)
     {
-        Validation.SizeBetween(nameof(hash), hash.Length, MinHashSize, MaxHashSize);
+        Validation.Between(nameof(hash), hash.Length, MinHashSize, MaxHashSize);
         Span<byte> hashBytes = stackalloc byte[HashSize]; hashBytes.Clear();
         try {
             for (int i = 0; i < hash.Length; i++) {
@@ -64,9 +64,9 @@ public static class Argon2id
 
     public static bool NeedsRehash(ReadOnlySpan<char> hash, int iterations, int memorySize)
     {
-        Validation.SizeBetween(nameof(hash), hash.Length, MinHashSize, MaxHashSize);
-        Validation.NotLessThanMin(nameof(iterations), iterations, MinIterations);
-        Validation.NotLessThanMin(nameof(memorySize), memorySize, MinMemorySize);
+        Validation.Between(nameof(hash), hash.Length, MinHashSize, MaxHashSize);
+        Validation.GreaterThanOrEqualTo(nameof(iterations), iterations, MinIterations);
+        Validation.GreaterThanOrEqualTo(nameof(memorySize), memorySize, MinMemorySize);
         Span<byte> hashBytes = stackalloc byte[HashSize]; hashBytes.Clear();
         try {
             for (int i = 0; i < hash.Length; i++) {

@@ -12,7 +12,7 @@ public sealed class GuardedHeapAllocation : IDisposable
 
     public GuardedHeapAllocation(int size)
     {
-        Validation.SizeBetween(nameof(size), size, 1, MaxSize);
+        Validation.Between(nameof(size), size, 1, MaxSize);
         Sodium.Initialize();
         _pointer = sodium_malloc((nuint)size);
         if (_pointer == IntPtr.Zero) { throw new InsufficientMemoryException("Insufficient memory for guarded heap allocation."); }

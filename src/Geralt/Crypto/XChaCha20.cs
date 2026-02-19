@@ -12,8 +12,8 @@ public static class XChaCha20
     public static void Fill(Span<byte> buffer, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> key)
     {
         Validation.NotEmpty(nameof(buffer), buffer.Length);
-        Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
-        Validation.EqualToSize(nameof(key), key.Length, KeySize);
+        Validation.EqualTo(nameof(nonce), nonce.Length, NonceSize);
+        Validation.EqualTo(nameof(key), key.Length, KeySize);
         Sodium.Initialize();
         int ret = crypto_stream_xchacha20(buffer, (ulong)buffer.Length, nonce, key);
         if (ret != 0) { throw new CryptographicException("Error computing pseudorandom bytes."); }
@@ -21,9 +21,9 @@ public static class XChaCha20
 
     public static void Encrypt(Span<byte> ciphertext, ReadOnlySpan<byte> plaintext, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> key, ulong counter = 0)
     {
-        Validation.EqualToSize(nameof(ciphertext), ciphertext.Length, plaintext.Length);
-        Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
-        Validation.EqualToSize(nameof(key), key.Length, KeySize);
+        Validation.EqualTo(nameof(ciphertext), ciphertext.Length, plaintext.Length);
+        Validation.EqualTo(nameof(nonce), nonce.Length, NonceSize);
+        Validation.EqualTo(nameof(key), key.Length, KeySize);
         ThrowIfCounterOverflow(plaintext.Length, counter);
         Sodium.Initialize();
         int ret = crypto_stream_xchacha20_xor_ic(ciphertext, plaintext, (ulong)plaintext.Length, nonce, counter, key);
@@ -32,9 +32,9 @@ public static class XChaCha20
 
     public static void Decrypt(Span<byte> plaintext, ReadOnlySpan<byte> ciphertext, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> key, ulong counter = 0)
     {
-        Validation.EqualToSize(nameof(plaintext), plaintext.Length, ciphertext.Length);
-        Validation.EqualToSize(nameof(nonce), nonce.Length, NonceSize);
-        Validation.EqualToSize(nameof(key), key.Length, KeySize);
+        Validation.EqualTo(nameof(plaintext), plaintext.Length, ciphertext.Length);
+        Validation.EqualTo(nameof(nonce), nonce.Length, NonceSize);
+        Validation.EqualTo(nameof(key), key.Length, KeySize);
         ThrowIfCounterOverflow(ciphertext.Length, counter);
         Sodium.Initialize();
         int ret = crypto_stream_xchacha20_xor_ic(plaintext, ciphertext, (ulong)ciphertext.Length, nonce, counter, key);

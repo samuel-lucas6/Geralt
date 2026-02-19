@@ -45,22 +45,22 @@ public static class SecureRandom
     public static void FillDeterministic(Span<byte> buffer, ReadOnlySpan<byte> seed)
     {
         Validation.NotEmpty(nameof(buffer), buffer.Length);
-        Validation.EqualToSize(nameof(seed), seed.Length, SeedSize);
+        Validation.EqualTo(nameof(seed), seed.Length, SeedSize);
         Sodium.Initialize();
         randombytes_buf_deterministic(buffer, (nuint)buffer.Length, seed);
     }
 
     public static int GetInt32(int upperBound)
     {
-        Validation.NotLessThanMin(nameof(upperBound), upperBound, MinUpperBound);
+        Validation.GreaterThanOrEqualTo(nameof(upperBound), upperBound, MinUpperBound);
         Sodium.Initialize();
         return randombytes_uniform((uint)upperBound);
     }
 
     public static void GenerateString(Span<char> buffer, ReadOnlySpan<char> characterSet)
     {
-        Validation.SizeBetween(nameof(buffer), buffer.Length, MinStringSize, MaxStringSize);
-        Validation.NotLessThanMin(nameof(characterSet), characterSet.Length, MinCharacterSetSize);
+        Validation.Between(nameof(buffer), buffer.Length, MinStringSize, MaxStringSize);
+        Validation.GreaterThanOrEqualTo(nameof(characterSet), characterSet.Length, MinCharacterSetSize);
         for (int i = 0; i < buffer.Length; i++) {
             buffer[i] = characterSet[GetInt32(characterSet.Length)];
         }
@@ -68,7 +68,7 @@ public static class SecureRandom
 
     public static void GeneratePassphrase(Span<char> buffer, out int passphraseSize, ReadOnlySpan<string> wordlist, int wordCount, char separatorChar = '-', bool capitalize = false, bool includeNumber = false)
     {
-        Validation.NotLessThanMin(nameof(wordlist), wordlist.Length, MinWordlistSize);
+        Validation.GreaterThanOrEqualTo(nameof(wordlist), wordlist.Length, MinWordlistSize);
         if (CharUnicodeInfo.GetUnicodeCategory(separatorChar) is UnicodeCategory.NonSpacingMark or UnicodeCategory.Control or UnicodeCategory.Format or UnicodeCategory.LineSeparator
             or UnicodeCategory.ParagraphSeparator or UnicodeCategory.Surrogate or UnicodeCategory.PrivateUse or UnicodeCategory.OtherNotAssigned) {
             throw new ArgumentException($"{nameof(separatorChar)} must be a printable character.", nameof(separatorChar));
@@ -88,7 +88,7 @@ public static class SecureRandom
                 longestWord = word.Length;
             }
         }
-        Validation.EqualToSize(nameof(buffer), buffer.Length, GetPassphraseBufferSize(longestWord, wordCount));
+        Validation.EqualTo(nameof(buffer), buffer.Length, GetPassphraseBufferSize(longestWord, wordCount));
         int numberIndex = 0;
         if (includeNumber) { numberIndex = GetInt32(wordCount); }
         int bufferIndex = 0;
@@ -121,8 +121,8 @@ public static class SecureRandom
 
     public static int GetPassphraseBufferSize(int longestWord, int wordCount)
     {
-        Validation.SizeBetween(nameof(longestWord), longestWord, MinLongestWordSize, MaxLongestWordSize);
-        Validation.SizeBetween(nameof(wordCount), wordCount, MinWordCount, MaxWordCount);
+        Validation.Between(nameof(longestWord), longestWord, MinLongestWordSize, MaxLongestWordSize);
+        Validation.Between(nameof(wordCount), wordCount, MinWordCount, MaxWordCount);
         // Need to account for the separator chars and a number
         return (longestWord * wordCount) + wordCount;
     }

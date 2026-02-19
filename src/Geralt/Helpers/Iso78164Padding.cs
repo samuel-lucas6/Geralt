@@ -7,7 +7,7 @@ public static class Iso78164Padding
 {
     public static void Pad(Span<byte> buffer, ReadOnlySpan<byte> data, int blockSize)
     {
-        Validation.EqualToSize(nameof(buffer), buffer.Length, GetPaddedBufferSize(data, blockSize));
+        Validation.EqualTo(nameof(buffer), buffer.Length, GetPaddedBufferSize(data, blockSize));
         Sodium.Initialize();
         data.CopyTo(buffer);
         int ret = sodium_pad(paddedBufferLength: out _, buffer, (nuint)data.Length, (nuint)blockSize, (nuint)buffer.Length);
@@ -17,7 +17,7 @@ public static class Iso78164Padding
     public static int GetPaddedBufferSize(ReadOnlySpan<byte> data, int blockSize)
     {
         // data can be empty for Fill()
-        Validation.GreaterThanZero(nameof(blockSize), blockSize);
+        Validation.GreaterThan(nameof(blockSize), blockSize, 0);
         int paddingSize = blockSize - (data.Length % blockSize);
         return checked(data.Length + paddingSize);
     }
@@ -31,7 +31,7 @@ public static class Iso78164Padding
     public static int GetUnpaddedBufferSize(ReadOnlySpan<byte> paddedData, int blockSize)
     {
         Validation.NotEmpty(nameof(paddedData), paddedData.Length);
-        Validation.GreaterThanZero(nameof(blockSize), blockSize);
+        Validation.GreaterThan(nameof(blockSize), blockSize, 0);
         Sodium.Initialize();
         int ret = sodium_unpad(out nuint unpaddedSize, paddedData, (nuint)paddedData.Length, (nuint)blockSize);
         if (ret != 0) { throw new FormatException("Invalid padding."); }
