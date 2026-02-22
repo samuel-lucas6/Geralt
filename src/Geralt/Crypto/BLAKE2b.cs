@@ -20,7 +20,7 @@ public static class BLAKE2b
 
     public static void ComputeHash(Span<byte> hash, ReadOnlySpan<byte> message)
     {
-        Validation.Between(nameof(hash), hash.Length, MinHashSize, MaxHashSize);
+        Validation.Between($"{nameof(hash)}.{nameof(hash.Length)}", hash.Length, MinHashSize, MaxHashSize);
         Sodium.Initialize();
         int ret = crypto_generichash_blake2b(hash, (nuint)hash.Length, message, (ulong)message.Length, key: ReadOnlySpan<byte>.Empty, keyLength: 0);
         if (ret != 0) { throw new CryptographicException("Error computing hash."); }
@@ -28,8 +28,8 @@ public static class BLAKE2b
 
     public static void ComputeTag(Span<byte> tag, ReadOnlySpan<byte> message, ReadOnlySpan<byte> key)
     {
-        Validation.Between(nameof(tag), tag.Length, MinTagSize, MaxTagSize);
-        Validation.Between(nameof(key), key.Length, MinKeySize, MaxKeySize);
+        Validation.Between($"{nameof(tag)}.{nameof(tag.Length)}", tag.Length, MinTagSize, MaxTagSize);
+        Validation.Between($"{nameof(key)}.{nameof(key.Length)}", key.Length, MinKeySize, MaxKeySize);
         Sodium.Initialize();
         int ret = crypto_generichash_blake2b(tag, (nuint)tag.Length, message, (ulong)message.Length, key, (nuint)key.Length);
         if (ret != 0) { throw new CryptographicException("Error computing tag."); }
@@ -37,8 +37,8 @@ public static class BLAKE2b
 
     public static bool VerifyTag(ReadOnlySpan<byte> tag, ReadOnlySpan<byte> message, ReadOnlySpan<byte> key)
     {
-        Validation.Between(nameof(tag), tag.Length, MinTagSize, MaxTagSize);
-        Validation.Between(nameof(key), key.Length, MinKeySize, MaxKeySize);
+        Validation.Between($"{nameof(tag)}.{nameof(tag.Length)}", tag.Length, MinTagSize, MaxTagSize);
+        Validation.Between($"{nameof(key)}.{nameof(key.Length)}", key.Length, MinKeySize, MaxKeySize);
         Span<byte> computedTag = stackalloc byte[tag.Length];
         ComputeTag(computedTag, message, key);
         bool equal = ConstantTime.Equals(tag, computedTag);
@@ -48,10 +48,10 @@ public static class BLAKE2b
 
     public static void DeriveKey(Span<byte> outputKeyingMaterial, ReadOnlySpan<byte> inputKeyingMaterial, ReadOnlySpan<byte> personalization, ReadOnlySpan<byte> salt = default, ReadOnlySpan<byte> info = default)
     {
-        Validation.Between(nameof(outputKeyingMaterial), outputKeyingMaterial.Length, MinKeySize, MaxKeySize);
-        Validation.Between(nameof(inputKeyingMaterial), inputKeyingMaterial.Length, MinKeySize, MaxKeySize);
-        Validation.EqualTo(nameof(personalization), personalization.Length, PersonalizationSize);
-        if (salt.Length != 0) { Validation.EqualTo(nameof(salt), salt.Length, SaltSize); }
+        Validation.Between($"{nameof(outputKeyingMaterial)}.{nameof(outputKeyingMaterial.Length)}", outputKeyingMaterial.Length, MinKeySize, MaxKeySize);
+        Validation.Between($"{nameof(inputKeyingMaterial)}.{nameof(inputKeyingMaterial.Length)}", inputKeyingMaterial.Length, MinKeySize, MaxKeySize);
+        Validation.EqualTo($"{nameof(personalization)}.{nameof(personalization.Length)}", personalization.Length, PersonalizationSize);
+        if (salt.Length != 0) { Validation.EqualTo($"{nameof(salt)}.{nameof(salt.Length)}", salt.Length, SaltSize); }
         Sodium.Initialize();
         int ret = crypto_generichash_blake2b_salt_personal(outputKeyingMaterial, (nuint)outputKeyingMaterial.Length, info, (ulong)info.Length, inputKeyingMaterial, (nuint)inputKeyingMaterial.Length, salt.Length != 0 ? salt : new byte[SaltSize], personalization);
         if (ret != 0) { throw new CryptographicException("Error deriving key."); }

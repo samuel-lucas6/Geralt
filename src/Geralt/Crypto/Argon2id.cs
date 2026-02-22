@@ -17,8 +17,8 @@ public static class Argon2id
 
     public static void DeriveKey(Span<byte> outputKeyingMaterial, ReadOnlySpan<byte> password, ReadOnlySpan<byte> salt, int iterations, int memorySize)
     {
-        Validation.GreaterThanOrEqualTo(nameof(outputKeyingMaterial), outputKeyingMaterial.Length, MinKeySize);
-        Validation.EqualTo(nameof(salt), salt.Length, SaltSize);
+        Validation.GreaterThanOrEqualTo($"{nameof(outputKeyingMaterial)}.{nameof(outputKeyingMaterial.Length)}", outputKeyingMaterial.Length, MinKeySize);
+        Validation.EqualTo($"{nameof(salt)}.{nameof(salt.Length)}", salt.Length, SaltSize);
         Validation.GreaterThanOrEqualTo(nameof(iterations), iterations, MinIterations);
         Validation.GreaterThanOrEqualTo(nameof(memorySize), memorySize, MinMemorySize);
         Sodium.Initialize();
@@ -28,7 +28,7 @@ public static class Argon2id
 
     public static void ComputeHash(Span<char> hash, ReadOnlySpan<byte> password, int iterations, int memorySize)
     {
-        Validation.EqualTo(nameof(hash), hash.Length, HashSize);
+        Validation.EqualTo($"{nameof(hash)}.{nameof(hash.Length)}", hash.Length, HashSize);
         Validation.GreaterThanOrEqualTo(nameof(iterations), iterations, MinIterations);
         Validation.GreaterThanOrEqualTo(nameof(memorySize), memorySize, MinMemorySize);
         Sodium.Initialize();
@@ -47,7 +47,7 @@ public static class Argon2id
 
     public static bool VerifyHash(ReadOnlySpan<char> hash, ReadOnlySpan<byte> password)
     {
-        Validation.Between(nameof(hash), hash.Length, MinHashSize, MaxHashSize);
+        Validation.Between($"{nameof(hash)}.{nameof(hash.Length)}", hash.Length, MinHashSize, MaxHashSize);
         Span<byte> hashBytes = stackalloc byte[HashSize]; hashBytes.Clear();
         try {
             for (int i = 0; i < hash.Length; i++) {
@@ -64,7 +64,7 @@ public static class Argon2id
 
     public static bool NeedsRehash(ReadOnlySpan<char> hash, int iterations, int memorySize)
     {
-        Validation.Between(nameof(hash), hash.Length, MinHashSize, MaxHashSize);
+        Validation.Between($"{nameof(hash)}.{nameof(hash.Length)}", hash.Length, MinHashSize, MaxHashSize);
         Validation.GreaterThanOrEqualTo(nameof(iterations), iterations, MinIterations);
         Validation.GreaterThanOrEqualTo(nameof(memorySize), memorySize, MinMemorySize);
         Span<byte> hashBytes = stackalloc byte[HashSize]; hashBytes.Clear();

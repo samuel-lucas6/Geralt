@@ -23,7 +23,7 @@ public static class Encodings
 
     public static void ToHex(Span<char> hex, ReadOnlySpan<byte> data)
     {
-        Validation.EqualTo(nameof(hex), hex.Length, GetToHexBufferSize(data));
+        Validation.EqualTo($"{nameof(hex)}.{nameof(hex.Length)}", hex.Length, GetToHexBufferSize(data));
         Sodium.Initialize();
         // libsodium includes a null byte terminator
         Span<byte> hexBuffer = GC.AllocateArray<byte>(hex.Length + 1, pinned: true);
@@ -47,7 +47,7 @@ public static class Encodings
 
     public static void FromHex(Span<byte> data, ReadOnlySpan<char> hex, ReadOnlySpan<char> ignoreChars = default)
     {
-        Validation.EqualTo(nameof(data), data.Length, GetFromHexBufferSize(hex, ignoreChars));
+        Validation.EqualTo($"{nameof(data)}.{nameof(data.Length)}", data.Length, GetFromHexBufferSize(hex, ignoreChars));
         Sodium.Initialize();
         Span<byte> hexBuffer = GC.AllocateArray<byte>(hex.Length, pinned: true);
         for (int i = 0; i < hex.Length; i++) {
@@ -65,7 +65,7 @@ public static class Encodings
     public static int GetFromHexBufferSize(ReadOnlySpan<char> hex, ReadOnlySpan<char> ignoreChars = default)
     {
         if (ignoreChars.IsEmpty) {
-            Validation.MultipleOf(nameof(hex), hex.Length, 2);
+            Validation.MultipleOf($"{nameof(hex)}.{nameof(hex.Length)}", hex.Length, 2);
             return hex.Length / 2;
         }
         Validation.NotEmpty(nameof(hex), hex.Length);
@@ -81,13 +81,13 @@ public static class Encodings
         if (hex.Length - ignoreCharsCount == 0) {
             throw new ArgumentException($"{nameof(hex)} must contain characters that aren't ignored.", nameof(hex));
         }
-        Validation.MultipleOf(nameof(hex), hex.Length - ignoreCharsCount, 2);
+        Validation.MultipleOf($"{nameof(hex)}.{nameof(hex.Length)}", hex.Length - ignoreCharsCount, 2);
         return (hex.Length - ignoreCharsCount) / 2;
     }
 
     public static void ToBase64(Span<char> base64, ReadOnlySpan<byte> data, Base64Variant variant = Base64Variant.Original)
     {
-        Validation.EqualTo(nameof(base64), base64.Length, GetToBase64BufferSize(data, variant));
+        Validation.EqualTo($"{nameof(base64)}.{nameof(base64.Length)}", base64.Length, GetToBase64BufferSize(data, variant));
         Sodium.Initialize();
         // libsodium includes a null byte terminator
         Span<byte> base64Buffer = GC.AllocateArray<byte>(base64.Length + 1, pinned: true);
@@ -112,7 +112,7 @@ public static class Encodings
 
     public static void FromBase64(Span<byte> data, ReadOnlySpan<char> base64, Base64Variant variant = Base64Variant.Original, ReadOnlySpan<char> ignoreChars = default)
     {
-        Validation.EqualTo(nameof(data), data.Length, GetFromBase64BufferSize(base64, variant, ignoreChars));
+        Validation.EqualTo($"{nameof(data)}.{nameof(data.Length)}", data.Length, GetFromBase64BufferSize(base64, variant, ignoreChars));
         Sodium.Initialize();
         Span<byte> base64Buffer = GC.AllocateArray<byte>(base64.Length, pinned: true);
         for (int i = 0; i < base64.Length; i++) {
@@ -132,7 +132,7 @@ public static class Encodings
         Validation.NotEmpty(nameof(base64), base64.Length);
         if (ignoreChars.IsEmpty) {
             if (variant is Base64Variant.Original or Base64Variant.Url) {
-                Validation.MultipleOf(nameof(base64), base64.Length, 4);
+                Validation.MultipleOf($"{nameof(base64)}.{nameof(base64.Length)}", base64.Length, 4);
             }
             else {
                 if (base64.Length % 4 == 1) {

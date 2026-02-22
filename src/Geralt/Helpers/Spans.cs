@@ -4,14 +4,14 @@ public static class Spans
 {
     public static void Concat(Span<byte> buffer, ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
     {
-        Validation.EqualTo(nameof(buffer), buffer.Length, checked(a.Length + b.Length));
+        Validation.EqualTo($"{nameof(buffer)}.{nameof(buffer.Length)}", buffer.Length, checked(a.Length + b.Length));
         a.CopyTo(buffer[..a.Length]);
         b.CopyTo(buffer.Slice(start: a.Length, b.Length));
     }
 
     public static void Concat(Span<byte> buffer, ReadOnlySpan<byte> a, ReadOnlySpan<byte> b, ReadOnlySpan<byte> c)
     {
-        Validation.EqualTo(nameof(buffer), buffer.Length, checked(a.Length + b.Length + c.Length));
+        Validation.EqualTo($"{nameof(buffer)}.{nameof(buffer.Length)}", buffer.Length, checked(a.Length + b.Length + c.Length));
         a.CopyTo(buffer[..a.Length]);
         b.CopyTo(buffer.Slice(start: a.Length, b.Length));
         c.CopyTo(buffer.Slice(start: a.Length + b.Length, c.Length));
@@ -19,7 +19,7 @@ public static class Spans
 
     public static void Concat(Span<byte> buffer, ReadOnlySpan<byte> a, ReadOnlySpan<byte> b, ReadOnlySpan<byte> c, ReadOnlySpan<byte> d)
     {
-        Validation.EqualTo(nameof(buffer), buffer.Length, checked(a.Length + b.Length + c.Length + d.Length));
+        Validation.EqualTo($"{nameof(buffer)}.{nameof(buffer.Length)}", buffer.Length, checked(a.Length + b.Length + c.Length + d.Length));
         a.CopyTo(buffer[..a.Length]);
         b.CopyTo(buffer.Slice(start: a.Length, b.Length));
         c.CopyTo(buffer.Slice(start: a.Length + b.Length, c.Length));
@@ -28,7 +28,7 @@ public static class Spans
 
     public static void Concat(Span<byte> buffer, ReadOnlySpan<byte> a, ReadOnlySpan<byte> b, ReadOnlySpan<byte> c, ReadOnlySpan<byte> d, ReadOnlySpan<byte> e)
     {
-        Validation.EqualTo(nameof(buffer), buffer.Length, checked(a.Length + b.Length + c.Length + d.Length + e.Length));
+        Validation.EqualTo($"{nameof(buffer)}.{nameof(buffer.Length)}", buffer.Length, checked(a.Length + b.Length + c.Length + d.Length + e.Length));
         a.CopyTo(buffer[..a.Length]);
         b.CopyTo(buffer.Slice(start: a.Length, b.Length));
         c.CopyTo(buffer.Slice(start: a.Length + b.Length, c.Length));
@@ -38,7 +38,7 @@ public static class Spans
 
     public static void Concat(Span<byte> buffer, ReadOnlySpan<byte> a, ReadOnlySpan<byte> b, ReadOnlySpan<byte> c, ReadOnlySpan<byte> d, ReadOnlySpan<byte> e, ReadOnlySpan<byte> f)
     {
-        Validation.EqualTo(nameof(buffer), buffer.Length, checked(a.Length + b.Length + c.Length + d.Length + e.Length + f.Length));
+        Validation.EqualTo($"{nameof(buffer)}.{nameof(buffer.Length)}", buffer.Length, checked(a.Length + b.Length + c.Length + d.Length + e.Length + f.Length));
         a.CopyTo(buffer[..a.Length]);
         b.CopyTo(buffer.Slice(start: a.Length, b.Length));
         c.CopyTo(buffer.Slice(start: a.Length + b.Length, c.Length));

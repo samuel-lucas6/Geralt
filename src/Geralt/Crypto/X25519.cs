@@ -16,8 +16,8 @@ public static class X25519
 
     public static void GenerateKeyPair(Span<byte> publicKey, Span<byte> privateKey)
     {
-        Validation.EqualTo(nameof(publicKey), publicKey.Length, PublicKeySize);
-        Validation.EqualTo(nameof(privateKey), privateKey.Length, PrivateKeySize);
+        Validation.EqualTo($"{nameof(publicKey)}.{nameof(publicKey.Length)}", publicKey.Length, PublicKeySize);
+        Validation.EqualTo($"{nameof(privateKey)}.{nameof(privateKey.Length)}", privateKey.Length, PrivateKeySize);
         Sodium.Initialize();
         int ret = crypto_kx_keypair(publicKey, privateKey);
         if (ret != 0) { throw new CryptographicException("Error generating key pair."); }
@@ -25,9 +25,9 @@ public static class X25519
 
     public static void GenerateKeyPair(Span<byte> publicKey, Span<byte> privateKey, ReadOnlySpan<byte> seed)
     {
-        Validation.EqualTo(nameof(publicKey), publicKey.Length, PublicKeySize);
-        Validation.EqualTo(nameof(privateKey), privateKey.Length, PrivateKeySize);
-        Validation.EqualTo(nameof(seed), seed.Length, SeedSize);
+        Validation.EqualTo($"{nameof(publicKey)}.{nameof(publicKey.Length)}", publicKey.Length, PublicKeySize);
+        Validation.EqualTo($"{nameof(privateKey)}.{nameof(privateKey.Length)}", privateKey.Length, PrivateKeySize);
+        Validation.EqualTo($"{nameof(seed)}.{nameof(seed.Length)}", seed.Length, SeedSize);
         Sodium.Initialize();
         int ret = crypto_kx_seed_keypair(publicKey, privateKey, seed);
         if (ret != 0) { throw new CryptographicException("Error generating key pair from seed."); }
@@ -35,8 +35,8 @@ public static class X25519
 
     public static void ComputePublicKey(Span<byte> publicKey, ReadOnlySpan<byte> privateKey)
     {
-        Validation.EqualTo(nameof(publicKey), publicKey.Length, PublicKeySize);
-        Validation.EqualTo(nameof(privateKey), privateKey.Length, PrivateKeySize);
+        Validation.EqualTo($"{nameof(publicKey)}.{nameof(publicKey.Length)}", publicKey.Length, PublicKeySize);
+        Validation.EqualTo($"{nameof(privateKey)}.{nameof(privateKey.Length)}", privateKey.Length, PrivateKeySize);
         Sodium.Initialize();
         int ret = crypto_scalarmult_curve25519_base(publicKey, privateKey);
         if (ret != 0) { throw new CryptographicException("Error computing public key from private key."); }
@@ -44,9 +44,9 @@ public static class X25519
 
     public static void ComputeSharedSecret(Span<byte> sharedSecret, ReadOnlySpan<byte> senderPrivateKey, ReadOnlySpan<byte> recipientPublicKey)
     {
-        Validation.EqualTo(nameof(sharedSecret), sharedSecret.Length, SharedSecretSize);
-        Validation.EqualTo(nameof(senderPrivateKey), senderPrivateKey.Length, PrivateKeySize);
-        Validation.EqualTo(nameof(recipientPublicKey), recipientPublicKey.Length, PublicKeySize);
+        Validation.EqualTo($"{nameof(sharedSecret)}.{nameof(sharedSecret.Length)}", sharedSecret.Length, SharedSecretSize);
+        Validation.EqualTo($"{nameof(senderPrivateKey)}.{nameof(senderPrivateKey.Length)}", senderPrivateKey.Length, PrivateKeySize);
+        Validation.EqualTo($"{nameof(recipientPublicKey)}.{nameof(recipientPublicKey.Length)}", recipientPublicKey.Length, PublicKeySize);
         Sodium.Initialize();
         int ret = crypto_scalarmult_curve25519(sharedSecret, senderPrivateKey, recipientPublicKey);
         if (ret != 0) { throw new CryptographicException("Invalid public key."); }
@@ -54,19 +54,19 @@ public static class X25519
 
     public static void DeriveSenderSharedKey(Span<byte> sharedKey, ReadOnlySpan<byte> senderPrivateKey, ReadOnlySpan<byte> recipientPublicKey, ReadOnlySpan<byte> preSharedKey = default)
     {
-        Validation.EqualTo(nameof(sharedKey), sharedKey.Length, SharedKeySize);
-        Validation.EqualTo(nameof(senderPrivateKey), senderPrivateKey.Length, PrivateKeySize);
-        Validation.EqualTo(nameof(recipientPublicKey), recipientPublicKey.Length, PublicKeySize);
-        if (preSharedKey.Length != 0) { Validation.Between(nameof(preSharedKey), preSharedKey.Length, MinPreSharedKeySize, MaxPreSharedKeySize); }
+        Validation.EqualTo($"{nameof(sharedKey)}.{nameof(sharedKey.Length)}", sharedKey.Length, SharedKeySize);
+        Validation.EqualTo($"{nameof(senderPrivateKey)}.{nameof(senderPrivateKey.Length)}", senderPrivateKey.Length, PrivateKeySize);
+        Validation.EqualTo($"{nameof(recipientPublicKey)}.{nameof(recipientPublicKey.Length)}", recipientPublicKey.Length, PublicKeySize);
+        if (preSharedKey.Length != 0) { Validation.Between($"{nameof(preSharedKey)}.{nameof(preSharedKey.Length)}", preSharedKey.Length, MinPreSharedKeySize, MaxPreSharedKeySize); }
         DeriveSharedKey(sharedKey, senderPrivateKey, recipientPublicKey, preSharedKey, isSender: true);
     }
 
     public static void DeriveRecipientSharedKey(Span<byte> sharedKey, ReadOnlySpan<byte> recipientPrivateKey, ReadOnlySpan<byte> senderPublicKey, ReadOnlySpan<byte> preSharedKey = default)
     {
-        Validation.EqualTo(nameof(sharedKey), sharedKey.Length, SharedKeySize);
-        Validation.EqualTo(nameof(recipientPrivateKey), recipientPrivateKey.Length, PrivateKeySize);
-        Validation.EqualTo(nameof(senderPublicKey), senderPublicKey.Length, PublicKeySize);
-        if (preSharedKey.Length != 0) { Validation.Between(nameof(preSharedKey), preSharedKey.Length, MinPreSharedKeySize, MaxPreSharedKeySize); }
+        Validation.EqualTo($"{nameof(sharedKey)}.{nameof(sharedKey.Length)}", sharedKey.Length, SharedKeySize);
+        Validation.EqualTo($"{nameof(recipientPrivateKey)}.{nameof(recipientPrivateKey.Length)}", recipientPrivateKey.Length, PrivateKeySize);
+        Validation.EqualTo($"{nameof(senderPublicKey)}.{nameof(senderPublicKey.Length)}", senderPublicKey.Length, PublicKeySize);
+        if (preSharedKey.Length != 0) { Validation.Between($"{nameof(preSharedKey)}.{nameof(preSharedKey.Length)}", preSharedKey.Length, MinPreSharedKeySize, MaxPreSharedKeySize); }
         DeriveSharedKey(sharedKey, recipientPrivateKey, senderPublicKey, preSharedKey, isSender: false);
     }
 

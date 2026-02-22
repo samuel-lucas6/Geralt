@@ -12,11 +12,11 @@ public static class HChaCha20
 
     public static void DeriveKey(Span<byte> outputKeyingMaterial, ReadOnlySpan<byte> inputKeyingMaterial, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> personalization = default)
     {
-        Validation.EqualTo(nameof(outputKeyingMaterial), outputKeyingMaterial.Length, OutputSize);
-        Validation.EqualTo(nameof(inputKeyingMaterial), inputKeyingMaterial.Length, KeySize);
-        Validation.EqualTo(nameof(nonce), nonce.Length, NonceSize);
+        Validation.EqualTo($"{nameof(outputKeyingMaterial)}.{nameof(outputKeyingMaterial.Length)}", outputKeyingMaterial.Length, OutputSize);
+        Validation.EqualTo($"{nameof(inputKeyingMaterial)}.{nameof(inputKeyingMaterial.Length)}", inputKeyingMaterial.Length, KeySize);
+        Validation.EqualTo($"{nameof(nonce)}.{nameof(nonce.Length)}", nonce.Length, NonceSize);
         if (personalization.Length != 0) {
-            Validation.EqualTo(nameof(personalization), personalization.Length, PersonalizationSize);
+            Validation.EqualTo($"{nameof(personalization)}.{nameof(personalization.Length)}", personalization.Length, PersonalizationSize);
             // https://link.springer.com/article/10.1007/s00145-018-9297-9
             if (ConstantTime.IsAllZeros(personalization)) { throw new ArgumentException($"{nameof(personalization)} cannot be all-zero.", nameof(personalization)); }
             if (ConstantTime.Equals(personalization[..8], personalization[8..])) { throw new ArgumentException($"{nameof(personalization)} must have asymmetry.", nameof(personalization)); }

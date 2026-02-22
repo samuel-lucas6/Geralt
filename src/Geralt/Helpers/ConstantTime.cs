@@ -26,8 +26,8 @@ public static class ConstantTime
         Validation.NotEmpty(nameof(buffer), buffer.Length);
         Validation.NotEmpty(nameof(a), a.Length);
         Validation.NotEmpty(nameof(b), b.Length);
-        Validation.EqualTo(nameof(a), a.Length, buffer.Length);
-        Validation.EqualTo(nameof(a), a.Length, b.Length);
+        Validation.EqualTo($"{nameof(a)}.{nameof(a.Length)}", a.Length, buffer.Length);
+        Validation.EqualTo($"{nameof(a)}.{nameof(a.Length)}", a.Length, b.Length);
         Sodium.Initialize();
         a.CopyTo(buffer);
         sodium_add(buffer, b, (nuint)buffer.Length);
@@ -38,8 +38,8 @@ public static class ConstantTime
         Validation.NotEmpty(nameof(buffer), buffer.Length);
         Validation.NotEmpty(nameof(a), a.Length);
         Validation.NotEmpty(nameof(b), b.Length);
-        Validation.EqualTo(nameof(a), a.Length, buffer.Length);
-        Validation.EqualTo(nameof(a), a.Length, b.Length);
+        Validation.EqualTo($"{nameof(a)}.{nameof(a.Length)}", a.Length, buffer.Length);
+        Validation.EqualTo($"{nameof(a)}.{nameof(a.Length)}", a.Length, b.Length);
         Sodium.Initialize();
         a.CopyTo(buffer);
         sodium_sub(buffer, b, (nuint)buffer.Length);
@@ -49,7 +49,7 @@ public static class ConstantTime
     {
         Validation.NotEmpty(nameof(a), a.Length);
         Validation.NotEmpty(nameof(b), b.Length);
-        Validation.EqualTo(nameof(a), a.Length, b.Length);
+        Validation.EqualTo($"{nameof(a)}.{nameof(a.Length)}", a.Length, b.Length);
         Sodium.Initialize();
         return sodium_compare(a, b, (nuint)a.Length) == -1;
     }
@@ -58,7 +58,7 @@ public static class ConstantTime
     {
         Validation.NotEmpty(nameof(a), a.Length);
         Validation.NotEmpty(nameof(b), b.Length);
-        Validation.EqualTo(nameof(a), a.Length, b.Length);
+        Validation.EqualTo($"{nameof(a)}.{nameof(a.Length)}", a.Length, b.Length);
         Sodium.Initialize();
         return sodium_compare(a, b, (nuint)a.Length) == 1;
     }

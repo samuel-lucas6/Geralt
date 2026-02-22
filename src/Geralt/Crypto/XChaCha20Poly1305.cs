@@ -11,9 +11,9 @@ public static class XChaCha20Poly1305
 
     public static void Encrypt(Span<byte> ciphertext, ReadOnlySpan<byte> plaintext, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> key, ReadOnlySpan<byte> associatedData = default)
     {
-        Validation.EqualTo(nameof(ciphertext), ciphertext.Length, plaintext.Length + TagSize);
-        Validation.EqualTo(nameof(nonce), nonce.Length, NonceSize);
-        Validation.EqualTo(nameof(key), key.Length, KeySize);
+        Validation.EqualTo($"{nameof(ciphertext)}.{nameof(ciphertext.Length)}", ciphertext.Length, plaintext.Length + TagSize);
+        Validation.EqualTo($"{nameof(nonce)}.{nameof(nonce.Length)}", nonce.Length, NonceSize);
+        Validation.EqualTo($"{nameof(key)}.{nameof(key.Length)}", key.Length, KeySize);
         Sodium.Initialize();
         int ret = crypto_aead_xchacha20poly1305_ietf_encrypt(ciphertext, ciphertextLength: out _, plaintext, (ulong)plaintext.Length, associatedData, (ulong)associatedData.Length, nsec: ReadOnlySpan<byte>.Empty, nonce, key);
         if (ret != 0) { throw new CryptographicException("Error encrypting plaintext."); }
@@ -21,10 +21,10 @@ public static class XChaCha20Poly1305
 
     public static void Decrypt(Span<byte> plaintext, ReadOnlySpan<byte> ciphertext, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> key, ReadOnlySpan<byte> associatedData = default)
     {
-        Validation.GreaterThanOrEqualTo(nameof(ciphertext), ciphertext.Length, TagSize);
-        Validation.EqualTo(nameof(plaintext), plaintext.Length, ciphertext.Length - TagSize);
-        Validation.EqualTo(nameof(nonce), nonce.Length, NonceSize);
-        Validation.EqualTo(nameof(key), key.Length, KeySize);
+        Validation.GreaterThanOrEqualTo($"{nameof(ciphertext)}.{nameof(ciphertext.Length)}", ciphertext.Length, TagSize);
+        Validation.EqualTo($"{nameof(plaintext)}.{nameof(plaintext.Length)}", plaintext.Length, ciphertext.Length - TagSize);
+        Validation.EqualTo($"{nameof(nonce)}.{nameof(nonce.Length)}", nonce.Length, NonceSize);
+        Validation.EqualTo($"{nameof(key)}.{nameof(key.Length)}", key.Length, KeySize);
         Sodium.Initialize();
         int ret = crypto_aead_xchacha20poly1305_ietf_decrypt(plaintext, plaintextLength: out _, nsec: ReadOnlySpan<byte>.Empty, ciphertext, (ulong)ciphertext.Length, associatedData, (ulong)associatedData.Length, nonce, key);
         if (ret != 0) { throw new CryptographicException("Invalid authentication tag for the given inputs."); }

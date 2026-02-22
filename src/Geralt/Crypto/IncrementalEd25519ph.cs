@@ -40,8 +40,8 @@ public sealed class IncrementalEd25519ph : IDisposable
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalEd25519ph)); }
         if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
-        Validation.EqualTo(nameof(signature), signature.Length, SignatureSize);
-        Validation.EqualTo(nameof(privateKey), privateKey.Length, PrivateKeySize);
+        Validation.EqualTo($"{nameof(signature)}.{nameof(signature.Length)}", signature.Length, SignatureSize);
+        Validation.EqualTo($"{nameof(privateKey)}.{nameof(privateKey.Length)}", privateKey.Length, PrivateKeySize);
         int ret = crypto_sign_ed25519ph_final_create(ref _state, signature, signatureLength: out _, privateKey);
         if (ret != 0) { throw new CryptographicException("Error finalizing signature."); }
         _finalized = true;
@@ -51,8 +51,8 @@ public sealed class IncrementalEd25519ph : IDisposable
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalEd25519ph)); }
         if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
-        Validation.EqualTo(nameof(signature), signature.Length, SignatureSize);
-        Validation.EqualTo(nameof(publicKey), publicKey.Length, PublicKeySize);
+        Validation.EqualTo($"{nameof(signature)}.{nameof(signature.Length)}", signature.Length, SignatureSize);
+        Validation.EqualTo($"{nameof(publicKey)}.{nameof(publicKey.Length)}", publicKey.Length, PublicKeySize);
         _finalized = true;
         return crypto_sign_ed25519ph_final_verify(ref _state, signature, publicKey) == 0;
     }

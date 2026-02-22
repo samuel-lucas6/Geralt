@@ -7,7 +7,7 @@ public static class Iso78164Padding
 {
     public static void Pad(Span<byte> buffer, ReadOnlySpan<byte> data, int blockSize)
     {
-        Validation.EqualTo(nameof(buffer), buffer.Length, GetPaddedBufferSize(data, blockSize));
+        Validation.EqualTo($"{nameof(buffer)}.{nameof(buffer.Length)}", buffer.Length, GetPaddedBufferSize(data, blockSize));
         Sodium.Initialize();
         data.CopyTo(buffer);
         int ret = sodium_pad(paddedBufferLength: out _, buffer, (nuint)data.Length, (nuint)blockSize, (nuint)buffer.Length);

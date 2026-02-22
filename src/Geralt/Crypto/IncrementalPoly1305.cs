@@ -23,7 +23,7 @@ public sealed class IncrementalPoly1305 : IDisposable
     public void Reinitialize(ReadOnlySpan<byte> oneTimeKey)
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalPoly1305)); }
-        Validation.EqualTo(nameof(oneTimeKey), oneTimeKey.Length, KeySize);
+        Validation.EqualTo($"{nameof(oneTimeKey)}.{nameof(oneTimeKey.Length)}", oneTimeKey.Length, KeySize);
         int ret = crypto_onetimeauth_poly1305_init(ref _state, oneTimeKey);
         if (ret != 0) { throw new CryptographicException("Error initializing message authentication code state."); }
         _finalized = false;
@@ -41,7 +41,7 @@ public sealed class IncrementalPoly1305 : IDisposable
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalPoly1305)); }
         if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
-        Validation.EqualTo(nameof(tag), tag.Length, TagSize);
+        Validation.EqualTo($"{nameof(tag)}.{nameof(tag.Length)}", tag.Length, TagSize);
         int ret = crypto_onetimeauth_poly1305_final(ref _state, tag);
         if (ret != 0) { throw new CryptographicException("Error finalizing message authentication code."); }
         _finalized = true;
@@ -51,7 +51,7 @@ public sealed class IncrementalPoly1305 : IDisposable
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalPoly1305)); }
         if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
-        Validation.EqualTo(nameof(tag), tag.Length, TagSize);
+        Validation.EqualTo($"{nameof(tag)}.{nameof(tag.Length)}", tag.Length, TagSize);
         Span<byte> computedTag = stackalloc byte[TagSize];
         Finalize(computedTag);
         bool equal = ConstantTime.Equals(tag, computedTag);
