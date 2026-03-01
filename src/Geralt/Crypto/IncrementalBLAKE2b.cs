@@ -10,6 +10,8 @@ public sealed class IncrementalBLAKE2b : IDisposable
     public const int KeySize = BLAKE2b.KeySize;
     public const int TagSize = BLAKE2b.TagSize;
     public const int BlockSize = BLAKE2b.BlockSize;
+    public const int SaltSize = BLAKE2b.SaltSize;
+    public const int PersonalizationSize = BLAKE2b.PersonalizationSize;
     public const int MinHashSize = BLAKE2b.MinHashSize;
     public const int MaxHashSize = BLAKE2b.MaxHashSize;
     public const int MinTagSize = BLAKE2b.MinTagSize;
@@ -24,18 +26,22 @@ public sealed class IncrementalBLAKE2b : IDisposable
     private bool _cached;
     private bool _disposed;
 
-    public IncrementalBLAKE2b(int hashSize, ReadOnlySpan<byte> key = default)
+    public IncrementalBLAKE2b(int hashSize, ReadOnlySpan<byte> key = default, ReadOnlySpan<byte> personalization = default, ReadOnlySpan<byte> salt = default)
     {
         Sodium.Initialize();
-        Reinitialize(hashSize, key);
+        Reinitialize(hashSize, key, personalization, salt);
     }
 
-    public void Reinitialize(int hashSize, ReadOnlySpan<byte> key = default)
+    public void Reinitialize(int hashSize, ReadOnlySpan<byte> key = default, ReadOnlySpan<byte> personalization = default, ReadOnlySpan<byte> salt = default)
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
         Validation.Between(nameof(hashSize), hashSize, MinHashSize, MaxHashSize);
         if (key.Length != 0) { Validation.Between($"{nameof(key)}.{nameof(key.Length)}", key.Length, MinKeySize, MaxKeySize); }
-        int ret = crypto_generichash_blake2b_init(ref _state, key, (nuint)key.Length, (nuint)hashSize);
+        if (personalization.Length != 0) { Validation.EqualTo($"{nameof(personalization)}.{nameof(personalization.Length)}", personalization.Length, PersonalizationSize); }
+        if (salt.Length != 0) { Validation.EqualTo($"{nameof(salt)}.{nameof(salt.Length)}", salt.Length, SaltSize); }
+        int ret = (personalization.Length == 0 && salt.Length == 0)
+            ? crypto_generichash_blake2b_init(ref _state, key, (nuint)key.Length, (nuint)hashSize)
+            : crypto_generichash_blake2b_init_salt_personal(ref _state, key, (nuint)key.Length, (nuint)hashSize, salt.Length != 0 ? salt : new byte[SaltSize], personalization.Length != 0 ? personalization : new byte[PersonalizationSize]);
         if (ret != 0) { throw new CryptographicException("Error initializing hash function state."); }
         _hashSize = hashSize;
         _finalized = false;

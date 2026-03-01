@@ -167,6 +167,18 @@ public class BLAKE2bTests
         yield return [BLAKE2b.TagSize, 1, BLAKE2b.MinKeySize - 1];
     }
 
+    public static IEnumerable<object[]> KeyDerivationInvalidParameterSizes()
+    {
+        yield return [BLAKE2b.MaxKeySize + 1, BLAKE2b.KeySize, BLAKE2b.PersonalizationSize, BLAKE2b.SaltSize, BLAKE2b.BlockSize];
+        yield return [BLAKE2b.MinKeySize - 1, BLAKE2b.KeySize, BLAKE2b.PersonalizationSize, BLAKE2b.SaltSize, BLAKE2b.BlockSize];
+        yield return [BLAKE2b.KeySize, BLAKE2b.MaxKeySize + 1, BLAKE2b.PersonalizationSize, BLAKE2b.SaltSize, BLAKE2b.BlockSize];
+        yield return [BLAKE2b.KeySize, BLAKE2b.MinKeySize - 1, BLAKE2b.PersonalizationSize, BLAKE2b.SaltSize, BLAKE2b.BlockSize];
+        yield return [BLAKE2b.KeySize, BLAKE2b.KeySize, BLAKE2b.PersonalizationSize + 1, BLAKE2b.SaltSize, BLAKE2b.BlockSize];
+        yield return [BLAKE2b.KeySize, BLAKE2b.KeySize, BLAKE2b.PersonalizationSize - 1, BLAKE2b.SaltSize, BLAKE2b.BlockSize];
+        yield return [BLAKE2b.KeySize, BLAKE2b.KeySize, BLAKE2b.PersonalizationSize, BLAKE2b.SaltSize + 1, BLAKE2b.BlockSize];
+        yield return [BLAKE2b.KeySize, BLAKE2b.KeySize, BLAKE2b.PersonalizationSize, BLAKE2b.SaltSize - 1, BLAKE2b.BlockSize];
+    }
+
     [TestMethod]
     public void Constants_Valid()
     {
@@ -290,14 +302,7 @@ public class BLAKE2bTests
     }
 
     [TestMethod]
-    [DataRow(BLAKE2b.MaxKeySize + 1, BLAKE2b.KeySize, BLAKE2b.PersonalizationSize, BLAKE2b.SaltSize, 1)]
-    [DataRow(BLAKE2b.MinKeySize - 1, BLAKE2b.KeySize, BLAKE2b.PersonalizationSize, BLAKE2b.SaltSize, 1)]
-    [DataRow(BLAKE2b.KeySize, BLAKE2b.MaxKeySize + 1, BLAKE2b.PersonalizationSize, BLAKE2b.SaltSize, 1)]
-    [DataRow(BLAKE2b.KeySize, BLAKE2b.MinKeySize - 1, BLAKE2b.PersonalizationSize, BLAKE2b.SaltSize, 1)]
-    [DataRow(BLAKE2b.KeySize, BLAKE2b.KeySize, BLAKE2b.PersonalizationSize + 1, BLAKE2b.SaltSize, 1)]
-    [DataRow(BLAKE2b.KeySize, BLAKE2b.KeySize, BLAKE2b.PersonalizationSize - 1, BLAKE2b.SaltSize, 1)]
-    [DataRow(BLAKE2b.KeySize, BLAKE2b.KeySize, BLAKE2b.PersonalizationSize, BLAKE2b.SaltSize + 1, 1)]
-    [DataRow(BLAKE2b.KeySize, BLAKE2b.KeySize, BLAKE2b.PersonalizationSize, BLAKE2b.SaltSize - 1, 1)]
+    [DynamicData(nameof(KeyDerivationInvalidParameterSizes))]
     public void DeriveKey_Invalid(int outputKeyingMaterialSize, int inputKeyingMaterialSize, int personalizationSize, int saltSize, int infoSize)
     {
         var okm = new byte[outputKeyingMaterialSize];

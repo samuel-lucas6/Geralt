@@ -11,6 +11,10 @@ internal static partial class Interop
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int crypto_generichash_blake2b_init_salt_personal(ref crypto_generichash_blake2b_state state, ReadOnlySpan<byte> key, nuint keyLength, nuint hashLength, ReadOnlySpan<byte> salt, ReadOnlySpan<byte> personalization);
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         internal static partial int crypto_generichash_blake2b_update(ref crypto_generichash_blake2b_state state, ReadOnlySpan<byte> message, ulong messageLength);
 
         [LibraryImport(DllName)]
