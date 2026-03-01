@@ -87,6 +87,17 @@ public class X25519Tests
             "de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f",
             "5dab087e624a8a4b79e17f8b83800ee66f3bb1292618b6fd1c2f8b27ff88e0eb",
             "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a",
+            "",
+            ""
+        ];
+        yield return
+        [
+            "005564bc3e2b36e0433c3779a4ffda459cd4f922338940b14c648a3d68507123",
+            "77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a",
+            "de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f",
+            "5dab087e624a8a4b79e17f8b83800ee66f3bb1292618b6fd1c2f8b27ff88e0eb",
+            "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a",
+            "35313236666232613337343030643261",
             ""
         ];
         yield return
@@ -96,6 +107,17 @@ public class X25519Tests
             "de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f",
             "5dab087e624a8a4b79e17f8b83800ee66f3bb1292618b6fd1c2f8b27ff88e0eb",
             "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a",
+            "",
+            "1f21c2a65b744b2cbe0d72270a708b8c"
+        ];
+        yield return
+        [
+            "9d86883c0f58a9cfc12fad7209a228c5eea452a710602e404fbc9189562ca307",
+            "77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a",
+            "de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f",
+            "5dab087e624a8a4b79e17f8b83800ee66f3bb1292618b6fd1c2f8b27ff88e0eb",
+            "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a",
+            "00000000000000000000000000000000",
             "1f21c2a65b744b2cbe0d72270a708b8c"
         ];
         yield return
@@ -105,6 +127,17 @@ public class X25519Tests
             "de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f",
             "5dab087e624a8a4b79e17f8b83800ee66f3bb1292618b6fd1c2f8b27ff88e0eb",
             "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a",
+            "",
+            "5dbbfd1c5549181aa9319cd71b946757e1f4769aee9568bd360b651a86ea29a2"
+        ];
+        yield return
+        [
+            "4b2404b1d63ca672cc43eb8776e9285ac37791036700912e45e37d58dbdc96b2",
+            "77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a",
+            "de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f",
+            "5dab087e624a8a4b79e17f8b83800ee66f3bb1292618b6fd1c2f8b27ff88e0eb",
+            "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a",
+            "35313236666232613337343030643261",
             "5dbbfd1c5549181aa9319cd71b946757e1f4769aee9568bd360b651a86ea29a2"
         ];
         yield return
@@ -114,6 +147,7 @@ public class X25519Tests
             "de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f",
             "5dab087e624a8a4b79e17f8b83800ee66f3bb1292618b6fd1c2f8b27ff88e0eb",
             "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a",
+            "",
             "871f4dcab454942a480381f59e34d3ed3cb0db4a70c575a984554c2af75b022aa02040644460daef8e64fe442e374be9b861ae142244412f76dbbb523f714eed"
         ];
     }
@@ -128,14 +162,16 @@ public class X25519Tests
 
     public static IEnumerable<object[]> SharedKeyInvalidParameterSizes()
     {
-        yield return [X25519.SharedKeySize + 1, X25519.PrivateKeySize, X25519.PublicKeySize, X25519.PreSharedKeySize];
-        yield return [X25519.SharedKeySize - 1, X25519.PrivateKeySize, X25519.PublicKeySize, X25519.PreSharedKeySize];
-        yield return [X25519.SharedKeySize, X25519.PrivateKeySize + 1, X25519.PublicKeySize, X25519.PreSharedKeySize];
-        yield return [X25519.SharedKeySize, X25519.PrivateKeySize - 1, X25519.PublicKeySize, X25519.PreSharedKeySize];
-        yield return [X25519.SharedKeySize, X25519.PrivateKeySize, X25519.PublicKeySize + 1, X25519.PreSharedKeySize];
-        yield return [X25519.SharedKeySize, X25519.PrivateKeySize, X25519.PublicKeySize - 1, X25519.PreSharedKeySize];
-        yield return [X25519.SharedKeySize, X25519.PrivateKeySize, X25519.PublicKeySize, X25519.MaxPreSharedKeySize + 1];
-        yield return [X25519.SharedKeySize, X25519.PrivateKeySize, X25519.PublicKeySize, X25519.MinPreSharedKeySize - 1];
+        yield return [X25519.SharedKeySize + 1, X25519.PrivateKeySize, X25519.PublicKeySize, X25519.PersonalizationSize, X25519.PreSharedKeySize];
+        yield return [X25519.SharedKeySize - 1, X25519.PrivateKeySize, X25519.PublicKeySize, X25519.PersonalizationSize, X25519.PreSharedKeySize];
+        yield return [X25519.SharedKeySize, X25519.PrivateKeySize + 1, X25519.PublicKeySize, X25519.PersonalizationSize, X25519.PreSharedKeySize];
+        yield return [X25519.SharedKeySize, X25519.PrivateKeySize - 1, X25519.PublicKeySize, X25519.PersonalizationSize, X25519.PreSharedKeySize];
+        yield return [X25519.SharedKeySize, X25519.PrivateKeySize, X25519.PublicKeySize + 1, X25519.PersonalizationSize, X25519.PreSharedKeySize];
+        yield return [X25519.SharedKeySize, X25519.PrivateKeySize, X25519.PublicKeySize - 1, X25519.PersonalizationSize, X25519.PreSharedKeySize];
+        yield return [X25519.SharedKeySize, X25519.PrivateKeySize, X25519.PublicKeySize, X25519.PersonalizationSize + 1, X25519.PreSharedKeySize];
+        yield return [X25519.SharedKeySize, X25519.PrivateKeySize, X25519.PublicKeySize, X25519.PersonalizationSize - 1, X25519.PreSharedKeySize];
+        yield return [X25519.SharedKeySize, X25519.PrivateKeySize, X25519.PublicKeySize, X25519.PersonalizationSize, X25519.MaxPreSharedKeySize + 1];
+        yield return [X25519.SharedKeySize, X25519.PrivateKeySize, X25519.PublicKeySize, X25519.PersonalizationSize, X25519.MinPreSharedKeySize - 1];
     }
 
     [TestMethod]
@@ -146,6 +182,7 @@ public class X25519Tests
         Assert.AreEqual(32, X25519.SeedSize);
         Assert.AreEqual(32, X25519.SharedSecretSize);
         Assert.AreEqual(32, X25519.SharedKeySize);
+        Assert.AreEqual(16, X25519.PersonalizationSize);
         Assert.AreEqual(32, X25519.PreSharedKeySize);
         Assert.AreEqual(16, X25519.MinPreSharedKeySize);
         Assert.AreEqual(64, X25519.MaxPreSharedKeySize);
@@ -264,7 +301,7 @@ public class X25519Tests
 
     [TestMethod]
     [DynamicData(nameof(DeriveSharedKeyTestVectors))]
-    public void DeriveSharedKey_Valid(string sharedKey, string senderPrivateKey, string recipientPublicKey, string recipientPrivateKey, string senderPublicKey, string preSharedKey)
+    public void DeriveSharedKey_Valid(string sharedKey, string senderPrivateKey, string recipientPublicKey, string recipientPrivateKey, string senderPublicKey, string personalization, string preSharedKey)
     {
         Span<byte> sss = stackalloc byte[X25519.SharedKeySize];
         Span<byte> ssk = Convert.FromHexString(senderPrivateKey);
@@ -272,10 +309,11 @@ public class X25519Tests
         Span<byte> rss = stackalloc byte[X25519.SharedKeySize];
         Span<byte> rsk = Convert.FromHexString(recipientPrivateKey);
         Span<byte> spk = Convert.FromHexString(senderPublicKey);
+        Span<byte> p = Convert.FromHexString(personalization);
         Span<byte> psk = Convert.FromHexString(preSharedKey);
 
-        X25519.DeriveSenderSharedKey(sss, ssk, rpk, psk);
-        X25519.DeriveRecipientSharedKey(rss, rsk, spk, psk);
+        X25519.DeriveSenderSharedKey(sss, ssk, rpk, p, psk);
+        X25519.DeriveRecipientSharedKey(rss, rsk, spk, p, psk);
 
         Assert.AreEqual(sharedKey, Convert.ToHexString(sss).ToLower());
         Assert.AreEqual(sharedKey, Convert.ToHexString(rss).ToLower());
@@ -283,14 +321,15 @@ public class X25519Tests
 
     [TestMethod]
     [DynamicData(nameof(SharedKeyInvalidParameterSizes))]
-    public void DeriveSharedKey_Invalid(int sharedKeySize, int privateKeySize, int publicKeySize, int preSharedKeySize)
+    public void DeriveSharedKey_Invalid(int sharedKeySize, int privateKeySize, int publicKeySize, int personalizationSize, int preSharedKeySize)
     {
         var ss = new byte[sharedKeySize];
         var sk = new byte[privateKeySize];
         var pk = new byte[publicKeySize];
+        var p = new byte[personalizationSize];
         var psk = new byte[preSharedKeySize];
 
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedKey(ss, sk, pk, psk));
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedKey(ss, sk, pk, psk));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => X25519.DeriveSenderSharedKey(ss, sk, pk, p, psk));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => X25519.DeriveRecipientSharedKey(ss, sk, pk, p, psk));
     }
 }

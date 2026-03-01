@@ -10,6 +10,7 @@ public static class X25519
     public const int SeedSize = crypto_kx_SEEDBYTES;
     public const int SharedSecretSize = crypto_scalarmult_curve25519_BYTES;
     public const int SharedKeySize = crypto_kx_SESSIONKEYBYTES;
+    public const int PersonalizationSize = BLAKE2b.PersonalizationSize;
     public const int PreSharedKeySize = BLAKE2b.KeySize;
     public const int MinPreSharedKeySize = BLAKE2b.MinKeySize;
     public const int MaxPreSharedKeySize = BLAKE2b.MaxKeySize;
@@ -52,31 +53,33 @@ public static class X25519
         if (ret != 0) { throw new CryptographicException("Invalid public key."); }
     }
 
-    public static void DeriveSenderSharedKey(Span<byte> sharedKey, ReadOnlySpan<byte> senderPrivateKey, ReadOnlySpan<byte> recipientPublicKey, ReadOnlySpan<byte> preSharedKey = default)
+    public static void DeriveSenderSharedKey(Span<byte> sharedKey, ReadOnlySpan<byte> senderPrivateKey, ReadOnlySpan<byte> recipientPublicKey, ReadOnlySpan<byte> personalization = default, ReadOnlySpan<byte> preSharedKey = default)
     {
         Validation.EqualTo($"{nameof(sharedKey)}.{nameof(sharedKey.Length)}", sharedKey.Length, SharedKeySize);
         Validation.EqualTo($"{nameof(senderPrivateKey)}.{nameof(senderPrivateKey.Length)}", senderPrivateKey.Length, PrivateKeySize);
         Validation.EqualTo($"{nameof(recipientPublicKey)}.{nameof(recipientPublicKey.Length)}", recipientPublicKey.Length, PublicKeySize);
+        if (personalization.Length != 0) { Validation.EqualTo($"{nameof(personalization)}.{nameof(personalization.Length)}", personalization.Length, PersonalizationSize); }
         if (preSharedKey.Length != 0) { Validation.Between($"{nameof(preSharedKey)}.{nameof(preSharedKey.Length)}", preSharedKey.Length, MinPreSharedKeySize, MaxPreSharedKeySize); }
-        DeriveSharedKey(sharedKey, senderPrivateKey, recipientPublicKey, preSharedKey, isSender: true);
+        DeriveSharedKey(sharedKey, senderPrivateKey, recipientPublicKey, personalization, preSharedKey, isSender: true);
     }
 
-    public static void DeriveRecipientSharedKey(Span<byte> sharedKey, ReadOnlySpan<byte> recipientPrivateKey, ReadOnlySpan<byte> senderPublicKey, ReadOnlySpan<byte> preSharedKey = default)
+    public static void DeriveRecipientSharedKey(Span<byte> sharedKey, ReadOnlySpan<byte> recipientPrivateKey, ReadOnlySpan<byte> senderPublicKey, ReadOnlySpan<byte> personalization = default, ReadOnlySpan<byte> preSharedKey = default)
     {
         Validation.EqualTo($"{nameof(sharedKey)}.{nameof(sharedKey.Length)}", sharedKey.Length, SharedKeySize);
         Validation.EqualTo($"{nameof(recipientPrivateKey)}.{nameof(recipientPrivateKey.Length)}", recipientPrivateKey.Length, PrivateKeySize);
         Validation.EqualTo($"{nameof(senderPublicKey)}.{nameof(senderPublicKey.Length)}", senderPublicKey.Length, PublicKeySize);
+        if (personalization.Length != 0) { Validation.EqualTo($"{nameof(personalization)}.{nameof(personalization.Length)}", personalization.Length, PersonalizationSize); }
         if (preSharedKey.Length != 0) { Validation.Between($"{nameof(preSharedKey)}.{nameof(preSharedKey.Length)}", preSharedKey.Length, MinPreSharedKeySize, MaxPreSharedKeySize); }
-        DeriveSharedKey(sharedKey, recipientPrivateKey, senderPublicKey, preSharedKey, isSender: false);
+        DeriveSharedKey(sharedKey, recipientPrivateKey, senderPublicKey, personalization, preSharedKey, isSender: false);
     }
 
-    private static void DeriveSharedKey(Span<byte> sharedKey, ReadOnlySpan<byte> yourPrivateKey, ReadOnlySpan<byte> othersPublicKey, ReadOnlySpan<byte> preSharedKey, bool isSender)
+    private static void DeriveSharedKey(Span<byte> sharedKey, ReadOnlySpan<byte> yourPrivateKey, ReadOnlySpan<byte> othersPublicKey, ReadOnlySpan<byte> personalization, ReadOnlySpan<byte> preSharedKey, bool isSender)
     {
         Span<byte> sharedSecret = stackalloc byte[SharedSecretSize];
         ComputeSharedSecret(sharedSecret, yourPrivateKey, othersPublicKey);
         Span<byte> yourPublicKey = stackalloc byte[PublicKeySize];
         ComputePublicKey(yourPublicKey, yourPrivateKey);
-        using var blake2b = new IncrementalBLAKE2b(sharedKey.Length, preSharedKey);
+        using var blake2b = new IncrementalBLAKE2b(sharedKey.Length, preSharedKey, personalization);
         blake2b.Update(sharedSecret);
         blake2b.Update(isSender ? yourPublicKey : othersPublicKey);
         blake2b.Update(isSender ? othersPublicKey : yourPublicKey);
