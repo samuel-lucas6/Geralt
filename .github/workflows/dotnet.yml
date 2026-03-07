@@ -22,7 +22,7 @@ jobs:
           9.0.x
           10.0.x
     - name: Install workloads
-      run: dotnet workload install ios tvos maccatalyst
+      run: dotnet workload install ios tvos maccatalyst android
     - run: dotnet --info
     - name: Test (.NET 8.0/Debug)
       run: dotnet test -f net8.0 -c Debug
