@@ -46,9 +46,9 @@ public class ValidationTests
     }
 
     [TestMethod]
-    [DataRow(16, 16, 64)]
+    [DataRow(17, 16, 64)]
     [DataRow(32, 16, 64)]
-    [DataRow(64, 16, 64)]
+    [DataRow(63, 16, 64)]
     public void Between_Valid(int value, int min, int max)
     {
         Validation.Between(nameof(value), (sbyte)value, (sbyte)min, (sbyte)max);
@@ -68,6 +68,8 @@ public class ValidationTests
 
     [TestMethod]
     [DataRow(15, 16, 64)]
+    [DataRow(16, 16, 64)]
+    [DataRow(64, 16, 64)]
     [DataRow(65, 16, 64)]
     public void Between_Invalid(int value, int min, int max)
     {
@@ -84,6 +86,47 @@ public class ValidationTests
         Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Validation.Between(nameof(value), (Int128)value, (Int128)min, (Int128)max));
         Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Validation.Between(nameof(value), (UInt128)value, (UInt128)min, (UInt128)max));
         Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Validation.Between(nameof(value), new BigInteger(value), new BigInteger(min), new BigInteger(max)));
+    }
+
+    [TestMethod]
+    [DataRow(16, 16, 64)]
+    [DataRow(32, 16, 64)]
+    [DataRow(64, 16, 64)]
+    public void BetweenOrEqualTo_Valid(int value, int min, int max)
+    {
+        Validation.BetweenOrEqualTo(nameof(value), (sbyte)value, (sbyte)min, (sbyte)max);
+        Validation.BetweenOrEqualTo(nameof(value), (byte)value, (byte)min, (byte)max);
+        Validation.BetweenOrEqualTo(nameof(value), (short)value, (short)min, (short)max);
+        Validation.BetweenOrEqualTo(nameof(value), (ushort)value, (ushort)min, (ushort)max);
+        Validation.BetweenOrEqualTo(nameof(value), (int)value, (int)min, (int)max);
+        Validation.BetweenOrEqualTo(nameof(value), (uint)value, (uint)min, (uint)max);
+        Validation.BetweenOrEqualTo(nameof(value), (long)value, (long)min, (long)max);
+        Validation.BetweenOrEqualTo(nameof(value), (ulong)value, (ulong)min, (ulong)max);
+        Validation.BetweenOrEqualTo(nameof(value), (IntPtr)value, (IntPtr)min, (IntPtr)max);
+        Validation.BetweenOrEqualTo(nameof(value), (UIntPtr)value, (UIntPtr)min, (UIntPtr)max);
+        Validation.BetweenOrEqualTo(nameof(value), (Int128)value, (Int128)min, (Int128)max);
+        Validation.BetweenOrEqualTo(nameof(value), (UInt128)value, (UInt128)min, (UInt128)max);
+        Validation.BetweenOrEqualTo(nameof(value), new BigInteger(value), new BigInteger(min), new BigInteger(max));
+    }
+
+    [TestMethod]
+    [DataRow(15, 16, 64)]
+    [DataRow(65, 16, 64)]
+    public void BetweenOrEqualTo_Invalid(int value, int min, int max)
+    {
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Validation.BetweenOrEqualTo(nameof(value), (sbyte)value, (sbyte)min, (sbyte)max));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Validation.BetweenOrEqualTo(nameof(value), (byte)value, (byte)min, (byte)max));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Validation.BetweenOrEqualTo(nameof(value), (short)value, (short)min, (short)max));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Validation.BetweenOrEqualTo(nameof(value), (ushort)value, (ushort)min, (ushort)max));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Validation.BetweenOrEqualTo(nameof(value), (int)value, (int)min, (int)max));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Validation.BetweenOrEqualTo(nameof(value), (uint)value, (uint)min, (uint)max));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Validation.BetweenOrEqualTo(nameof(value), (long)value, (long)min, (long)max));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Validation.BetweenOrEqualTo(nameof(value), (ulong)value, (ulong)min, (ulong)max));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Validation.BetweenOrEqualTo(nameof(value), (IntPtr)value, (IntPtr)min, (IntPtr)max));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Validation.BetweenOrEqualTo(nameof(value), (UIntPtr)value, (UIntPtr)min, (UIntPtr)max));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Validation.BetweenOrEqualTo(nameof(value), (Int128)value, (Int128)min, (Int128)max));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Validation.BetweenOrEqualTo(nameof(value), (UInt128)value, (UInt128)min, (UInt128)max));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Validation.BetweenOrEqualTo(nameof(value), new BigInteger(value), new BigInteger(min), new BigInteger(max)));
     }
 
     [TestMethod]

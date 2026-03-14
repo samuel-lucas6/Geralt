@@ -59,7 +59,7 @@ public static class SecureRandom
 
     public static void GenerateString(Span<char> buffer, ReadOnlySpan<char> characterSet)
     {
-        Validation.Between($"{nameof(buffer)}.{nameof(buffer.Length)}", buffer.Length, MinStringSize, MaxStringSize);
+        Validation.BetweenOrEqualTo($"{nameof(buffer)}.{nameof(buffer.Length)}", buffer.Length, MinStringSize, MaxStringSize);
         Validation.GreaterThanOrEqualTo($"{nameof(characterSet)}.{nameof(characterSet.Length)}", characterSet.Length, MinCharacterSetSize);
         for (int i = 0; i < buffer.Length; i++) {
             buffer[i] = characterSet[GetInt32(characterSet.Length)];
@@ -121,8 +121,8 @@ public static class SecureRandom
 
     public static int GetPassphraseBufferSize(int longestWord, int wordCount)
     {
-        Validation.Between(nameof(longestWord), longestWord, MinLongestWordSize, MaxLongestWordSize);
-        Validation.Between(nameof(wordCount), wordCount, MinWordCount, MaxWordCount);
+        Validation.BetweenOrEqualTo(nameof(longestWord), longestWord, MinLongestWordSize, MaxLongestWordSize);
+        Validation.BetweenOrEqualTo(nameof(wordCount), wordCount, MinWordCount, MaxWordCount);
         // Need to account for the separator chars and a number
         return (longestWord * wordCount) + wordCount;
     }

@@ -47,7 +47,7 @@ public static class Argon2id
 
     public static bool VerifyHash(ReadOnlySpan<char> hash, ReadOnlySpan<byte> password)
     {
-        Validation.Between($"{nameof(hash)}.{nameof(hash.Length)}", hash.Length, MinHashSize, MaxHashSize);
+        Validation.BetweenOrEqualTo($"{nameof(hash)}.{nameof(hash.Length)}", hash.Length, MinHashSize, MaxHashSize);
         Span<byte> hashBytes = stackalloc byte[HashSize]; hashBytes.Clear();
         try {
             for (int i = 0; i < hash.Length; i++) {
@@ -64,7 +64,7 @@ public static class Argon2id
 
     public static bool NeedsRehash(ReadOnlySpan<char> hash, int iterations, int memorySize)
     {
-        Validation.Between($"{nameof(hash)}.{nameof(hash.Length)}", hash.Length, MinHashSize, MaxHashSize);
+        Validation.BetweenOrEqualTo($"{nameof(hash)}.{nameof(hash.Length)}", hash.Length, MinHashSize, MaxHashSize);
         Validation.GreaterThanOrEqualTo(nameof(iterations), iterations, MinIterations);
         Validation.GreaterThanOrEqualTo(nameof(memorySize), memorySize, MinMemorySize);
         Span<byte> hashBytes = stackalloc byte[HashSize]; hashBytes.Clear();

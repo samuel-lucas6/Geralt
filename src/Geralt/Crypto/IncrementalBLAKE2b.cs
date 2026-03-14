@@ -35,8 +35,8 @@ public sealed class IncrementalBLAKE2b : IDisposable
     public void Reinitialize(int hashSize, ReadOnlySpan<byte> key = default, ReadOnlySpan<byte> personalization = default, ReadOnlySpan<byte> salt = default)
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
-        Validation.Between(nameof(hashSize), hashSize, MinHashSize, MaxHashSize);
-        if (key.Length != 0) { Validation.Between($"{nameof(key)}.{nameof(key.Length)}", key.Length, MinKeySize, MaxKeySize); }
+        Validation.BetweenOrEqualTo(nameof(hashSize), hashSize, MinHashSize, MaxHashSize);
+        if (key.Length != 0) { Validation.BetweenOrEqualTo($"{nameof(key)}.{nameof(key.Length)}", key.Length, MinKeySize, MaxKeySize); }
         if (personalization.Length != 0) { Validation.EqualTo($"{nameof(personalization)}.{nameof(personalization.Length)}", personalization.Length, PersonalizationSize); }
         if (salt.Length != 0) { Validation.EqualTo($"{nameof(salt)}.{nameof(salt.Length)}", salt.Length, SaltSize); }
         int ret = (personalization.Length == 0 && salt.Length == 0)

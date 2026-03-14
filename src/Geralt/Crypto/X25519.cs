@@ -59,7 +59,7 @@ public static class X25519
         Validation.EqualTo($"{nameof(senderPrivateKey)}.{nameof(senderPrivateKey.Length)}", senderPrivateKey.Length, PrivateKeySize);
         Validation.EqualTo($"{nameof(recipientPublicKey)}.{nameof(recipientPublicKey.Length)}", recipientPublicKey.Length, PublicKeySize);
         if (personalization.Length != 0) { Validation.EqualTo($"{nameof(personalization)}.{nameof(personalization.Length)}", personalization.Length, PersonalizationSize); }
-        if (preSharedKey.Length != 0) { Validation.Between($"{nameof(preSharedKey)}.{nameof(preSharedKey.Length)}", preSharedKey.Length, MinPreSharedKeySize, MaxPreSharedKeySize); }
+        if (preSharedKey.Length != 0) { Validation.BetweenOrEqualTo($"{nameof(preSharedKey)}.{nameof(preSharedKey.Length)}", preSharedKey.Length, MinPreSharedKeySize, MaxPreSharedKeySize); }
         DeriveSharedKey(sharedKey, senderPrivateKey, recipientPublicKey, personalization, preSharedKey, isSender: true);
     }
 
@@ -69,7 +69,7 @@ public static class X25519
         Validation.EqualTo($"{nameof(recipientPrivateKey)}.{nameof(recipientPrivateKey.Length)}", recipientPrivateKey.Length, PrivateKeySize);
         Validation.EqualTo($"{nameof(senderPublicKey)}.{nameof(senderPublicKey.Length)}", senderPublicKey.Length, PublicKeySize);
         if (personalization.Length != 0) { Validation.EqualTo($"{nameof(personalization)}.{nameof(personalization.Length)}", personalization.Length, PersonalizationSize); }
-        if (preSharedKey.Length != 0) { Validation.Between($"{nameof(preSharedKey)}.{nameof(preSharedKey.Length)}", preSharedKey.Length, MinPreSharedKeySize, MaxPreSharedKeySize); }
+        if (preSharedKey.Length != 0) { Validation.BetweenOrEqualTo($"{nameof(preSharedKey)}.{nameof(preSharedKey.Length)}", preSharedKey.Length, MinPreSharedKeySize, MaxPreSharedKeySize); }
         DeriveSharedKey(sharedKey, recipientPrivateKey, senderPublicKey, personalization, preSharedKey, isSender: false);
     }
 

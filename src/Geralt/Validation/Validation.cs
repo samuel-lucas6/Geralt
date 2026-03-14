@@ -13,8 +13,15 @@ public static class Validation
 
     public static void Between<T>(string paramName, T value, T min, T max) where T : IBinaryInteger<T>
     {
+        if (value <= min || value >= max) {
+            throw new ArgumentOutOfRangeException(paramName, value, $"{paramName} must be between {min} and {max} (exclusive).");
+        }
+    }
+
+    public static void BetweenOrEqualTo<T>(string paramName, T value, T min, T max) where T : IBinaryInteger<T>
+    {
         if (value < min || value > max) {
-            throw new ArgumentOutOfRangeException(paramName, value, $"{paramName} must be between {min} and {max}.");
+            throw new ArgumentOutOfRangeException(paramName, value, $"{paramName} must be between {min} and {max} (inclusive).");
         }
     }
 
