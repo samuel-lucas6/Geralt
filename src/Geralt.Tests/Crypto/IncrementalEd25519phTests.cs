@@ -45,7 +45,7 @@ public class IncrementalEd25519phTests
         Span<byte> s = stackalloc byte[IncrementalEd25519ph.SignatureSize];
         Span<byte> m = Convert.FromHexString(message);
         Span<byte> sk = Convert.FromHexString(privateKey);
-        Span<byte> pk = sk[^Ed25519.PublicKeySize..];
+        Span<byte> pk = sk[^IncrementalEd25519ph.PublicKeySize..];
 
         using var ed25519ph = new IncrementalEd25519ph();
         ed25519ph.Update(m);
@@ -63,7 +63,7 @@ public class IncrementalEd25519phTests
     {
         Span<byte> s = Convert.FromHexString(signature);
         Span<byte> m = Convert.FromHexString(message);
-        Span<byte> pk = Convert.FromHexString(privateKey)[^Ed25519.PublicKeySize..];
+        Span<byte> pk = Convert.FromHexString(privateKey)[^IncrementalEd25519ph.PublicKeySize..];
 
         using var ed25519ph = new IncrementalEd25519ph();
         ed25519ph.Update(m[..(m.Length / 2)]);
@@ -81,7 +81,7 @@ public class IncrementalEd25519phTests
         {
             { "s", Convert.FromHexString(signature) },
             { "m", Convert.FromHexString(message) },
-            { "pk", Convert.FromHexString(privateKey)[^Ed25519.PublicKeySize..] }
+            { "pk", Convert.FromHexString(privateKey)[^IncrementalEd25519ph.PublicKeySize..] }
         };
 
         foreach (var param in parameters.Values.Where(param => param.Length > 0)) {
@@ -101,7 +101,7 @@ public class IncrementalEd25519phTests
         var s = new byte[signatureSize];
         var m = new byte[messageSize];
         var sk = new byte[privateKeySize];
-        var pk = new byte[privateKeySize - Ed25519.PublicKeySize];
+        var pk = new byte[privateKeySize - IncrementalEd25519ph.PublicKeySize];
 
         using var ed25519ph = new IncrementalEd25519ph();
         ed25519ph.Update(m);
@@ -117,7 +117,7 @@ public class IncrementalEd25519phTests
         var s = new byte[IncrementalEd25519ph.SignatureSize];
         var m = Convert.FromHexString(message);
         var sk = Convert.FromHexString(privateKey);
-        var pk = sk[^Ed25519.PublicKeySize..];
+        var pk = sk[^IncrementalEd25519ph.PublicKeySize..];
 
         using var ed25519ph = new IncrementalEd25519ph();
         ed25519ph.Update(m);
@@ -143,7 +143,7 @@ public class IncrementalEd25519phTests
         var s = Convert.FromHexString(signature);
         var m = Convert.FromHexString(message);
         var sk = Convert.FromHexString(privateKey);
-        var pk = sk[^Ed25519.PublicKeySize..];
+        var pk = sk[^IncrementalEd25519ph.PublicKeySize..];
 
         var ed25519ph = new IncrementalEd25519ph();
         ed25519ph.Dispose();

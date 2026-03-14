@@ -15,7 +15,7 @@ public class IncrementalPoly1305Tests
     [DynamicData(nameof(Poly1305Tests.Rfc8439TestVectors), typeof(Poly1305Tests))]
     public void Compute_Valid(string tag, string message, string oneTimeKey)
     {
-        Span<byte> t = stackalloc byte[Poly1305.TagSize];
+        Span<byte> t = stackalloc byte[IncrementalPoly1305.TagSize];
         Span<byte> m = Convert.FromHexString(message);
         Span<byte> k = Convert.FromHexString(oneTimeKey);
 
@@ -31,7 +31,7 @@ public class IncrementalPoly1305Tests
     [DynamicData(nameof(Poly1305Tests.Rfc8439TestVectors), typeof(Poly1305Tests))]
     public void Reinitialize_Valid(string tag, string message, string oneTimeKey)
     {
-        Span<byte> t = stackalloc byte[Poly1305.TagSize];
+        Span<byte> t = stackalloc byte[IncrementalPoly1305.TagSize];
         Span<byte> m = Convert.FromHexString(message);
         Span<byte> k = Convert.FromHexString(oneTimeKey);
 
@@ -105,7 +105,7 @@ public class IncrementalPoly1305Tests
     [DynamicData(nameof(Poly1305Tests.Rfc8439TestVectors), typeof(Poly1305Tests))]
     public void Incremental_InvalidOperation(string tag, string message, string oneTimeKey)
     {
-        var t = new byte[Poly1305.TagSize];
+        var t = new byte[IncrementalPoly1305.TagSize];
         var m = Convert.FromHexString(message);
         var k = Convert.FromHexString(oneTimeKey);
 
