@@ -17,9 +17,8 @@ public static class HChaCha20
         Validation.EqualTo($"{nameof(nonce)}.{nameof(nonce.Length)}", nonce.Length, NonceSize);
         if (personalization.Length != 0) {
             Validation.EqualTo($"{nameof(personalization)}.{nameof(personalization.Length)}", personalization.Length, PersonalizationSize);
-            // https://link.springer.com/article/10.1007/s00145-018-9297-9
-            if (ConstantTime.IsAllZeros(personalization)) { throw new ArgumentException($"{nameof(personalization)} cannot be all-zero.", nameof(personalization)); }
-            if (ConstantTime.Equals(personalization[..8], personalization[8..])) { throw new ArgumentException($"{nameof(personalization)} must have asymmetry.", nameof(personalization)); }
+            // https://link.springer.com/article/10.1007/s00145-018-9297-9 - Section 3.1 Non-random Properties of F
+            if (ConstantTime.Equals(personalization[..8], personalization[8..])) { throw new ArgumentException($"{nameof(personalization)} cannot be all-zero and must have asymmetry.", nameof(personalization)); }
         }
         Sodium.Initialize();
         int ret = crypto_core_hchacha20(outputKeyingMaterial, nonce, inputKeyingMaterial, personalization);
