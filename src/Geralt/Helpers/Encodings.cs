@@ -12,6 +12,7 @@ public static class Encodings
     public const string Base64FullCharacterSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/-_=";
     public const string HexIgnoreChars = ":- _./,%;";
     public const string Base64IgnoreChars = " \r\n";
+    private const int MaxStackSize = 1024;
 
     public enum Base64Variant
     {
@@ -26,7 +27,8 @@ public static class Encodings
         Validation.EqualTo($"{nameof(hex)}.{nameof(hex.Length)}", hex.Length, GetToHexBufferSize(data));
         Sodium.Initialize();
         // libsodium includes a null byte terminator
-        Span<byte> hexBuffer = GC.AllocateArray<byte>(hex.Length + 1, pinned: true);
+        int hexBufferSize = hex.Length + 1;
+        Span<byte> hexBuffer = hexBufferSize <= MaxStackSize ? stackalloc byte[hexBufferSize] : GC.AllocateArray<byte>(hexBufferSize, pinned: true);
         try {
             IntPtr ret = sodium_bin2hex(hexBuffer, (nuint)hexBuffer.Length, data, (nuint)data.Length);
             if (ret == IntPtr.Zero) { throw new CryptographicException("Error converting bytes to hex."); }
@@ -49,7 +51,7 @@ public static class Encodings
     {
         Validation.EqualTo($"{nameof(data)}.{nameof(data.Length)}", data.Length, GetFromHexBufferSize(hex, ignoreChars));
         Sodium.Initialize();
-        Span<byte> hexBuffer = GC.AllocateArray<byte>(hex.Length, pinned: true);
+        Span<byte> hexBuffer = hex.Length <= MaxStackSize ? stackalloc byte[hex.Length] : GC.AllocateArray<byte>(hex.Length, pinned: true);
         for (int i = 0; i < hex.Length; i++) {
             hexBuffer[i] = (byte)hex[i];
         }
@@ -90,7 +92,8 @@ public static class Encodings
         Validation.EqualTo($"{nameof(base64)}.{nameof(base64.Length)}", base64.Length, GetToBase64BufferSize(data, variant));
         Sodium.Initialize();
         // libsodium includes a null byte terminator
-        Span<byte> base64Buffer = GC.AllocateArray<byte>(base64.Length + 1, pinned: true);
+        int base64BufferSize = base64.Length + 1;
+        Span<byte> base64Buffer = base64BufferSize <= MaxStackSize ? stackalloc byte[base64BufferSize] : GC.AllocateArray<byte>(base64BufferSize, pinned: true);
         try {
             IntPtr ret = sodium_bin2base64(base64Buffer, (nuint)base64Buffer.Length, data, (nuint)data.Length, (int)variant);
             if (ret == IntPtr.Zero) { throw new CryptographicException("Error converting bytes to Base64."); }
@@ -114,7 +117,7 @@ public static class Encodings
     {
         Validation.EqualTo($"{nameof(data)}.{nameof(data.Length)}", data.Length, GetFromBase64BufferSize(base64, variant, ignoreChars));
         Sodium.Initialize();
-        Span<byte> base64Buffer = GC.AllocateArray<byte>(base64.Length, pinned: true);
+        Span<byte> base64Buffer = base64.Length <= MaxStackSize ? stackalloc byte[base64.Length] : GC.AllocateArray<byte>(base64.Length, pinned: true);
         for (int i = 0; i < base64.Length; i++) {
             base64Buffer[i] = (byte)base64[i];
         }
