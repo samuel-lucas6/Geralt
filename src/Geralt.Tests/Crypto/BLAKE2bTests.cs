@@ -54,6 +54,87 @@ public class BLAKE2bTests
         ];
     }
 
+    public static IEnumerable<object[]> SaltedTestVectors()
+    {
+        yield return
+        [
+            "570de94a9bc21e06630e0427f34fd4c8",
+            "",
+            "35313236666232613337343030643261",
+            "35623662343165643962333433666530"
+        ];
+        yield return
+        [
+            "1fbfe4c5c30434f7019a07649ae965f77949cc19",
+            "",
+            "35313236666232613337343030643261",
+            "35623662343165643962333433666530"
+        ];
+        yield return
+        [
+            "f6d90f4a4c0463d40fd814ca1758480458e12a8a100e336db14eef8c5640ac33",
+            "",
+            "",
+            "35623662343165643962333433666530"
+        ];
+        yield return
+        [
+            "7159dbf1dece77849c18df9697e022d1d636c04cc9537dcb502eb14eaf8eefae",
+            "",
+            "35623662343165643962333433666530",
+            ""
+        ];
+        yield return
+        [
+            "0d6de192242a308d0282bca727da279b5091396adc7e781dc9251a60dd1ebd85",
+            "",
+            "35313236666232613337343030643261",
+            "35623662343165643962333433666530"
+        ];
+        yield return
+        [
+            "d35eedba6a96179041cab2205779204512aadfc14175c3ea747e5cda215fb543cd5d9ac9d54638e95ce7a33bc2792b45",
+            "",
+            "35313236666232613337343030643261",
+            "35623662343165643962333433666530"
+        ];
+        yield return
+        [
+            "d71e0ad238739150f48b2c5321e734a654e0f138b54b2124b550d2de4ce1cd212860e43afb3b8e004a4975c32d40d48b35639f433384d83a212b0e494a94919c",
+            "",
+            "35313236666232613337343030643261",
+            "35623662343165643962333433666530"
+        ];
+        yield return
+        [
+            "14cb1f00bea74fedd8e60bb53d44d5f329baff05bace28ae4d3fe928746950168b2728ecff39e0f525951467279caefbce7890601d382d9c57e2df8cda3cb551",
+            "0001020304",
+            "35313236666232613337343030643261",
+            "35623662343165643962333433666530"
+        ];
+        yield return
+        [
+            "1afc8ec818bef0a479d2b4cac81d40a52cafa27f6d80c42fc23cbaf4141882ab59ab1101922fcb6e707ef2f61efd07cce5d09094e6bee420b1b96998c7cee96d",
+            "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f",
+            "35313236666232613337343030643261",
+            "35623662343165643962333433666530"
+        ];
+        yield return
+        [
+            "8501b5376015480338d6612a150572925f2f632b5020854828411fc38fbfecb6779dd0003e2b7d5909683aceaf6e2cf4e57f9a140e9217b65664d49a5e5c0f24",
+            "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f",
+            "35313236666232613337343030643261",
+            "35623662343165643962333433666530"
+        ];
+        yield return
+        [
+            "22f03433ab2be34809aff8440f149e1fb9b6fcfb3de1501b863376c7e1d99d47aa9ffd7cc19d2c5a9c222da02f01845d7a3eff88e4dfdfa4f1e275f027b108f2",
+            "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f9091929394959697",
+            "35313236666232613337343030643261",
+            "35623662343165643962333433666530"
+        ];
+    }
+
     // https://cyberchef.org/#recipe=BLAKE2b('128','Hex',%7B'option':'Hex','string':'000102030405060708090a0b0c0d0e0f'%7D)
     // https://github.com/BLAKE2/BLAKE2/blob/master/testvectors/blake2b-kat.txt
     public static IEnumerable<object[]> KeyedTestVectors()
@@ -159,6 +240,17 @@ public class BLAKE2bTests
         ];
     }
 
+    public static IEnumerable<object[]> SaltedInvalidParameterSizes()
+    {
+        yield return [BLAKE2b.MaxHashSize + 1, BLAKE2b.BlockSize, BLAKE2b.PersonalizationSize, BLAKE2b.SaltSize];
+        yield return [BLAKE2b.MinHashSize - 1, BLAKE2b.BlockSize, BLAKE2b.PersonalizationSize, BLAKE2b.SaltSize];
+        yield return [BLAKE2b.HashSize, BLAKE2b.BlockSize, BLAKE2b.PersonalizationSize + 1, BLAKE2b.SaltSize];
+        yield return [BLAKE2b.HashSize, BLAKE2b.BlockSize, BLAKE2b.PersonalizationSize - 1, BLAKE2b.SaltSize];
+        yield return [BLAKE2b.HashSize, BLAKE2b.BlockSize, BLAKE2b.PersonalizationSize, BLAKE2b.SaltSize + 1];
+        yield return [BLAKE2b.HashSize, BLAKE2b.BlockSize, BLAKE2b.PersonalizationSize, BLAKE2b.SaltSize - 1];
+        yield return [BLAKE2b.HashSize, BLAKE2b.BlockSize, 0, 0];
+    }
+
     public static IEnumerable<object[]> TagInvalidParameterSizes()
     {
         yield return [BLAKE2b.MaxTagSize + 1, 1, BLAKE2b.KeySize];
@@ -209,14 +301,41 @@ public class BLAKE2bTests
     }
 
     [TestMethod]
-    [DataRow(BLAKE2b.MaxHashSize + 1, 1)]
-    [DataRow(BLAKE2b.MinHashSize - 1, 1)]
+    [DataRow(BLAKE2b.MaxHashSize + 1, BLAKE2b.BlockSize)]
+    [DataRow(BLAKE2b.MinHashSize - 1, BLAKE2b.BlockSize)]
     public void ComputeHash_Invalid(int hashSize, int messageSize)
     {
         var h = new byte[hashSize];
         var m = new byte[messageSize];
 
         Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => BLAKE2b.ComputeHash(h, m));
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(UnkeyedTestVectors))]
+    [DynamicData(nameof(SaltedTestVectors))]
+    public void ComputeHash_Salted_Valid(string hash, string message, string? personalization = null, string? salt = null)
+    {
+        Span<byte> h = stackalloc byte[hash.Length / 2];
+        Span<byte> m = Convert.FromHexString(message);
+        Span<byte> p = personalization != null ? Convert.FromHexString(personalization) : new byte[BLAKE2b.PersonalizationSize];
+        Span<byte> s = salt != null ? Convert.FromHexString(salt) : new byte[BLAKE2b.SaltSize];
+
+        BLAKE2b.ComputeHash(h, m, p, s);
+
+        Assert.AreEqual(hash, Convert.ToHexString(h).ToLower());
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(SaltedInvalidParameterSizes))]
+    public void ComputeHash_Salted_Invalid(int hashSize, int messageSize, int personalizationSize, int saltSize)
+    {
+        var h = new byte[hashSize];
+        var m = new byte[messageSize];
+        var p = new byte[personalizationSize];
+        var s = new byte[saltSize];
+
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => BLAKE2b.ComputeHash(h, m, p, s));
     }
 
     [TestMethod]

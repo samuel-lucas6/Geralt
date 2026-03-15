@@ -26,6 +26,16 @@ public static class BLAKE2b
         if (ret != 0) { throw new CryptographicException("Error computing hash."); }
     }
 
+    public static void ComputeHash(Span<byte> hash, ReadOnlySpan<byte> message, ReadOnlySpan<byte> personalization, ReadOnlySpan<byte> salt = default)
+    {
+        Validation.BetweenOrEqualTo($"{nameof(hash)}.{nameof(hash.Length)}", hash.Length, MinHashSize, MaxHashSize);
+        if (personalization.Length != 0 || salt.Length == 0) { Validation.EqualTo($"{nameof(personalization)}.{nameof(personalization.Length)}", personalization.Length, PersonalizationSize); }
+        if (salt.Length != 0 || personalization.Length == 0) { Validation.EqualTo($"{nameof(salt)}.{nameof(salt.Length)}", salt.Length, SaltSize); }
+        Sodium.Initialize();
+        int ret = crypto_generichash_blake2b_salt_personal(hash, (nuint)hash.Length, message, (ulong)message.Length, key: ReadOnlySpan<byte>.Empty, keyLength: 0, salt.Length != 0 ? salt : new byte[SaltSize], personalization.Length != 0 ? personalization : new byte[PersonalizationSize]);
+        if (ret != 0) { throw new CryptographicException("Error computing personalized/salted hash."); }
+    }
+
     public static void ComputeTag(Span<byte> tag, ReadOnlySpan<byte> message, ReadOnlySpan<byte> key)
     {
         Validation.BetweenOrEqualTo($"{nameof(tag)}.{nameof(tag.Length)}", tag.Length, MinTagSize, MaxTagSize);

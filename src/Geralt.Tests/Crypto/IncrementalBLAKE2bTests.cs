@@ -42,7 +42,9 @@ public class IncrementalBLAKE2bTests
     // Empty personalization (should be equivalent to all-zero)
     [DataRow("10ebb67700b1868efb4417987acf4690ae9d972fb7a590c2f02871799aaa4786b5e996e8f0f4eb981fc214b005f42d2ff4233499391653df7aefcbc13fc51568", "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f", "", "00000000000000000000000000000000", "")]
     // BLAKE2bTests.UnkeyedTestVectors - BLAKE2 parameter block (containing salt/personalization) is XORed with the IV, meaning all-zero does nothing (no length encoding is performed)
+    [DataRow("0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8", "", "", "", "")]
     [DataRow("0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8", "", "00000000000000000000000000000000", "00000000000000000000000000000000", "")]
+    [DataRow("cbaa0ba7d482b1f301109ae41051991a3289bc1198005af226c5e4f103b66579f461361044c8ba3439ff12c515fb29c52161b7eb9c2837b76a5dc33f7cb2e2e8", "", "", "", "0001020304")]
     [DataRow("cbaa0ba7d482b1f301109ae41051991a3289bc1198005af226c5e4f103b66579f461361044c8ba3439ff12c515fb29c52161b7eb9c2837b76a5dc33f7cb2e2e8", "", "00000000000000000000000000000000", "00000000000000000000000000000000", "0001020304")]
     public void Compute_Salted_Valid(string hash, string key, string personalization, string salt, string message)
     {
@@ -162,14 +164,15 @@ public class IncrementalBLAKE2bTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(BLAKE2bTests.KeyDerivationInvalidParameterSizes), typeof(BLAKE2bTests))]
-    public void Incremental_Salted_Invalid(int hashSize, int keySize, int personalizationSize, int saltSize, int messageSize)
+    [DynamicData(nameof(BLAKE2bTests.SaltedInvalidParameterSizes), typeof(BLAKE2bTests))]
+    public void Incremental_Salted_Invalid(int hashSize, int messageSize, int personalizationSize, int saltSize)
     {
-        var k = new byte[keySize];
         var p = new byte[personalizationSize];
         var s = new byte[saltSize];
 
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new IncrementalBLAKE2b(hashSize, k, p, s));
+        if (personalizationSize != 0 || saltSize != 0) {
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new IncrementalBLAKE2b(hashSize, key: ReadOnlySpan<byte>.Empty, p, s));
+        }
     }
 
     [TestMethod]
