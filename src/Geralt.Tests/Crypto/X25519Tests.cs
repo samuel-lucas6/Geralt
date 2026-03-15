@@ -82,7 +82,27 @@ public class X25519Tests
     {
         yield return
         [
+            "9d0dbe87b897d843d83556bfe80a417b",
+            "77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a",
+            "de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f",
+            "5dab087e624a8a4b79e17f8b83800ee66f3bb1292618b6fd1c2f8b27ff88e0eb",
+            "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a",
+            "",
+            ""
+        ];
+        yield return
+        [
             "519fb3af2f3f9e310718cf1f8bdec6e26ab64affe730f0f8b43c43b0e8ee52be",
+            "77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a",
+            "de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f",
+            "5dab087e624a8a4b79e17f8b83800ee66f3bb1292618b6fd1c2f8b27ff88e0eb",
+            "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a",
+            "",
+            ""
+        ];
+        yield return
+        [
+            "322b7be3b9bce4a84fe6e2dea61e8e6d0a98f3e4c60b58bad722b1c855c9db22284901a611708379d0b5b0e40d77ea207624eaab8dd0c95e693fc3ee76c73ccb",
             "77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a",
             "de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f",
             "5dab087e624a8a4b79e17f8b83800ee66f3bb1292618b6fd1c2f8b27ff88e0eb",
@@ -162,8 +182,8 @@ public class X25519Tests
 
     public static IEnumerable<object[]> SharedKeyInvalidParameterSizes()
     {
-        yield return [X25519.SharedKeySize + 1, X25519.PrivateKeySize, X25519.PublicKeySize, X25519.PersonalizationSize, X25519.PreSharedKeySize];
-        yield return [X25519.SharedKeySize - 1, X25519.PrivateKeySize, X25519.PublicKeySize, X25519.PersonalizationSize, X25519.PreSharedKeySize];
+        yield return [X25519.MaxSharedKeySize + 1, X25519.PrivateKeySize, X25519.PublicKeySize, X25519.PersonalizationSize, X25519.PreSharedKeySize];
+        yield return [X25519.MinSharedKeySize - 1, X25519.PrivateKeySize, X25519.PublicKeySize, X25519.PersonalizationSize, X25519.PreSharedKeySize];
         yield return [X25519.SharedKeySize, X25519.PrivateKeySize + 1, X25519.PublicKeySize, X25519.PersonalizationSize, X25519.PreSharedKeySize];
         yield return [X25519.SharedKeySize, X25519.PrivateKeySize - 1, X25519.PublicKeySize, X25519.PersonalizationSize, X25519.PreSharedKeySize];
         yield return [X25519.SharedKeySize, X25519.PrivateKeySize, X25519.PublicKeySize + 1, X25519.PersonalizationSize, X25519.PreSharedKeySize];
@@ -182,6 +202,8 @@ public class X25519Tests
         Assert.AreEqual(32, X25519.SeedSize);
         Assert.AreEqual(32, X25519.SharedSecretSize);
         Assert.AreEqual(32, X25519.SharedKeySize);
+        Assert.AreEqual(16, X25519.MinSharedKeySize);
+        Assert.AreEqual(64, X25519.MaxSharedKeySize);
         Assert.AreEqual(16, X25519.PersonalizationSize);
         Assert.AreEqual(32, X25519.PreSharedKeySize);
         Assert.AreEqual(16, X25519.MinPreSharedKeySize);
@@ -303,10 +325,10 @@ public class X25519Tests
     [DynamicData(nameof(DeriveSharedKeyTestVectors))]
     public void DeriveSharedKey_Valid(string sharedKey, string senderPrivateKey, string recipientPublicKey, string recipientPrivateKey, string senderPublicKey, string personalization, string preSharedKey)
     {
-        Span<byte> sss = stackalloc byte[X25519.SharedKeySize];
+        Span<byte> sss = stackalloc byte[sharedKey.Length / 2];
         Span<byte> ssk = Convert.FromHexString(senderPrivateKey);
         Span<byte> rpk = Convert.FromHexString(recipientPublicKey);
-        Span<byte> rss = stackalloc byte[X25519.SharedKeySize];
+        Span<byte> rss = stackalloc byte[sharedKey.Length / 2];
         Span<byte> rsk = Convert.FromHexString(recipientPrivateKey);
         Span<byte> spk = Convert.FromHexString(senderPublicKey);
         Span<byte> p = Convert.FromHexString(personalization);

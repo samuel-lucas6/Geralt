@@ -10,6 +10,8 @@ public static class X25519
     public const int SeedSize = crypto_kx_SEEDBYTES;
     public const int SharedSecretSize = crypto_scalarmult_curve25519_BYTES;
     public const int SharedKeySize = crypto_kx_SESSIONKEYBYTES;
+    public const int MinSharedKeySize = BLAKE2b.MinKeySize;
+    public const int MaxSharedKeySize = BLAKE2b.MaxKeySize;
     public const int PersonalizationSize = BLAKE2b.PersonalizationSize;
     public const int PreSharedKeySize = BLAKE2b.KeySize;
     public const int MinPreSharedKeySize = BLAKE2b.MinKeySize;
@@ -55,7 +57,7 @@ public static class X25519
 
     public static void DeriveSenderSharedKey(Span<byte> sharedKey, ReadOnlySpan<byte> senderPrivateKey, ReadOnlySpan<byte> recipientPublicKey, ReadOnlySpan<byte> personalization = default, ReadOnlySpan<byte> preSharedKey = default)
     {
-        Validation.EqualTo($"{nameof(sharedKey)}.{nameof(sharedKey.Length)}", sharedKey.Length, SharedKeySize);
+        Validation.BetweenOrEqualTo($"{nameof(sharedKey)}.{nameof(sharedKey.Length)}", sharedKey.Length, MinSharedKeySize, MaxSharedKeySize);
         Validation.EqualTo($"{nameof(senderPrivateKey)}.{nameof(senderPrivateKey.Length)}", senderPrivateKey.Length, PrivateKeySize);
         Validation.EqualTo($"{nameof(recipientPublicKey)}.{nameof(recipientPublicKey.Length)}", recipientPublicKey.Length, PublicKeySize);
         if (personalization.Length != 0) { Validation.EqualTo($"{nameof(personalization)}.{nameof(personalization.Length)}", personalization.Length, PersonalizationSize); }
@@ -65,7 +67,7 @@ public static class X25519
 
     public static void DeriveRecipientSharedKey(Span<byte> sharedKey, ReadOnlySpan<byte> recipientPrivateKey, ReadOnlySpan<byte> senderPublicKey, ReadOnlySpan<byte> personalization = default, ReadOnlySpan<byte> preSharedKey = default)
     {
-        Validation.EqualTo($"{nameof(sharedKey)}.{nameof(sharedKey.Length)}", sharedKey.Length, SharedKeySize);
+        Validation.BetweenOrEqualTo($"{nameof(sharedKey)}.{nameof(sharedKey.Length)}", sharedKey.Length, MinSharedKeySize, MaxSharedKeySize);
         Validation.EqualTo($"{nameof(recipientPrivateKey)}.{nameof(recipientPrivateKey.Length)}", recipientPrivateKey.Length, PrivateKeySize);
         Validation.EqualTo($"{nameof(senderPublicKey)}.{nameof(senderPublicKey.Length)}", senderPublicKey.Length, PublicKeySize);
         if (personalization.Length != 0) { Validation.EqualTo($"{nameof(personalization)}.{nameof(personalization.Length)}", personalization.Length, PersonalizationSize); }
