@@ -32,7 +32,7 @@ public static class Argon2id
         Validation.GreaterThanOrEqualTo(nameof(iterations), iterations, MinIterations);
         Validation.GreaterThanOrEqualTo(nameof(memorySize), memorySize, MinMemorySize);
         Sodium.Initialize();
-        Span<byte> hashBytes = stackalloc byte[HashSize];
+        Span<byte> hashBytes = stackalloc byte[HashSize]; hashBytes.Clear();
         try {
             int ret = crypto_pwhash_argon2id_str(hashBytes, password, (ulong)password.Length, (ulong)iterations, (nuint)memorySize);
             if (ret != 0) { throw new InsufficientMemoryException("Insufficient memory to perform password hashing."); }
