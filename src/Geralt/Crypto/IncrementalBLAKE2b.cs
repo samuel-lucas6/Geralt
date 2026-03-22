@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using static Interop.Libsodium;
 
@@ -21,6 +22,8 @@ public sealed class IncrementalBLAKE2b : IDisposable
 
     private crypto_generichash_blake2b_state _state;
     private crypto_generichash_blake2b_state _cachedState;
+    private GCHandle _stateHandle;
+    private GCHandle _cachedStateHandle;
     private int _hashSize;
     private bool _finalized;
     private bool _cached;
@@ -29,6 +32,8 @@ public sealed class IncrementalBLAKE2b : IDisposable
     public IncrementalBLAKE2b(int hashSize, ReadOnlySpan<byte> key = default, ReadOnlySpan<byte> personalization = default, ReadOnlySpan<byte> salt = default)
     {
         Sodium.Initialize();
+        _stateHandle = GCHandle.Alloc(_state,  GCHandleType.Pinned);
+        _cachedStateHandle = GCHandle.Alloc(_cachedState,  GCHandleType.Pinned);
         Reinitialize(hashSize, key, personalization, salt);
     }
 
@@ -93,12 +98,27 @@ public sealed class IncrementalBLAKE2b : IDisposable
         _finalized = false;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
     public void Dispose()
     {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+    private unsafe void Dispose(bool disposing)
+    {
         if (_disposed) { return; }
-        _state = default;
-        _cachedState = default;
+        fixed (void* s = &_state, cs = &_cachedState) {
+            SecureMemory.ZeroMemory(new Span<byte>(s, Marshal.SizeOf(_state)));
+            SecureMemory.ZeroMemory(new Span<byte>(cs, Marshal.SizeOf(_cachedState)));
+        }
+        if (_stateHandle.IsAllocated) { _stateHandle.Free(); }
+        if (_cachedStateHandle.IsAllocated) { _cachedStateHandle.Free(); }
         _disposed = true;
+    }
+
+    ~IncrementalBLAKE2b()
+    {
+        Dispose(false);
     }
 }

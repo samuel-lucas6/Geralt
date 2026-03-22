@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using static Interop.Libsodium;
 
@@ -11,12 +12,14 @@ public sealed class IncrementalEd25519ph : IDisposable
     public const int SignatureSize = Ed25519.SignatureSize;
 
     private crypto_sign_ed25519ph_state _state;
+    private GCHandle _stateHandle;
     private bool _finalized;
     private bool _disposed;
 
     public IncrementalEd25519ph()
     {
         Sodium.Initialize();
+        _stateHandle = GCHandle.Alloc(_state,  GCHandleType.Pinned);
         Reinitialize();
     }
 
@@ -57,11 +60,25 @@ public sealed class IncrementalEd25519ph : IDisposable
         return crypto_sign_ed25519ph_final_verify(ref _state, signature, publicKey) == 0;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
     public void Dispose()
     {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+    private unsafe void Dispose(bool disposing)
+    {
         if (_disposed) { return; }
-        _state = default;
+        fixed (void* s = &_state) {
+            SecureMemory.ZeroMemory(new Span<byte>(s, Marshal.SizeOf(_state)));
+        }
+        if (_stateHandle.IsAllocated) { _stateHandle.Free(); }
         _disposed = true;
+    }
+
+    ~IncrementalEd25519ph()
+    {
+        Dispose(false);
     }
 }

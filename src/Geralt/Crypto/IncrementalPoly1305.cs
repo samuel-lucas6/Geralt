@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using static Interop.Libsodium;
 
@@ -11,12 +12,14 @@ public sealed class IncrementalPoly1305 : IDisposable
     public const int BlockSize = Poly1305.BlockSize;
 
     private crypto_onetimeauth_poly1305_state _state;
+    private GCHandle _stateHandle;
     private bool _finalized;
     private bool _disposed;
 
     public IncrementalPoly1305(ReadOnlySpan<byte> oneTimeKey)
     {
         Sodium.Initialize();
+        _stateHandle = GCHandle.Alloc(_state,  GCHandleType.Pinned);
         Reinitialize(oneTimeKey);
     }
 
@@ -59,11 +62,25 @@ public sealed class IncrementalPoly1305 : IDisposable
         return equal;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
     public void Dispose()
     {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+    private unsafe void Dispose(bool disposing)
+    {
         if (_disposed) { return; }
-        _state = default;
+        fixed (void* s = &_state) {
+            SecureMemory.ZeroMemory(new Span<byte>(s, Marshal.SizeOf(_state)));
+        }
+        if (_stateHandle.IsAllocated) { _stateHandle.Free(); }
         _disposed = true;
+    }
+
+    ~IncrementalPoly1305()
+    {
+        Dispose(false);
     }
 }
