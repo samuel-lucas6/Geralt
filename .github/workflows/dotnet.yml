@@ -37,7 +37,7 @@ jobs:
     - name: Test (.NET 10.0/Release)
       run: dotnet test -f net10.0 -c Release
     - name: Pack
-      run: dotnet pack -p:TargetFrameworks="net8.0;net9.0-ios;net9.0-tvos;net9.0-maccatalyst;net9.0-android" -c Release
+      run: dotnet pack -c Release
     - name: Upload artifacts
       uses: actions/upload-artifact@v6
       with:
