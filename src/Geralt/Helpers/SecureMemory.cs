@@ -1,9 +1,11 @@
-﻿using static Interop.Libsodium;
+﻿using System.Runtime.CompilerServices;
+using static Interop.Libsodium;
 
 namespace Geralt;
 
 public static class SecureMemory
 {
+    [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
     public static unsafe void ZeroMemory(Span<byte> buffer)
     {
         Sodium.Initialize();
@@ -12,6 +14,7 @@ public static class SecureMemory
         }
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
     public static unsafe void ZeroMemory(ReadOnlySpan<char> buffer)
     {
         Sodium.Initialize();
