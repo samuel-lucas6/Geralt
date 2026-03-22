@@ -13,9 +13,10 @@
 
 For more information, please visit these links:
 
-|                           |                                                  |
-|:------------------------- |:------------------------------------------------ |
-| Documentation:            | https://www.geralt.xyz/                          |
-| Installation:             | https://www.geralt.xyz/#installation             |
-| Open issues:              | https://github.com/samuel-lucas6/Geralt/issues   |
-| Pull requests:            | https://github.com/samuel-lucas6/Geralt/pulls    |
+|                           |                                                     |
+|:------------------------- |:--------------------------------------------------- |
+| Documentation:            | https://www.geralt.xyz/                             |
+| Installation:             | https://www.geralt.xyz/#installation                |
+| Open issues:              | https://github.com/samuel-lucas6/Geralt/issues      |
+| Discussions:              | https://github.com/samuel-lucas6/Geralt/discussions |
+| Pull requests:            | https://github.com/samuel-lucas6/Geralt/pulls       |
