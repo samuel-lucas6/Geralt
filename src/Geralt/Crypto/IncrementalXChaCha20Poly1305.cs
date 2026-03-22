@@ -37,10 +37,10 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalXChaCha20Poly1305)); }
         Validation.EqualTo($"{nameof(header)}.{nameof(header.Length)}", header.Length, HeaderSize);
         Validation.EqualTo($"{nameof(key)}.{nameof(key.Length)}", key.Length, KeySize);
-        int ret = _encryption
+        int ret = encryption
             ? crypto_secretstream_xchacha20poly1305_init_push(ref _state, header, key)
             : crypto_secretstream_xchacha20poly1305_init_pull(ref _state, header, key);
-        if (ret != 0) { throw new CryptographicException(_encryption ? "Error initializing stream encryption." : "Error initializing stream decryption."); }
+        if (ret != 0) { throw new CryptographicException(encryption ? "Error initializing stream encryption." : "Error initializing stream decryption."); }
         _encryption = encryption;
         _finalized = false;
     }
