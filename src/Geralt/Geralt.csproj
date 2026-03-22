@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <!-- Edit GitHub Actions 'dotnet pack' command for NuGet package -->
         <TargetFrameworks>net8.0</TargetFrameworks>
+        <TargetFrameworks Condition="'$(RUNNER_OS)'=='Windows' And '$(RUNNER_ARCH)'=='X64'">net8.0;net9.0-ios;net9.0-tvos;net9.0-maccatalyst;net9.0-android</TargetFrameworks>
         <Version>4.0.1</Version>
         <Authors>Samuel Lucas</Authors>
         <Description>A modern cryptographic library for .NET 8+ based on libsodium and inspired by Monocypher.</Description>
