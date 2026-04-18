@@ -53,6 +53,7 @@ public static class Argon2id
             for (int i = 0; i < hash.Length; i++) {
                 hashBytes[i] = (byte)hash[i];
             }
+            if (!ConstantTime.IsAllZeros(hashBytes[^1..])) { throw new FormatException("Password hash string is not null terminated."); }
             ThrowIfInvalidHashPrefix(hashBytes);
             Sodium.Initialize();
             return crypto_pwhash_argon2id_str_verify(hashBytes, password, (ulong)password.Length) == 0;
@@ -72,6 +73,7 @@ public static class Argon2id
             for (int i = 0; i < hash.Length; i++) {
                 hashBytes[i] = (byte)hash[i];
             }
+            if (!ConstantTime.IsAllZeros(hashBytes[^1..])) { throw new FormatException("Password hash string is not null terminated."); }
             ThrowIfInvalidHashPrefix(hashBytes);
             Sodium.Initialize();
             int ret = crypto_pwhash_argon2id_str_needs_rehash(hashBytes, (ulong)iterations, (nuint)memorySize);

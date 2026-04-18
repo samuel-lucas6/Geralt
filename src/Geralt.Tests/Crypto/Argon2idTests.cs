@@ -290,6 +290,12 @@ public class Argon2idTests
             "$argon2id$v=19$m=8,t=1,p=1$c29tZXNhbH$AKal+Q",
             ""
         ];
+        // Max length but not null terminated
+        yield return
+        [
+            "$argon2id$v=19$m=4096,t=1,p=1$c29tZXNhbHQ$UFkGXYpXFGCjLlK9KbQuTrliLXkChb28ogJIaCmZJ7WRS7Nr641qUBf2byDeNbmdAWdc6o8dh6WPzEDimBZZjw",
+            ""
+        ];
         // Long hash
         yield return
         [
@@ -397,7 +403,7 @@ public class Argon2idTests
     {
         var p = Encoding.UTF8.GetBytes(password);
 
-        if (!hash.StartsWith("$argon2id$")) {
+        if (!hash.StartsWith("$argon2id$") || hash.Length == Argon2id.HashSize) {
             Assert.ThrowsExactly<FormatException>(() => Argon2id.VerifyHash(hash, p));
         }
         else {
@@ -429,7 +435,7 @@ public class Argon2idTests
     [DynamicData(nameof(InvalidStringTestVectors))]
     public void NeedsRehash_Invalid(string hash, string password, int iterations = Argon2id.MinIterations, int memorySize = Argon2id.MinMemorySize)
     {
-        if (!hash.StartsWith("$argon2id$")) {
+        if (!hash.StartsWith("$argon2id$") || hash.Length == Argon2id.HashSize) {
             Assert.ThrowsExactly<FormatException>(() => Argon2id.NeedsRehash(hash, iterations, memorySize));
         }
         else {
