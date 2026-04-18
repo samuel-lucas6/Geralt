@@ -21,7 +21,7 @@ public static class HChaCha20
             if (ConstantTime.Equals(personalization[..8], personalization[8..])) { throw new ArgumentException($"{nameof(personalization)} cannot be all-zero and must have asymmetry.", nameof(personalization)); }
         }
         Sodium.Initialize();
-        int ret = crypto_core_hchacha20(outputKeyingMaterial, nonce, inputKeyingMaterial, personalization);
+        int ret = crypto_core_hchacha20(outputKeyingMaterial, nonce, inputKeyingMaterial, personalization.Length != 0 ? personalization : ReadOnlySpan<byte>.Empty);
         if (ret != 0) { throw new CryptographicException("Error deriving key."); }
     }
 }
