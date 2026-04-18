@@ -110,7 +110,7 @@ public static class Encodings
     {
         Validation.NotEmpty(nameof(data), data.Length);
         // Remove the null byte terminator
-        return sodium_base64_encoded_len((nuint)data.Length, (int)variant) - 1;
+        return checked((int)sodium_base64_encoded_len((nuint)data.Length, (int)variant) - 1);
     }
 
     public static void FromBase64(Span<byte> data, ReadOnlySpan<char> base64, Base64Variant variant = Base64Variant.Original, ReadOnlySpan<char> ignoreChars = default)

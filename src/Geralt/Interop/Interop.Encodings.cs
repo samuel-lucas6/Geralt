@@ -15,7 +15,7 @@ internal static partial class Interop
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial int sodium_base64_encoded_len(nuint binaryLength, int variant);
+        internal static partial nuint sodium_base64_encoded_len(nuint binaryLength, int variant);
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
