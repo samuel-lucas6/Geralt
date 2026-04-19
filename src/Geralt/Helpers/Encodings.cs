@@ -52,10 +52,10 @@ public static class Encodings
         Validation.EqualTo($"{nameof(data)}.{nameof(data.Length)}", data.Length, GetFromHexBufferSize(hex, ignoreChars));
         Sodium.Initialize();
         Span<byte> hexBuffer = hex.Length <= MaxStackSize ? stackalloc byte[hex.Length] : GC.AllocateArray<byte>(hex.Length, pinned: true);
-        for (int i = 0; i < hex.Length; i++) {
-            hexBuffer[i] = (byte)hex[i];
-        }
         try {
+            for (int i = 0; i < hex.Length; i++) {
+                hexBuffer[i] = (byte)hex[i];
+            }
             int ret = sodium_hex2bin(data, (nuint)data.Length, hexBuffer, (nuint)hexBuffer.Length, ignoreChars.ToString(), binaryLength: out _, hexEnd: null);
             if (ret != 0) { throw new FormatException("Invalid hex string."); }
         }
@@ -66,25 +66,25 @@ public static class Encodings
 
     public static int GetFromHexBufferSize(ReadOnlySpan<char> hex, ReadOnlySpan<char> ignoreChars = default)
     {
-        if (ignoreChars.IsEmpty) {
-            Validation.MultipleOf($"{nameof(hex)}.{nameof(hex.Length)}", hex.Length, 2);
-            return hex.Length / 2;
-        }
         Validation.NotEmpty(nameof(hex), hex.Length);
-        if (ignoreChars.ContainsAny(SearchValues.Create(HexCharacterSet))) {
-            throw new ArgumentException($"{nameof(ignoreChars)} cannot contain hex characters.", nameof(ignoreChars));
-        }
-        int ignoreCharsCount = 0;
+        int lengthMinusIgnoredChars = hex.Length, allAscii = 0;
         foreach (char c in hex) {
-            if (ignoreChars.Contains(c)) {
-                ignoreCharsCount++;
+            if (ignoreChars.Length != 0 && ignoreChars.Contains(c)) {
+                lengthMinusIgnoredChars--;
+            }
+            allAscii |= c >> 7;
+        }
+        if (allAscii != 0) { throw new ArgumentException($"{nameof(hex)} cannot contain non-ASCII characters.", nameof(hex)); }
+        if (ignoreChars.Length != 0) {
+            if (ignoreChars.ContainsAny(SearchValues.Create(HexCharacterSet))) {
+                throw new ArgumentException($"{nameof(ignoreChars)} cannot contain hex characters.", nameof(ignoreChars));
+            }
+            if (lengthMinusIgnoredChars == 0) {
+                throw new ArgumentException($"{nameof(hex)} must contain characters that aren't ignored.", nameof(hex));
             }
         }
-        if (hex.Length - ignoreCharsCount == 0) {
-            throw new ArgumentException($"{nameof(hex)} must contain characters that aren't ignored.", nameof(hex));
-        }
-        Validation.MultipleOf($"{nameof(hex)}.{nameof(hex.Length)}", hex.Length - ignoreCharsCount, 2);
-        return (hex.Length - ignoreCharsCount) / 2;
+        Validation.MultipleOf($"{nameof(hex)}.{nameof(hex.Length)}", lengthMinusIgnoredChars, 2);
+        return lengthMinusIgnoredChars / 2;
     }
 
     public static void ToBase64(Span<char> base64, ReadOnlySpan<byte> data, Base64Variant variant = Base64Variant.Original)
@@ -118,10 +118,10 @@ public static class Encodings
         Validation.EqualTo($"{nameof(data)}.{nameof(data.Length)}", data.Length, GetFromBase64BufferSize(base64, variant, ignoreChars));
         Sodium.Initialize();
         Span<byte> base64Buffer = base64.Length <= MaxStackSize ? stackalloc byte[base64.Length] : GC.AllocateArray<byte>(base64.Length, pinned: true);
-        for (int i = 0; i < base64.Length; i++) {
-            base64Buffer[i] = (byte)base64[i];
-        }
         try {
+            for (int i = 0; i < base64.Length; i++) {
+                base64Buffer[i] = (byte)base64[i];
+            }
             int ret = sodium_base642bin(data, (nuint)data.Length, base64Buffer, (nuint)base64Buffer.Length, ignoreChars.ToString(), binaryLength: out _, base64End: null, (int)variant);
             if (ret != 0) { throw new FormatException("Invalid Base64 string."); }
         }
@@ -133,33 +133,31 @@ public static class Encodings
     public static int GetFromBase64BufferSize(ReadOnlySpan<char> base64, Base64Variant variant = Base64Variant.Original, ReadOnlySpan<char> ignoreChars = default)
     {
         Validation.NotEmpty(nameof(base64), base64.Length);
-        if (ignoreChars.IsEmpty) {
-            if (variant is Base64Variant.Original or Base64Variant.Url) {
-                Validation.MultipleOf($"{nameof(base64)}.{nameof(base64.Length)}", base64.Length, 4);
+        int lengthMinusIgnoredChars = base64.Length, allAscii = 0;
+        foreach (char c in base64) {
+            if (ignoreChars.Length != 0 && ignoreChars.Contains(c)) {
+                lengthMinusIgnoredChars--;
             }
-            else {
-                if (base64.Length % 4 == 1) {
-                    throw new ArgumentOutOfRangeException(nameof(base64), base64.Length, $"{nameof(base64)} without padding must be a valid length.");
-                }
-            }
+            allAscii |= c >> 7;
         }
-        int ignoreCharsCount = 0;
-        if (!ignoreChars.IsEmpty) {
+        if (allAscii != 0) { throw new ArgumentException($"{nameof(base64)} cannot contain non-ASCII characters.", nameof(base64)); }
+        if (ignoreChars.Length != 0) {
             if (ignoreChars.ContainsAny(SearchValues.Create(Base64FullCharacterSet))) {
                 throw new ArgumentException($"{nameof(ignoreChars)} cannot contain Base64 characters.", nameof(ignoreChars));
             }
-            foreach (char c in base64) {
-                if (ignoreChars.Contains(c)) {
-                    ignoreCharsCount++;
-                }
-            }
-            if (base64.Length - ignoreCharsCount == 0) {
+            if (lengthMinusIgnoredChars == 0) {
                 throw new ArgumentException($"{nameof(base64)} must contain characters that aren't ignored.", nameof(base64));
             }
         }
         if (variant is Base64Variant.Original or Base64Variant.Url) {
-            return checked((base64.Length - ignoreCharsCount - base64.Count('=')) * 3) / 4;
+            Validation.MultipleOf($"{nameof(base64)}.{nameof(base64.Length)}", lengthMinusIgnoredChars, 4);
+            lengthMinusIgnoredChars -= base64.Count('=');
         }
-        return checked((base64.Length - ignoreCharsCount) * 3) / 4;
+        else {
+            if (lengthMinusIgnoredChars % 4 == 1) {
+                throw new ArgumentOutOfRangeException(nameof(base64), base64.Length, $"{nameof(base64)} without padding must be a valid length.");
+            }
+        }
+        return checked(lengthMinusIgnoredChars * 3) / 4;
     }
 }

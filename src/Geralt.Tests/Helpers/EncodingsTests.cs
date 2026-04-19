@@ -104,6 +104,9 @@ public class EncodingsTests
     [TestMethod]
     [DataRow(0, null, "")]
     [DataRow(0, "", "")]
+    [DataRow(0, "ÿя", "")]
+    [DataRow(0, "66ΩF6F", ":")]
+    [DataRow(0, "666F6国", "")]
     [DataRow(0, null, ":")]
     [DataRow(0, "", ":")]
     [DataRow(2, "zzz", "")]
@@ -121,7 +124,7 @@ public class EncodingsTests
     {
         var d = new byte[dataSize];
 
-        if ((ignoreChars.Length > 0 && Encodings.HexCharacterSet.Contains(ignoreChars)) || (hex is { Length: > 0 } && hex == ignoreChars)) {
+        if ((hex is { Length: > 0 } && (hex == ignoreChars || !hex.All(char.IsAscii))) || (ignoreChars.Length > 0 && Encodings.HexCharacterSet.Contains(ignoreChars))) {
             Assert.ThrowsExactly<ArgumentException>(() => Encodings.FromHex(d, hex, ignoreChars));
         }
         else {
@@ -199,6 +202,9 @@ public class EncodingsTests
     [DataRow(1 - 1, "Zg==", Encodings.Base64Variant.Original, "")]
     [DataRow(1, null, Encodings.Base64Variant.Original, "")]
     [DataRow(1, "", Encodings.Base64Variant.Original, "")]
+    [DataRow(1, "好g==", Encodings.Base64Variant.Original, "")]
+    [DataRow(1, "Z€==", Encodings.Base64Variant.Original, " ")]
+    [DataRow(1, "Zg=é", Encodings.Base64Variant.Original, "")]
     // https://eprint.iacr.org/2022/361
     [DataRow(5, "SGVsbG9", Encodings.Base64Variant.Original, "")]
     [DataRow(4, "SGVsbA=", Encodings.Base64Variant.Original, "")]
@@ -229,7 +235,7 @@ public class EncodingsTests
     {
         var d = new byte[dataSize];
 
-        if ((ignoreChars.Length > 0 && Encodings.Base64FullCharacterSet.Contains(ignoreChars)) || (base64 is { Length: > 0 } && base64 == ignoreChars)) {
+        if ((base64 is { Length: > 0 } && (base64 == ignoreChars || !base64.All(char.IsAscii))) || (ignoreChars.Length > 0 && Encodings.Base64FullCharacterSet.Contains(ignoreChars))) {
             Assert.ThrowsExactly<ArgumentException>(() => Encodings.FromBase64(d, base64, variant, ignoreChars));
         }
         else {
