@@ -50,11 +50,12 @@ public static class Argon2id
         Validation.BetweenOrEqualTo($"{nameof(hash)}.{nameof(hash.Length)}", hash.Length, MinHashSize, MaxHashSize);
         Span<byte> hashBytes = stackalloc byte[HashSize]; hashBytes.Clear();
         try {
+            int allAscii = 0;
             for (int i = 0; i < hash.Length; i++) {
                 hashBytes[i] = (byte)hash[i];
+                allAscii |= hash[i] >> 7;
             }
-            if (!ConstantTime.IsAllZeros(hashBytes[^1..])) { throw new FormatException("Password hash string is not null terminated."); }
-            ThrowIfInvalidHashPrefix(hashBytes);
+            ThrowIfInvalidHashFormat(allAscii, hashBytes);
             Sodium.Initialize();
             return crypto_pwhash_argon2id_str_verify(hashBytes, password, (ulong)password.Length) == 0;
         }
@@ -70,11 +71,12 @@ public static class Argon2id
         Validation.GreaterThanOrEqualTo(nameof(memorySize), memorySize, MinMemorySize);
         Span<byte> hashBytes = stackalloc byte[HashSize]; hashBytes.Clear();
         try {
+            int allAscii = 0;
             for (int i = 0; i < hash.Length; i++) {
                 hashBytes[i] = (byte)hash[i];
+                allAscii |= hash[i] >> 7;
             }
-            if (!ConstantTime.IsAllZeros(hashBytes[^1..])) { throw new FormatException("Password hash string is not null terminated."); }
-            ThrowIfInvalidHashPrefix(hashBytes);
+            ThrowIfInvalidHashFormat(allAscii, hashBytes);
             Sodium.Initialize();
             int ret = crypto_pwhash_argon2id_str_needs_rehash(hashBytes, (ulong)iterations, (nuint)memorySize);
             return ret == -1 ? throw new FormatException("Invalid password hash string.") : ret == 1;
@@ -84,8 +86,10 @@ public static class Argon2id
         }
     }
 
-    private static void ThrowIfInvalidHashPrefix(ReadOnlySpan<byte> hashBytes)
+    private static void ThrowIfInvalidHashFormat(int allAscii, ReadOnlySpan<byte> hashBytes)
     {
+        if (allAscii != 0) { throw new FormatException("Invalid password hash string encoding."); }
+        if (!ConstantTime.IsAllZeros(hashBytes[^1..])) { throw new FormatException("Invalid password hash string termination."); }
         if (!ConstantTime.Equals(hashBytes[..HashPrefix.Length], Encoding.ASCII.GetBytes(HashPrefix))) {
             throw new FormatException("Invalid password hash string prefix.");
         }

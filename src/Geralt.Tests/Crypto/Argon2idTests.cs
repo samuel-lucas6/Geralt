@@ -60,6 +60,16 @@ public class Argon2idTests
         ];
         yield return
         [
+            "$argon2id$v=19$m=262144,t=2,p=1$c29tZXNhbHQ$eP4eyR+zqlZX1y5xCFTkw9m5GYx0L5YWwvCFvtlbLow\0",
+            "password"
+        ];
+        yield return
+        [
+            "$argon2id$v=19$m=262144,t=2,p=1$c29tZXNhbHQ$eP4eyR+zqlZX1y5xCFTkw9m5GYx0L5YWwvCFvtlbLow\0\0",
+            "password"
+        ];
+        yield return
+        [
             "$argon2id$v=19$m=65536,t=2,p=1$c29tZXNhbHQ$CTFhFdXPJO1aFaMaO6Mm5c8y7cJHAph8ArZWb2GRPPc",
             "password"
         ];
@@ -302,6 +312,37 @@ public class Argon2idTests
             "$argon2id$v=19$m=8,t=1,p=1$c29tZXNhbHRzb21lc2FsdA$EyCMRolQLn0SWMIxqaEjbg1Pza/F22HoRXyn5JI9n0XPbrQPlL86IU45f8VfN4+dCEIT2h6Ekf8wVPM",
             ""
         ];
+        // Non-ASCII characters
+        yield return
+        [
+            "$argon2id$v=19$m=262144,t=2,p=1$c29tZXNhbHQ$€P4eyR+zqlZX1y5xCFTkw9m5GYx0L5YWwvCFvtlbLow",
+            ""
+        ];
+        yield return
+        [
+            "$argon2id$v=19$m=262144,t=2,p=1$c29tZXNhbHQ$eP4eyR+zqlZX1y5中CFTkw9m5GYx0L5YWwvCFvtlbLow",
+            ""
+        ];
+        yield return
+        [
+            "$argon2id$v=19$m=262144,t=2,p=1$c29tZXNhbHQ$eP4eyR+zqlZX1y5xCFTkw9m5GYx0L5YWwvCFvtlbLoé",
+            ""
+        ];
+        yield return
+        [
+            "$argon2id$v=19$m=262144,t=2,p=1$ñ29tZXNhbHQ$eP4eyR+zqlZX1y5xCFTkw9m5GYx0L5YWwvCFvtlbLow",
+            ""
+        ];
+        yield return
+        [
+            "$argon2id$v=19$m=262144,t=2,p=1$c29tZβNhbHQ$eP4eyR+zqlZX1y5xCFTkw9m5GYx0L5YWwvCFvtlbLow",
+            ""
+        ];
+        yield return
+        [
+            "$argon2id$v=19$m=262144,t=2,p=1$c29tZXNhbHÿ$eP4eyR+zqlZX1y5xCFTkw9m5GYx0L5YWwvCFvtlbLow",
+            ""
+        ];
     }
 
     [TestMethod]
@@ -403,7 +444,7 @@ public class Argon2idTests
     {
         var p = Encoding.UTF8.GetBytes(password);
 
-        if (!hash.StartsWith("$argon2id$") || hash.Length == Argon2id.HashSize) {
+        if (!hash.StartsWith("$argon2id$") || hash.Length == Argon2id.HashSize || !hash.All(char.IsAscii)) {
             Assert.ThrowsExactly<FormatException>(() => Argon2id.VerifyHash(hash, p));
         }
         else {
@@ -415,6 +456,8 @@ public class Argon2idTests
     [DataRow("$argon2id$v=19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 3, 16777216)]
     [DataRow("$argon2id$v=19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 4, 16777216)]
     [DataRow("$argon2id$v=19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us", 3, 33554432)]
+    [DataRow("$argon2id$v=19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us\0", 3, 33554432)]
+    [DataRow("$argon2id$v=19$m=16384,t=3,p=1$9jzdCOZe8dvfNWga1TS9wQ$ZdlB31msrCUY3R83w6GRGXdmq2zgUcLQGwnedCzU4Us\0\0", 3, 33554432)]
     public void NeedsRehash_Valid(string hash, int iterations, int memorySize)
     {
         bool expected = !hash.Contains($"m={memorySize / 1024},t={iterations}");
@@ -435,7 +478,7 @@ public class Argon2idTests
     [DynamicData(nameof(InvalidStringTestVectors))]
     public void NeedsRehash_Invalid(string hash, string password, int iterations = Argon2id.MinIterations, int memorySize = Argon2id.MinMemorySize)
     {
-        if (!hash.StartsWith("$argon2id$") || hash.Length == Argon2id.HashSize) {
+        if (!hash.StartsWith("$argon2id$") || hash.Length == Argon2id.HashSize || !hash.All(char.IsAscii)) {
             Assert.ThrowsExactly<FormatException>(() => Argon2id.NeedsRehash(hash, iterations, memorySize));
         }
         else {
