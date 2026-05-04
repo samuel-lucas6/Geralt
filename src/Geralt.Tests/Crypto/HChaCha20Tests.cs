@@ -22,7 +22,8 @@ public class HChaCha20Tests
         Span<byte> okm = stackalloc byte[HChaCha20.OutputSize];
         Span<byte> ikm = Convert.FromHexString(inputKeyingMaterial);
         Span<byte> n = Convert.FromHexString(nonce);
-        Span<byte> p = personalization != null ? Convert.FromHexString(personalization) : Span<byte>.Empty;
+        // Array.Empty<byte>() to test a non-null pointer to the array's memory location (different to Span<byte>.Empty)
+        Span<byte> p = personalization != null ? Convert.FromHexString(personalization) : Array.Empty<byte>();
 
         HChaCha20.DeriveKey(okm, ikm, n, p);
 
