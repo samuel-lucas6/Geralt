@@ -23,9 +23,9 @@ public sealed class IncrementalBLAKE2b : IDisposable
     private unsafe void* _state;
     private unsafe void* _cachedState;
     private int _hashSize;
-    private bool _finalized;
-    private bool _cached;
-    private bool _disposed;
+    private int _finalized;
+    private int _cached;
+    private int _disposed;
 
     public unsafe IncrementalBLAKE2b(int hashSize, ReadOnlySpan<byte> key = default, ReadOnlySpan<byte> personalization = default, ReadOnlySpan<byte> salt = default)
     {
@@ -37,7 +37,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
 
     public unsafe void Reinitialize(int hashSize, ReadOnlySpan<byte> key = default, ReadOnlySpan<byte> personalization = default, ReadOnlySpan<byte> salt = default)
     {
-        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
+        if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 1) != 0) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
         Validation.BetweenOrEqualTo(nameof(hashSize), hashSize, MinHashSize, MaxHashSize);
         if (key.Length != 0) { Validation.BetweenOrEqualTo($"{nameof(key)}.{nameof(key.Length)}", key.Length, MinKeySize, MaxKeySize); }
         if (personalization.Length != 0) { Validation.EqualTo($"{nameof(personalization)}.{nameof(personalization.Length)}", personalization.Length, PersonalizationSize); }
@@ -47,31 +47,31 @@ public sealed class IncrementalBLAKE2b : IDisposable
             : crypto_generichash_blake2b_init_salt_personal(_state, key, (nuint)key.Length, (nuint)hashSize, salt.Length != 0 ? salt : new byte[SaltSize], personalization.Length != 0 ? personalization : new byte[PersonalizationSize]);
         if (ret != 0) { throw new CryptographicException("Error initializing hash function state."); }
         _hashSize = hashSize;
-        _finalized = false;
+        Interlocked.Exchange(ref _finalized, 0);
     }
 
     public unsafe void Update(ReadOnlySpan<byte> message)
     {
-        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
-        if (_finalized) { throw new InvalidOperationException("Cannot update after finalizing without reinitializing or restoring a cached state."); }
+        if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 1) != 0) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
+        if (Interlocked.CompareExchange(ref _finalized, value: 1, comparand: 1) != 0) { throw new InvalidOperationException("Cannot update after finalizing without reinitializing or restoring a cached state."); }
         int ret = crypto_generichash_blake2b_update(_state, message, (ulong)message.Length);
         if (ret != 0) { throw new CryptographicException("Error updating hash function state."); }
     }
 
     public unsafe void Finalize(Span<byte> hash)
     {
-        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
-        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing or restoring a cached state."); }
+        if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 1) != 0) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
+        if (Interlocked.CompareExchange(ref _finalized, value: 1, comparand: 1) != 0) { throw new InvalidOperationException("Cannot finalize twice without reinitializing or restoring a cached state."); }
         Validation.EqualTo($"{nameof(hash)}.{nameof(hash.Length)}", hash.Length, _hashSize);
         int ret = crypto_generichash_blake2b_final(_state, hash, (nuint)hash.Length);
         if (ret != 0) { throw new CryptographicException("Error finalizing hash."); }
-        _finalized = true;
+        Interlocked.Exchange(ref _finalized, 1);
     }
 
     public bool FinalizeAndVerify(ReadOnlySpan<byte> hash)
     {
-        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
-        if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing or restoring a cached state."); }
+        if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 1) != 0) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
+        if (Interlocked.CompareExchange(ref _finalized, value: 1, comparand: 1) != 0) { throw new InvalidOperationException("Cannot finalize twice without reinitializing or restoring a cached state."); }
         Validation.EqualTo($"{nameof(hash)}.{nameof(hash.Length)}", hash.Length, _hashSize);
         Span<byte> computedHash = stackalloc byte[_hashSize];
         Finalize(computedHash);
@@ -82,22 +82,22 @@ public sealed class IncrementalBLAKE2b : IDisposable
 
     public unsafe void CacheState()
     {
-        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
-        if (_finalized) { throw new InvalidOperationException("Cannot cache the state after finalizing without reinitializing."); }
+        if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 1) != 0) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
+        if (Interlocked.CompareExchange(ref _finalized, value: 1, comparand: 1) != 0) { throw new InvalidOperationException("Cannot cache the state after finalizing without reinitializing."); }
         var state = new Span<byte>(_state, crypto_generichash_blake2b_statebytes);
         var cachedState = new Span<byte>(_cachedState, crypto_generichash_blake2b_statebytes);
         state.CopyTo(cachedState);
-        _cached = true;
+        Interlocked.Exchange(ref _cached, 1);
     }
 
     public unsafe void RestoreCachedState()
     {
-        if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
-        if (!_cached) { throw new InvalidOperationException("Cannot restore the state when it has not been cached."); }
+        if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 1) != 0) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
+        if (Interlocked.CompareExchange(ref _cached, value: 1, comparand: 1) != 1) { throw new InvalidOperationException("Cannot restore the state when it has not been cached."); }
         var cachedState = new Span<byte>(_cachedState, crypto_generichash_blake2b_statebytes);
         var state = new Span<byte>(_state, crypto_generichash_blake2b_statebytes);
         cachedState.CopyTo(state);
-        _finalized = false;
+        Interlocked.Exchange(ref _finalized, 0);
     }
 
     public void Dispose()
@@ -109,7 +109,8 @@ public sealed class IncrementalBLAKE2b : IDisposable
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
     private unsafe void Dispose(bool disposing)
     {
-        if (_disposed) { return; }
+        // If _disposed is 0, set to 1
+        if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 0) != 0) { return; }
         if (_state != null) {
             SecureMemory.ZeroMemory(new Span<byte>(_state, crypto_generichash_blake2b_statebytes));
             NativeMemory.AlignedFree(_state);
@@ -120,7 +121,6 @@ public sealed class IncrementalBLAKE2b : IDisposable
             NativeMemory.AlignedFree(_cachedState);
             _cachedState = null;
         }
-        _disposed = true;
     }
 
     ~IncrementalBLAKE2b()
