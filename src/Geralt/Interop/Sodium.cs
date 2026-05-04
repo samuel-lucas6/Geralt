@@ -9,7 +9,8 @@ internal static class Sodium
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static void Initialize()
     {
-        if (_initialized == 0) {
+        // If _initialized is 1, stay at 1
+        if (Interlocked.CompareExchange(ref _initialized, value: 1, comparand: 1) != 1) {
             Init();
         }
     }
