@@ -11,53 +11,52 @@ public sealed class IncrementalEd25519ph : IDisposable
     public const int PrivateKeySize = Ed25519.PrivateKeySize;
     public const int SignatureSize = Ed25519.SignatureSize;
 
-    private crypto_sign_ed25519ph_state _state;
-    private GCHandle _stateHandle;
+    private unsafe void* _state;
     private bool _finalized;
     private bool _disposed;
 
-    public IncrementalEd25519ph()
+    public unsafe IncrementalEd25519ph()
     {
         Sodium.Initialize();
-        _stateHandle = GCHandle.Alloc(_state,  GCHandleType.Pinned);
+        _state = NativeMemory.Alloc(crypto_sign_ed25519ph_statebytes);
         Reinitialize();
     }
 
-    public void Reinitialize()
+    public unsafe void Reinitialize()
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalEd25519ph)); }
-        int ret = crypto_sign_ed25519ph_init(ref _state);
+        int ret = crypto_sign_ed25519ph_init(_state);
         if (ret != 0) { throw new CryptographicException("Error initializing signature scheme state."); }
         _finalized = false;
     }
 
-    public void Update(ReadOnlySpan<byte> message)
+    public unsafe void Update(ReadOnlySpan<byte> message)
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalEd25519ph)); }
         if (_finalized) { throw new InvalidOperationException("Cannot update after finalizing without reinitializing."); }
-        int ret = crypto_sign_ed25519ph_update(ref _state, message, (ulong)message.Length);
+        int ret = crypto_sign_ed25519ph_update(_state, message, (ulong)message.Length);
         if (ret != 0) { throw new CryptographicException("Error updating signature scheme state."); }
     }
 
-    public void Finalize(Span<byte> signature, ReadOnlySpan<byte> privateKey)
+    public unsafe void Finalize(Span<byte> signature, ReadOnlySpan<byte> privateKey)
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalEd25519ph)); }
         if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
         Validation.EqualTo($"{nameof(signature)}.{nameof(signature.Length)}", signature.Length, SignatureSize);
         Validation.EqualTo($"{nameof(privateKey)}.{nameof(privateKey.Length)}", privateKey.Length, PrivateKeySize);
-        int ret = crypto_sign_ed25519ph_final_create(ref _state, signature, signatureLength: out _, privateKey);
+        int ret = crypto_sign_ed25519ph_final_create(_state, signature, signatureLength: out _, privateKey);
         if (ret != 0) { throw new CryptographicException("Error finalizing signature."); }
         _finalized = true;
     }
 
-    public bool FinalizeAndVerify(ReadOnlySpan<byte> signature, ReadOnlySpan<byte> publicKey)
+    public unsafe bool FinalizeAndVerify(ReadOnlySpan<byte> signature, ReadOnlySpan<byte> publicKey)
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalEd25519ph)); }
         if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
         Validation.EqualTo($"{nameof(signature)}.{nameof(signature.Length)}", signature.Length, SignatureSize);
         Validation.EqualTo($"{nameof(publicKey)}.{nameof(publicKey.Length)}", publicKey.Length, PublicKeySize);
         _finalized = true;
-        return crypto_sign_ed25519ph_final_verify(ref _state, signature, publicKey) == 0;
+        return crypto_sign_ed25519ph_final_verify(_state, signature, publicKey) == 0;
     }
 
     public void Dispose()
@@ -70,10 +69,11 @@ public sealed class IncrementalEd25519ph : IDisposable
     private unsafe void Dispose(bool disposing)
     {
         if (_disposed) { return; }
-        fixed (void* s = &_state) {
-            SecureMemory.ZeroMemory(new Span<byte>(s, Marshal.SizeOf(_state)));
+        if (_state != null) {
+            SecureMemory.ZeroMemory(new Span<byte>(_state, crypto_sign_ed25519ph_statebytes));
+            NativeMemory.Free(_state);
+            _state = null;
         }
-        if (_stateHandle.IsAllocated) { _stateHandle.Free(); }
         _disposed = true;
     }
 

@@ -11,41 +11,40 @@ public sealed class IncrementalPoly1305 : IDisposable
     public const int TagSize = Poly1305.TagSize;
     public const int BlockSize = Poly1305.BlockSize;
 
-    private crypto_onetimeauth_poly1305_state _state;
-    private GCHandle _stateHandle;
+    private unsafe void* _state;
     private bool _finalized;
     private bool _disposed;
 
-    public IncrementalPoly1305(ReadOnlySpan<byte> oneTimeKey)
+    public unsafe IncrementalPoly1305(ReadOnlySpan<byte> oneTimeKey)
     {
         Sodium.Initialize();
-        _stateHandle = GCHandle.Alloc(_state,  GCHandleType.Pinned);
+        _state = NativeMemory.AlignedAlloc(crypto_onetimeauth_poly1305_statebytes, alignment: crypto_onetimeauth_poly1305_statebytes_CRYPTO_ALIGN);
         Reinitialize(oneTimeKey);
     }
 
-    public void Reinitialize(ReadOnlySpan<byte> oneTimeKey)
+    public unsafe void Reinitialize(ReadOnlySpan<byte> oneTimeKey)
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalPoly1305)); }
         Validation.EqualTo($"{nameof(oneTimeKey)}.{nameof(oneTimeKey.Length)}", oneTimeKey.Length, KeySize);
-        int ret = crypto_onetimeauth_poly1305_init(ref _state, oneTimeKey);
+        int ret = crypto_onetimeauth_poly1305_init(_state, oneTimeKey);
         if (ret != 0) { throw new CryptographicException("Error initializing message authentication code state."); }
         _finalized = false;
     }
 
-    public void Update(ReadOnlySpan<byte> message)
+    public unsafe void Update(ReadOnlySpan<byte> message)
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalPoly1305)); }
         if (_finalized) { throw new InvalidOperationException("Cannot update after finalizing without reinitializing."); }
-        int ret = crypto_onetimeauth_poly1305_update(ref _state, message, (ulong)message.Length);
+        int ret = crypto_onetimeauth_poly1305_update(_state, message, (ulong)message.Length);
         if (ret != 0) { throw new CryptographicException("Error updating message authentication code state."); }
     }
 
-    public void Finalize(Span<byte> tag)
+    public unsafe void Finalize(Span<byte> tag)
     {
         if (_disposed) { throw new ObjectDisposedException(nameof(IncrementalPoly1305)); }
         if (_finalized) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
         Validation.EqualTo($"{nameof(tag)}.{nameof(tag.Length)}", tag.Length, TagSize);
-        int ret = crypto_onetimeauth_poly1305_final(ref _state, tag);
+        int ret = crypto_onetimeauth_poly1305_final(_state, tag);
         if (ret != 0) { throw new CryptographicException("Error finalizing message authentication code."); }
         _finalized = true;
     }
@@ -72,10 +71,11 @@ public sealed class IncrementalPoly1305 : IDisposable
     private unsafe void Dispose(bool disposing)
     {
         if (_disposed) { return; }
-        fixed (void* s = &_state) {
-            SecureMemory.ZeroMemory(new Span<byte>(s, Marshal.SizeOf(_state)));
+        if (_state != null) {
+            SecureMemory.ZeroMemory(new Span<byte>(_state, crypto_onetimeauth_poly1305_statebytes));
+            NativeMemory.AlignedFree(_state);
+            _state = null;
         }
-        if (_stateHandle.IsAllocated) { _stateHandle.Free(); }
         _disposed = true;
     }
 

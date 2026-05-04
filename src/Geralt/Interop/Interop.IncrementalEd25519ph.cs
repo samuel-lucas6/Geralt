@@ -9,21 +9,18 @@ internal static partial class Interop
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial int crypto_sign_ed25519ph_init(ref crypto_sign_ed25519ph_state state);
+        internal static unsafe partial int crypto_sign_ed25519ph_init(void* state);
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial int crypto_sign_ed25519ph_update(ref crypto_sign_ed25519ph_state state, ReadOnlySpan<byte> message, ulong messageLength);
+        internal static unsafe partial int crypto_sign_ed25519ph_update(void* state, ReadOnlySpan<byte> message, ulong messageLength);
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial int crypto_sign_ed25519ph_final_create(ref crypto_sign_ed25519ph_state state, Span<byte> signature, out ulong signatureLength, ReadOnlySpan<byte> privateKey);
+        internal static unsafe partial int crypto_sign_ed25519ph_final_create(void* state, Span<byte> signature, out ulong signatureLength, ReadOnlySpan<byte> privateKey);
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial int crypto_sign_ed25519ph_final_verify(ref crypto_sign_ed25519ph_state state, ReadOnlySpan<byte> signature, ReadOnlySpan<byte> publicKey);
-
-        [StructLayout(LayoutKind.Explicit, Size = crypto_sign_ed25519ph_statebytes)]
-        internal struct crypto_sign_ed25519ph_state;
+        internal static unsafe partial int crypto_sign_ed25519ph_final_verify(void* state, ReadOnlySpan<byte> signature, ReadOnlySpan<byte> publicKey);
     }
 }
