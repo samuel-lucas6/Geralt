@@ -109,6 +109,7 @@ public static class Encodings
     public static int GetToBase64BufferSize(ReadOnlySpan<byte> data, Base64Variant variant = Base64Variant.Original)
     {
         Validation.NotEmpty(nameof(data), data.Length);
+        Sodium.Initialize();
         // Remove the null byte terminator
         return checked((int)sodium_base64_encoded_len((nuint)data.Length, (int)variant) - 1);
     }
