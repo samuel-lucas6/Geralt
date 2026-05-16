@@ -56,10 +56,12 @@ public sealed class GuardedHeapAllocation : IDisposable
     {
         // If _disposed is 0, set to 1
         if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 0) != 0) { return; }
-        // This calls sodium_mprotect_readwrite internally
-        sodium_free(_pointer);
-        _pointer = IntPtr.Zero;
-        _size = 0;
+        if (_pointer != IntPtr.Zero) {
+            // This calls sodium_mprotect_readwrite internally
+            sodium_free(_pointer);
+            _pointer = IntPtr.Zero;
+            _size = 0;
+        }
     }
 
     ~GuardedHeapAllocation()
