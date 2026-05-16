@@ -78,15 +78,19 @@ public static class X25519
     private static void DeriveSharedKey(Span<byte> sharedKey, ReadOnlySpan<byte> yourPrivateKey, ReadOnlySpan<byte> othersPublicKey, ReadOnlySpan<byte> personalization, ReadOnlySpan<byte> preSharedKey, bool isSender)
     {
         Span<byte> sharedSecret = stackalloc byte[SharedSecretSize];
-        ComputeSharedSecret(sharedSecret, yourPrivateKey, othersPublicKey);
         Span<byte> yourPublicKey = stackalloc byte[PublicKeySize];
-        ComputePublicKey(yourPublicKey, yourPrivateKey);
-        using var blake2b = new IncrementalBLAKE2b(sharedKey.Length, preSharedKey, personalization);
-        blake2b.Update(sharedSecret);
-        blake2b.Update(isSender ? yourPublicKey : othersPublicKey);
-        blake2b.Update(isSender ? othersPublicKey : yourPublicKey);
-        blake2b.Finalize(sharedKey);
-        SecureMemory.ZeroMemory(sharedSecret);
-        SecureMemory.ZeroMemory(yourPublicKey);
+        try {
+            ComputeSharedSecret(sharedSecret, yourPrivateKey, othersPublicKey);
+            ComputePublicKey(yourPublicKey, yourPrivateKey);
+            using var blake2b = new IncrementalBLAKE2b(sharedKey.Length, preSharedKey, personalization);
+            blake2b.Update(sharedSecret);
+            blake2b.Update(isSender ? yourPublicKey : othersPublicKey);
+            blake2b.Update(isSender ? othersPublicKey : yourPublicKey);
+            blake2b.Finalize(sharedKey);
+        }
+        finally {
+            SecureMemory.ZeroMemory(sharedSecret);
+            SecureMemory.ZeroMemory(yourPublicKey);
+        }
     }
 }
