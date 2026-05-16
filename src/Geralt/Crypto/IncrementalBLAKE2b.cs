@@ -74,10 +74,13 @@ public sealed class IncrementalBLAKE2b : IDisposable
         if (Interlocked.CompareExchange(ref _finalized, value: 1, comparand: 1) != 0) { throw new InvalidOperationException("Cannot finalize twice without reinitializing or restoring a cached state."); }
         Validation.EqualTo($"{nameof(hash)}.{nameof(hash.Length)}", hash.Length, _hashSize);
         Span<byte> computedHash = stackalloc byte[_hashSize];
-        Finalize(computedHash);
-        bool equal = ConstantTime.Equals(hash, computedHash);
-        SecureMemory.ZeroMemory(computedHash);
-        return equal;
+        try {
+            Finalize(computedHash);
+            return ConstantTime.Equals(hash, computedHash);
+        }
+        finally {
+            SecureMemory.ZeroMemory(computedHash);
+        }
     }
 
     public unsafe void CacheState()

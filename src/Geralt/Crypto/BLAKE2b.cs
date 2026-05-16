@@ -50,10 +50,13 @@ public static class BLAKE2b
         Validation.BetweenOrEqualTo($"{nameof(tag)}.{nameof(tag.Length)}", tag.Length, MinTagSize, MaxTagSize);
         Validation.BetweenOrEqualTo($"{nameof(key)}.{nameof(key.Length)}", key.Length, MinKeySize, MaxKeySize);
         Span<byte> computedTag = stackalloc byte[tag.Length];
-        ComputeTag(computedTag, message, key);
-        bool equal = ConstantTime.Equals(tag, computedTag);
-        SecureMemory.ZeroMemory(computedTag);
-        return equal;
+        try {
+            ComputeTag(computedTag, message, key);
+            return ConstantTime.Equals(tag, computedTag);
+        }
+        finally {
+            SecureMemory.ZeroMemory(computedTag);
+        }
     }
 
     public static void DeriveKey(Span<byte> outputKeyingMaterial, ReadOnlySpan<byte> inputKeyingMaterial, ReadOnlySpan<byte> personalization, ReadOnlySpan<byte> salt = default, ReadOnlySpan<byte> info = default)

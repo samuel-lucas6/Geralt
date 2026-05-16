@@ -55,10 +55,13 @@ public sealed class IncrementalPoly1305 : IDisposable
         if (Interlocked.CompareExchange(ref _finalized, value: 1, comparand: 1) != 0) { throw new InvalidOperationException("Cannot finalize twice without reinitializing."); }
         Validation.EqualTo($"{nameof(tag)}.{nameof(tag.Length)}", tag.Length, TagSize);
         Span<byte> computedTag = stackalloc byte[TagSize];
-        Finalize(computedTag);
-        bool equal = ConstantTime.Equals(tag, computedTag);
-        SecureMemory.ZeroMemory(computedTag);
-        return equal;
+        try {
+            Finalize(computedTag);
+            return ConstantTime.Equals(tag, computedTag);
+        }
+        finally {
+            SecureMemory.ZeroMemory(computedTag);
+        }
     }
 
     public void Dispose()
