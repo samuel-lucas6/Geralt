@@ -15,16 +15,18 @@ public sealed class IncrementalEd25519ph : IDisposable
     private int _finalized;
     private int _disposed;
 
-    public unsafe IncrementalEd25519ph()
+    public IncrementalEd25519ph()
     {
         Sodium.Initialize();
-        _state = NativeMemory.Alloc(crypto_sign_ed25519ph_statebytes);
         Reinitialize();
     }
 
     public unsafe void Reinitialize()
     {
         if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 1) != 0) { throw new ObjectDisposedException(nameof(IncrementalEd25519ph)); }
+        if (_state == null) {
+            _state = NativeMemory.Alloc(crypto_sign_ed25519ph_statebytes);
+        }
         int ret = crypto_sign_ed25519ph_init(_state);
         if (ret != 0) { throw new CryptographicException("Error initializing signature scheme state."); }
         Interlocked.Exchange(ref _finalized, 0);

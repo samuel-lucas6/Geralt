@@ -27,11 +27,9 @@ public sealed class IncrementalBLAKE2b : IDisposable
     private int _cached;
     private int _disposed;
 
-    public unsafe IncrementalBLAKE2b(int hashSize, ReadOnlySpan<byte> key = default, ReadOnlySpan<byte> personalization = default, ReadOnlySpan<byte> salt = default)
+    public IncrementalBLAKE2b(int hashSize, ReadOnlySpan<byte> key = default, ReadOnlySpan<byte> personalization = default, ReadOnlySpan<byte> salt = default)
     {
         Sodium.Initialize();
-        _state = NativeMemory.AlignedAlloc(crypto_generichash_blake2b_statebytes, alignment: crypto_generichash_blake2b_statebytes_CRYPTO_ALIGN);
-        _cachedState = NativeMemory.AlignedAlloc(crypto_generichash_blake2b_statebytes, alignment: crypto_generichash_blake2b_statebytes_CRYPTO_ALIGN);
         Reinitialize(hashSize, key, personalization, salt);
     }
 
@@ -42,6 +40,12 @@ public sealed class IncrementalBLAKE2b : IDisposable
         if (key.Length != 0) { Validation.BetweenOrEqualTo($"{nameof(key)}.{nameof(key.Length)}", key.Length, MinKeySize, MaxKeySize); }
         if (personalization.Length != 0) { Validation.EqualTo($"{nameof(personalization)}.{nameof(personalization.Length)}", personalization.Length, PersonalizationSize); }
         if (salt.Length != 0) { Validation.EqualTo($"{nameof(salt)}.{nameof(salt.Length)}", salt.Length, SaltSize); }
+        if (_state == null) {
+            _state = NativeMemory.AlignedAlloc(crypto_generichash_blake2b_statebytes, alignment: crypto_generichash_blake2b_statebytes_CRYPTO_ALIGN);
+        }
+        if (_cachedState == null) {
+            _cachedState = NativeMemory.AlignedAlloc(crypto_generichash_blake2b_statebytes, alignment: crypto_generichash_blake2b_statebytes_CRYPTO_ALIGN);
+        }
         int ret = (personalization.Length == 0 && salt.Length == 0)
             ? crypto_generichash_blake2b_init(_state, key, (nuint)key.Length, (nuint)hashSize)
             : crypto_generichash_blake2b_init_salt_personal(_state, key, (nuint)key.Length, (nuint)hashSize, salt.Length != 0 ? salt : new byte[SaltSize], personalization.Length != 0 ? personalization : new byte[PersonalizationSize]);

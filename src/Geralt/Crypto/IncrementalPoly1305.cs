@@ -15,10 +15,9 @@ public sealed class IncrementalPoly1305 : IDisposable
     private int _finalized;
     private int _disposed;
 
-    public unsafe IncrementalPoly1305(ReadOnlySpan<byte> oneTimeKey)
+    public IncrementalPoly1305(ReadOnlySpan<byte> oneTimeKey)
     {
         Sodium.Initialize();
-        _state = NativeMemory.AlignedAlloc(crypto_onetimeauth_poly1305_statebytes, alignment: crypto_onetimeauth_poly1305_statebytes_CRYPTO_ALIGN);
         Reinitialize(oneTimeKey);
     }
 
@@ -26,6 +25,9 @@ public sealed class IncrementalPoly1305 : IDisposable
     {
         if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 1) != 0) { throw new ObjectDisposedException(nameof(IncrementalPoly1305)); }
         Validation.EqualTo($"{nameof(oneTimeKey)}.{nameof(oneTimeKey.Length)}", oneTimeKey.Length, KeySize);
+        if (_state == null) {
+            _state = NativeMemory.AlignedAlloc(crypto_onetimeauth_poly1305_statebytes, alignment: crypto_onetimeauth_poly1305_statebytes_CRYPTO_ALIGN);
+        }
         int ret = crypto_onetimeauth_poly1305_init(_state, oneTimeKey);
         if (ret != 0) { throw new CryptographicException("Error initializing message authentication code state."); }
         Interlocked.Exchange(ref _finalized, 0);

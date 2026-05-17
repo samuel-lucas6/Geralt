@@ -24,10 +24,9 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
         Final = crypto_secretstream_xchacha20poly1305_TAG_FINAL
     }
 
-    public unsafe IncrementalXChaCha20Poly1305(Span<byte> header, ReadOnlySpan<byte> key, bool encryption)
+    public IncrementalXChaCha20Poly1305(Span<byte> header, ReadOnlySpan<byte> key, bool encryption)
     {
         Sodium.Initialize();
-        _state = NativeMemory.Alloc(crypto_secretstream_xchacha20poly1305_statebytes);
         Reinitialize(header, key, encryption);
     }
 
@@ -36,6 +35,9 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
         if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 1) != 0) { throw new ObjectDisposedException(nameof(IncrementalXChaCha20Poly1305)); }
         Validation.EqualTo($"{nameof(header)}.{nameof(header.Length)}", header.Length, HeaderSize);
         Validation.EqualTo($"{nameof(key)}.{nameof(key.Length)}", key.Length, KeySize);
+        if (_state == null) {
+            _state = NativeMemory.Alloc(crypto_secretstream_xchacha20poly1305_statebytes);
+        }
         int ret = encryption
             ? crypto_secretstream_xchacha20poly1305_init_push(_state, header, key)
             : crypto_secretstream_xchacha20poly1305_init_pull(_state, header, key);
