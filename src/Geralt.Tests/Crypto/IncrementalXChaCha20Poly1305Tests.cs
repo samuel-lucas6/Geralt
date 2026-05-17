@@ -51,6 +51,8 @@ public class IncrementalXChaCha20Poly1305Tests
         yield return [IncrementalXChaCha20Poly1305.HeaderSize, IncrementalXChaCha20Poly1305.KeySize - 1, IncrementalXChaCha20Poly1305.TagSize, 0];
         yield return [IncrementalXChaCha20Poly1305.HeaderSize, IncrementalXChaCha20Poly1305.KeySize, IncrementalXChaCha20Poly1305.TagSize - 1, 0];
         yield return [IncrementalXChaCha20Poly1305.HeaderSize, IncrementalXChaCha20Poly1305.KeySize, IncrementalXChaCha20Poly1305.TagSize, 1];
+        yield return [IncrementalXChaCha20Poly1305.HeaderSize, IncrementalXChaCha20Poly1305.KeySize, IncrementalXChaCha20Poly1305.TagSize, 0, (IncrementalXChaCha20Poly1305.ChunkFlag)(-1)];
+        yield return [IncrementalXChaCha20Poly1305.HeaderSize, IncrementalXChaCha20Poly1305.KeySize, IncrementalXChaCha20Poly1305.TagSize, 0, (IncrementalXChaCha20Poly1305.ChunkFlag)4];
     }
 
     [TestMethod]
@@ -175,7 +177,7 @@ public class IncrementalXChaCha20Poly1305Tests
 
     [TestMethod]
     [DynamicData(nameof(InvalidParameterSizes))]
-    public void Encrypt_Decrypt_Invalid(int headerSize, int keySize, int ciphertextSize, int plaintextSize)
+    public void Encrypt_Decrypt_Invalid(int headerSize, int keySize, int ciphertextSize, int plaintextSize, IncrementalXChaCha20Poly1305.ChunkFlag chunkFlag = IncrementalXChaCha20Poly1305.ChunkFlag.Message)
     {
         var h = new byte[headerSize];
         var k = new byte[keySize];
@@ -185,6 +187,10 @@ public class IncrementalXChaCha20Poly1305Tests
         if (headerSize != IncrementalXChaCha20Poly1305.HeaderSize || keySize != IncrementalXChaCha20Poly1305.KeySize) {
             Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new IncrementalXChaCha20Poly1305(h, k, encryption: true));
             Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new IncrementalXChaCha20Poly1305(h, k, encryption: false));
+        }
+        else if (!Enum.IsDefined(chunkFlag)) {
+            using var encryptor = new IncrementalXChaCha20Poly1305(h, k, encryption: true);
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => encryptor.EncryptChunk(c, p, chunkFlag));
         }
         else {
             using var encryptor = new IncrementalXChaCha20Poly1305(h, k, encryption: true);

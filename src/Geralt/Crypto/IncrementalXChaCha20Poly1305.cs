@@ -55,6 +55,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
         if (Interlocked.CompareExchange(ref _encryption, value: 1, comparand: 1) != 1) { throw new InvalidOperationException("Cannot encrypt on a decryption stream."); }
         if (Interlocked.CompareExchange(ref _finalized, value: 1, comparand: 1) != 0) { throw new InvalidOperationException("Cannot encrypt after the final chunk without reinitializing."); }
         Validation.EqualTo($"{nameof(ciphertextChunk)}.{nameof(ciphertextChunk.Length)}", ciphertextChunk.Length, plaintextChunk.Length + TagSize);
+        if (!Enum.IsDefined(chunkFlag)) { throw new ArgumentOutOfRangeException(nameof(chunkFlag), chunkFlag, $"{nameof(chunkFlag)} must be a value within the enum."); }
         int ret = crypto_secretstream_xchacha20poly1305_push(_state, ciphertextChunk, ciphertextChunkLength: out _, plaintextChunk, (ulong)plaintextChunk.Length, associatedData, (ulong)associatedData.Length, (byte)chunkFlag);
         if (ret != 0) { throw new CryptographicException("Error encrypting plaintext chunk."); }
         if (chunkFlag == ChunkFlag.Final) { Interlocked.Exchange(ref _finalized, 1); }

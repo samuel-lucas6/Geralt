@@ -109,6 +109,7 @@ public static class Encodings
     public static int GetToBase64BufferSize(ReadOnlySpan<byte> data, Base64Variant variant = Base64Variant.Original)
     {
         Validation.NotEmpty(nameof(data), data.Length);
+        if (!Enum.IsDefined(variant)) { throw new ArgumentOutOfRangeException(nameof(variant), variant, $"{nameof(variant)} must be a value within the enum."); }
         Sodium.Initialize();
         // Remove the null byte terminator
         return checked((int)sodium_base64_encoded_len((nuint)data.Length, (int)variant) - 1);
@@ -134,6 +135,7 @@ public static class Encodings
     public static int GetFromBase64BufferSize(ReadOnlySpan<char> base64, Base64Variant variant = Base64Variant.Original, ReadOnlySpan<char> ignoreChars = default)
     {
         Validation.NotEmpty(nameof(base64), base64.Length);
+        if (!Enum.IsDefined(variant)) { throw new ArgumentOutOfRangeException(nameof(variant), variant, $"{nameof(variant)} must be a value within the enum."); }
         int lengthMinusIgnoredChars = base64.Length, allAscii = 0;
         foreach (char c in base64) {
             if (ignoreChars.Length != 0 && ignoreChars.Contains(c)) {

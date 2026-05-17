@@ -150,12 +150,15 @@ public class EncodingsTests
     [DataRow(1, 0)]
     [DataRow(4 + 1, 3)]
     [DataRow(4 - 1, 3)]
-    public void ToBase64_Invalid(int base64Size, int dataSize)
+    [DataRow(4, 3, (Encodings.Base64Variant)0)]
+    [DataRow(4, 3, (Encodings.Base64Variant)2)]
+    [DataRow(4, 3, (Encodings.Base64Variant)8)]
+    public void ToBase64_Invalid(int base64Size, int dataSize, Encodings.Base64Variant variant = Encodings.Base64Variant.Original)
     {
         var b = new char[base64Size];
         var d = new byte[dataSize];
 
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Encodings.ToBase64(b, d));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Encodings.ToBase64(b, d, variant));
     }
 
     [TestMethod]
@@ -231,6 +234,9 @@ public class EncodingsTests
     [DataRow(1, "Zg==", Encodings.Base64Variant.Original, "_")]
     [DataRow(1, "Zg==", Encodings.Base64Variant.Original, "=")]
     [DataRow(1, "!", Encodings.Base64Variant.Original, "!")]
+    [DataRow(3, "Zm9v", (Encodings.Base64Variant)0, "")]
+    [DataRow(3, "Zm9v", (Encodings.Base64Variant)2, "")]
+    [DataRow(3, "Zm9v", (Encodings.Base64Variant)8, "")]
     public void FromBase64_Invalid(int dataSize, string? base64, Encodings.Base64Variant variant, string ignoreChars)
     {
         var d = new byte[dataSize];
