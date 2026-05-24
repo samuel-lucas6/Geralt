@@ -8,6 +8,7 @@ public sealed class GuardedHeapAllocation : IDisposable
     public static readonly int MaxSize = Environment.SystemPageSize - CANARY_SIZE;
     private IntPtr _pointer;
     private int _size;
+    private int _locked;
     private int _disposed;
 
     public GuardedHeapAllocation(int size)
@@ -21,29 +22,61 @@ public sealed class GuardedHeapAllocation : IDisposable
 
     public unsafe Span<byte> AsSpan()
     {
-        if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 1) != 0) { throw new ObjectDisposedException(nameof(GuardedHeapAllocation)); }
-        return new Span<byte>((void*)_pointer, _size);
+        if (Interlocked.CompareExchange(ref _locked, value: 1, comparand: 0) != 0) {
+            throw new InvalidOperationException("Cannot retrieve span from multiple threads simultaneously.");
+        }
+        try {
+            if (_disposed != 0) { throw new ObjectDisposedException(nameof(GuardedHeapAllocation)); }
+            return new Span<byte>((void*)_pointer, _size);
+        }
+        finally {
+            Interlocked.Exchange(ref _locked, value: 0);
+        }
     }
 
     public void NoAccess()
     {
-        if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 1) != 0) { throw new ObjectDisposedException(nameof(GuardedHeapAllocation)); }
-        int ret = sodium_mprotect_noaccess(_pointer);
-        if (ret != 0) { throw new InvalidOperationException("Error marking memory as inaccessible."); }
+        if (Interlocked.CompareExchange(ref _locked, value: 1, comparand: 0) != 0) {
+            throw new InvalidOperationException("Cannot mark memory as inaccessible from multiple threads simultaneously.");
+        }
+        try {
+            if (_disposed != 0) { throw new ObjectDisposedException(nameof(GuardedHeapAllocation)); }
+            int ret = sodium_mprotect_noaccess(_pointer);
+            if (ret != 0) { throw new InvalidOperationException("Error marking memory as inaccessible."); }
+        }
+        finally {
+            Interlocked.Exchange(ref _locked, value: 0);
+        }
     }
 
     public void ReadOnly()
     {
-        if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 1) != 0) { throw new ObjectDisposedException(nameof(GuardedHeapAllocation)); }
-        int ret = sodium_mprotect_readonly(_pointer);
-        if (ret != 0) { throw new InvalidOperationException("Error marking memory as read-only."); }
+        if (Interlocked.CompareExchange(ref _locked, value: 1, comparand: 0) != 0) {
+            throw new InvalidOperationException("Cannot mark memory as read-only from multiple threads simultaneously.");
+        }
+        try {
+            if (_disposed != 0) { throw new ObjectDisposedException(nameof(GuardedHeapAllocation)); }
+            int ret = sodium_mprotect_readonly(_pointer);
+            if (ret != 0) { throw new InvalidOperationException("Error marking memory as read-only."); }
+        }
+        finally {
+            Interlocked.Exchange(ref _locked, value: 0);
+        }
     }
 
     public void ReadWrite()
     {
-        if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 1) != 0) { throw new ObjectDisposedException(nameof(GuardedHeapAllocation)); }
-        int ret = sodium_mprotect_readwrite(_pointer);
-        if (ret != 0) { throw new InvalidOperationException("Error marking memory as readable and writable."); }
+        if (Interlocked.CompareExchange(ref _locked, value: 1, comparand: 0) != 0) {
+            throw new InvalidOperationException("Cannot mark memory as readable and writable from multiple threads simultaneously.");
+        }
+        try {
+            if (_disposed != 0) { throw new ObjectDisposedException(nameof(GuardedHeapAllocation)); }
+            int ret = sodium_mprotect_readwrite(_pointer);
+            if (ret != 0) { throw new InvalidOperationException("Error marking memory as readable and writable."); }
+        }
+        finally {
+            Interlocked.Exchange(ref _locked, value: 0);
+        }
     }
 
     public void Dispose()
@@ -54,13 +87,21 @@ public sealed class GuardedHeapAllocation : IDisposable
 
     private void Dispose(bool disposing)
     {
-        // If _disposed is 0, set to 1
-        if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 0) != 0) { return; }
-        if (_pointer != IntPtr.Zero) {
-            // This calls sodium_mprotect_readwrite internally
-            sodium_free(_pointer);
-            _pointer = IntPtr.Zero;
-            _size = 0;
+        if (Interlocked.CompareExchange(ref _locked, value: 1, comparand: 0) != 0) {
+            throw new InvalidOperationException("Cannot dispose when another method is locked.");
+        }
+        try {
+            // Only dispose once
+            if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 0) != 0) { return; }
+            if (_pointer != IntPtr.Zero) {
+                // This calls sodium_mprotect_readwrite internally
+                sodium_free(_pointer);
+                _pointer = IntPtr.Zero;
+                _size = 0;
+            }
+        }
+        finally {
+            Interlocked.Exchange(ref _locked, value: 0);
         }
     }
 

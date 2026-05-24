@@ -12,6 +12,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
     public const int TagSize = crypto_secretstream_xchacha20poly1305_ABYTES;
 
     private unsafe void* _state;
+    private int _locked;
     private int _encryption;
     private int _finalized;
     private int _disposed;
@@ -32,18 +33,26 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
 
     public unsafe void Reinitialize(Span<byte> header, ReadOnlySpan<byte> key, bool encryption)
     {
-        if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 1) != 0) { throw new ObjectDisposedException(nameof(IncrementalXChaCha20Poly1305)); }
-        Validation.EqualTo($"{nameof(header)}.{nameof(header.Length)}", header.Length, HeaderSize);
-        Validation.EqualTo($"{nameof(key)}.{nameof(key.Length)}", key.Length, KeySize);
-        if (_state == null) {
-            _state = NativeMemory.Alloc(crypto_secretstream_xchacha20poly1305_statebytes);
+        if (Interlocked.CompareExchange(ref _locked, value: 1, comparand: 0) != 0) {
+            throw new InvalidOperationException("Cannot reinitialize from multiple threads simultaneously.");
         }
-        int ret = encryption
-            ? crypto_secretstream_xchacha20poly1305_init_push(_state, header, key)
-            : crypto_secretstream_xchacha20poly1305_init_pull(_state, header, key);
-        if (ret != 0) { throw new CryptographicException(encryption ? "Error initializing stream encryption." : "Error initializing stream decryption."); }
-        Interlocked.Exchange(ref _encryption, encryption ? 1 : 0);
-        Interlocked.Exchange(ref _finalized, 0);
+        try {
+            if (_disposed != 0) { throw new ObjectDisposedException(nameof(IncrementalXChaCha20Poly1305)); }
+            Validation.EqualTo($"{nameof(header)}.{nameof(header.Length)}", header.Length, HeaderSize);
+            Validation.EqualTo($"{nameof(key)}.{nameof(key.Length)}", key.Length, KeySize);
+            if (_state == null) {
+                _state = NativeMemory.Alloc(crypto_secretstream_xchacha20poly1305_statebytes);
+            }
+            int ret = encryption
+                ? crypto_secretstream_xchacha20poly1305_init_push(_state, header, key)
+                : crypto_secretstream_xchacha20poly1305_init_pull(_state, header, key);
+            if (ret != 0) { throw new CryptographicException(encryption ? "Error initializing stream encryption." : "Error initializing stream decryption."); }
+            _encryption = encryption ? 1 : 0;
+            _finalized = 0;
+        }
+        finally {
+            Interlocked.Exchange(ref _locked, value: 0);
+        }
     }
 
     public void EncryptChunk(Span<byte> ciphertextChunk, ReadOnlySpan<byte> plaintextChunk, ChunkFlag chunkFlag = ChunkFlag.Message)
@@ -53,34 +62,58 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
 
     public unsafe void EncryptChunk(Span<byte> ciphertextChunk, ReadOnlySpan<byte> plaintextChunk, ReadOnlySpan<byte> associatedData, ChunkFlag chunkFlag = ChunkFlag.Message)
     {
-        if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 1) != 0) { throw new ObjectDisposedException(nameof(IncrementalXChaCha20Poly1305)); }
-        if (Interlocked.CompareExchange(ref _encryption, value: 1, comparand: 1) != 1) { throw new InvalidOperationException("Cannot encrypt on a decryption stream."); }
-        if (Interlocked.CompareExchange(ref _finalized, value: 1, comparand: 1) != 0) { throw new InvalidOperationException("Cannot encrypt after the final chunk without reinitializing."); }
-        Validation.EqualTo($"{nameof(ciphertextChunk)}.{nameof(ciphertextChunk.Length)}", ciphertextChunk.Length, plaintextChunk.Length + TagSize);
-        if (!Enum.IsDefined(chunkFlag)) { throw new ArgumentOutOfRangeException(nameof(chunkFlag), chunkFlag, $"{nameof(chunkFlag)} must be a value within the enum."); }
-        int ret = crypto_secretstream_xchacha20poly1305_push(_state, ciphertextChunk, ciphertextChunkLength: out _, plaintextChunk, (ulong)plaintextChunk.Length, associatedData, (ulong)associatedData.Length, (byte)chunkFlag);
-        if (ret != 0) { throw new CryptographicException("Error encrypting plaintext chunk."); }
-        if (chunkFlag == ChunkFlag.Final) { Interlocked.Exchange(ref _finalized, 1); }
+        if (Interlocked.CompareExchange(ref _locked, value: 1, comparand: 0) != 0) {
+            throw new InvalidOperationException("Cannot encrypt from multiple threads simultaneously.");
+        }
+        try {
+            if (_disposed != 0) { throw new ObjectDisposedException(nameof(IncrementalXChaCha20Poly1305)); }
+            if (_encryption != 1) { throw new InvalidOperationException("Cannot encrypt on a decryption stream."); }
+            if (_finalized != 0) { throw new InvalidOperationException("Cannot encrypt after the final chunk without reinitializing."); }
+            Validation.EqualTo($"{nameof(ciphertextChunk)}.{nameof(ciphertextChunk.Length)}", ciphertextChunk.Length, plaintextChunk.Length + TagSize);
+            if (!Enum.IsDefined(chunkFlag)) { throw new ArgumentOutOfRangeException(nameof(chunkFlag), chunkFlag, $"{nameof(chunkFlag)} must be a value within the enum."); }
+            int ret = crypto_secretstream_xchacha20poly1305_push(_state, ciphertextChunk, ciphertextChunkLength: out _, plaintextChunk, (ulong)plaintextChunk.Length, associatedData, (ulong)associatedData.Length, (byte)chunkFlag);
+            if (ret != 0) { throw new CryptographicException("Error encrypting plaintext chunk."); }
+            if (chunkFlag == ChunkFlag.Final) { _finalized = 1; }
+        }
+        finally {
+            Interlocked.Exchange(ref _locked, value: 0);
+        }
     }
 
     public unsafe ChunkFlag DecryptChunk(Span<byte> plaintextChunk, ReadOnlySpan<byte> ciphertextChunk, ReadOnlySpan<byte> associatedData = default)
     {
-        if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 1) != 0) { throw new ObjectDisposedException(nameof(IncrementalXChaCha20Poly1305)); }
-        if (Interlocked.CompareExchange(ref _encryption, value: 1, comparand: 1) != 0) { throw new InvalidOperationException("Cannot decrypt on an encryption stream."); }
-        if (Interlocked.CompareExchange(ref _finalized, value: 1, comparand: 1) != 0) { throw new InvalidOperationException("Cannot decrypt after the final chunk without reinitializing."); }
-        Validation.GreaterThanOrEqualTo($"{nameof(ciphertextChunk)}.{nameof(ciphertextChunk.Length)}", ciphertextChunk.Length, TagSize);
-        Validation.EqualTo($"{nameof(plaintextChunk)}.{nameof(plaintextChunk.Length)}", plaintextChunk.Length, ciphertextChunk.Length - TagSize);
-        int ret = crypto_secretstream_xchacha20poly1305_pull(_state, plaintextChunk, plaintextChunkLength: out _, out byte chunkFlag, ciphertextChunk, (ulong)ciphertextChunk.Length, associatedData, (ulong)associatedData.Length);
-        if (ret != 0) { throw new CryptographicException("Invalid chunk authentication tag for the given inputs."); }
-        if (chunkFlag == (byte)ChunkFlag.Final) { Interlocked.Exchange(ref _finalized, 1); }
-        return (ChunkFlag)chunkFlag;
+        if (Interlocked.CompareExchange(ref _locked, value: 1, comparand: 0) != 0) {
+            throw new InvalidOperationException("Cannot decrypt from multiple threads simultaneously.");
+        }
+        try {
+            if (_disposed != 0) { throw new ObjectDisposedException(nameof(IncrementalXChaCha20Poly1305)); }
+            if (_encryption != 0) { throw new InvalidOperationException("Cannot decrypt on an encryption stream."); }
+            if (_finalized != 0) { throw new InvalidOperationException("Cannot decrypt after the final chunk without reinitializing."); }
+            Validation.GreaterThanOrEqualTo($"{nameof(ciphertextChunk)}.{nameof(ciphertextChunk.Length)}", ciphertextChunk.Length, TagSize);
+            Validation.EqualTo($"{nameof(plaintextChunk)}.{nameof(plaintextChunk.Length)}", plaintextChunk.Length, ciphertextChunk.Length - TagSize);
+            int ret = crypto_secretstream_xchacha20poly1305_pull(_state, plaintextChunk, plaintextChunkLength: out _, out byte chunkFlag, ciphertextChunk, (ulong)ciphertextChunk.Length, associatedData, (ulong)associatedData.Length);
+            if (ret != 0) { throw new CryptographicException("Invalid chunk authentication tag for the given inputs."); }
+            if (chunkFlag == (byte)ChunkFlag.Final) { _finalized = 1; }
+            return (ChunkFlag)chunkFlag;
+        }
+        finally {
+            Interlocked.Exchange(ref _locked, value: 0);
+        }
     }
 
     public unsafe void Rekey()
     {
-        if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 1) != 0) { throw new ObjectDisposedException(nameof(IncrementalXChaCha20Poly1305)); }
-        if (Interlocked.CompareExchange(ref _finalized, value: 1, comparand: 1) != 0) { throw new InvalidOperationException("Cannot rekey after the final chunk without reinitializing."); }
-        crypto_secretstream_xchacha20poly1305_rekey(_state);
+        if (Interlocked.CompareExchange(ref _locked, value: 1, comparand: 0) != 0) {
+            throw new InvalidOperationException("Cannot rekey from multiple threads simultaneously.");
+        }
+        try {
+            if (_disposed != 0) { throw new ObjectDisposedException(nameof(IncrementalXChaCha20Poly1305)); }
+            if (_finalized != 0) { throw new InvalidOperationException("Cannot rekey after the final chunk without reinitializing."); }
+            crypto_secretstream_xchacha20poly1305_rekey(_state);
+        }
+        finally {
+            Interlocked.Exchange(ref _locked, value: 0);
+        }
     }
 
     public void Dispose()
@@ -92,12 +125,20 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
     private unsafe void Dispose(bool disposing)
     {
-        // If _disposed is 0, set to 1
-        if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 0) != 0) { return; }
-        if (_state != null) {
-            SecureMemory.ZeroMemory(new Span<byte>(_state, crypto_secretstream_xchacha20poly1305_statebytes));
-            NativeMemory.Free(_state);
-            _state = null;
+        if (Interlocked.CompareExchange(ref _locked, value: 1, comparand: 0) != 0) {
+            throw new InvalidOperationException("Cannot dispose when another method is locked.");
+        }
+        try {
+            // Only dispose once
+            if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 0) != 0) { return; }
+            if (_state != null) {
+                SecureMemory.ZeroMemory(new Span<byte>(_state, crypto_secretstream_xchacha20poly1305_statebytes));
+                NativeMemory.Free(_state);
+                _state = null;
+            }
+        }
+        finally {
+            Interlocked.Exchange(ref _locked, value: 0);
         }
     }
 
