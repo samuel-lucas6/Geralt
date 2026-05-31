@@ -87,7 +87,8 @@ public sealed class GuardedHeapAllocation : IDisposable
 
     private void Dispose(bool disposing)
     {
-        if (Interlocked.CompareExchange(ref _locked, value: 1, comparand: 0) != 0) {
+        // Skip for finalizer because finalizers must not throw exceptions
+        if (disposing && Interlocked.CompareExchange(ref _locked, value: 1, comparand: 0) != 0) {
             throw new InvalidOperationException("Cannot dispose when another method is locked.");
         }
         try {
@@ -101,7 +102,9 @@ public sealed class GuardedHeapAllocation : IDisposable
             }
         }
         finally {
-            Interlocked.Exchange(ref _locked, value: 0);
+            if (disposing) {
+                Interlocked.Exchange(ref _locked, value: 0);
+            }
         }
     }
 
