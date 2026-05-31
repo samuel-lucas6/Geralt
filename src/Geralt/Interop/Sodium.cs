@@ -4,51 +4,52 @@ using static Interop.Libsodium;
 
 internal static class Sodium
 {
-    private static int _initialized;
+    private static readonly object InitLock = new();
+    private static bool _initialized;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static void Initialize()
     {
         // Initialize once unless there's an error
-        if (Interlocked.CompareExchange(ref _initialized, value: 1, comparand: 0) != 0) { return; }
-        try {
+        if (!_initialized) {
             Init();
-        }
-        catch {
-            Interlocked.Exchange(ref _initialized, 0);
-            throw;
         }
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static unsafe void Init()
     {
-        try {
-            // libsodium uses a two-tier versioning system:
-            // 1. Point releases (e.g., 1.0.21) - new features/significant changes
-            // 2. Stable releases (e.g., 26.3) - no new features/breaking changes
-            string? pointRelease = Marshal.PtrToStringAnsi(sodium_version_string());
-            if (pointRelease == null) {
-                throw new InvalidOperationException("Unable to retrieve libsodium version.");
+        // Block and exit on second thread (even though libsodium should be thread-safe)
+        lock (InitLock) {
+            if (_initialized) { return; }
+            try {
+                // libsodium uses a two-tier versioning system:
+                // 1. Point releases (e.g., 1.0.21) - new features/significant changes
+                // 2. Stable releases (e.g., 26.3) - no new features/breaking changes
+                string? pointRelease = Marshal.PtrToStringAnsi(sodium_version_string());
+                if (pointRelease == null) {
+                    throw new InvalidOperationException("Unable to retrieve libsodium version.");
+                }
+                if (pointRelease != SODIUM_VERSION_STRING) {
+                    throw new NotSupportedException($"libsodium v{SODIUM_VERSION_STRING} is required for this version of Geralt.");
+                }
+                // If a function is used incorrectly, sodium_misuse() is called to abort the execution
+                // This never happens unless there's a bug in the application/binding (e.g., an output buffer that would cause an overflow)
+                // sodium_set_misuse_handler() defines what to do on a panic
+                if (sodium_set_misuse_handler(&MisuseHandlerError) != 0) {
+                    throw new InvalidOperationException("Unable to set libsodium misuse handler.");
+                }
+                // sodium_init() must be called before any other function
+                // It picks the best implementations for the current platform, initializes the random number generator, and generates the canary for guarded heap allocations
+                // It returns 0 on success, -1 on failure, and 1 if the library has already been initialized
+                if (sodium_init() < 0) {
+                    throw new InvalidOperationException("Unable to initialize libsodium.");
+                }
+                _initialized = true;
             }
-            if (pointRelease != SODIUM_VERSION_STRING) {
-                throw new NotSupportedException($"libsodium v{SODIUM_VERSION_STRING} is required for this version of Geralt.");
+            catch (Exception ex) when (ex is DllNotFoundException or BadImageFormatException) {
+                throw new PlatformNotSupportedException("Unable to access the libsodium shared library file. Geralt may not be supported on this platform, or this machine may be missing the Visual C++ Redistributable on Windows.", ex);
             }
-            // If a function is used incorrectly, sodium_misuse() is called to abort the execution
-            // This never happens unless there's a bug in the application/binding (e.g., an output buffer that would cause an overflow)
-            // sodium_set_misuse_handler() defines what to do on a panic
-            if (sodium_set_misuse_handler(&MisuseHandlerError) != 0) {
-                throw new InvalidOperationException("Unable to set libsodium misuse handler.");
-            }
-            // sodium_init() must be called before any other function
-            // It picks the best implementations for the current platform, initializes the random number generator, and generates the canary for guarded heap allocations
-            // It returns 0 on success, -1 on failure, and 1 if the library has already been initialized
-            if (sodium_init() < 0) {
-                throw new InvalidOperationException("Unable to initialize libsodium.");
-            }
-        }
-        catch (Exception ex) when (ex is DllNotFoundException or BadImageFormatException) {
-            throw new PlatformNotSupportedException("Unable to access the libsodium shared library file. Geralt may not be supported on this platform, or this machine may be missing the Visual C++ Redistributable on Windows.", ex);
         }
     }
 
