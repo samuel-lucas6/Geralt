@@ -89,7 +89,8 @@ public static class Argon2id
     private static void ThrowIfInvalidHashFormat(int allAscii, ReadOnlySpan<byte> hashBytes)
     {
         if (allAscii != 0) { throw new FormatException("Invalid password hash string encoding."); }
-        if (!ConstantTime.IsAllZeros(hashBytes[^1..])) { throw new FormatException("Invalid password hash string termination."); }
+        int firstNullIndex = hashBytes.IndexOf(stackalloc byte[] { 0x00 });
+        if (firstNullIndex == -1 || !ConstantTime.IsAllZeros(hashBytes[firstNullIndex..])) { throw new FormatException("Invalid password hash string termination."); }
         if (!ConstantTime.Equals(hashBytes[..HashPrefix.Length], Encoding.ASCII.GetBytes(HashPrefix))) {
             throw new FormatException("Invalid password hash string prefix.");
         }

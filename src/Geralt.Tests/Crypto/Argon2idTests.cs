@@ -300,6 +300,22 @@ public class Argon2idTests
             "$argon2id$v=19$m=8,t=1,p=1$c29tZXNhbH$AKal+Q",
             ""
         ];
+        // Non-null characters after first null
+        yield return
+        [
+            "$argon2id$v=19$m=4882,t=2,p=1$bA81arsiXysd3WbTRzmEOw$Nm8QBM+7RH1DXo9rvp5cwKEOOOfD2g6JuxlXihoNcpE\0\0test",
+            ""
+        ];
+        yield return
+        [
+            "$argon2id$v=19$m=4882,t=2,p=1$bA81arsiXysd3WbTRzmEOw$Nm8QBM+7RH1DXo9rvp5cwKEOOOfD2g6JuxlXihoNcpE\0test\0",
+            ""
+        ];
+        yield return
+        [
+            "$argon2id$v=19$m=4882,t=2,p=1$bA81arsiXysd3WbTRzmEOw$Nm8QBM+7RH1DXo9rvp5cwKEOOOfD2g6JuxlXihoNcpE\0\0test\0\0",
+            ""
+        ];
         // Max length but not null terminated
         yield return
         [
@@ -444,7 +460,7 @@ public class Argon2idTests
     {
         var p = Encoding.UTF8.GetBytes(password);
 
-        if (!hash.StartsWith("$argon2id$") || hash.Length == Argon2id.HashSize || !hash.All(char.IsAscii)) {
+        if (!hash.StartsWith("$argon2id$") || hash.Length == Argon2id.HashSize || hash.Contains('\0') || !hash.All(char.IsAscii)) {
             Assert.ThrowsExactly<FormatException>(() => Argon2id.VerifyHash(hash, p));
         }
         else {
@@ -478,7 +494,7 @@ public class Argon2idTests
     [DynamicData(nameof(InvalidStringTestVectors))]
     public void NeedsRehash_Invalid(string hash, string password, int iterations = Argon2id.MinIterations, int memorySize = Argon2id.MinMemorySize)
     {
-        if (!hash.StartsWith("$argon2id$") || hash.Length == Argon2id.HashSize || !hash.All(char.IsAscii)) {
+        if (!hash.StartsWith("$argon2id$") || hash.Length == Argon2id.HashSize || hash.Contains('\0') || !hash.All(char.IsAscii)) {
             Assert.ThrowsExactly<FormatException>(() => Argon2id.NeedsRehash(hash, iterations, memorySize));
         }
         else {
