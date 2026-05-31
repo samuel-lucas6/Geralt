@@ -203,6 +203,13 @@ public class IncrementalBLAKE2bTests
         Assert.ThrowsExactly<InvalidOperationException>(() => blake2b.FinalizeAndVerify(h));
         Assert.ThrowsExactly<InvalidOperationException>(() => blake2b.CacheState());
         Assert.ThrowsExactly<InvalidOperationException>(() => blake2b.RestoreCachedState());
+
+        blake2b.Reinitialize(IncrementalBLAKE2b.MinHashSize, k);
+        blake2b.CacheState();
+        blake2b.Reinitialize(IncrementalBLAKE2b.MinHashSize, k);
+        blake2b.RestoreCachedState();
+        blake2b.Reinitialize(IncrementalBLAKE2b.MaxHashSize, k);
+        Assert.ThrowsExactly<InvalidOperationException>(() => blake2b.RestoreCachedState());
     }
 
     [TestMethod]

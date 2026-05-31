@@ -23,6 +23,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
     private unsafe void* _state;
     private unsafe void* _cachedState;
     private int _hashSize;
+    private int _cachedHashSize;
     private int _locked;
     private int _finalized;
     private int _cached;
@@ -137,6 +138,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
             var state = new Span<byte>(_state, crypto_generichash_blake2b_statebytes);
             var cachedState = new Span<byte>(_cachedState, crypto_generichash_blake2b_statebytes);
             state.CopyTo(cachedState);
+            _cachedHashSize = _hashSize;
             _cached = 1;
         }
         finally {
@@ -152,6 +154,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
         try {
             if (_disposed != 0) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
             if (_cached != 1) { throw new InvalidOperationException("Cannot restore the state when it has not been cached."); }
+            if (_cachedHashSize != _hashSize) { throw new InvalidOperationException("Cannot restore the state when the current hash size differs from what was cached."); }
             var cachedState = new Span<byte>(_cachedState, crypto_generichash_blake2b_statebytes);
             var state = new Span<byte>(_state, crypto_generichash_blake2b_statebytes);
             cachedState.CopyTo(state);
