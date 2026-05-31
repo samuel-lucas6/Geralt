@@ -8,11 +8,11 @@ public class SpansTests
     {
         var parameters = new List<byte[]>
         {
-            new byte[] { 0x01, 0x02, 0x03, 0x04 }
+            new byte[] { 0x01 }
         };
 
         for (int i = 0; i < 5; i++) {
-            parameters.Add(parameters[0]);
+            parameters.Add([(byte)(i + 2)]);
             Span<byte> buffer = new byte[parameters.Count * parameters[0].Length];
             Span<byte> expected = new byte[buffer.Length];
             switch (parameters.Count) {
@@ -59,6 +59,64 @@ public class SpansTests
 
             parameters[1] = [0x01, 0x02, 0x03, 0x04];
             buffer = new byte[parameters[1].Length];
+        }
+    }
+
+    [TestMethod]
+    public void Concat_Invalid()
+    {
+        var parameters = new List<byte[]>
+        {
+            new byte[] { 0x01 }
+        };
+
+        for (int i = 0; i < 5; i++) {
+            parameters.Add([(byte)(i + 2)]);
+            var buffer = new byte[parameters.Count * parameters[0].Length];
+            var biggerBuffer = new byte[buffer.Length + 1];
+            var smallerBuffer = new byte[buffer.Length - 1];
+            switch (parameters.Count) {
+                case 2:
+                    Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Spans.Concat(biggerBuffer, parameters[0], parameters[1]));
+                    Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Spans.Concat(smallerBuffer, parameters[0], parameters[1]));
+                    Assert.ThrowsExactly<ArgumentException>(() => Spans.Concat(buffer, buffer.AsSpan()[..(buffer.Length / 2)], parameters[1]));
+                    Assert.ThrowsExactly<ArgumentException>(() => Spans.Concat(buffer, parameters[0], buffer.AsSpan()[..(buffer.Length / 2)]));
+                    break;
+                case 3:
+                    Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Spans.Concat(biggerBuffer, parameters[0], parameters[1], parameters[2]));
+                    Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Spans.Concat(smallerBuffer, parameters[0], parameters[1], parameters[2]));
+                    Assert.ThrowsExactly<ArgumentException>(() => Spans.Concat(buffer, buffer.AsSpan()[..(buffer.Length / 3)], parameters[1], parameters[2]));
+                    Assert.ThrowsExactly<ArgumentException>(() => Spans.Concat(buffer, parameters[0], buffer.AsSpan()[..(buffer.Length / 3)], parameters[2]));
+                    Assert.ThrowsExactly<ArgumentException>(() => Spans.Concat(buffer, parameters[0], parameters[1], buffer.AsSpan()[..(buffer.Length / 3)]));
+                    break;
+                case 4:
+                    Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Spans.Concat(biggerBuffer, parameters[0], parameters[1], parameters[2], parameters[3]));
+                    Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Spans.Concat(smallerBuffer, parameters[0], parameters[1], parameters[2], parameters[3]));
+                    Assert.ThrowsExactly<ArgumentException>(() => Spans.Concat(buffer, buffer.AsSpan()[..(buffer.Length / 4)], parameters[1], parameters[2], parameters[3]));
+                    Assert.ThrowsExactly<ArgumentException>(() => Spans.Concat(buffer, parameters[0], buffer.AsSpan()[..(buffer.Length / 4)], parameters[2], parameters[3]));
+                    Assert.ThrowsExactly<ArgumentException>(() => Spans.Concat(buffer, parameters[0], parameters[1], buffer.AsSpan()[..(buffer.Length / 4)], parameters[3]));
+                    Assert.ThrowsExactly<ArgumentException>(() => Spans.Concat(buffer, parameters[0], parameters[1], parameters[2], buffer.AsSpan()[..(buffer.Length / 4)]));
+                    break;
+                case 5:
+                    Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Spans.Concat(biggerBuffer, parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]));
+                    Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Spans.Concat(smallerBuffer, parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]));
+                    Assert.ThrowsExactly<ArgumentException>(() => Spans.Concat(buffer, buffer.AsSpan()[..(buffer.Length / 5)], parameters[1], parameters[2], parameters[3], parameters[4]));
+                    Assert.ThrowsExactly<ArgumentException>(() => Spans.Concat(buffer, parameters[0], buffer.AsSpan()[..(buffer.Length / 5)], parameters[2], parameters[3], parameters[4]));
+                    Assert.ThrowsExactly<ArgumentException>(() => Spans.Concat(buffer, parameters[0], parameters[1], buffer.AsSpan()[..(buffer.Length / 5)], parameters[3], parameters[4]));
+                    Assert.ThrowsExactly<ArgumentException>(() => Spans.Concat(buffer, parameters[0], parameters[1], parameters[2], buffer.AsSpan()[..(buffer.Length / 5)], parameters[4]));
+                    Assert.ThrowsExactly<ArgumentException>(() => Spans.Concat(buffer, parameters[0], parameters[1], parameters[2], parameters[3], buffer.AsSpan()[..(buffer.Length / 5)]));
+                    break;
+                case 6:
+                    Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Spans.Concat(biggerBuffer, parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], parameters[5]));
+                    Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Spans.Concat(smallerBuffer, parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], parameters[5]));
+                    Assert.ThrowsExactly<ArgumentException>(() => Spans.Concat(buffer, buffer.AsSpan()[..(buffer.Length / 6)], parameters[1], parameters[2], parameters[3], parameters[4], parameters[5]));
+                    Assert.ThrowsExactly<ArgumentException>(() => Spans.Concat(buffer, parameters[0], buffer.AsSpan()[..(buffer.Length / 6)], parameters[2], parameters[3], parameters[4], parameters[5]));
+                    Assert.ThrowsExactly<ArgumentException>(() => Spans.Concat(buffer, parameters[0], parameters[1], buffer.AsSpan()[..(buffer.Length / 6)], parameters[3], parameters[4], parameters[5]));
+                    Assert.ThrowsExactly<ArgumentException>(() => Spans.Concat(buffer, parameters[0], parameters[1], parameters[2], buffer.AsSpan()[..(buffer.Length / 6)], parameters[4], parameters[5]));
+                    Assert.ThrowsExactly<ArgumentException>(() => Spans.Concat(buffer, parameters[0], parameters[1], parameters[2], parameters[3], buffer.AsSpan()[..(buffer.Length / 6)], parameters[5]));
+                    Assert.ThrowsExactly<ArgumentException>(() => Spans.Concat(buffer, parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], buffer.AsSpan()[..(buffer.Length / 6)]));
+                    break;
+            }
         }
     }
 
