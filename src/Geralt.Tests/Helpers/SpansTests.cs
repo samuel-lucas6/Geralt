@@ -8,11 +8,11 @@ public class SpansTests
     {
         var parameters = new List<byte[]>
         {
-            new byte[] { 0x01 }
+            new byte[] { 0x01, 0x02, 0x03, 0x04 }
         };
 
         for (int i = 0; i < 5; i++) {
-            parameters.Add([(byte)(i + 2)]);
+            parameters.Add(parameters[0]);
             Span<byte> buffer = new byte[parameters.Count * parameters[0].Length];
             Span<byte> expected = new byte[buffer.Length];
             switch (parameters.Count) {
@@ -67,11 +67,11 @@ public class SpansTests
     {
         var parameters = new List<byte[]>
         {
-            new byte[] { 0x01 }
+            new byte[] { 0x01, 0x02, 0x03, 0x04 }
         };
 
         for (int i = 0; i < 5; i++) {
-            parameters.Add([(byte)(i + 2)]);
+            parameters.Add(parameters[0]);
             var buffer = new byte[parameters.Count * parameters[0].Length];
             var biggerBuffer = new byte[buffer.Length + 1];
             var smallerBuffer = new byte[buffer.Length - 1];
