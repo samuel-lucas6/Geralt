@@ -65,7 +65,7 @@ public class ConstantTimeTests
     }
 
     [TestMethod]
-    [DataRow(true, "")]
+    [DataRow(true, "00")]
     [DataRow(true, "0000")]
     [DataRow(false, "0001")]
     public void IsAllZeros_Valid(bool expected, string buffer)
@@ -75,6 +75,14 @@ public class ConstantTimeTests
         bool allZeros = ConstantTime.IsAllZeros(b);
 
         Assert.AreEqual(expected, allZeros);
+    }
+
+    [TestMethod]
+    public void IsAllZeros_Invalid()
+    {
+        var b = Array.Empty<byte>();
+
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => ConstantTime.IsAllZeros(b));
     }
 
     [TestMethod]

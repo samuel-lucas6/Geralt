@@ -65,6 +65,7 @@ public static class ConstantTime
 
     public static bool IsAllZeros(ReadOnlySpan<byte> buffer)
     {
+        Validation.NotEmpty(nameof(buffer), buffer.Length);
         Sodium.Initialize();
         return sodium_is_zero(buffer, (nuint)buffer.Length) == 1;
     }
