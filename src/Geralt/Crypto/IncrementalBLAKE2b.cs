@@ -21,7 +21,7 @@ public sealed class IncrementalBLAKE2b : IDisposable
     public const int MaxKeySize = BLAKE2b.MaxKeySize;
 
     internal const int StateSize = crypto_generichash_blake2b_STATEBYTES;
-    internal const int AlignmentSize = crypto_generichash_blake2b_STATEBYTES_CRYPTO_ALIGN;
+    internal const int AlignmentSize = crypto_generichash_blake2b_state_CRYPTO_ALIGN;
 
     private unsafe void* _state;
     private unsafe void* _cachedState;

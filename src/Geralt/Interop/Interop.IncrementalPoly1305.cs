@@ -6,7 +6,7 @@ internal static partial class Interop
     internal static partial class Libsodium
     {
         internal const int crypto_onetimeauth_poly1305_STATEBYTES = 256;
-        internal const int crypto_onetimeauth_poly1305_STATEBYTES_CRYPTO_ALIGN = 16;
+        internal const int crypto_onetimeauth_poly1305_state_CRYPTO_ALIGN = 16;
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]

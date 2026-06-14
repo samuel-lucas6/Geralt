@@ -12,7 +12,7 @@ public sealed class IncrementalPoly1305 : IDisposable
     public const int BlockSize = Poly1305.BlockSize;
 
     internal const int StateSize = crypto_onetimeauth_poly1305_STATEBYTES;
-    internal const int AlignmentSize = crypto_onetimeauth_poly1305_STATEBYTES_CRYPTO_ALIGN;
+    internal const int AlignmentSize = crypto_onetimeauth_poly1305_state_CRYPTO_ALIGN;
 
     private unsafe void* _state;
     private int _locked;
