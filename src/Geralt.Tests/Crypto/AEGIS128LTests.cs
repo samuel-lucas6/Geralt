@@ -61,9 +61,9 @@ public class AEGIS128LTests
     [TestMethod]
     public void Constants_Valid()
     {
-        Assert.AreEqual(16, AEGIS128L.KeySize);
-        Assert.AreEqual(16, AEGIS128L.NonceSize);
-        Assert.AreEqual(32, AEGIS128L.TagSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_aead_aegis128l_keybytes(), AEGIS128L.KeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_aead_aegis128l_npubbytes(), AEGIS128L.NonceSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_aead_aegis128l_abytes(), AEGIS128L.TagSize);
     }
 
     [TestMethod]

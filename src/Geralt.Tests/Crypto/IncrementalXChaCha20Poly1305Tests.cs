@@ -58,10 +58,14 @@ public class IncrementalXChaCha20Poly1305Tests
     [TestMethod]
     public void Constants_Valid()
     {
-        Assert.AreEqual(32, IncrementalXChaCha20Poly1305.KeySize);
-        Assert.AreEqual(24, IncrementalXChaCha20Poly1305.HeaderSize);
-        Assert.AreEqual(17, IncrementalXChaCha20Poly1305.TagSize);
-        Assert.IsTrue(IncrementalXChaCha20Poly1305.StateSize == Interop.Libsodium.crypto_secretstream_xchacha20poly1305_statebytes());
+        Assert.AreEqual((int)Interop.Libsodium.crypto_secretstream_xchacha20poly1305_keybytes(), IncrementalXChaCha20Poly1305.KeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_secretstream_xchacha20poly1305_headerbytes(), IncrementalXChaCha20Poly1305.HeaderSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_secretstream_xchacha20poly1305_abytes(), IncrementalXChaCha20Poly1305.TagSize);
+        Assert.AreEqual(Interop.Libsodium.crypto_secretstream_xchacha20poly1305_tag_message(), (byte)IncrementalXChaCha20Poly1305.ChunkFlag.Message);
+        Assert.AreEqual(Interop.Libsodium.crypto_secretstream_xchacha20poly1305_tag_push(), (byte)IncrementalXChaCha20Poly1305.ChunkFlag.Boundary);
+        Assert.AreEqual(Interop.Libsodium.crypto_secretstream_xchacha20poly1305_tag_rekey(), (byte)IncrementalXChaCha20Poly1305.ChunkFlag.Rekey);
+        Assert.AreEqual(Interop.Libsodium.crypto_secretstream_xchacha20poly1305_tag_final(), (byte)IncrementalXChaCha20Poly1305.ChunkFlag.Final);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_secretstream_xchacha20poly1305_statebytes(), IncrementalXChaCha20Poly1305.StateSize);
     }
 
     [TestMethod]

@@ -5,6 +5,11 @@ internal static partial class Interop
 {
     internal static partial class Libsodium
     {
+        internal const int sodium_base64_VARIANT_ORIGINAL = 1;
+        internal const int sodium_base64_VARIANT_ORIGINAL_NO_PADDING = 3;
+        internal const int sodium_base64_VARIANT_URLSAFE = 5;
+        internal const int sodium_base64_VARIANT_URLSAFE_NO_PADDING = 7;
+
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         internal static partial IntPtr sodium_bin2hex(Span<byte> hex, nuint hexMaxLength, ReadOnlySpan<byte> binary, nuint binaryLength);

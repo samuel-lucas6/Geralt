@@ -6,11 +6,11 @@ public class IncrementalPoly1305Tests
     [TestMethod]
     public void Constants_Valid()
     {
-        Assert.AreEqual(32, IncrementalPoly1305.KeySize);
-        Assert.AreEqual(16, IncrementalPoly1305.TagSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_onetimeauth_poly1305_keybytes(), IncrementalPoly1305.KeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_onetimeauth_poly1305_bytes(), IncrementalPoly1305.TagSize);
         Assert.AreEqual(16, IncrementalPoly1305.BlockSize);
-        Assert.IsTrue(IncrementalPoly1305.StateSize == Interop.Libsodium.crypto_onetimeauth_poly1305_statebytes());
-        Assert.IsTrue(IncrementalPoly1305.AlignmentSize == Interop.Libsodium.crypto_onetimeauth_poly1305_state_CRYPTO_ALIGN);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_onetimeauth_poly1305_statebytes(), IncrementalPoly1305.StateSize);
+        Assert.AreEqual(Interop.Libsodium.crypto_onetimeauth_poly1305_state_CRYPTO_ALIGN, IncrementalPoly1305.AlignmentSize);
     }
 
     [TestMethod]

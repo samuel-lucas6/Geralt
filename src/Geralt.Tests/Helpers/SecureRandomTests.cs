@@ -8,7 +8,7 @@ public class SecureRandomTests
     [TestMethod]
     public void Constants_Valid()
     {
-        Assert.AreEqual(32, SecureRandom.SeedSize);
+        Assert.AreEqual((int)Interop.Libsodium.randombytes_seedbytes(), SecureRandom.SeedSize);
         Assert.AreEqual("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", SecureRandom.AlphabeticChars);
         Assert.AreEqual("0123456789", SecureRandom.NumericChars);
         Assert.AreEqual("!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~", SecureRandom.SymbolChars);

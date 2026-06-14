@@ -6,20 +6,20 @@ public class IncrementalBLAKE2bTests
     [TestMethod]
     public void Constants_Valid()
     {
-        Assert.AreEqual(32, IncrementalBLAKE2b.HashSize);
-        Assert.AreEqual(32, IncrementalBLAKE2b.KeySize);
-        Assert.AreEqual(32, IncrementalBLAKE2b.TagSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_bytes(), IncrementalBLAKE2b.HashSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_keybytes(), IncrementalBLAKE2b.KeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_bytes(), IncrementalBLAKE2b.TagSize);
         Assert.AreEqual(128, IncrementalBLAKE2b.BlockSize);
-        Assert.AreEqual(16, IncrementalBLAKE2b.SaltSize);
-        Assert.AreEqual(16, IncrementalBLAKE2b.PersonalizationSize);
-        Assert.AreEqual(16, IncrementalBLAKE2b.MinHashSize);
-        Assert.AreEqual(64, IncrementalBLAKE2b.MaxHashSize);
-        Assert.AreEqual(16, IncrementalBLAKE2b.MinTagSize);
-        Assert.AreEqual(64, IncrementalBLAKE2b.MaxTagSize);
-        Assert.AreEqual(16, IncrementalBLAKE2b.MinKeySize);
-        Assert.AreEqual(64, IncrementalBLAKE2b.MaxKeySize);
-        Assert.IsTrue(IncrementalBLAKE2b.StateSize == Interop.Libsodium.crypto_generichash_blake2b_statebytes());
-        Assert.IsTrue(IncrementalBLAKE2b.AlignmentSize == Interop.Libsodium.crypto_generichash_blake2b_state_CRYPTO_ALIGN);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_saltbytes(), IncrementalBLAKE2b.SaltSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_personalbytes(), IncrementalBLAKE2b.PersonalizationSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_bytes_min(), IncrementalBLAKE2b.MinHashSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_bytes_max(), IncrementalBLAKE2b.MaxHashSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_bytes_min(), IncrementalBLAKE2b.MinTagSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_bytes_max(), IncrementalBLAKE2b.MaxTagSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_keybytes_min(), IncrementalBLAKE2b.MinKeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_keybytes_max(), IncrementalBLAKE2b.MaxKeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_statebytes(), IncrementalBLAKE2b.StateSize);
+        Assert.AreEqual(Interop.Libsodium.crypto_generichash_blake2b_state_CRYPTO_ALIGN, IncrementalBLAKE2b.AlignmentSize);
     }
 
     [TestMethod]

@@ -16,10 +16,10 @@ public static class Encodings
 
     public enum Base64Variant
     {
-        Original = 1,
-        OriginalNoPadding = 3,
-        Url = 5,
-        UrlNoPadding = 7
+        Original = sodium_base64_VARIANT_ORIGINAL,
+        OriginalNoPadding = sodium_base64_VARIANT_ORIGINAL_NO_PADDING,
+        Url = sodium_base64_VARIANT_URLSAFE,
+        UrlNoPadding = sodium_base64_VARIANT_URLSAFE_NO_PADDING
     }
 
     public static void ToHex(Span<char> hex, ReadOnlySpan<byte> data)

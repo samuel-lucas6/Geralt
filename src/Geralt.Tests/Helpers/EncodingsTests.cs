@@ -45,6 +45,10 @@ public class EncodingsTests
         Assert.AreEqual("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/-_=", Encodings.Base64FullCharacterSet);
         Assert.AreEqual(":- _./,%;", Encodings.HexIgnoreChars);
         Assert.AreEqual(" \r\n", Encodings.Base64IgnoreChars);
+        Assert.AreEqual(Interop.Libsodium.sodium_base64_VARIANT_ORIGINAL, (int)Encodings.Base64Variant.Original);
+        Assert.AreEqual(Interop.Libsodium.sodium_base64_VARIANT_ORIGINAL_NO_PADDING, (int)Encodings.Base64Variant.OriginalNoPadding);
+        Assert.AreEqual(Interop.Libsodium.sodium_base64_VARIANT_URLSAFE, (int)Encodings.Base64Variant.Url);
+        Assert.AreEqual(Interop.Libsodium.sodium_base64_VARIANT_URLSAFE_NO_PADDING, (int)Encodings.Base64Variant.UrlNoPadding);
     }
 
     [TestMethod]

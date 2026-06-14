@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 
 internal static partial class Interop
 {
+    // Unused functions have been omitted
     internal static partial class Libsodium
     {
         internal const int CANARY_SIZE = 16;

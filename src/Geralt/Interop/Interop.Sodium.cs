@@ -3,11 +3,14 @@ using System.Runtime.InteropServices;
 
 internal static partial class Interop
 {
+    // Unused constants/functions have been omitted
     internal static partial class Libsodium
     {
         internal const string SODIUM_VERSION_STRING = "1.0.22";
-        internal const int SODIUM_LIBRARY_VERSION_MAJOR = 26;
-        internal const int SODIUM_LIBRARY_VERSION_MINOR = 4;
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial IntPtr sodium_version_string();
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -16,17 +19,5 @@ internal static partial class Interop
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         internal static unsafe partial int sodium_set_misuse_handler(delegate* unmanaged[Cdecl]<void> handler);
-
-        [LibraryImport(DllName)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial IntPtr sodium_version_string();
-
-        [LibraryImport(DllName)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial int sodium_library_version_major();
-
-        [LibraryImport(DllName)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial int sodium_library_version_minor();
     }
 }

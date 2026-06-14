@@ -6,10 +6,10 @@ public class HChaCha20Tests
     [TestMethod]
     public void Constants_Valid()
     {
-        Assert.AreEqual(32, HChaCha20.OutputSize);
-        Assert.AreEqual(32, HChaCha20.KeySize);
-        Assert.AreEqual(16, HChaCha20.NonceSize);
-        Assert.AreEqual(16, HChaCha20.PersonalizationSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_core_hchacha20_outputbytes(), HChaCha20.OutputSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_core_hchacha20_keybytes(), HChaCha20.KeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_core_hchacha20_inputbytes(), HChaCha20.NonceSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_core_hchacha20_constbytes(), HChaCha20.PersonalizationSize);
     }
 
     [TestMethod]

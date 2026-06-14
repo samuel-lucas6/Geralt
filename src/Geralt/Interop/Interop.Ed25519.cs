@@ -3,12 +3,29 @@ using System.Runtime.InteropServices;
 
 internal static partial class Interop
 {
+    // Unused constants/functions have been omitted
     internal static partial class Libsodium
     {
         internal const int crypto_sign_ed25519_PUBLICKEYBYTES = 32;
         internal const int crypto_sign_ed25519_SECRETKEYBYTES = 64;
         internal const int crypto_sign_ed25519_SEEDBYTES = 32;
         internal const int crypto_sign_ed25519_BYTES = 64;
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial nuint crypto_sign_ed25519_publickeybytes();
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial nuint crypto_sign_ed25519_secretkeybytes();
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial nuint crypto_sign_ed25519_seedbytes();
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial nuint crypto_sign_ed25519_bytes();
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]

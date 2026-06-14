@@ -3,11 +3,24 @@ using System.Runtime.InteropServices;
 
 internal static partial class Interop
 {
+    // Unused constants/functions have been omitted
     internal static partial class Libsodium
     {
         internal const int crypto_aead_aegis256_KEYBYTES = 32;
         internal const int crypto_aead_aegis256_NPUBBYTES = 32;
         internal const int crypto_aead_aegis256_ABYTES = 32;
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial nuint crypto_aead_aegis256_keybytes();
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial nuint crypto_aead_aegis256_npubbytes();
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial nuint crypto_aead_aegis256_abytes();
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]

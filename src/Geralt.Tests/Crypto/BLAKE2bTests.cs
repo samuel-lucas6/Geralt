@@ -274,18 +274,18 @@ public class BLAKE2bTests
     [TestMethod]
     public void Constants_Valid()
     {
-        Assert.AreEqual(32, BLAKE2b.HashSize);
-        Assert.AreEqual(32, BLAKE2b.KeySize);
-        Assert.AreEqual(32, BLAKE2b.TagSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_bytes(), BLAKE2b.HashSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_keybytes(), BLAKE2b.KeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_bytes(), BLAKE2b.TagSize);
         Assert.AreEqual(128, BLAKE2b.BlockSize);
-        Assert.AreEqual(16, BLAKE2b.SaltSize);
-        Assert.AreEqual(16, BLAKE2b.PersonalizationSize);
-        Assert.AreEqual(16, BLAKE2b.MinHashSize);
-        Assert.AreEqual(64, BLAKE2b.MaxHashSize);
-        Assert.AreEqual(16, BLAKE2b.MinTagSize);
-        Assert.AreEqual(64, BLAKE2b.MaxTagSize);
-        Assert.AreEqual(16, BLAKE2b.MinKeySize);
-        Assert.AreEqual(64, BLAKE2b.MaxKeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_saltbytes(), BLAKE2b.SaltSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_personalbytes(), BLAKE2b.PersonalizationSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_bytes_min(), BLAKE2b.MinHashSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_bytes_max(), BLAKE2b.MaxHashSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_bytes_min(), BLAKE2b.MinTagSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_bytes_max(), BLAKE2b.MaxTagSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_keybytes_min(), BLAKE2b.MinKeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_keybytes_max(), BLAKE2b.MaxKeySize);
     }
 
     [TestMethod]

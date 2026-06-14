@@ -5,9 +5,9 @@ namespace Geralt;
 
 public static class ChaCha20Poly1305
 {
-    public const int KeySize = crypto_aead_chacha20poly1305_IETF_KEYBYTES;
-    public const int NonceSize = crypto_aead_chacha20poly1305_IETF_NPUBBYTES;
-    public const int TagSize = crypto_aead_chacha20poly1305_IETF_ABYTES;
+    public const int KeySize = crypto_aead_chacha20poly1305_ietf_KEYBYTES;
+    public const int NonceSize = crypto_aead_chacha20poly1305_ietf_NPUBBYTES;
+    public const int TagSize = crypto_aead_chacha20poly1305_ietf_ABYTES;
 
     public static void Encrypt(Span<byte> ciphertext, ReadOnlySpan<byte> plaintext, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> key, ReadOnlySpan<byte> associatedData = default)
     {

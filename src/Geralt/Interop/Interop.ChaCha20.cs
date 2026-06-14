@@ -3,10 +3,19 @@ using System.Runtime.InteropServices;
 
 internal static partial class Interop
 {
+    // Unused constants/functions have been omitted
     internal static partial class Libsodium
     {
         internal const int crypto_stream_chacha20_ietf_KEYBYTES = 32;
         internal const int crypto_stream_chacha20_ietf_NONCEBYTES = 12;
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial nuint crypto_stream_chacha20_ietf_keybytes();
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial nuint crypto_stream_chacha20_ietf_noncebytes();
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]

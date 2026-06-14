@@ -61,9 +61,9 @@ public class AEGIS256Tests
     [TestMethod]
     public void Constants_Valid()
     {
-        Assert.AreEqual(32, AEGIS256.KeySize);
-        Assert.AreEqual(32, AEGIS256.NonceSize);
-        Assert.AreEqual(32, AEGIS256.TagSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_aead_aegis256_keybytes(), AEGIS256.KeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_aead_aegis256_npubbytes(), AEGIS256.NonceSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_aead_aegis256_abytes(), AEGIS256.TagSize);
     }
 
     [TestMethod]

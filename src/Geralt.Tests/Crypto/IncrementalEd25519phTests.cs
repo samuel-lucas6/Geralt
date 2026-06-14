@@ -17,10 +17,10 @@ public class IncrementalEd25519phTests
     [TestMethod]
     public void Constants_Valid()
     {
-        Assert.AreEqual(32, IncrementalEd25519ph.PublicKeySize);
-        Assert.AreEqual(64, IncrementalEd25519ph.PrivateKeySize);
-        Assert.AreEqual(64, IncrementalEd25519ph.SignatureSize);
-        Assert.IsTrue(IncrementalEd25519ph.StateSize == Interop.Libsodium.crypto_sign_ed25519ph_statebytes());
+        Assert.AreEqual((int)Interop.Libsodium.crypto_sign_ed25519_publickeybytes(), IncrementalEd25519ph.PublicKeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_sign_ed25519_secretkeybytes(), IncrementalEd25519ph.PrivateKeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_sign_ed25519_bytes(), IncrementalEd25519ph.SignatureSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_sign_ed25519ph_statebytes(), IncrementalEd25519ph.StateSize);
     }
 
     [TestMethod]

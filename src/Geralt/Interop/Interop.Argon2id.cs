@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 
 internal static partial class Interop
 {
+    // Unused constants/functions have been omitted
     internal static partial class Libsodium
     {
         internal const int crypto_pwhash_argon2id_BYTES_MIN = 16;
@@ -12,6 +13,34 @@ internal static partial class Interop
         internal const int crypto_pwhash_argon2id_ALG_ARGON2ID13 = 2;
         internal const int crypto_pwhash_argon2id_STRBYTES = 128;
         internal const string crypto_pwhash_argon2id_STRPREFIX = "$argon2id$";
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial nuint crypto_pwhash_argon2id_bytes_min();
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial nuint crypto_pwhash_argon2id_saltbytes();
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial ulong crypto_pwhash_argon2id_opslimit_min();
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial nuint crypto_pwhash_argon2id_memlimit_min();
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial int crypto_pwhash_argon2id_alg_argon2id13();
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial nuint crypto_pwhash_argon2id_strbytes();
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial IntPtr crypto_pwhash_argon2id_strprefix();
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]

@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 
 internal static partial class Interop
 {
+    // Unused constants/functions have been omitted
     internal static partial class Libsodium
     {
         internal const int crypto_secretstream_xchacha20poly1305_KEYBYTES = 32;
@@ -13,6 +14,34 @@ internal static partial class Interop
         internal const byte crypto_secretstream_xchacha20poly1305_TAG_REKEY = 0x02;
         internal const byte crypto_secretstream_xchacha20poly1305_TAG_FINAL = 0x03;
         internal const int crypto_secretstream_xchacha20poly1305_STATEBYTES = 52;
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial nuint crypto_secretstream_xchacha20poly1305_keybytes();
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial nuint crypto_secretstream_xchacha20poly1305_headerbytes();
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial nuint crypto_secretstream_xchacha20poly1305_abytes();
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial byte crypto_secretstream_xchacha20poly1305_tag_message();
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial byte crypto_secretstream_xchacha20poly1305_tag_push();
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial byte crypto_secretstream_xchacha20poly1305_tag_rekey();
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial byte crypto_secretstream_xchacha20poly1305_tag_final();
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]

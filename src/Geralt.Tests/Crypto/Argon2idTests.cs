@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace Geralt.Tests;
 
 [TestClass]
@@ -365,11 +367,13 @@ public class Argon2idTests
     public void Constants_Valid()
     {
         Assert.AreEqual(32, Argon2id.KeySize);
-        Assert.AreEqual(16, Argon2id.SaltSize);
-        Assert.AreEqual(128, Argon2id.HashSize);
-        Assert.AreEqual(16, Argon2id.MinKeySize);
-        Assert.AreEqual(1, Argon2id.MinIterations);
-        Assert.AreEqual(8192, Argon2id.MinMemorySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_pwhash_argon2id_saltbytes(), Argon2id.SaltSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_pwhash_argon2id_strbytes(), Argon2id.HashSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_pwhash_argon2id_bytes_min(), Argon2id.MinKeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_pwhash_argon2id_opslimit_min(), Argon2id.MinIterations);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_pwhash_argon2id_memlimit_min(), Argon2id.MinMemorySize);
+        Assert.AreEqual(Interop.Libsodium.crypto_pwhash_argon2id_alg_argon2id13(), Interop.Libsodium.crypto_pwhash_argon2id_ALG_ARGON2ID13);
+        Assert.AreEqual(Marshal.PtrToStringAnsi(Interop.Libsodium.crypto_pwhash_argon2id_strprefix()), Interop.Libsodium.crypto_pwhash_argon2id_STRPREFIX);
     }
 
     [TestMethod]

@@ -80,8 +80,8 @@ public class Poly1305Tests
     [TestMethod]
     public void Constants_Valid()
     {
-        Assert.AreEqual(32, Poly1305.KeySize);
-        Assert.AreEqual(16, Poly1305.TagSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_onetimeauth_poly1305_keybytes(), Poly1305.KeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_onetimeauth_poly1305_bytes(), Poly1305.TagSize);
         Assert.AreEqual(16, Poly1305.BlockSize);
     }
 

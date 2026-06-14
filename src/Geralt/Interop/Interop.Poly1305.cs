@@ -10,6 +10,14 @@ internal static partial class Interop
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial nuint crypto_onetimeauth_poly1305_keybytes();
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial nuint crypto_onetimeauth_poly1305_bytes();
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         internal static partial int crypto_onetimeauth_poly1305(Span<byte> tag, ReadOnlySpan<byte> message, ulong messageLength, ReadOnlySpan<byte> oneTimeKey);
 
         [LibraryImport(DllName)]

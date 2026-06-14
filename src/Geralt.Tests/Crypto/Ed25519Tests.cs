@@ -99,10 +99,10 @@ public class Ed25519Tests
     [TestMethod]
     public void Constants_Valid()
     {
-        Assert.AreEqual(32, Ed25519.PublicKeySize);
-        Assert.AreEqual(64, Ed25519.PrivateKeySize);
-        Assert.AreEqual(64, Ed25519.SignatureSize);
-        Assert.AreEqual(32, Ed25519.SeedSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_sign_ed25519_publickeybytes(), Ed25519.PublicKeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_sign_ed25519_secretkeybytes(), Ed25519.PrivateKeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_sign_ed25519_bytes(), Ed25519.SignatureSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_sign_ed25519_seedbytes(), Ed25519.SeedSize);
     }
 
     [TestMethod]

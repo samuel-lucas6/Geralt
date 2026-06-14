@@ -38,9 +38,9 @@ public class ChaCha20Poly1305Tests
     [TestMethod]
     public void Constants_Valid()
     {
-        Assert.AreEqual(32, ChaCha20Poly1305.KeySize);
-        Assert.AreEqual(12, ChaCha20Poly1305.NonceSize);
-        Assert.AreEqual(16, ChaCha20Poly1305.TagSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_aead_chacha20poly1305_ietf_keybytes(), ChaCha20Poly1305.KeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_aead_chacha20poly1305_ietf_npubbytes(), ChaCha20Poly1305.NonceSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_aead_chacha20poly1305_ietf_abytes(), ChaCha20Poly1305.TagSize);
     }
 
     [TestMethod]

@@ -197,17 +197,17 @@ public class X25519Tests
     [TestMethod]
     public void Constants_Valid()
     {
-        Assert.AreEqual(32, X25519.PublicKeySize);
-        Assert.AreEqual(32, X25519.PrivateKeySize);
-        Assert.AreEqual(32, X25519.SeedSize);
-        Assert.AreEqual(32, X25519.SharedSecretSize);
-        Assert.AreEqual(32, X25519.SharedKeySize);
-        Assert.AreEqual(16, X25519.MinSharedKeySize);
-        Assert.AreEqual(64, X25519.MaxSharedKeySize);
-        Assert.AreEqual(16, X25519.PersonalizationSize);
-        Assert.AreEqual(32, X25519.PreSharedKeySize);
-        Assert.AreEqual(16, X25519.MinPreSharedKeySize);
-        Assert.AreEqual(64, X25519.MaxPreSharedKeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_kx_publickeybytes(), X25519.PublicKeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_kx_secretkeybytes(), X25519.PrivateKeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_kx_seedbytes(), X25519.SeedSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_scalarmult_curve25519_bytes(), X25519.SharedSecretSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_kx_sessionkeybytes(), X25519.SharedKeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_bytes_min(), X25519.MinSharedKeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_bytes_max(), X25519.MaxSharedKeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_personalbytes(), X25519.PersonalizationSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_keybytes(), X25519.PreSharedKeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_keybytes_min(), X25519.MinPreSharedKeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_generichash_blake2b_keybytes_max(), X25519.MaxPreSharedKeySize);
     }
 
     [TestMethod]

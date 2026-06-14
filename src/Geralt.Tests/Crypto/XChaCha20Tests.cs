@@ -59,8 +59,8 @@ public class XChaCha20Tests
     [TestMethod]
     public void Constants_Valid()
     {
-        Assert.AreEqual(32, XChaCha20.KeySize);
-        Assert.AreEqual(24, XChaCha20.NonceSize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_stream_xchacha20_keybytes(), XChaCha20.KeySize);
+        Assert.AreEqual((int)Interop.Libsodium.crypto_stream_xchacha20_noncebytes(), XChaCha20.NonceSize);
         Assert.AreEqual(64, XChaCha20.BlockSize);
     }
 
