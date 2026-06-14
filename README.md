@@ -8,7 +8,7 @@
 
 - **Simple**: an easy-to-learn API with descriptive naming. Only one algorithm for each task is provided when possible.
 - **Modern**: the latest and greatest cryptographic algorithms, such as AEGIS-128L/AEGIS-256, (X)ChaCha20-Poly1305, BLAKE2b, Argon2id, X25519, and Ed25519.
-- **Secure**: libsodium was [audited](https://www.privateinternetaccess.com/blog/libsodium-audit-results/) in 2017 and is the library of choice for [lots](https://doc.libsodium.org/libsodium_users) of projects and [even](https://doc.libsodium.org/libsodium_users#companies-using-libsodium) large companies. Geralt has also been repeatedly audited, albeit by AI.
+- **Secure**: libsodium was [audited](https://www.privateinternetaccess.com/blog/libsodium-audit-results/) in 2017 and is the library of choice for [lots](https://doc.libsodium.org/libsodium_users) of projects and [even](https://doc.libsodium.org/libsodium_users#companies-using-libsodium) large companies. Geralt has also been [repeatedly audited](https://www.geralt.xyz/#code-audits), albeit by AI.
 - **Fast**: libsodium is [faster](https://monocypher.org/speed) than many other cryptographic libraries. Furthermore, Geralt uses [Span&lt;T&gt;](https://docs.microsoft.com/en-us/archive/msdn-magazine/2017/connect/csharp-all-about-span-exploring-a-new-net-mainstay) buffers to avoid memory allocations.
 
 For more information, please visit these links:
