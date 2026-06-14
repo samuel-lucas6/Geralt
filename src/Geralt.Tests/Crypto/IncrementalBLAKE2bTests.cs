@@ -18,6 +18,8 @@ public class IncrementalBLAKE2bTests
         Assert.AreEqual(64, IncrementalBLAKE2b.MaxTagSize);
         Assert.AreEqual(16, IncrementalBLAKE2b.MinKeySize);
         Assert.AreEqual(64, IncrementalBLAKE2b.MaxKeySize);
+        Assert.IsTrue(IncrementalBLAKE2b.StateSize == Interop.Libsodium.crypto_generichash_blake2b_statebytes());
+        Assert.IsTrue(IncrementalBLAKE2b.AlignmentSize == Interop.Libsodium.crypto_generichash_blake2b_STATEBYTES_CRYPTO_ALIGN);
     }
 
     [TestMethod]

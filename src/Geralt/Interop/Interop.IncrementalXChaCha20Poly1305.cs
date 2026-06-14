@@ -12,7 +12,11 @@ internal static partial class Interop
         internal const byte crypto_secretstream_xchacha20poly1305_TAG_PUSH = 0x01;
         internal const byte crypto_secretstream_xchacha20poly1305_TAG_REKEY = 0x02;
         internal const byte crypto_secretstream_xchacha20poly1305_TAG_FINAL = 0x03;
-        internal const int crypto_secretstream_xchacha20poly1305_statebytes = 52;
+        internal const int crypto_secretstream_xchacha20poly1305_STATEBYTES = 52;
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial nuint crypto_secretstream_xchacha20poly1305_statebytes();
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]

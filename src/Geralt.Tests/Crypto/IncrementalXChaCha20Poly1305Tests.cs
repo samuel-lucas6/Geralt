@@ -61,6 +61,7 @@ public class IncrementalXChaCha20Poly1305Tests
         Assert.AreEqual(32, IncrementalXChaCha20Poly1305.KeySize);
         Assert.AreEqual(24, IncrementalXChaCha20Poly1305.HeaderSize);
         Assert.AreEqual(17, IncrementalXChaCha20Poly1305.TagSize);
+        Assert.IsTrue(IncrementalXChaCha20Poly1305.StateSize == Interop.Libsodium.crypto_secretstream_xchacha20poly1305_statebytes());
     }
 
     [TestMethod]

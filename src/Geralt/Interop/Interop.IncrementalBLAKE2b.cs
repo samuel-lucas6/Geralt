@@ -5,8 +5,12 @@ internal static partial class Interop
 {
     internal static partial class Libsodium
     {
-        internal const int crypto_generichash_blake2b_statebytes = 384;
-        internal const int crypto_generichash_blake2b_statebytes_CRYPTO_ALIGN = 64;
+        internal const int crypto_generichash_blake2b_STATEBYTES = 384;
+        internal const int crypto_generichash_blake2b_STATEBYTES_CRYPTO_ALIGN = 64;
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial nuint crypto_generichash_blake2b_statebytes();
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]

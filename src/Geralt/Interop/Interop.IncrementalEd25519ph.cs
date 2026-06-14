@@ -5,7 +5,11 @@ internal static partial class Interop
 {
     internal static partial class Libsodium
     {
-        internal const int crypto_sign_ed25519ph_statebytes = 208;
+        internal const int crypto_sign_ed25519ph_STATEBYTES = 208;
+
+        [LibraryImport(DllName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        internal static partial nuint crypto_sign_ed25519ph_statebytes();
 
         [LibraryImport(DllName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]

@@ -24,6 +24,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <InternalsVisibleTo Include="Geralt.Tests"/>
+    </ItemGroup>
+
+    <ItemGroup>
         <None Include="Geralt.png">
             <Pack>True</Pack>
             <PackagePath></PackagePath>

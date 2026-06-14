@@ -11,6 +11,8 @@ public sealed class IncrementalEd25519ph : IDisposable
     public const int PrivateKeySize = Ed25519.PrivateKeySize;
     public const int SignatureSize = Ed25519.SignatureSize;
 
+    internal const int StateSize = crypto_sign_ed25519ph_STATEBYTES;
+
     private unsafe void* _state;
     private int _locked;
     private int _finalized;
@@ -30,7 +32,7 @@ public sealed class IncrementalEd25519ph : IDisposable
         try {
             if (_disposed != 0) { throw new ObjectDisposedException(nameof(IncrementalEd25519ph)); }
             if (_state == null) {
-                _state = NativeMemory.Alloc(crypto_sign_ed25519ph_statebytes);
+                _state = NativeMemory.Alloc(StateSize);
             }
             int ret = crypto_sign_ed25519ph_init(_state);
             if (ret != 0) { throw new CryptographicException("Error initializing signature scheme state."); }
@@ -112,7 +114,7 @@ public sealed class IncrementalEd25519ph : IDisposable
             // Only dispose once
             if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 0) != 0) { return; }
             if (_state != null) {
-                SecureMemory.ZeroMemory(new Span<byte>(_state, crypto_sign_ed25519ph_statebytes));
+                SecureMemory.ZeroMemory(new Span<byte>(_state, StateSize));
                 NativeMemory.Free(_state);
                 _state = null;
             }

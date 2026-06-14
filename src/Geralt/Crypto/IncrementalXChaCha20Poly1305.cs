@@ -11,6 +11,8 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
     public const int HeaderSize = crypto_secretstream_xchacha20poly1305_HEADERBYTES;
     public const int TagSize = crypto_secretstream_xchacha20poly1305_ABYTES;
 
+    internal const int StateSize = crypto_secretstream_xchacha20poly1305_STATEBYTES;
+
     private unsafe void* _state;
     private int _locked;
     private int _encryption;
@@ -41,7 +43,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
             Validation.EqualTo($"{nameof(header)}.{nameof(header.Length)}", header.Length, HeaderSize);
             Validation.EqualTo($"{nameof(key)}.{nameof(key.Length)}", key.Length, KeySize);
             if (_state == null) {
-                _state = NativeMemory.Alloc(crypto_secretstream_xchacha20poly1305_statebytes);
+                _state = NativeMemory.Alloc(StateSize);
             }
             int ret = encryption
                 ? crypto_secretstream_xchacha20poly1305_init_push(_state, header, key)
@@ -133,7 +135,7 @@ public sealed class IncrementalXChaCha20Poly1305 : IDisposable
             // Only dispose once
             if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 0) != 0) { return; }
             if (_state != null) {
-                SecureMemory.ZeroMemory(new Span<byte>(_state, crypto_secretstream_xchacha20poly1305_statebytes));
+                SecureMemory.ZeroMemory(new Span<byte>(_state, StateSize));
                 NativeMemory.Free(_state);
                 _state = null;
             }

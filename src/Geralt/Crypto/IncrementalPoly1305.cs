@@ -11,6 +11,9 @@ public sealed class IncrementalPoly1305 : IDisposable
     public const int TagSize = Poly1305.TagSize;
     public const int BlockSize = Poly1305.BlockSize;
 
+    internal const int StateSize = crypto_onetimeauth_poly1305_STATEBYTES;
+    internal const int AlignmentSize = crypto_onetimeauth_poly1305_STATEBYTES_CRYPTO_ALIGN;
+
     private unsafe void* _state;
     private int _locked;
     private int _finalized;
@@ -31,7 +34,7 @@ public sealed class IncrementalPoly1305 : IDisposable
             if (_disposed != 0) { throw new ObjectDisposedException(nameof(IncrementalPoly1305)); }
             Validation.EqualTo($"{nameof(oneTimeKey)}.{nameof(oneTimeKey.Length)}", oneTimeKey.Length, KeySize);
             if (_state == null) {
-                _state = NativeMemory.AlignedAlloc(crypto_onetimeauth_poly1305_statebytes, alignment: crypto_onetimeauth_poly1305_statebytes_CRYPTO_ALIGN);
+                _state = NativeMemory.AlignedAlloc(StateSize, AlignmentSize);
             }
             int ret = crypto_onetimeauth_poly1305_init(_state, oneTimeKey);
             if (ret != 0) { throw new CryptographicException("Error initializing message authentication code state."); }
@@ -122,7 +125,7 @@ public sealed class IncrementalPoly1305 : IDisposable
             // Only dispose once
             if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 0) != 0) { return; }
             if (_state != null) {
-                SecureMemory.ZeroMemory(new Span<byte>(_state, crypto_onetimeauth_poly1305_statebytes));
+                SecureMemory.ZeroMemory(new Span<byte>(_state, StateSize));
                 NativeMemory.AlignedFree(_state);
                 _state = null;
             }

@@ -20,6 +20,9 @@ public sealed class IncrementalBLAKE2b : IDisposable
     public const int MinKeySize = BLAKE2b.MinKeySize;
     public const int MaxKeySize = BLAKE2b.MaxKeySize;
 
+    internal const int StateSize = crypto_generichash_blake2b_STATEBYTES;
+    internal const int AlignmentSize = crypto_generichash_blake2b_STATEBYTES_CRYPTO_ALIGN;
+
     private unsafe void* _state;
     private unsafe void* _cachedState;
     private int _hashSize;
@@ -47,10 +50,10 @@ public sealed class IncrementalBLAKE2b : IDisposable
             if (personalization.Length != 0) { Validation.EqualTo($"{nameof(personalization)}.{nameof(personalization.Length)}", personalization.Length, PersonalizationSize); }
             if (salt.Length != 0) { Validation.EqualTo($"{nameof(salt)}.{nameof(salt.Length)}", salt.Length, SaltSize); }
             if (_state == null) {
-                _state = NativeMemory.AlignedAlloc(crypto_generichash_blake2b_statebytes, alignment: crypto_generichash_blake2b_statebytes_CRYPTO_ALIGN);
+                _state = NativeMemory.AlignedAlloc(StateSize, AlignmentSize);
             }
             if (_cachedState == null) {
-                _cachedState = NativeMemory.AlignedAlloc(crypto_generichash_blake2b_statebytes, alignment: crypto_generichash_blake2b_statebytes_CRYPTO_ALIGN);
+                _cachedState = NativeMemory.AlignedAlloc(StateSize, AlignmentSize);
             }
             int ret = (personalization.Length == 0 && salt.Length == 0)
                 ? crypto_generichash_blake2b_init(_state, key, (nuint)key.Length, (nuint)hashSize)
@@ -135,8 +138,8 @@ public sealed class IncrementalBLAKE2b : IDisposable
         try {
             if (_disposed != 0) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
             if (_finalized != 0) { throw new InvalidOperationException("Cannot cache the state after finalizing without reinitializing."); }
-            var state = new Span<byte>(_state, crypto_generichash_blake2b_statebytes);
-            var cachedState = new Span<byte>(_cachedState, crypto_generichash_blake2b_statebytes);
+            var state = new Span<byte>(_state, StateSize);
+            var cachedState = new Span<byte>(_cachedState, StateSize);
             state.CopyTo(cachedState);
             _cachedHashSize = _hashSize;
             _cached = 1;
@@ -155,8 +158,8 @@ public sealed class IncrementalBLAKE2b : IDisposable
             if (_disposed != 0) { throw new ObjectDisposedException(nameof(IncrementalBLAKE2b)); }
             if (_cached != 1) { throw new InvalidOperationException("Cannot restore the state when it has not been cached."); }
             if (_cachedHashSize != _hashSize) { throw new InvalidOperationException("Cannot restore the state when the current hash size differs from what was cached."); }
-            var cachedState = new Span<byte>(_cachedState, crypto_generichash_blake2b_statebytes);
-            var state = new Span<byte>(_state, crypto_generichash_blake2b_statebytes);
+            var cachedState = new Span<byte>(_cachedState, StateSize);
+            var state = new Span<byte>(_state, StateSize);
             cachedState.CopyTo(state);
             _finalized = 0;
         }
@@ -182,12 +185,12 @@ public sealed class IncrementalBLAKE2b : IDisposable
             // Only dispose once
             if (Interlocked.CompareExchange(ref _disposed, value: 1, comparand: 0) != 0) { return; }
             if (_state != null) {
-                SecureMemory.ZeroMemory(new Span<byte>(_state, crypto_generichash_blake2b_statebytes));
+                SecureMemory.ZeroMemory(new Span<byte>(_state, StateSize));
                 NativeMemory.AlignedFree(_state);
                 _state = null;
             }
             if (_cachedState != null) {
-                SecureMemory.ZeroMemory(new Span<byte>(_cachedState, crypto_generichash_blake2b_statebytes));
+                SecureMemory.ZeroMemory(new Span<byte>(_cachedState, StateSize));
                 NativeMemory.AlignedFree(_cachedState);
                 _cachedState = null;
             }
