@@ -7,6 +7,7 @@ internal static class Sodium
     private static readonly object InitLock = new();
     private static bool _initialized;
 
+    // Avoid method call overhead
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static void Initialize()
     {
