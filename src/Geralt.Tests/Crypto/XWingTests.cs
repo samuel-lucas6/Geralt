@@ -156,8 +156,8 @@ public class XWingTests
     [DynamicData(nameof(KeyPairTestVectors))]
     public void GenerateKeyPair_Seed_Valid(string publicKey, string privateKey, string seed)
     {
-        Span<byte> pk = Convert.FromHexString(publicKey);
-        Span<byte> sk = Convert.FromHexString(privateKey);
+        Span<byte> pk = stackalloc byte[XWing.PublicKeySize];
+        Span<byte> sk = stackalloc byte[XWing.PrivateKeySize];
         Span<byte> s = Convert.FromHexString(seed);
 
         XWing.GenerateKeyPair(pk, sk, s);
