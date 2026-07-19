@@ -10,7 +10,7 @@ public class IncrementalPoly1305Tests
         Assert.AreEqual((int)Interop.Libsodium.crypto_onetimeauth_poly1305_bytes(), IncrementalPoly1305.TagSize);
         Assert.AreEqual(16, IncrementalPoly1305.BlockSize);
         Assert.AreEqual((int)Interop.Libsodium.crypto_onetimeauth_poly1305_statebytes(), IncrementalPoly1305.StateSize);
-        Assert.AreEqual(Interop.Libsodium.crypto_onetimeauth_poly1305_state_CRYPTO_ALIGN, IncrementalPoly1305.AlignmentSize);
+        Assert.AreEqual(16, IncrementalPoly1305.AlignmentSize);
     }
 
     [TestMethod]
