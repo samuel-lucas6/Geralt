@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 internal static partial class Interop
 {
-    // Unused constants/functions have been omitted
+    // Unused functions have been omitted
     internal static partial class Libsodium
     {
         internal const int crypto_kem_xwing_PUBLICKEYBYTES = 1216;
