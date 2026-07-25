@@ -37,7 +37,7 @@ public static class XWing
         Validation.EqualTo($"{nameof(recipientPublicKey)}.{nameof(recipientPublicKey.Length)}", recipientPublicKey.Length, PublicKeySize);
         Sodium.Initialize();
         int ret = crypto_kem_xwing_enc(ciphertext, sharedSecret, recipientPublicKey);
-        if (ret != 0) { throw new CryptographicException("Error encapsulating."); }
+        if (ret != 0) { throw new CryptographicException("Invalid public key."); }
     }
 
     public static void Decapsulate(Span<byte> sharedSecret, ReadOnlySpan<byte> ciphertext, ReadOnlySpan<byte> recipientPrivateKey)
@@ -47,6 +47,6 @@ public static class XWing
         Validation.EqualTo($"{nameof(recipientPrivateKey)}.{nameof(recipientPrivateKey.Length)}", recipientPrivateKey.Length, PrivateKeySize);
         Sodium.Initialize();
         int ret = crypto_kem_xwing_dec(sharedSecret, ciphertext, recipientPrivateKey);
-        if (ret != 0) { throw new CryptographicException("Error decapsulating."); }
+        if (ret != 0) { throw new CryptographicException("Invalid ciphertext."); }
     }
 }
