@@ -12,7 +12,7 @@
         <PackageProjectUrl>https://www.geralt.xyz</PackageProjectUrl>
         <RepositoryUrl>https://github.com/samuel-lucas6/Geralt</RepositoryUrl>
         <PackageReleaseNotes>https://github.com/samuel-lucas6/Geralt/releases</PackageReleaseNotes>
-        <PackageTags>libsodium cryptography crypto security aegis-128l aegis-256 chacha20-poly1305 xchacha20-poly1305 blake2b argon2id x25519 curve25519 x-wing ml-kem-768 ed25519 ed25519ph keccak-f1600 chacha20 xchacha20 hchacha20 poly1305 secretstream secure-random secure-memory guarded-heap-allocations constant-time hex base64 padding</PackageTags>
+        <PackageTags>libsodium cryptography crypto security aegis-128l aegis-256 chacha20-poly1305 xchacha20-poly1305 blake2b argon2id x25519 curve25519 x-wing ml-kem-768 ed25519 ed25519ph keccak-f1600 chacha20 xchacha20 hchacha20 poly1305 secretstream secure-random secure-memory guarded-heap-allocations constant-time hex base64 padding iso78164-padding padme padme-padding</PackageTags>
         <PackageIcon>Geralt.png</PackageIcon>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <ImplicitUsings>enable</ImplicitUsings>
