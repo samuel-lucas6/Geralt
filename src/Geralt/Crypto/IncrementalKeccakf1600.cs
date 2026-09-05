@@ -12,6 +12,8 @@ namespace Geralt;
 public sealed class IncrementalKeccakf1600 : IDisposable
 {
     public const int StateSize = 200;
+    public const int MinOffset = 0;
+    public const int MaxOffset = StateSize - 1;
 
     internal const int InternalStateSize = crypto_core_keccak1600_STATEBYTES;
     internal const int AlignmentSize = crypto_core_keccak1600_state_CRYPTO_ALIGN;
@@ -43,14 +45,14 @@ public sealed class IncrementalKeccakf1600 : IDisposable
         }
     }
 
-    public unsafe void XorBytes(ReadOnlySpan<byte> bytes, int offset = 0)
+    public unsafe void XorBytes(ReadOnlySpan<byte> bytes, int offset = MinOffset)
     {
         if (Interlocked.CompareExchange(ref _locked, value: 1, comparand: 0) != 0) {
             throw new InvalidOperationException("Cannot XOR bytes from multiple threads simultaneously.");
         }
         try {
             if (_disposed != 0) { throw new ObjectDisposedException(nameof(IncrementalKeccakf1600)); }
-            Validation.BetweenOrEqualTo($"{nameof(offset)}", offset, 0, StateSize - 1);
+            Validation.BetweenOrEqualTo($"{nameof(offset)}", offset, MinOffset, MaxOffset);
             Validation.LessThanOrEqualTo($"{nameof(bytes)}.{nameof(bytes.Length)} + {nameof(offset)}", bytes.Length + offset, StateSize);
             crypto_core_keccak1600_xor_bytes(_state, bytes, (nuint)offset, (nuint)bytes.Length);
         }
@@ -59,14 +61,14 @@ public sealed class IncrementalKeccakf1600 : IDisposable
         }
     }
 
-    public unsafe void ExtractBytes(Span<byte> bytes, int offset = 0)
+    public unsafe void ExtractBytes(Span<byte> bytes, int offset = MinOffset)
     {
         if (Interlocked.CompareExchange(ref _locked, value: 1, comparand: 0) != 0) {
             throw new InvalidOperationException("Cannot extract bytes from multiple threads simultaneously.");
         }
         try {
             if (_disposed != 0) { throw new ObjectDisposedException(nameof(IncrementalKeccakf1600)); }
-            Validation.BetweenOrEqualTo($"{nameof(offset)}", offset, 0, StateSize - 1);
+            Validation.BetweenOrEqualTo($"{nameof(offset)}", offset, MinOffset, MaxOffset);
             Validation.LessThanOrEqualTo($"{nameof(bytes)}.{nameof(bytes.Length)} + {nameof(offset)}", bytes.Length + offset, StateSize);
             crypto_core_keccak1600_extract_bytes(_state, bytes, (nuint)offset, (nuint)bytes.Length);
         }

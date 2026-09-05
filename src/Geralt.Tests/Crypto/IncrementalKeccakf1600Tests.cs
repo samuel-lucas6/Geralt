@@ -126,6 +126,8 @@ public class IncrementalKeccakf1600Tests
     public void Constants_Valid()
     {
         Assert.AreEqual(200, IncrementalKeccakf1600.StateSize);
+        Assert.AreEqual(0, IncrementalKeccakf1600.MinOffset);
+        Assert.AreEqual(199, IncrementalKeccakf1600.MaxOffset);
         Assert.AreEqual((int)Interop.Libsodium.crypto_core_keccak1600_statebytes(), IncrementalKeccakf1600.InternalStateSize);
         Assert.AreEqual(16, IncrementalKeccakf1600.AlignmentSize);
     }
@@ -156,10 +158,10 @@ public class IncrementalKeccakf1600Tests
     }
 
     [TestMethod]
-    [DataRow(0, -1)]
-    [DataRow(0, IncrementalKeccakf1600.StateSize)]
-    [DataRow(IncrementalKeccakf1600.StateSize + 1, 0)]
-    [DataRow(2, IncrementalKeccakf1600.StateSize - 1)]
+    [DataRow(0, IncrementalKeccakf1600.MinOffset - 1)]
+    [DataRow(0, IncrementalKeccakf1600.MaxOffset + 1)]
+    [DataRow(IncrementalKeccakf1600.StateSize + 1, IncrementalKeccakf1600.MinOffset)]
+    [DataRow(2, IncrementalKeccakf1600.MaxOffset)]
     public void Incremental_Invalid(int bytesSize, int offset)
     {
         var b = new byte[bytesSize];
